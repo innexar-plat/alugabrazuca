@@ -1,0 +1,76 @@
+/* ================================================================== */
+/* BrasilQuartos — Design Tokens                                      */
+/* Mudar ESTAS variáveis muda a plataforma INTEIRA.                   */
+/* Nunca usar cores hex diretamente em componentes.                   */
+/* ================================================================== */
+
+:root {
+  /* --- Primary (Verde Esmeralda) --- */
+  --primary: 160 84% 39%;
+  --primary-foreground: 0 0% 100%;
+
+  /* --- Accent (Dourado/Amber) --- */
+  --accent: 43 96% 56%;
+  --accent-foreground: 0 0% 0%;
+
+  /* --- Background & Surface --- */
+  --background: 0 0% 98%;
+  --foreground: 0 0% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 10%;
+
+  /* --- Muted --- */
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+
+  /* --- Border & Input --- */
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --ring: 160 84% 39%;
+
+  /* --- Destructive --- */
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  /* --- Semantic --- */
+  --success: 142 71% 45%;
+  --warning: 43 96% 56%;
+  --info: 217 91% 60%;
+
+  /* --- Radius --- */
+  --radius: 0.5rem;
+}
+
+.dark {
+  /* --- Primary (mais claro no dark) --- */
+  --primary: 160 84% 55%;
+  --primary-foreground: 0 0% 0%;
+
+  /* --- Accent --- */
+  --accent: 43 96% 56%;
+  --accent-foreground: 0 0% 0%;
+
+  /* --- Background & Surface --- */
+  --background: 0 0% 4%;
+  --foreground: 0 0% 95%;
+  --card: 0 0% 7%;
+  --card-foreground: 0 0% 95%;
+
+  /* --- Muted --- */
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 64%;
+
+  /* --- Border & Input --- */
+  --border: 0 0% 20%;
+  --input: 0 0% 20%;
+  --ring: 160 84% 55%;
+
+  /* --- Destructive --- */
+  --destructive: 0 62% 50%;
+  --destructive-foreground: 0 0% 100%;
+
+  /* --- Semantic --- */
+  --success: 142 71% 50%;
+  --warning: 43 96% 60%;
+  --info: 217 91% 65%;
+}

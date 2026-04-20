@@ -1,0 +1,472 @@
+// BrasilQuartos — Prisma Schema
+// Este schema cresce módulo a módulo.
+// M1: Auth & Perfil
+// M2: Listing (Anúncio de Quarto)
+// M5: Inquiries (Solicitações de Contato)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ─────────────────────────────────────────────────────────
+
+enum UserRole {
+  tenant
+  host
+  admin
+}
+
+enum UserStatus {
+  active
+  suspended
+  banned
+}
+
+enum AuthProvider {
+  email
+  google
+}
+
+enum Locale {
+  pt
+  en
+  es
+}
+
+// ─── M2: Listing Enums ────────────────────────────────────────────
+
+enum PropertyType {
+  house
+  apartment
+  condo
+  townhouse
+  studio
+  other
+}
+
+enum ListingType {
+  private_room
+  shared_room
+  entire_place
+}
+
+enum ListingStatus {
+  draft
+  pending_review
+  active
+  paused
+  rejected
+  expired
+  rented
+}
+
+enum RoomSize {
+  small
+  medium
+  large
+  extra_large
+}
+
+enum BedType {
+  single
+  double
+  queen
+  king
+  bunk_bed
+  sofa_bed
+  mattress_only
+  no_bed
+}
+
+enum BathroomType {
+  private_ensuite
+  private_not_ensuite
+  shared
+}
+
+enum KitchenAccess {
+  full
+  limited
+  scheduled
+  none
+}
+
+enum LaundryAccess {
+  in_unit
+  in_building
+  nearby
+  none
+}
+
+enum ParkingType {
+  included
+  available_paid
+  street
+  none
+}
+
+enum PetPolicy {
+  yes
+  small_only
+  cats_only
+  dogs_only
+  no
+}
+
+enum SmokingPolicy {
+  yes
+  outside_only
+  no
+}
+
+enum VisitorPolicy {
+  anytime
+  daytime_only
+  with_notice
+  no_overnight
+  no
+}
+
+enum Currency {
+  USD
+  EUR
+  GBP
+}
+
+// ─── Users ─────────────────────────────────────────────────────────
+
+model User {
+  id             String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  firstName      String     @map("first_name") @db.VarChar(50)
+  lastName       String     @map("last_name") @db.VarChar(50)
+  displayName    String?    @map("display_name") @db.VarChar(100)
+  email          String     @unique @db.VarChar(255)
+  passwordHash   String?    @map("password_hash") @db.VarChar(255)
+  phone          String?    @db.VarChar(20)
+  whatsapp       String?    @db.VarChar(20)
+  avatarUrl      String?    @map("avatar_url") @db.VarChar(500)
+  bio            String?    @db.Text
+  nationality    String?    @db.VarChar(50)
+  languages      String[]   @default([])
+  currentCity    String?    @map("current_city") @db.VarChar(100)
+  currentCountry String?    @map("current_country") @db.VarChar(100)
+  preferredLang  Locale     @default(pt) @map("preferred_lang")
+  role           UserRole   @default(tenant)
+  status         UserStatus @default(active)
+  isVerified     Boolean    @default(false) @map("is_verified")
+  emailVerified  Boolean    @default(false) @map("email_verified")
+  provider       AuthProvider @default(email)
+  providerId     String?    @map("provider_id") @db.VarChar(255)
+  lastLoginAt    DateTime?  @map("last_login_at")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+  deletedAt      DateTime?  @map("deleted_at")
+
+  refreshTokens  RefreshToken[]
+  passwordResets PasswordReset[]
+  listings       Listing[]
+  sentInquiries  Inquiry[]      @relation("InquiryTenant")
+  hostInquiries  Inquiry[]      @relation("InquiryHost")
+
+  @@map("users")
+}
+
+// ─── Refresh Tokens ────────────────────────────────────────────────
+
+model RefreshToken {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  tokenHash String   @map("token_hash") @db.VarChar(255)
+  expiresAt DateTime @map("expires_at")
+  isRevoked Boolean  @default(false) @map("is_revoked")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("refresh_tokens")
+}
+
+// ─── Password Resets ───────────────────────────────────────────────
+
+model PasswordReset {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @map("token_hash") @db.VarChar(255)
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tokenHash])
+  @@map("password_resets")
+}
+
+// ─── Login Attempts ────────────────────────────────────────────────
+
+model LoginAttempt {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email     String   @db.VarChar(255)
+  ipAddress String   @map("ip_address") @db.VarChar(45)
+  success   Boolean
+  userAgent String?  @map("user_agent") @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([email, createdAt])
+  @@map("login_attempts")
+}
+
+// ─── Listings (M2) ─────────────────────────────────────────────────
+
+model Listing {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  hostId          String        @map("host_id") @db.Uuid
+  title           String        @db.VarChar(120)
+  description     String        @db.Text
+  propertyType    PropertyType  @map("property_type")
+  listingType     ListingType   @map("listing_type")
+  status          ListingStatus @default(draft)
+
+  // ── Location ──
+  country            String  @db.VarChar(50)
+  state              String  @db.VarChar(50)
+  city               String  @db.VarChar(100)
+  neighborhood       String? @db.VarChar(100)
+  zipCode            String  @map("zip_code") @db.VarChar(20)
+  streetAddress      String  @map("street_address") @db.VarChar(255)
+  latitude           Decimal? @db.Decimal(10, 7)
+  longitude          Decimal? @db.Decimal(10, 7)
+  nearbyLocations    String[] @default([]) @map("nearby_locations")
+  publicTransport    String?  @map("public_transport") @db.VarChar(255)
+  distanceToDowntown String?  @map("distance_to_downtown") @db.VarChar(50)
+
+  // ── Room ──
+  roomSize         RoomSize @map("room_size")
+  roomSizeSqft     Int?     @map("room_size_sqft")
+  floorLevel       Int?     @map("floor_level")
+  hasWindow        Boolean  @map("has_window")
+  hasCloset        Boolean  @map("has_closet")
+  hasLock          Boolean  @map("has_lock")
+  isFurnished      Boolean  @map("is_furnished")
+  naturalLight     String?  @map("natural_light") @db.VarChar(10)
+  bedType          BedType  @map("bed_type")
+  bedCount         Int      @default(1) @map("bed_count")
+  bedsheetsProvided Boolean @default(false) @map("bedsheets_provided")
+  roomFurniture    String[] @default([]) @map("room_furniture")
+
+  // ── Bathroom ──
+  bathroomType     BathroomType @map("bathroom_type")
+  bathroomCount    Int?         @map("bathroom_count")
+  sharedWithCount  Int?         @map("shared_with_count")
+  hasBathtub       Boolean      @default(false) @map("has_bathtub")
+  hasShower        Boolean      @default(true) @map("has_shower")
+  hasBidet         Boolean      @default(false) @map("has_bidet")
+  hotWater         String?      @map("hot_water") @db.VarChar(20)
+  towelsProvided   Boolean      @default(false) @map("towels_provided")
+
+  // ── Kitchen ──
+  kitchenAccess       KitchenAccess @map("kitchen_access")
+  kitchenSchedule     String?       @map("kitchen_schedule") @db.VarChar(100)
+  kitchenAppliances   String[]      @default([]) @map("kitchen_appliances")
+  hasOwnCabinetSpace  Boolean       @default(false) @map("has_own_cabinet_space")
+  hasOwnFridgeSpace   Boolean       @default(false) @map("has_own_fridge_space")
+
+  // ── Laundry ──
+  laundryAccess      LaundryAccess @map("laundry_access")
+  laundryFrequency   String?       @map("laundry_frequency") @db.VarChar(20)
+  laundryCost        String?       @map("laundry_cost") @db.VarChar(20)
+  laundryCostAmount  Decimal?      @map("laundry_cost_amount") @db.Decimal(10, 2)
+  hasDryer           Boolean       @default(false) @map("has_dryer")
+  hasIron            Boolean       @default(false) @map("has_iron")
+
+  // ── Living & Parking ──
+  livingRoomAccess   Boolean     @default(false) @map("living_room_access")
+  livingRoomShared   Boolean     @default(true) @map("living_room_shared")
+  parkingType        ParkingType @map("parking_type")
+  parkingCost        Decimal?    @map("parking_cost") @db.Decimal(10, 2)
+  parkingSpaces      Int?        @map("parking_spaces")
+
+  // ── Outdoor ──
+  hasBackyard Boolean @default(false) @map("has_backyard")
+  hasPatio    Boolean @default(false) @map("has_patio")
+  hasBalcony  Boolean @default(false) @map("has_balcony")
+  hasPool     Boolean @default(false) @map("has_pool")
+  hasBBQArea  Boolean @default(false) @map("has_bbq_area")
+
+  // ── Amenities ──
+  amenities String[] @default([])
+
+  // ── Price ──
+  pricePerMonth     Decimal     @map("price_per_month") @db.Decimal(10, 2)
+  currency          Currency    @default(USD)
+  securityDeposit   Decimal?    @map("security_deposit") @db.Decimal(10, 2)
+  depositMonths     Decimal?    @map("deposit_months") @db.Decimal(3, 1)
+  utilitiesIncluded Boolean     @map("utilities_included")
+  utilitiesEstimate Decimal?    @map("utilities_estimate") @db.Decimal(10, 2)
+  utilitiesDetails  String?     @map("utilities_details") @db.Text
+  internetIncluded  Boolean     @map("internet_included")
+  minimumStay       Int         @default(1) @map("minimum_stay")
+  maximumStay       Int?        @map("maximum_stay")
+  availableFrom     DateTime    @map("available_from") @db.Date
+  availableTo       DateTime?   @map("available_to") @db.Date
+  paymentMethods    String[]    @default([]) @map("payment_methods")
+  priceNegotiable   Boolean     @default(false) @map("price_negotiable")
+
+  // ── House Rules ──
+  allowsPets        PetPolicy     @map("allows_pets")
+  petDeposit        Decimal?      @map("pet_deposit") @db.Decimal(10, 2)
+  allowsSmoking     SmokingPolicy @map("allows_smoking")
+  allowsCouples     Boolean       @map("allows_couples")
+  coupleExtraCharge Decimal?      @map("couple_extra_charge") @db.Decimal(10, 2)
+  allowsChildren    Boolean       @map("allows_children")
+  allowsVisitors    VisitorPolicy @map("allows_visitors")
+  quietHours        String?       @map("quiet_hours") @db.VarChar(50)
+  maxOccupants      Int           @default(1) @map("max_occupants")
+  additionalRules   String?       @map("additional_rules") @db.Text
+
+  // ── Tenant Preferences ──
+  preferredGender     String? @map("preferred_gender") @db.VarChar(10)
+  preferredAge        String? @map("preferred_age") @db.VarChar(20)
+  preferredOccupation String? @map("preferred_occupation") @db.VarChar(20)
+  lgbtFriendly        Boolean @default(true) @map("lgbt_friendly")
+  prefersBrazilian    Boolean @default(false) @map("prefers_brazilian")
+
+  // ── Housing Info ──
+  totalRooms           Int     @map("total_rooms")
+  totalBathrooms       Int     @map("total_bathrooms")
+  currentOccupants     Int     @map("current_occupants")
+  occupantsGender      String? @map("occupants_gender") @db.VarChar(10)
+  occupantsDescription String? @map("occupants_description") @db.VarChar(255)
+  hostLivesIn          Boolean @map("host_lives_in")
+  hasContract          Boolean @map("has_contract")
+  contractType         String? @map("contract_type") @db.VarChar(30)
+
+  // ── Media ──
+  videoUrl        String? @map("video_url") @db.VarChar(500)
+  virtualTourUrl  String? @map("virtual_tour_url") @db.VarChar(500)
+  coverPhotoIndex Int     @default(0) @map("cover_photo_index")
+
+  // ── Engagement (cache counters) ──
+  viewCount     Int @default(0) @map("view_count")
+  favoriteCount Int @default(0) @map("favorite_count")
+  inquiryCount  Int @default(0) @map("inquiry_count")
+
+  // ── Boost / Featured ──
+  isFeatured    Boolean   @default(false) @map("is_featured")
+  featuredUntil DateTime? @map("featured_until")
+
+  // ── Admin ──
+  rejectionReason String?   @map("rejection_reason") @db.Text
+  reviewedBy      String?   @map("reviewed_by") @db.Uuid
+  reviewedAt      DateTime? @map("reviewed_at")
+
+  // ── Timestamps ──
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // ── Relations ──
+  host   User           @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  photos ListingPhoto[]
+  inquiries Inquiry[]
+
+  @@index([hostId])
+  @@index([status])
+  @@index([city, status])
+  @@index([country, city, status])
+  @@index([pricePerMonth])
+  @@index([availableFrom])
+  @@index([createdAt])
+  @@map("listings")
+}
+
+// ─── Listing Photos (M2) ──────────────────────────────────────────
+
+model ListingPhoto {
+  id           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  listingId    String  @map("listing_id") @db.Uuid
+  url          String  @db.VarChar(500)
+  thumbnailUrl String  @map("thumbnail_url") @db.VarChar(500)
+  caption      String? @db.VarChar(200)
+  sortOrder    Int     @default(0) @map("sort_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+  @@map("listing_photos")
+}
+
+// ─── M4: Landing — Contact Messages ────────────────────────────────
+
+model ContactMessage {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String   @db.VarChar(100)
+  email     String   @db.VarChar(255)
+  subject   String   @db.VarChar(200)
+  message   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("contact_messages")
+}
+
+// ─── M5: Inquiries (Solicitações de Contato) ───────────────────────
+
+enum InquiryType {
+  visit
+  info
+  apply
+}
+
+enum InquiryStatus {
+  pending
+  accepted
+  rejected
+  expired
+  cancelled
+  completed
+}
+
+model Inquiry {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  listingId       String        @map("listing_id") @db.Uuid
+  tenantId        String        @map("tenant_id") @db.Uuid
+  hostId          String        @map("host_id") @db.Uuid
+  type            InquiryType
+  status          InquiryStatus @default(pending)
+  message         String        @db.Text
+  moveInDate      DateTime?     @map("move_in_date") @db.Date
+  stayDuration    Int?          @map("stay_duration")
+  occupants       Int           @default(1)
+  hasPets         Boolean       @default(false) @map("has_pets")
+  petDetails      String?       @map("pet_details") @db.VarChar(255)
+  occupation      String?       @db.VarChar(100)
+  aboutMe         String?       @map("about_me") @db.Text
+  hostReply       String?       @map("host_reply") @db.Text
+  rejectionReason String?       @map("rejection_reason") @db.Text
+  acceptedAt      DateTime?     @map("accepted_at")
+  rejectedAt      DateTime?     @map("rejected_at")
+  expiredAt       DateTime?     @map("expired_at")
+  cancelledAt     DateTime?     @map("cancelled_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  tenant  User    @relation("InquiryTenant", fields: [tenantId], references: [id], onDelete: Cascade)
+  host    User    @relation("InquiryHost", fields: [hostId], references: [id], onDelete: Cascade)
+
+  @@unique([listingId, tenantId])
+  @@index([listingId])
+  @@index([tenantId])
+  @@index([hostId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("inquiries")
+}

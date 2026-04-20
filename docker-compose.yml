@@ -1,0 +1,95 @@
+# Docker Compose — Desenvolvimento Local
+# Sobe apenas os serviços de infraestrutura (DB, Redis, MinIO).
+# Frontend e backend rodam local com hot reload.
+#
+# Uso:
+#   docker compose up -d        → sobe tudo
+#   docker compose down         → para tudo
+#   docker compose down -v      → para tudo e apaga volumes (dados)
+
+services:
+  # --------------------------------------------------------------------------
+  # PostgreSQL 16
+  # --------------------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: alugabrazuca-db
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-alugabrazuca}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_in_production}
+      POSTGRES_DB: ${POSTGRES_DB:-alugabrazuca_dev}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-alugabrazuca} -d ${POSTGRES_DB:-alugabrazuca_dev}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --------------------------------------------------------------------------
+  # Redis 7
+  # --------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: alugabrazuca-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --------------------------------------------------------------------------
+  # MinIO — Storage S3-compatible
+  # --------------------------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    container_name: brasilquartos-minio
+    restart: unless-stopped
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --------------------------------------------------------------------------
+  # MinIO — Criar bucket automaticamente no startup
+  # --------------------------------------------------------------------------
+  minio-setup:
+    image: minio/mc:latest
+    container_name: alugabrazuca-minio-setup
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 $${MINIO_ROOT_USER:-minioadmin} $${MINIO_ROOT_PASSWORD:-minioadmin};
+      mc mb local/$${MINIO_BUCKET:-alugabrazuca-media} --ignore-existing;
+      mc anonymous set download local/$${MINIO_BUCKET:-alugabrazuca-media}/public;
+      echo 'Bucket criado com sucesso!';
+      exit 0;
+      "
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  minio_data:
+    driver: local
