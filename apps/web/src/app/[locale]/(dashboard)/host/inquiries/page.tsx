@@ -56,7 +56,6 @@ export default function HostInquiriesPage() {
 
   useEffect(() => {
     loadInquiries();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function loadInquiries(page = 1) {

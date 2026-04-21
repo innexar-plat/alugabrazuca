@@ -249,10 +249,9 @@ export default function CreateListingPage() {
   // ── Submit handlers ──
 
   function buildPayload(data: ListingFormData): Record<string, unknown> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { photos, ...rest } = data;
     const payload: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(rest)) {
+    for (const [key, value] of Object.entries(data)) {
+      if (key === "photos") continue;
       if (value === null || value === undefined) continue;
       if (typeof value === "string" && value === "") continue;
       if (Array.isArray(value) && value.length === 0) continue;
