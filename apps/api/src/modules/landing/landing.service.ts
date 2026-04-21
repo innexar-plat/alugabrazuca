@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { ListingStatus, UserStatus } from '@prisma/client';
-import { ContactDto } from './dto/contact.dto';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { ListingStatus, UserStatus } from "@prisma/client";
+import { ContactDto } from "./dto/contact.dto";
 
 @Injectable()
 export class LandingService {
@@ -30,7 +30,7 @@ export class LandingService {
         availableFrom: true,
         createdAt: true,
         photos: {
-          orderBy: { sortOrder: 'asc' },
+          orderBy: { sortOrder: "asc" },
           take: 1,
           select: { url: true, thumbnailUrl: true },
         },
@@ -42,7 +42,7 @@ export class LandingService {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: 8,
     });
 
@@ -70,7 +70,7 @@ export class LandingService {
           availableFrom: true,
           createdAt: true,
           photos: {
-            orderBy: { sortOrder: 'asc' },
+            orderBy: { sortOrder: "asc" },
             take: 1,
             select: { url: true, thumbnailUrl: true },
           },
@@ -82,7 +82,7 @@ export class LandingService {
             },
           },
         },
-        orderBy: [{ viewCount: 'desc' }, { createdAt: 'desc' }],
+        orderBy: [{ viewCount: "desc" }, { createdAt: "desc" }],
         take: 8 - listings.length,
       });
       listings.push(...additional);
@@ -93,13 +93,13 @@ export class LandingService {
 
   async getCities() {
     const cities = await this.prisma.listing.groupBy({
-      by: ['country', 'state', 'city'],
+      by: ["country", "state", "city"],
       where: {
         status: ListingStatus.active,
         deletedAt: null,
       },
       _count: { id: true },
-      orderBy: { _count: { id: 'desc' } },
+      orderBy: { _count: { id: "desc" } },
       take: 8,
     });
 
@@ -120,9 +120,9 @@ export class LandingService {
           where: { status: ListingStatus.active, deletedAt: null },
         }),
         this.prisma.listing.groupBy({
-          by: ['city'],
+          by: ["city"],
           where: { status: ListingStatus.active, deletedAt: null },
-          orderBy: { city: 'asc' },
+          orderBy: { city: "asc" },
         }),
         this.prisma.user.count({
           where: { status: UserStatus.active, deletedAt: null },
@@ -145,27 +145,27 @@ export class LandingService {
     return {
       data: [
         {
-          id: '1',
-          name: 'Ana Silva',
-          city: 'Orlando, FL',
+          id: "1",
+          name: "Ana Silva",
+          city: "Orlando, FL",
           avatarUrl: null,
-          text: 'testimonial_1',
+          text: "testimonial_1",
           rating: 5,
         },
         {
-          id: '2',
-          name: 'Carlos Santos',
-          city: 'Newark, NJ',
+          id: "2",
+          name: "Carlos Santos",
+          city: "Newark, NJ",
           avatarUrl: null,
-          text: 'testimonial_2',
+          text: "testimonial_2",
           rating: 5,
         },
         {
-          id: '3',
-          name: 'Juliana Costa',
-          city: 'Lisboa, PT',
+          id: "3",
+          name: "Juliana Costa",
+          city: "Lisboa, PT",
           avatarUrl: null,
-          text: 'testimonial_3',
+          text: "testimonial_3",
           rating: 4,
         },
       ],
@@ -182,6 +182,6 @@ export class LandingService {
       },
     });
 
-    return { message: 'Message sent successfully' };
+    return { message: "Message sent successfully" };
   }
 }

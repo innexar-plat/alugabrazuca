@@ -2,7 +2,7 @@
 
 ## Why Psychological Safety Matters
 
-Research in *Empirical Software Engineering* found that **psychological safety directly advances teams' ability to pursue software quality**. When developers feel safe:
+Research in _Empirical Software Engineering_ found that **psychological safety directly advances teams' ability to pursue software quality**. When developers feel safe:
 
 - They speak up about potential issues more freely
 - They debate solutions constructively
@@ -15,12 +15,14 @@ Research in *Empirical Software Engineering* found that **psychological safety d
 ### 1. Focus on Code, Not People
 
 **BAD: Bad**:
+
 - "You wrote this wrong"
 - "Why didn't you know about this pattern?"
 - "This is sloppy work"
 - "You always miss edge cases"
 
 **GOOD: Good**:
+
 - "This approach might lead to X issue. Consider Y instead"
 - "This pattern might help here: [example]"
 - "Let's add handling for this edge case: [specific case]"
@@ -29,12 +31,14 @@ Research in *Empirical Software Engineering* found that **psychological safety d
 ### 2. Ask Questions, Don't Command
 
 **BAD: Bad**:
+
 - "Change this to use X pattern"
 - "Fix this immediately"
 - "This needs to be refactored"
 - "Use Y library instead"
 
 **GOOD: Good**:
+
 - "Have you considered using X pattern? It might help with [specific benefit]"
 - "What do you think about refactoring this to improve [specific aspect]?"
 - "Could we use Y library here? I've found it helpful for [reason]"
@@ -43,12 +47,14 @@ Research in *Empirical Software Engineering* found that **psychological safety d
 ### 3. Explain the "Why"
 
 **BAD: Bad**:
+
 - "Don't do this"
 - "Use parameterized queries"
 - "This is wrong"
 - "Needs error handling"
 
 **GOOD: Good**:
+
 - "This creates a SQL injection vulnerability because user input goes directly into the query. Use parameterized queries to prevent this"
 - "REQUIRED: Add error handling here. If the API call fails, the app will crash without user feedback"
 - "This approach might cause memory leaks because event listeners aren't cleaned up. Consider using cleanup functions"
@@ -151,11 +157,13 @@ Great work on [specific aspect]!
 Instead of telling someone what's wrong, guide them to discover it:
 
 **BAD: Directive**:
+
 ```
 This function is too complex. Extract the validation logic.
 ```
 
 **GOOD: Collaborative**:
+
 ```
 QUESTION: I'm finding this function a bit hard to follow. What do you
 think about extracting the validation logic into a helper? It might
@@ -173,11 +181,13 @@ to be together?
 Present options rather than mandates:
 
 **BAD: Single directive**:
+
 ```
 Use Zod for validation here.
 ```
 
 **GOOD: Multiple options**:
+
 ```
 SUGGESTION: For type-safe validation, we have a few options:
 
@@ -194,11 +204,13 @@ option 1 might give us the most consistency. What do you think?
 Recognize that there may be good reasons for current approach:
 
 **BAD: Assuming**:
+
 ```
 This should use async/await instead of promises.
 ```
 
 **GOOD: Acknowledging**:
+
 ```
 QUESTION: I notice this uses promise chains instead of async/await.
 Is there a specific reason for this choice? I'm wondering if
@@ -211,24 +223,28 @@ be missing a constraint.
 ### When You Disagree with an Approach
 
 **Step 1**: Understand their reasoning
+
 ```
 QUESTION: Can you help me understand the reasoning behind [decision]?
 I want to make sure I'm considering all the factors you considered.
 ```
 
 **Step 2**: Present your concern
+
 ```
 I see your point about [their reasoning]. My concern is that
 [specific issue] might occur because [explanation].
 ```
 
 **Step 3**: Suggest alternatives
+
 ```
 Would [alternative approach] address both concerns? It would
 [solve your issue] while also [addressing my concern].
 ```
 
 **Step 4**: Escalate if needed (for critical issues only)
+
 ```
 This is a critical concern because [impact]. Can we get input
 from [senior engineer/architect] before proceeding? I want to
@@ -238,18 +254,21 @@ make sure we're making the best decision here.
 ### When Someone Disagrees with Your Feedback
 
 **Listen and reconsider**:
+
 ```
 That's a good point about [their reasoning]. I hadn't considered
 [aspect]. Given that, my suggestion might not be the best fit here.
 ```
 
 **Find middle ground**:
+
 ```
 I see what you mean about [their point]. What if we [compromise
 solution] that addresses both [your concern] and [their concern]?
 ```
 
 **Agree to disagree on non-critical items**:
+
 ```
 I understand your perspective. Since this is a SUGGESTION and not
 REQUIRED, let's go with your approach. We can revisit if issues arise.
@@ -258,9 +277,11 @@ REQUIRED, let's go with your approach. We can revisit if issues arise.
 ## Anti-Patterns to Avoid
 
 ### 1. Bikeshedding
+
 Spending disproportionate time on trivial issues:
 
 **BAD: Bad**:
+
 ```
 Use single quotes instead of double quotes here (20 comments about quote style)
 This color should be #FF0000 not #FF0001
@@ -268,15 +289,18 @@ Rename `data` to `responseData` (when naming is already clear)
 ```
 
 **GOOD: Good**:
+
 ```
 Focus on: logic errors, security issues, performance problems, architectural concerns
 Let automated tools handle: formatting, style, trivial naming
 ```
 
 ### 2. Nitpicking Without Impact
+
 Pointing out issues that don't actually matter:
 
 **BAD: Bad**:
+
 ```
 This function is 51 lines, it should be 50 maximum.
 You could save 2 bytes by using ++ instead of += 1.
@@ -284,6 +308,7 @@ This comment could be more concise.
 ```
 
 **GOOD: Good**:
+
 ```
 This function handles 4 different responsibilities. Consider
 extracting the validation logic and error handling into separate
@@ -291,9 +316,11 @@ functions to improve testability.
 ```
 
 ### 3. Vague Criticism
+
 Feedback without actionable guidance:
 
 **BAD: Bad**:
+
 ```
 This doesn't look right.
 This is not best practice.
@@ -302,6 +329,7 @@ There's a problem here.
 ```
 
 **GOOD: Good**:
+
 ```
 This approach might cause race conditions when multiple users
 update the same record. Consider using optimistic locking with
@@ -309,9 +337,11 @@ a version field.
 ```
 
 ### 4. "Just" Language
+
 Minimizing the work required:
 
 **BAD: Bad**:
+
 ```
 Just refactor this.
 Just add tests.
@@ -320,6 +350,7 @@ Why don't you just rewrite it?
 ```
 
 **GOOD: Good**:
+
 ```
 This refactoring would improve maintainability. It would involve:
 1. Extracting the validation logic
@@ -330,9 +361,11 @@ Estimated effort: 2-3 hours. Worth it for this critical path?
 ```
 
 ### 5. Approval Without Review
+
 Rubber-stamping without actually reading:
 
 **BAD: Bad**:
+
 ```
 LGTM (on a 800-line PR reviewed in 30 seconds)
 Looks good! (no specific feedback, no questions)
@@ -340,6 +373,7 @@ Ship it! (clear issues visible in the code)
 ```
 
 **GOOD: Good**:
+
 ```
 Reviewed focused on [specific areas]. Here's what I found:
 
@@ -354,6 +388,7 @@ Overall looks solid after addressing the REQUIRED items.
 ## Cultural Practices
 
 ### 1. Normalize Learning
+
 ```
 "I learned something new from this PR - thanks for introducing
 me to [pattern/library/technique]!"
@@ -366,6 +401,7 @@ this pattern for future use."
 ```
 
 ### 2. Celebrate Good Code
+
 ```
 PRAISE: This error handling is exemplary. The detailed logging,
 graceful fallback, and user-friendly error messages make this
@@ -377,6 +413,7 @@ bugs down the line.
 ```
 
 ### 3. Share Context
+
 ```
 "For context: We had a similar issue in [other project] where
 [problem] occurred. That's why I'm suggesting [alternative]."
@@ -386,6 +423,7 @@ last architecture review. See [link to decision]."
 ```
 
 ### 4. Welcome Questions
+
 ```
 "Great question! Let me explain why we use this pattern..."
 
@@ -398,16 +436,19 @@ the reasoning..."
 ## Review Etiquette
 
 ### Timing
+
 - Review within 24 hours of request
 - Provide initial feedback even if review isn't complete
 - Communicate if you can't review within expected timeframe
 
 ### Response
+
 - Respond to author's questions promptly
 - Re-review updated code in a timely manner
 - Approve promptly when REQUIRED items are addressed
 
 ### Tone
+
 - Assume positive intent
 - Be respectful and professional
 - Use emoji thoughtfully ([OK] [FAIL] [TIP]) but don't overdo it
@@ -415,7 +456,7 @@ the reasoning..."
 
 ## Example: Full Review with Psychological Safety
 
-```
+````
 ## Summary
 This PR adds user authentication to the API. The core logic is solid,
 and I appreciate the comprehensive test coverage. A few required
@@ -442,25 +483,29 @@ Solution: Use bcrypt with salt for password hashing:
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const hashedPassword = await bcrypt.hash(password, saltRounds);
-```
+````
 
 ### 2. SQL Injection Prevention
+
 REQUIRED: Line 89 - String concatenation in SQL query
 
 Current:
+
 ```javascript
 const query = `SELECT * FROM users WHERE email = '${email}'`;
 ```
 
 This allows SQL injection attacks. Use parameterized queries:
+
 ```javascript
-const query = 'SELECT * FROM users WHERE email = ?';
+const query = "SELECT * FROM users WHERE email = ?";
 const results = await db.query(query, [email]);
 ```
 
 ## Suggestions
 
 ### 1. Token Expiration
+
 SUGGESTION: Consider adding token expiration
 
 Current tokens never expire, which increases risk if compromised.
@@ -470,14 +515,16 @@ This is optional for now but we should add it before production.
 What do you think about implementing this in a follow-up PR?
 
 ### 2. Rate Limiting
+
 SUGGESTION: Add rate limiting to login endpoint
 
 This would prevent brute-force attacks. We could use express-rate-limit:
+
 ```javascript
-const rateLimit = require('express-rate-limit');
+const rateLimit = require("express-rate-limit");
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5 // limit each IP to 5 requests per windowMs
+  max: 5, // limit each IP to 5 requests per windowMs
 });
 ```
 
@@ -498,6 +545,7 @@ you have questions about implementing the bcrypt or parameterized
 queries.
 
 Thanks for the thorough work on this!
+
 ```
 
 ## Resources
@@ -506,3 +554,4 @@ Thanks for the thorough work on this!
 - **Google**: "How to Do a Code Review" (engineering practices guide)
 - **Microsoft**: "Code Review Best Practices" (Azure DevOps documentation)
 - **Book**: "The Fearless Organization" by Amy Edmondson
+```

@@ -35,6 +35,7 @@ const moonPhase = useMemo(() => calculateMoonPhase(new Date()), []);
 ```
 
 **Rule**: Use `useState(null) + useEffect` for ANY computation depending on:
+
 - `new Date()` (timezone-dependent)
 - `localStorage` / `sessionStorage` (not available on server)
 - `window.*` properties (navigator, screen, location)
@@ -49,19 +50,26 @@ JavaScript evaluates function arguments BEFORE the function body executes. Passi
 ```typescript
 // FAIL: localStorage is evaluated at the CALL SITE, before try/catch
 function safeGet(storage: Storage, key: string) {
-  try { return storage.getItem(key); } // too late — already threw
-  catch { return null; }
+  try {
+    return storage.getItem(key);
+  } catch {
+    // too late — already threw
+    return null;
+  }
 }
-safeGet(localStorage, 'theme'); // SecurityError in Firefox (cookies disabled)
+safeGet(localStorage, "theme"); // SecurityError in Firefox (cookies disabled)
 
 // PASS: String discriminator — storage access inside try/catch
-function safeGet(type: 'local' | 'session', key: string) {
+function safeGet(type: "local" | "session", key: string) {
   try {
-    const storage = type === 'local' ? window.localStorage : window.sessionStorage;
+    const storage =
+      type === "local" ? window.localStorage : window.sessionStorage;
     return storage.getItem(key);
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
-safeGet('local', 'theme'); // Safe — never throws
+safeGet("local", "theme"); // Safe — never throws
 ```
 
 ---
@@ -97,7 +105,9 @@ let data;
 try {
   data = await response.json();
 } catch {
-  throw new Error('Invalid JSON response — server may have returned an error page');
+  throw new Error(
+    "Invalid JSON response — server may have returned an error page",
+  );
 }
 ```
 
@@ -121,11 +131,13 @@ const items = Array.isArray(data.transits) ? data.transits : [];
 ## 6. Turbopack + macOS File Descriptor Limit
 
 macOS default ulimit (~256) is too low for Turbopack in large Next.js projects. Causes:
+
 - `EMFILE: too many open files` errors
 - `build-manifest.json` ENOENT panics
 - Stale chunk loading failures in browser
 
 Fix:
+
 ```bash
 # Add to ~/.zshrc or ~/.bashrc
 ulimit -n 10240
@@ -141,6 +153,7 @@ ulimit -n 10240
 ## 7. Procedural Generation over External Assets (WebGL)
 
 For WebGL/Three.js visuals, procedural generation (GLSL shaders) is more robust than external texture files:
+
 - No 404 errors from missing textures
 - No sandbox/CORS issues
 - No loading states or error cascades

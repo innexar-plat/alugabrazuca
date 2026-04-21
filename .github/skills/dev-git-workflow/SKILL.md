@@ -19,18 +19,17 @@ Use this skill to choose a branching model, standardize PR discipline, enforce c
 
 ## Quick Reference
 
-| Task | Tool/Command | When to Use | Reference |
-|------|-------------|-------------|-----------|
-| Create feature branch | `git switch -c feat/name main` | Start new work | [Branching Strategies](references/branching-strategies.md) |
-| Create feature worktree | `git worktree add .worktrees/feature -b feature/name` | Isolate one feature per agent/branch | [AI Agent Worktrees](references/ai-agent-worktrees.md) |
-| Squash WIP commits | `git rebase -i HEAD~3` | Clean up before PR | [Interactive Rebase](references/interactive-rebase-guide.md) |
-| Conventional commit | `git commit -m "feat: add feature"` | All commits | [Commit Conventions](references/commit-conventions.md) |
-| Force push safely | `git push --force-with-lease` | After rebase | [Common Mistakes](references/common-mistakes.md) |
-| Resolve conflicts | `git mergetool` | Merge conflicts | [Conflict Resolution](references/conflict-resolution.md) |
-| Create stacked PRs | `gt create stack-name` (Graphite) | Large features | [Stacked Diffs](references/stacked-diffs-guide.md) |
-| Auto-generate changelog | `npx standard-version` | Before release | [Release Management](references/release-management.md) |
-| Run quality gates | GitHub Actions / GitLab CI | Every PR | [Automated Quality Gates](references/automated-quality-gates.md) |
-
+| Task                    | Tool/Command                                          | When to Use                          | Reference                                                        |
+| ----------------------- | ----------------------------------------------------- | ------------------------------------ | ---------------------------------------------------------------- |
+| Create feature branch   | `git switch -c feat/name main`                        | Start new work                       | [Branching Strategies](references/branching-strategies.md)       |
+| Create feature worktree | `git worktree add .worktrees/feature -b feature/name` | Isolate one feature per agent/branch | [AI Agent Worktrees](references/ai-agent-worktrees.md)           |
+| Squash WIP commits      | `git rebase -i HEAD~3`                                | Clean up before PR                   | [Interactive Rebase](references/interactive-rebase-guide.md)     |
+| Conventional commit     | `git commit -m "feat: add feature"`                   | All commits                          | [Commit Conventions](references/commit-conventions.md)           |
+| Force push safely       | `git push --force-with-lease`                         | After rebase                         | [Common Mistakes](references/common-mistakes.md)                 |
+| Resolve conflicts       | `git mergetool`                                       | Merge conflicts                      | [Conflict Resolution](references/conflict-resolution.md)         |
+| Create stacked PRs      | `gt create stack-name` (Graphite)                     | Large features                       | [Stacked Diffs](references/stacked-diffs-guide.md)               |
+| Auto-generate changelog | `npx standard-version`                                | Before release                       | [Release Management](references/release-management.md)           |
+| Run quality gates       | GitHub Actions / GitLab CI                            | Every PR                             | [Automated Quality Gates](references/automated-quality-gates.md) |
 
 ## AI Agent Feature Loop
 
@@ -69,24 +68,28 @@ If repository scripts exist (for example `scripts/git/feature-workflow.sh`), use
 Use this quick sequence to avoid common local Git blockers during agent-driven work.
 
 1. Working tree cleanliness:
+
 - `git status --porcelain`
 - If non-empty, decide explicitly: commit, stash, or abort branch switch.
 
 2. Lock/process check:
+
 - If Git commands fail with `index.lock`, check running Git processes first:
   - `test -f .git/index.lock && ps aux | rg "[g]it"`
 - Remove stale lock only after confirming no active Git process.
 
 3. Branch switch guard:
+
 - Do not `checkout`/`switch` when local changes would be overwritten.
 - Commit/stash intentionally; avoid accidental context loss.
 
 4. Merge conflict protocol:
+
 - On conflict, stop new edits, resolve conflict file-by-file, rerun relevant tests, then complete merge commit.
 
 5. Automation note:
-- For recurring branch operations, prefer project scripts/worktrees over ad-hoc local branch juggling.
 
+- For recurring branch operations, prefer project scripts/worktrees over ad-hoc local branch juggling.
 
 ## Decision Tree: Choosing Branching Strategy
 
@@ -273,24 +276,24 @@ Team characteristics -> What's your situation?
 
 ### When to Use Each Branching Strategy
 
-| Requirement | GitHub Flow | Trunk-Based | GitFlow |
-|-------------|-------------|-------------|---------|
-| Continuous deployment | [OK] Best | [OK] Best | [FAIL] Poor |
-| Scheduled releases | [WARNING] OK | [WARNING] OK | [OK] Best |
-| Multiple versions | [FAIL] Poor | [FAIL] Poor | [OK] Best |
-| Small team (< 5) | [OK] Best | [WARNING] OK | [FAIL] Overkill |
-| Large team (> 15) | [WARNING] OK | [OK] Best | [WARNING] OK |
-| Fast iteration | [OK] Best | [OK] Best | [FAIL] Poor |
+| Requirement           | GitHub Flow  | Trunk-Based  | GitFlow         |
+| --------------------- | ------------ | ------------ | --------------- |
+| Continuous deployment | [OK] Best    | [OK] Best    | [FAIL] Poor     |
+| Scheduled releases    | [WARNING] OK | [WARNING] OK | [OK] Best       |
+| Multiple versions     | [FAIL] Poor  | [FAIL] Poor  | [OK] Best       |
+| Small team (< 5)      | [OK] Best    | [WARNING] OK | [FAIL] Overkill |
+| Large team (> 15)     | [WARNING] OK | [OK] Best    | [WARNING] OK    |
+| Fast iteration        | [OK] Best    | [OK] Best    | [FAIL] Poor     |
 
 ### PR Size vs Review Time
 
-| LOC | Review Time | Bug Detection | Recommendation |
-|-----|-------------|---------------|----------------|
-| < 50 | < 10 min | High | [OK] Ideal for hotfixes |
-| 50-200 | 10-30 min | High | [OK] Ideal for features |
-| 200-400 | 30-60 min | Medium-High | [OK] Acceptable |
-| 400-1000 | 1-2 hours | Medium | [WARNING] Consider splitting |
-| > 1000 | > 2 hours | Low | [FAIL] Always split |
+| LOC      | Review Time | Bug Detection | Recommendation               |
+| -------- | ----------- | ------------- | ---------------------------- |
+| < 50     | < 10 min    | High          | [OK] Ideal for hotfixes      |
+| 50-200   | 10-30 min   | High          | [OK] Ideal for features      |
+| 200-400  | 30-60 min   | Medium-High   | [OK] Acceptable              |
+| 400-1000 | 1-2 hours   | Medium        | [WARNING] Consider splitting |
+| > 1000   | > 2 hours   | Low           | [FAIL] Always split          |
 
 ## Do / Avoid
 
@@ -318,15 +321,15 @@ Team characteristics -> What's your situation?
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|--------------|---------|-----|
-| **Long-lived branches** | Merge conflicts, stale code | Trunk-based, short branches |
-| **Unreviewed merges** | Bugs reach production | Branch protection rules |
-| **Rebasing main** | History corruption | Never rebase public branches |
-| **1000+ LOC PRs** | Poor review quality | Stacked diffs, split PRs |
-| **"fix" commits** | Unclear history | Conventional commits |
-| **No CI gates** | Broken main | Required status checks |
-| **Secrets in history** | Security breach | Pre-commit hooks, gitleaks |
+| Anti-Pattern            | Problem                     | Fix                          |
+| ----------------------- | --------------------------- | ---------------------------- |
+| **Long-lived branches** | Merge conflicts, stale code | Trunk-based, short branches  |
+| **Unreviewed merges**   | Bugs reach production       | Branch protection rules      |
+| **Rebasing main**       | History corruption          | Never rebase public branches |
+| **1000+ LOC PRs**       | Poor review quality         | Stacked diffs, split PRs     |
+| **"fix" commits**       | Unclear history             | Conventional commits         |
+| **No CI gates**         | Broken main                 | Required status checks       |
+| **Secrets in history**  | Security breach             | Pre-commit hooks, gitleaks   |
 
 ## Repository Baseline (Security + Reliability)
 

@@ -71,9 +71,12 @@ This enables attacks like phishing, same-origin bypass, CSRF, and more.
 
 ```javascript
 // Good: Strict CSP for SVG serving routes
-app.use('/uploads/svg', (req, res, next) => {
-  res.setHeader('Content-Security-Policy', "script-src 'none'; style-src 'none'");
-  res.setHeader('X-Content-Type-Options', 'nosniff');
+app.use("/uploads/svg", (req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "script-src 'none'; style-src 'none'",
+  );
+  res.setHeader("X-Content-Type-Options", "nosniff");
   next();
 });
 ```
@@ -85,35 +88,70 @@ app.use('/uploads/svg', (req, res, next) => {
 ```javascript
 // Good: Whitelist-based SVG sanitization
 const sanitizeSvg = (svgContent) => {
-  const DOMPurify = require('isomorphic-dompurify');
+  const DOMPurify = require("isomorphic-dompurify");
 
   const clean = DOMPurify.sanitize(svgContent, {
     USE_PROFILES: { svg: true, svgFilters: true },
     ALLOWED_TAGS: [
-      'svg', 'circle', 'ellipse', 'line', 'path', 'polygon',
-      'polyline', 'rect', 'g', 'defs', 'clipPath', 'linearGradient',
-      'radialGradient', 'stop', 'filter'
+      "svg",
+      "circle",
+      "ellipse",
+      "line",
+      "path",
+      "polygon",
+      "polyline",
+      "rect",
+      "g",
+      "defs",
+      "clipPath",
+      "linearGradient",
+      "radialGradient",
+      "stop",
+      "filter",
     ],
     ALLOWED_ATTR: [
-      'width', 'height', 'viewBox', 'xmlns', 'fill', 'stroke',
-      'stroke-width', 'd', 'cx', 'cy', 'r', 'x', 'y', 'x1', 'y1',
-      'x2', 'y2', 'points', 'id', 'class'
+      "width",
+      "height",
+      "viewBox",
+      "xmlns",
+      "fill",
+      "stroke",
+      "stroke-width",
+      "d",
+      "cx",
+      "cy",
+      "r",
+      "x",
+      "y",
+      "x1",
+      "y1",
+      "x2",
+      "y2",
+      "points",
+      "id",
+      "class",
     ],
     // Block all event handlers
     FORBID_ATTR: [
-      'onload', 'onclick', 'onmouseover', 'onerror', 'onbegin',
-      'onend', 'onrepeat', 'onabort'
+      "onload",
+      "onclick",
+      "onmouseover",
+      "onerror",
+      "onbegin",
+      "onend",
+      "onrepeat",
+      "onabort",
     ],
     // Block script and foreignObject
-    FORBID_TAGS: ['script', 'foreignObject', 'iframe', 'embed', 'object']
+    FORBID_TAGS: ["script", "foreignObject", "iframe", "embed", "object"],
   });
 
   return clean;
 };
 
 // Usage
-app.post('/api/upload-svg', upload.single('svg'), async (req, res) => {
-  const svgContent = await fs.readFile(req.file.path, 'utf8');
+app.post("/api/upload-svg", upload.single("svg"), async (req, res) => {
+  const svgContent = await fs.readFile(req.file.path, "utf8");
 
   // Sanitize SVG
   const cleanSvg = sanitizeSvg(svgContent);
@@ -129,7 +167,7 @@ app.post('/api/upload-svg', upload.single('svg'), async (req, res) => {
 
 ```html
 <!-- Good: SVG in img tag (browser prevents script execution) -->
-<img src="/uploads/user-avatar.svg" alt="User avatar">
+<img src="/uploads/user-avatar.svg" alt="User avatar" />
 
 <!-- WARNING: Opening SVG in new tab bypasses this protection! -->
 ```
@@ -140,15 +178,15 @@ Modern browsers do not execute scripts inside `<img>` tags, making this approach
 
 ```javascript
 // Good: Convert SVG to PNG on upload (eliminates all script risks)
-const sharp = require('sharp');
+const sharp = require("sharp");
 
-app.post('/api/upload-svg', upload.single('svg'), async (req, res) => {
+app.post("/api/upload-svg", upload.single("svg"), async (req, res) => {
   const svgBuffer = await fs.readFile(req.file.path);
 
   // Convert to PNG
   const pngBuffer = await sharp(svgBuffer)
     .png()
-    .resize(800, 800, { fit: 'inside' })
+    .resize(800, 800, { fit: "inside" })
     .toBuffer();
 
   const filename = `${crypto.randomUUID()}.png`;
@@ -234,7 +272,7 @@ const UserComment = ({ comment }) => {
 const sanitizeForInnerHTML = (dirty) => {
   const clean = DOMPurify.sanitize(dirty, {
     RETURN_DOM: true,
-    RETURN_DOM_FRAGMENT: true
+    RETURN_DOM_FRAGMENT: true,
   });
 
   // Append DOM nodes directly instead of innerHTML
@@ -242,11 +280,11 @@ const sanitizeForInnerHTML = (dirty) => {
 };
 
 // Good: Server-side sanitization + CSP
-app.post('/api/comments', async (req, res) => {
+app.post("/api/comments", async (req, res) => {
   // Sanitize on server
   const clean = DOMPurify.sanitize(req.body.comment, {
-    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p'],
-    ALLOWED_ATTR: []
+    ALLOWED_TAGS: ["b", "i", "em", "strong", "p"],
+    ALLOWED_ATTR: [],
   });
 
   await Comment.create({ content: clean });
@@ -254,8 +292,10 @@ app.post('/api/comments', async (req, res) => {
 });
 
 // Client-side: Add CSP to prevent any script execution
-res.setHeader('Content-Security-Policy',
-  "default-src 'self'; script-src 'none'; object-src 'none'");
+res.setHeader(
+  "Content-Security-Policy",
+  "default-src 'self'; script-src 'none'; object-src 'none'",
+);
 ```
 
 ### Best Practices
@@ -286,12 +326,12 @@ const html = `<div>${userInput}</div>`;
 // Good: HTML entity encoding
 const escapeHtml = (text) => {
   const map = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#x27;',
-    '/': '&#x2F;'
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#x27;",
+    "/": "&#x2F;",
   };
   return text.replace(/[&<>"'/]/g, (char) => map[char]);
 };
@@ -331,9 +371,9 @@ const escapeJavaScript = (text) => {
   return text.replace(/[^a-zA-Z0-9]/g, (char) => {
     const code = char.charCodeAt(0);
     if (code < 256) {
-      return `\\x${code.toString(16).padStart(2, '0')}`;
+      return `\\x${code.toString(16).padStart(2, "0")}`;
     }
-    return `\\u${code.toString(16).padStart(4, '0')}`;
+    return `\\u${code.toString(16).padStart(4, "0")}`;
   });
 };
 
@@ -370,11 +410,11 @@ const escapeCss = (text) => {
 const safe = `<style>.user { color: ${escapeCss(userInput)}; }</style>`;
 
 // Better: Validate against allowlist
-const allowedColors = ['red', 'blue', 'green', 'black', 'white'];
+const allowedColors = ["red", "blue", "green", "black", "white"];
 
 const validateColor = (color) => {
   if (!allowedColors.includes(color)) {
-    throw new ValidationError('Invalid color');
+    throw new ValidationError("Invalid color");
   }
   return color;
 };
@@ -395,13 +435,13 @@ const html = `<a href="${userInput}">Click</a>`;
 // Good: URL encoding + protocol validation
 const escapeUrl = (url) => {
   // Validate protocol first
-  const allowedProtocols = ['http:', 'https:', 'mailto:'];
+  const allowedProtocols = ["http:", "https:", "mailto:"];
 
   try {
     const parsed = new URL(url);
 
     if (!allowedProtocols.includes(parsed.protocol)) {
-      throw new Error('Invalid protocol');
+      throw new Error("Invalid protocol");
     }
 
     // URL constructor handles encoding
@@ -416,22 +456,22 @@ const safe = `<a href="${escapeUrl(userInput)}">Click</a>`;
 
 // Better: Allowlist domains
 const validateUrl = (url) => {
-  const allowedDomains = ['example.com', 'trusted.com'];
+  const allowedDomains = ["example.com", "trusted.com"];
 
   try {
     const parsed = new URL(url);
 
-    if (!['http:', 'https:'].includes(parsed.protocol)) {
-      throw new Error('Invalid protocol');
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      throw new Error("Invalid protocol");
     }
 
     if (!allowedDomains.includes(parsed.hostname)) {
-      throw new Error('Domain not allowed');
+      throw new Error("Domain not allowed");
     }
 
     return parsed.href;
   } catch (error) {
-    throw new ValidationError('Invalid URL');
+    throw new ValidationError("Invalid URL");
   }
 };
 ```
@@ -471,31 +511,31 @@ User Input → Output Context?
 // string safeJS = Encoder.JavaScriptEncode(userInput);
 
 // Node.js - he library
-const he = require('he');
+const he = require("he");
 
 const encodeByContext = (input, context) => {
   switch (context) {
-    case 'html':
+    case "html":
       return he.encode(input);
 
-    case 'htmlAttribute':
+    case "htmlAttribute":
       return he.encode(input, { useNamedReferences: false });
 
-    case 'javascript':
+    case "javascript":
       return input.replace(/[^a-zA-Z0-9]/g, (char) => {
-        return `\\x${char.charCodeAt(0).toString(16).padStart(2, '0')}`;
+        return `\\x${char.charCodeAt(0).toString(16).padStart(2, "0")}`;
       });
 
-    case 'css':
+    case "css":
       return input.replace(/[^a-zA-Z0-9]/g, (char) => {
         return `\\${char.charCodeAt(0).toString(16)} `;
       });
 
-    case 'url':
+    case "url":
       return encodeURIComponent(input);
 
     default:
-      throw new Error('Unknown context');
+      throw new Error("Unknown context");
   }
 };
 ```
@@ -519,10 +559,11 @@ Polyglot XSS payloads are snippets of code designed to work across multiple cont
 
 ```javascript
 // This payload works in multiple contexts
-jaVasCript:/*-/*`/*\`/*'/*"/**/(/* */oNcliCk=alert() )//%0D%0A%0d%0a//</stYle/</titLe/</teXtarEa/</scRipt/--!>\x3csVg/<sVg/oNloAd=alert()//>\x3e
+jaVasCript: /*-/*`/*\`/*'/*"/**/ /* */ oNcliCk = alert(); //%0D%0A%0d%0a//</stYle/</titLe/</teXtarEa/</scRipt/--!>\x3csVg/<sVg/oNloAd=alert()//>\x3e
 ```
 
 This works in:
+
 - HTML element content
 - HTML attribute (with/without quotes)
 - JavaScript string (single/double quotes)
@@ -552,7 +593,7 @@ const strongDefense = {
   validate: (input) => {
     // Strict allowlist - reject anything suspicious
     if (/<script|javascript:|on\w+=/i.test(input)) {
-      throw new ValidationError('Invalid input detected');
+      throw new ValidationError("Invalid input detected");
     }
     return input;
   },
@@ -562,14 +603,14 @@ const strongDefense = {
     const validated = strongDefense.validate(input);
 
     switch (context) {
-      case 'html':
+      case "html":
         return escapeHtml(validated);
-      case 'js':
+      case "js":
         return escapeJavaScript(validated);
-      case 'url':
+      case "url":
         return escapeUrl(validated);
       default:
-        throw new Error('Unknown context');
+        throw new Error("Unknown context");
     }
   },
 
@@ -578,23 +619,23 @@ const strongDefense = {
 
   // Layer 4: Additional headers
   headers: {
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-    'X-XSS-Protection': '1; mode=block'
-  }
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "X-XSS-Protection": "1; mode=block",
+  },
 };
 
 // Usage
-app.get('/profile', (req, res) => {
+app.get("/profile", (req, res) => {
   const userName = req.query.name;
 
   res.set(strongDefense.headers);
-  res.set('Content-Security-Policy', strongDefense.csp);
+  res.set("Content-Security-Policy", strongDefense.csp);
 
   res.send(`
-    <div>${strongDefense.encode(userName, 'html')}</div>
+    <div>${strongDefense.encode(userName, "html")}</div>
     <script nonce="{random}">
-      var name = "${strongDefense.encode(userName, 'js')}";
+      var name = "${strongDefense.encode(userName, "js")}";
     </script>
   `);
 });
@@ -628,7 +669,7 @@ const detectPolyglot = (input) => {
     /data:text\/html/i,
 
     // Multiple encoding layers
-    /&#x[0-9a-f]{2}/i
+    /&#x[0-9a-f]{2}/i,
   ];
 
   for (const pattern of polyglotPatterns) {
@@ -641,16 +682,16 @@ const detectPolyglot = (input) => {
 };
 
 // Usage
-app.post('/api/comment', (req, res) => {
+app.post("/api/comment", (req, res) => {
   const comment = req.body.comment;
 
   if (detectPolyglot(comment)) {
-    logger.warn('Polyglot XSS attempt detected', {
+    logger.warn("Polyglot XSS attempt detected", {
       input: comment,
-      ip: req.ip
+      ip: req.ip,
     });
 
-    return res.status(400).json({ error: 'Invalid input' });
+    return res.status(400).json({ error: "Invalid input" });
   }
 
   // Proceed with sanitization
@@ -666,6 +707,7 @@ app.post('/api/comment', (req, res) => {
 ### Major Incidents
 
 **June 2024: Polyfill.io Supply Chain Attack**
+
 - Single JavaScript injection compromised 100,000+ websites
 - Largest JavaScript injection attack of 2024
 - Highlights importance of:
@@ -694,24 +736,28 @@ app.post('/api/comment', (req, res) => {
 ## Comprehensive Defense Checklist
 
 ### Input Layer
+
 - [ ] Strict allowlist validation on all inputs
 - [ ] Length limits enforced
 - [ ] Data type validation (string, number, email, URL)
 - [ ] Reject inputs matching polyglot patterns
 
 ### Processing Layer
+
 - [ ] Server-side sanitization with DOMPurify
 - [ ] Context-aware output encoding (HTML, JS, CSS, URL)
 - [ ] Avoid innerHTML; use textContent or DOM methods
 - [ ] Use modern frameworks with auto-escaping
 
 ### Output Layer
+
 - [ ] CSP headers with nonces/hashes (no `unsafe-inline`)
 - [ ] X-Content-Type-Options: nosniff
 - [ ] X-Frame-Options: DENY
 - [ ] Trusted Types API enabled (if supported)
 
 ### File Upload Layer
+
 - [ ] SVG sanitization or rasterization
 - [ ] MIME type validation (server-side)
 - [ ] File content verification (magic bytes)
@@ -719,6 +765,7 @@ app.post('/api/comment', (req, res) => {
 - [ ] Serve user uploads from separate domain
 
 ### Monitoring Layer
+
 - [ ] Log all XSS attempts (polyglot detection)
 - [ ] Real-time alerting on suspicious patterns
 - [ ] Regular security audits and penetration testing

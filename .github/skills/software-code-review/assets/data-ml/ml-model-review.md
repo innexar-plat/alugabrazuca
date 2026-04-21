@@ -7,6 +7,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 ## Model Architecture & Design
 
 ### Architecture Decisions
+
 - [ ] Model type justified (tree-based, neural network, linear, etc.)
 - [ ] Baseline model implemented and documented
 - [ ] Model complexity appropriate for data size
@@ -15,6 +16,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] Feature dimensionality documented
 
 ### Modern Best Practices
+
 - [ ] LightGBM/XGBoost considered for tabular data
 - [ ] Tree-based methods used as first baseline
 - [ ] Computational efficiency considered early
@@ -22,6 +24,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] Hyperparameter search space reasonable
 
 ### Feature Engineering
+
 - [ ] Feature transformations documented
 - [ ] Feature scaling/normalization applied correctly
 - [ ] Categorical encoding strategy defined
@@ -34,6 +37,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 ## Data Validation & Quality
 
 ### Data Checks
+
 - [ ] Training data schema validated
 - [ ] Missing values handled explicitly
 - [ ] Outliers identified and strategy documented
@@ -42,6 +46,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] Class imbalance identified and addressed
 
 ### Train/Test Splitting
+
 - [ ] Split strategy documented (random, time-based, stratified)
 - [ ] No data leakage between train and test
 - [ ] Time ordering preserved for time series
@@ -50,6 +55,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] Test set never used during development
 
 ### Data Leakage Prevention
+
 - [ ] No future information in features
 - [ ] Target encoding uses only training data
 - [ ] Normalization statistics from training set only
@@ -62,6 +68,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 ## Training Pipeline
 
 ### Training Process
+
 - [ ] Random seeds set for reproducibility
 - [ ] Training loop implemented correctly
 - [ ] Early stopping implemented (if applicable)
@@ -70,6 +77,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] Training progress logged
 
 ### Hyperparameter Tuning
+
 - [ ] Hyperparameter search strategy documented (grid, random, Bayesian)
 - [ ] Search space defined and justified
 - [ ] Cross-validation used for tuning
@@ -78,6 +86,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] Best hyperparameters documented
 
 ### Regularization
+
 - [ ] Regularization techniques applied (L1/L2, dropout, etc.)
 - [ ] Regularization strength tuned
 - [ ] Early stopping prevents overfitting
@@ -88,6 +97,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 ## Model Evaluation
 
 ### Metrics & Validation
+
 - [ ] Primary metric chosen and justified
 - [ ] Guardrail metrics defined (fairness, calibration, cost)
 - [ ] Metrics calculated on held-out test set
@@ -96,6 +106,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] Metric definitions reproducible
 
 ### Slice Analysis
+
 - [ ] Performance evaluated across key slices
 - [ ] Weak segments identified and documented
 - [ ] Fairness across sensitive groups checked
@@ -103,6 +114,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] Systematic failures documented
 
 ### Robustness Checks
+
 - [ ] Model tested on edge cases
 - [ ] Adversarial examples considered (if applicable)
 - [ ] Sensitivity to input perturbations checked
@@ -114,6 +126,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 ## Reproducibility & Versioning
 
 ### Code & Environment
+
 - [ ] Code version controlled (git commit tracked)
 - [ ] Python/package versions pinned
 - [ ] Random seeds documented
@@ -121,6 +134,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] Environment setup documented (requirements.txt, Dockerfile)
 
 ### Data & Model Versioning
+
 - [ ] Training data version tracked
 - [ ] Data snapshot ID recorded
 - [ ] Model artifacts versioned
@@ -128,6 +142,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] Model registry entry created
 
 ### Experiment Tracking
+
 - [ ] Experiments logged in tracker (MLflow, W&B)
 - [ ] Hyperparameters logged
 - [ ] Metrics logged
@@ -139,6 +154,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 ## MLOps Integration
 
 ### Feature Store Integration
+
 - [ ] Features retrieved from feature store
 - [ ] Feature versions tracked
 - [ ] Train-serve consistency ensured
@@ -146,6 +162,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] Feature monitoring enabled
 
 ### CI/CD Integration
+
 - [ ] Model training pipeline automated
 - [ ] Unit tests for data processing
 - [ ] Model validation checks automated
@@ -153,6 +170,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] Environment-specific configs (dev/staging/prod)
 
 ### Monitoring Setup
+
 - [ ] Data drift detection configured
 - [ ] Model performance monitoring planned
 - [ ] Retraining triggers defined
@@ -168,6 +186,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - Common `CC-*` IDs for model code: `CC-NAM-01`, `CC-FUN-01`, `CC-FUN-05`, `CC-TYP-01`, `CC-TYP-04`, `CC-ERR-01`, `CC-SEC-05`, `CC-DOC-01`, `CC-DOC-04`, `CC-TST-01`, `CC-TST-02`, `CC-TST-04`
 
 ### Testing
+
 - [ ] Unit tests for data processing functions
 - [ ] Unit tests for feature engineering
 - [ ] Integration tests for training pipeline
@@ -175,6 +194,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] Edge case tests included
 
 ### Documentation
+
 - [ ] Model architecture documented
 - [ ] Training procedure documented
 - [ ] Hyperparameter choices explained
@@ -187,6 +207,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 ## Security & Ethics
 
 ### Data Privacy
+
 - [ ] PII handling compliant with regulations
 - [ ] Sensitive features identified
 - [ ] Data anonymization applied where needed
@@ -194,6 +215,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] No secrets in code or logs
 
 ### Fairness & Bias
+
 - [ ] Protected attributes identified
 - [ ] Fairness metrics computed
 - [ ] Bias mitigation strategies considered
@@ -201,6 +223,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] Ethical considerations documented
 
 ### Model Safety
+
 - [ ] Failure modes identified
 - [ ] Safety checks in prediction pipeline
 - [ ] Human-in-the-loop for high-risk decisions
@@ -211,6 +234,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 ## Performance & Efficiency
 
 ### Computational Efficiency
+
 - [ ] Training time reasonable for iteration cycle
 - [ ] Memory usage within constraints
 - [ ] GPU utilization optimized (if applicable)
@@ -218,6 +242,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] Unnecessary computations eliminated
 
 ### Inference Performance
+
 - [ ] Inference latency measured
 - [ ] Inference meets production requirements
 - [ ] Model size acceptable for deployment
@@ -229,6 +254,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 ## Documentation & Handover
 
 ### Model Documentation
+
 - [ ] Model evaluation report written
 - [ ] Model card created
 - [ ] Training notebook/script documented
@@ -236,6 +262,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 - [ ] Performance summary clear
 
 ### Production Readiness
+
 - [ ] Deployment requirements documented
 - [ ] Input/output contracts defined
 - [ ] Expected latency and throughput documented
@@ -248,6 +275,7 @@ Specialized checklist for reviewing machine learning model code (training, archi
 ## Final Checklist
 
 Before approving ML model code:
+
 - [ ] Model performance meets requirements
 - [ ] No data leakage detected
 - [ ] Reproducibility verified

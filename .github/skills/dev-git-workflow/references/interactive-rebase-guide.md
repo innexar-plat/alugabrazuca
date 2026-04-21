@@ -29,6 +29,7 @@ git config --global rebase.autosquash true
 ### Workflow with Auto-Squash
 
 **1. Work with WIP commits**:
+
 ```bash
 git commit -m "feat: add user service"
 git commit -m "WIP test coverage"
@@ -37,6 +38,7 @@ git commit -m "WIP add validation"
 ```
 
 **2. Mark fixup commits**:
+
 ```bash
 # Instead of "WIP", use fixup! or squash!
 git commit -m "fixup! feat: add user service"  # Squashes silently
@@ -44,6 +46,7 @@ git commit -m "squash! feat: add user service" # Squashes with message
 ```
 
 **3. Rebase auto-squashes**:
+
 ```bash
 git rebase -i main  # Auto-squash flag triggers automatically
 # Commits are automatically organized and squashed
@@ -53,14 +56,14 @@ git rebase -i main  # Auto-squash flag triggers automatically
 
 ## Interactive Rebase Commands
 
-| Command | Short | Action |
-|---------|-------|--------|
-| `pick` | `p` | Keep commit as-is |
-| `reword` | `r` | Keep commit, edit message |
-| `edit` | `e` | Pause to amend commit |
-| `squash` | `s` | Combine with previous, keep message |
-| `fixup` | `f` | Combine with previous, discard message |
-| `drop` | `d` | Remove commit |
+| Command  | Short | Action                                 |
+| -------- | ----- | -------------------------------------- |
+| `pick`   | `p`   | Keep commit as-is                      |
+| `reword` | `r`   | Keep commit, edit message              |
+| `edit`   | `e`   | Pause to amend commit                  |
+| `squash` | `s`   | Combine with previous, keep message    |
+| `fixup`  | `f`   | Combine with previous, discard message |
+| `drop`   | `d`   | Remove commit                          |
 
 ---
 
@@ -175,6 +178,7 @@ pick a1b2c3d docs: update README
 ## Best Practices
 
 **DO**:
+
 - [OK] Squash WIP, debug, and fixup commits before merging
 - [OK] Rebase frequently to avoid complex conflicts
 - [OK] Keep logical commits separate (feature ≠ tests ≠ docs)
@@ -182,6 +186,7 @@ pick a1b2c3d docs: update README
 - [OK] Test after rebasing to ensure nothing broke
 
 **DON'T**:
+
 - [FAIL] Rebase commits already pushed to `main`
 - [FAIL] Rebase shared branches others are working on
 - [FAIL] Force push to protected branches
@@ -204,6 +209,7 @@ git log origin/feature-branch
 ```
 
 **Never force push to**:
+
 - `main` or `master` branches
 - Shared feature branches
 - Any branch others are working on

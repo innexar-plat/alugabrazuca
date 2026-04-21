@@ -9,11 +9,13 @@ Comprehensive guide to building scalable, maintainable, and developer-friendly A
 ### 1. Resource-Oriented Design (REST)
 
 **Think Resources, Not Actions:**
+
 - URLs represent resources (nouns), not operations (verbs)
 - Use HTTP methods to express intent
 - Keep URLs predictable and hierarchical
 
 **Good Examples:**
+
 ```
 GET    /api/v1/users              # List users
 POST   /api/v1/users              # Create user
@@ -28,6 +30,7 @@ POST   /api/v1/users/123/orders   # Create order for user
 ```
 
 **Bad Examples:**
+
 ```
 [FAIL] GET  /api/v1/getUser?id=123
 [FAIL] POST /api/v1/createUser
@@ -39,17 +42,18 @@ POST   /api/v1/users/123/orders   # Create order for user
 
 **Proper Method Usage:**
 
-| Method | Purpose | Idempotent | Safe | Request Body | Response Body |
-|--------|---------|------------|------|--------------|---------------|
-| GET | Retrieve resource | Yes | Yes | No | Yes |
-| POST | Create resource | No | No | Yes | Yes (created resource) |
-| PUT | Replace entire resource | Yes | No | Yes | Yes (updated resource) |
-| PATCH | Partial update | No | No | Yes | Yes (updated resource) |
-| DELETE | Remove resource | Yes | No | Optional | Optional |
-| HEAD | Get metadata only | Yes | Yes | No | No (headers only) |
-| OPTIONS | Get allowed methods | Yes | Yes | No | Yes (capabilities) |
+| Method  | Purpose                 | Idempotent | Safe | Request Body | Response Body          |
+| ------- | ----------------------- | ---------- | ---- | ------------ | ---------------------- |
+| GET     | Retrieve resource       | Yes        | Yes  | No           | Yes                    |
+| POST    | Create resource         | No         | No   | Yes          | Yes (created resource) |
+| PUT     | Replace entire resource | Yes        | No   | Yes          | Yes (updated resource) |
+| PATCH   | Partial update          | No         | No   | Yes          | Yes (updated resource) |
+| DELETE  | Remove resource         | Yes        | No   | Optional     | Optional               |
+| HEAD    | Get metadata only       | Yes        | Yes  | No           | No (headers only)      |
+| OPTIONS | Get allowed methods     | Yes        | Yes  | No           | Yes (capabilities)     |
 
 **Idempotency Importance:**
+
 - GET, PUT, DELETE must produce same result on repeated calls
 - POST creates new resource each time (not idempotent)
 - Use PUT for full replacement, PATCH for partial updates
@@ -57,6 +61,7 @@ POST   /api/v1/users/123/orders   # Create order for user
 ### 3. HTTP Status Codes
 
 **2xx Success:**
+
 ```
 200 OK                - Successful GET, PUT, PATCH, DELETE
 201 Created           - Successful POST (include Location header)
@@ -65,6 +70,7 @@ POST   /api/v1/users/123/orders   # Create order for user
 ```
 
 **4xx Client Errors:**
+
 ```
 400 Bad Request       - Malformed syntax, invalid JSON
 401 Unauthorized      - Authentication required or failed
@@ -77,6 +83,7 @@ POST   /api/v1/users/123/orders   # Create order for user
 ```
 
 **5xx Server Errors:**
+
 ```
 500 Internal Server   - Unexpected server error
 502 Bad Gateway       - Upstream service error
@@ -91,12 +98,14 @@ POST   /api/v1/users/123/orders   # Create order for user
 ### Naming Conventions
 
 **Resource Names:**
+
 - Use **plural nouns** for collections: `/users`, `/orders`, `/products`
 - Use **lowercase** with hyphens (kebab-case): `/product-categories`
 - Avoid underscores or camelCase in URLs
 - Keep URLs concise (under 2048 characters)
 
 **Query Parameters:**
+
 ```
 # Filtering
 GET /api/v1/users?status=active&role=admin
@@ -137,6 +146,7 @@ See [versioning-strategies.md](versioning-strategies.md) for full comparison.
 ### Standard Response Envelope
 
 **Success Response (200/201):**
+
 ```json
 {
   "data": {
@@ -152,11 +162,12 @@ See [versioning-strategies.md](versioning-strategies.md) for full comparison.
 ```
 
 **Collection Response with Pagination:**
+
 ```json
 {
   "data": [
-    {"id": "1", "name": "User 1"},
-    {"id": "2", "name": "User 2"}
+    { "id": "1", "name": "User 1" },
+    { "id": "2", "name": "User 2" }
   ],
   "meta": {
     "total": 1500,
@@ -173,6 +184,7 @@ See [versioning-strategies.md](versioning-strategies.md) for full comparison.
 ```
 
 **Error Response (4xx/5xx):**
+
 ```json
 {
   "error": {
@@ -202,17 +214,20 @@ See [RFC 9457 Problem Details](https://datatracker.ietf.org/doc/html/rfc9457) fo
 ### JSON Best Practices
 
 **Field Naming:**
+
 - Use `snake_case` (recommended): `created_at`, `first_name`
 - Or `camelCase` (JavaScript ecosystems): `createdAt`, `firstName`
 - Be consistent across entire API
 
 **Date/Time Format:**
+
 - Use ISO 8601 format: `2025-01-20T14:25:00Z`
 - Always include timezone (prefer UTC with Z suffix)
 - For date-only: `2025-01-20`
 - For time-only: `14:25:00`
 
 **Null vs Omitted Fields:**
+
 ```json
 # Option 1: Include null fields
 {
@@ -228,9 +243,10 @@ See [RFC 9457 Problem Details](https://datatracker.ietf.org/doc/html/rfc9457) fo
 ```
 
 **Boolean Fields:**
+
 ```json
 {
-  "is_active": true,        // Prefix with "is_" or "has_"
+  "is_active": true, // Prefix with "is_" or "has_"
   "has_verified_email": false,
   "can_edit": true
 }
@@ -239,6 +255,7 @@ See [RFC 9457 Problem Details](https://datatracker.ietf.org/doc/html/rfc9457) fo
 ### Content Negotiation
 
 **Request Headers:**
+
 ```http
 Accept: application/json                          # JSON response
 Accept: application/xml                           # XML response
@@ -247,6 +264,7 @@ Accept-Language: en-US,en;q=0.9                   # Language preference
 ```
 
 **Response Headers:**
+
 ```http
 Content-Type: application/json; charset=utf-8
 Content-Language: en-US
@@ -259,6 +277,7 @@ Content-Language: en-US
 ### 1. Pagination
 
 **Offset-Based (Simple but has limitations):**
+
 ```
 GET /api/v1/users?limit=20&offset=40
 
@@ -267,6 +286,7 @@ Cons: Performance degrades with large offsets, inconsistent if data changes
 ```
 
 **Cursor-Based (Recommended for real-time data):**
+
 ```
 GET /api/v1/users?limit=20&cursor=eyJpZCI6MTIzfQ
 
@@ -275,6 +295,7 @@ Cons: Can't jump to arbitrary page
 ```
 
 **Keyset Pagination (Best performance):**
+
 ```
 GET /api/v1/users?limit=20&since_id=123
 
@@ -285,6 +306,7 @@ Cons: Requires indexed sort field
 ### 2. Caching
 
 **HTTP Cache Headers:**
+
 ```http
 # Response headers
 Cache-Control: public, max-age=3600                # Cache for 1 hour
@@ -300,6 +322,7 @@ If-Modified-Since: Wed, 15 Jan 2025 10:30:00 GMT
 ```
 
 **Cache Strategy:**
+
 - Static resources: `Cache-Control: public, max-age=31536000, immutable`
 - User data: `Cache-Control: private, max-age=300`
 - Dynamic/realtime: `Cache-Control: no-cache` with ETags
@@ -320,6 +343,7 @@ Enable compression for text-based responses (JSON, XML, HTML). Reduces bandwidth
 ### 4. Field Selection
 
 Allow clients to request only needed fields:
+
 ```
 GET /api/v1/users?fields=id,name,email
 ```
@@ -340,16 +364,19 @@ Reduces response size and database load.
 ### 2. Authentication
 
 **Bearer Tokens (Recommended):**
+
 ```http
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **API Keys (For server-to-server):**
+
 ```http
 X-API-Key: your-api-key-here
 ```
 
 **Basic Auth (Avoid for production):**
+
 ```http
 Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=
 ```
@@ -359,6 +386,7 @@ See [api-security-checklist.md](api-security-checklist.md) for comprehensive sec
 ### 3. Rate Limiting
 
 **Response Headers:**
+
 ```http
 X-RateLimit-Limit: 1000           # Requests per window
 X-RateLimit-Remaining: 987        # Requests left
@@ -366,6 +394,7 @@ X-RateLimit-Reset: 1640000060     # Window reset time (Unix timestamp)
 ```
 
 **429 Response:**
+
 ```http
 HTTP/1.1 429 Too Many Requests
 Retry-After: 60
@@ -393,12 +422,14 @@ Retry-After: 60
 ### OpenAPI Specification
 
 **Benefits:**
+
 - Auto-generated interactive docs
 - Client SDK generation
 - API testing tools integration
 - Contract-first development
 
 **Example:**
+
 ```yaml
 openapi: 3.1.0
 info:
@@ -415,14 +446,14 @@ paths:
             type: integer
             default: 20
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: "#/components/schemas/User"
 ```
 
 See [openapi-guide.md](openapi-guide.md) for full OpenAPI 3.1 reference.
@@ -441,30 +472,33 @@ See [openapi-guide.md](openapi-guide.md) for full OpenAPI 3.1 reference.
 
 ## REST vs GraphQL vs gRPC
 
-| Aspect | REST | GraphQL | gRPC |
-|--------|------|---------|------|
-| **Best For** | Public APIs, CRUD operations | Complex queries, mobile apps | Microservices, high performance |
-| **Learning Curve** | Low | Medium | High |
-| **Caching** | Excellent (HTTP caching) | Challenging | None built-in |
-| **Tooling** | Mature (OpenAPI, Postman) | Good (GraphiQL, Apollo) | Limited (mainly for Go, Java) |
-| **Bandwidth** | Higher (can over-fetch) | Optimized (request exactly what's needed) | Most efficient (binary protocol) |
-| **Versioning** | Required | Optional (evolving schema) | Required |
-| **Browser Support** | Native | Native | Requires proxy (no HTTP/2) |
-| **Real-time** | WebSockets/SSE | Subscriptions (native) | Streaming (native) |
+| Aspect              | REST                         | GraphQL                                   | gRPC                             |
+| ------------------- | ---------------------------- | ----------------------------------------- | -------------------------------- |
+| **Best For**        | Public APIs, CRUD operations | Complex queries, mobile apps              | Microservices, high performance  |
+| **Learning Curve**  | Low                          | Medium                                    | High                             |
+| **Caching**         | Excellent (HTTP caching)     | Challenging                               | None built-in                    |
+| **Tooling**         | Mature (OpenAPI, Postman)    | Good (GraphiQL, Apollo)                   | Limited (mainly for Go, Java)    |
+| **Bandwidth**       | Higher (can over-fetch)      | Optimized (request exactly what's needed) | Most efficient (binary protocol) |
+| **Versioning**      | Required                     | Optional (evolving schema)                | Required                         |
+| **Browser Support** | Native                       | Native                                    | Requires proxy (no HTTP/2)       |
+| **Real-time**       | WebSockets/SSE               | Subscriptions (native)                    | Streaming (native)               |
 
 **Choose REST when:**
+
 - Building public APIs
 - Simple CRUD operations
 - Caching is critical
 - Team is familiar with HTTP
 
 **Choose GraphQL when:**
+
 - Clients need flexible queries
 - Mobile/web apps with varying data needs
 - Rapid frontend iteration
 - Multiple clients with different requirements
 
 **Choose gRPC when:**
+
 - Internal microservices
 - High throughput required
 - Strong typing needed
@@ -479,6 +513,7 @@ See [graphql-patterns.md](graphql-patterns.md) for GraphQL-specific guidance.
 ### Contract Testing
 
 Use OpenAPI specs to validate API contracts:
+
 ```bash
 # Dredd - API testing framework
 dredd openapi.yaml https://api.example.com
@@ -505,24 +540,28 @@ wrk -t12 -c400 -d30s https://api.example.com/users
 ## Common Anti-Patterns
 
 ### 1. Verbs in URLs
+
 ```
 [FAIL] POST /api/v1/createUser
 [OK] POST /api/v1/users
 ```
 
 ### 2. Ignoring HTTP Methods
+
 ```
 [FAIL] GET /api/v1/users/123/delete
 [OK] DELETE /api/v1/users/123
 ```
 
 ### 3. No Versioning
+
 ```
 [FAIL] https://api.example.com/users  (no version)
 [OK] https://api.example.com/v1/users
 ```
 
 ### 4. Inconsistent Naming
+
 ```
 [FAIL] /api/v1/Users (capitalized)
 [FAIL] /api/v1/user_profiles (mixed conventions)
@@ -530,18 +569,21 @@ wrk -t12 -c400 -d30s https://api.example.com/users
 ```
 
 ### 5. Missing Pagination
+
 ```
 [FAIL] GET /api/v1/users  (returns all 1M users)
 [OK] GET /api/v1/users?limit=20&offset=0
 ```
 
 ### 6. Exposing Internal IDs
+
 ```
 [FAIL] Auto-incrementing IDs (predictable, leaks growth rate)
 [OK] UUIDs or opaque tokens
 ```
 
 ### 7. Generic Error Messages
+
 ```
 [FAIL] { "error": "Something went wrong" }
 [OK] { "error": { "code": "DUPLICATE_EMAIL", "field": "email", "message": "..." } }
@@ -552,22 +594,26 @@ wrk -t12 -c400 -d30s https://api.example.com/users
 ## Resources
 
 **Official Standards:**
+
 - [RFC 9457 - Problem Details](https://datatracker.ietf.org/doc/html/rfc9457)
 - [RFC 6749 - OAuth 2.0](https://datatracker.ietf.org/doc/html/rfc6749)
 - [RFC 7519 - JWT](https://datatracker.ietf.org/doc/html/rfc7519)
 
 **Style Guides:**
+
 - [Microsoft REST API Guidelines](https://github.com/microsoft/api-guidelines)
 - [Google API Design Guide](https://cloud.google.com/apis/design)
 - [Stripe API Design](https://stripe.com/docs/api)
 
 **Books:**
+
 - "API Design Patterns" by JJ Geewax (Manning)
 - "RESTful Web API Patterns & Practices Cookbook" by Mike Amundsen (O'Reilly)
 
 ---
 
 **Related Resources:**
+
 - [OpenAPI 3.1 Guide](openapi-guide.md)
 - [API Security Checklist](api-security-checklist.md)
 - [GraphQL Patterns](graphql-patterns.md)

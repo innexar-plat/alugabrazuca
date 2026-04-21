@@ -27,7 +27,7 @@ BCRYPT_ROUNDS=12
 
 ```javascript
 // models/User.js
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -35,53 +35,53 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     lowercase: true,
-    trim: true
+    trim: true,
   },
   passwordHash: {
     type: String,
-    required: true
+    required: true,
   },
   name: {
     type: String,
-    required: true
+    required: true,
   },
   role: {
     type: String,
-    enum: ['user', 'moderator', 'admin'],
-    default: 'user'
+    enum: ["user", "moderator", "admin"],
+    default: "user",
   },
   emailVerified: {
     type: Boolean,
-    default: false
+    default: false,
   },
   mfaEnabled: {
     type: Boolean,
-    default: false
+    default: false,
   },
   mfaSecret: String,
   tokenVersion: {
     type: Number,
-    default: 0
+    default: 0,
   },
   failedLoginAttempts: {
     type: Number,
-    default: 0
+    default: 0,
   },
   lockedUntil: Date,
   createdAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);
 ```
 
 ### Password Utilities
 
 ```javascript
 // utils/password.js
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 const BCRYPT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS) || 12;
 
@@ -104,11 +104,17 @@ const validatePasswordStrength = (password) => {
     throw new Error(`Password must be at least ${minLength} characters`);
   }
 
-  const complexityScore = [hasUpperCase, hasLowerCase, hasNumbers, hasSpecialChar]
-    .filter(Boolean).length;
+  const complexityScore = [
+    hasUpperCase,
+    hasLowerCase,
+    hasNumbers,
+    hasSpecialChar,
+  ].filter(Boolean).length;
 
   if (complexityScore < 3) {
-    throw new Error('Password must include at least 3 of: uppercase, lowercase, numbers, special characters');
+    throw new Error(
+      "Password must include at least 3 of: uppercase, lowercase, numbers, special characters",
+    );
   }
 
   return true;
@@ -117,7 +123,7 @@ const validatePasswordStrength = (password) => {
 module.exports = {
   hashPassword,
   verifyPassword,
-  validatePasswordStrength
+  validatePasswordStrength,
 };
 ```
 
@@ -125,27 +131,27 @@ module.exports = {
 
 ```javascript
 // utils/jwt.js
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '15m';
-const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "15m";
+const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || "7d";
 
 const generateAccessToken = (user) => {
   return jwt.sign(
     {
       userId: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
     },
     JWT_SECRET,
     {
       expiresIn: JWT_EXPIRES_IN,
-      algorithm: 'HS256',
-      issuer: 'your-app',
-      audience: 'your-api'
-    }
+      algorithm: "HS256",
+      issuer: "your-app",
+      audience: "your-api",
+    },
   );
 };
 
@@ -153,35 +159,35 @@ const generateRefreshToken = (user) => {
   return jwt.sign(
     {
       userId: user.id,
-      tokenVersion: user.tokenVersion
+      tokenVersion: user.tokenVersion,
     },
     JWT_REFRESH_SECRET,
     {
       expiresIn: JWT_REFRESH_EXPIRES_IN,
-      algorithm: 'HS256'
-    }
+      algorithm: "HS256",
+    },
   );
 };
 
 const verifyAccessToken = (token) => {
   try {
     return jwt.verify(token, JWT_SECRET, {
-      algorithms: ['HS256'],
-      issuer: 'your-app',
-      audience: 'your-api'
+      algorithms: ["HS256"],
+      issuer: "your-app",
+      audience: "your-api",
     });
   } catch (error) {
-    throw new Error('Invalid or expired token');
+    throw new Error("Invalid or expired token");
   }
 };
 
 const verifyRefreshToken = (token) => {
   try {
     return jwt.verify(token, JWT_REFRESH_SECRET, {
-      algorithms: ['HS256']
+      algorithms: ["HS256"],
     });
   } catch (error) {
-    throw new Error('Invalid or expired refresh token');
+    throw new Error("Invalid or expired refresh token");
   }
 };
 
@@ -189,7 +195,7 @@ module.exports = {
   generateAccessToken,
   generateRefreshToken,
   verifyAccessToken,
-  verifyRefreshToken
+  verifyRefreshToken,
 };
 ```
 
@@ -197,13 +203,13 @@ module.exports = {
 
 ```javascript
 // middleware/authenticate.js
-const { verifyAccessToken } = require('../utils/jwt');
+const { verifyAccessToken } = require("../utils/jwt");
 
 const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Missing authentication token' });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Missing authentication token" });
   }
 
   const token = authHeader.substring(7);
@@ -224,11 +230,19 @@ module.exports = authenticate;
 
 ```javascript
 // routes/auth.js
-const express = require('express');
-const rateLimit = require('express-rate-limit');
-const User = require('../models/User');
-const { hashPassword, verifyPassword, validatePasswordStrength } = require('../utils/password');
-const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/jwt');
+const express = require("express");
+const rateLimit = require("express-rate-limit");
+const User = require("../models/User");
+const {
+  hashPassword,
+  verifyPassword,
+  validatePasswordStrength,
+} = require("../utils/password");
+const {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} = require("../utils/jwt");
 
 const router = express.Router();
 
@@ -236,24 +250,24 @@ const router = express.Router();
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 5,
-  message: 'Too many registration attempts, please try again later'
+  message: "Too many registration attempts, please try again later",
 });
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5,
   skipSuccessfulRequests: true,
-  message: 'Too many login attempts, please try again later'
+  message: "Too many login attempts, please try again later",
 });
 
 // Register
-router.post('/register', registerLimiter, async (req, res) => {
+router.post("/register", registerLimiter, async (req, res) => {
   try {
     const { email, password, name } = req.body;
 
     // Validate inputs
     if (!email || !password || !name) {
-      return res.status(400).json({ error: 'Missing required fields' });
+      return res.status(400).json({ error: "Missing required fields" });
     }
 
     // Validate password strength
@@ -262,7 +276,7 @@ router.post('/register', registerLimiter, async (req, res) => {
     // Check if user exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ error: 'Email already registered' });
+      return res.status(400).json({ error: "Email already registered" });
     }
 
     // Hash password
@@ -272,7 +286,7 @@ router.post('/register', registerLimiter, async (req, res) => {
     const user = await User.create({
       email,
       passwordHash,
-      name
+      name,
     });
 
     // Generate tokens
@@ -284,10 +298,10 @@ router.post('/register', registerLimiter, async (req, res) => {
         id: user.id,
         email: user.email,
         name: user.name,
-        role: user.role
+        role: user.role,
       },
       accessToken,
-      refreshToken
+      refreshToken,
     });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -295,12 +309,12 @@ router.post('/register', registerLimiter, async (req, res) => {
 });
 
 // Login
-router.post('/login', loginLimiter, async (req, res) => {
+router.post("/login", loginLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: 'Missing email or password' });
+      return res.status(400).json({ error: "Missing email or password" });
     }
 
     // Find user
@@ -308,16 +322,18 @@ router.post('/login', loginLimiter, async (req, res) => {
 
     // Check account lockout
     if (user && user.lockedUntil && user.lockedUntil > Date.now()) {
-      const minutesRemaining = Math.ceil((user.lockedUntil - Date.now()) / 60000);
+      const minutesRemaining = Math.ceil(
+        (user.lockedUntil - Date.now()) / 60000,
+      );
       return res.status(429).json({
-        error: `Account locked. Try again in ${minutesRemaining} minutes`
+        error: `Account locked. Try again in ${minutesRemaining} minutes`,
       });
     }
 
     // Verify password (constant-time response)
     if (!user) {
-      await verifyPassword(password, '$2b$12$constantTimeHashValue');
-      return res.status(401).json({ error: 'Invalid credentials' });
+      await verifyPassword(password, "$2b$12$constantTimeHashValue");
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
     const validPassword = await verifyPassword(password, user.passwordHash);
@@ -333,7 +349,7 @@ router.post('/login', loginLimiter, async (req, res) => {
 
       await user.save();
 
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
     // Reset failed attempts on successful login
@@ -350,23 +366,23 @@ router.post('/login', loginLimiter, async (req, res) => {
         id: user.id,
         email: user.email,
         name: user.name,
-        role: user.role
+        role: user.role,
       },
       accessToken,
-      refreshToken
+      refreshToken,
     });
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
 // Refresh token
-router.post('/refresh', async (req, res) => {
+router.post("/refresh", async (req, res) => {
   try {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
-      return res.status(400).json({ error: 'Missing refresh token' });
+      return res.status(400).json({ error: "Missing refresh token" });
     }
 
     // Verify refresh token
@@ -376,7 +392,7 @@ router.post('/refresh', async (req, res) => {
     const user = await User.findById(payload.userId);
 
     if (!user || user.tokenVersion !== payload.tokenVersion) {
-      return res.status(401).json({ error: 'Invalid refresh token' });
+      return res.status(401).json({ error: "Invalid refresh token" });
     }
 
     // Generate new access token
@@ -389,18 +405,18 @@ router.post('/refresh', async (req, res) => {
 });
 
 // Logout (invalidate all tokens)
-router.post('/logout', async (req, res) => {
+router.post("/logout", async (req, res) => {
   try {
     const { userId } = req.body;
 
     // Increment token version to invalidate all existing tokens
     await User.findByIdAndUpdate(userId, {
-      $inc: { tokenVersion: 1 }
+      $inc: { tokenVersion: 1 },
     });
 
-    res.json({ message: 'Logged out successfully' });
+    res.json({ message: "Logged out successfully" });
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -411,30 +427,30 @@ module.exports = router;
 
 ```javascript
 // app.js
-const express = require('express');
-const authRoutes = require('./routes/auth');
-const authenticate = require('./middleware/authenticate');
+const express = require("express");
+const authRoutes = require("./routes/auth");
+const authenticate = require("./middleware/authenticate");
 
 const app = express();
 
 app.use(express.json());
 
 // Auth routes (public)
-app.use('/api/auth', authRoutes);
+app.use("/api/auth", authRoutes);
 
 // Protected routes
-app.get('/api/profile', authenticate, async (req, res) => {
+app.get("/api/profile", authenticate, async (req, res) => {
   const user = await User.findById(req.user.userId);
   res.json({
     id: user.id,
     email: user.email,
     name: user.name,
-    role: user.role
+    role: user.role,
   });
 });
 
 app.listen(3000, () => {
-  console.log('Server running on port 3000');
+  console.log("Server running on port 3000");
 });
 ```
 
@@ -452,23 +468,23 @@ npm install speakeasy qrcode
 
 ```javascript
 // routes/mfa.js
-const express = require('express');
-const speakeasy = require('speakeasy');
-const QRCode = require('qrcode');
-const User = require('../models/User');
-const authenticate = require('../middleware/authenticate');
+const express = require("express");
+const speakeasy = require("speakeasy");
+const QRCode = require("qrcode");
+const User = require("../models/User");
+const authenticate = require("../middleware/authenticate");
 
 const router = express.Router();
 
 // Enable MFA (generate secret)
-router.post('/enable', authenticate, async (req, res) => {
+router.post("/enable", authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
 
     // Generate secret
     const secret = speakeasy.generateSecret({
       name: `YourApp (${user.email})`,
-      length: 32
+      length: 32,
     });
 
     // Store secret (not enabled until verified)
@@ -480,42 +496,42 @@ router.post('/enable', authenticate, async (req, res) => {
 
     res.json({
       secret: secret.base32,
-      qrCode
+      qrCode,
     });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to enable MFA' });
+    res.status(500).json({ error: "Failed to enable MFA" });
   }
 });
 
 // Verify and activate MFA
-router.post('/verify', authenticate, async (req, res) => {
+router.post("/verify", authenticate, async (req, res) => {
   try {
     const { token } = req.body;
     const user = await User.findById(req.user.userId);
 
     const verified = speakeasy.totp.verify({
       secret: user.mfaSecret,
-      encoding: 'base32',
+      encoding: "base32",
       token,
-      window: 2
+      window: 2,
     });
 
     if (!verified) {
-      return res.status(400).json({ error: 'Invalid MFA code' });
+      return res.status(400).json({ error: "Invalid MFA code" });
     }
 
     // Activate MFA
     user.mfaEnabled = true;
     await user.save();
 
-    res.json({ message: 'MFA enabled successfully' });
+    res.json({ message: "MFA enabled successfully" });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to verify MFA' });
+    res.status(500).json({ error: "Failed to verify MFA" });
   }
 });
 
 // Disable MFA
-router.post('/disable', authenticate, async (req, res) => {
+router.post("/disable", authenticate, async (req, res) => {
   try {
     const { password } = req.body;
     const user = await User.findById(req.user.userId);
@@ -524,16 +540,16 @@ router.post('/disable', authenticate, async (req, res) => {
     const validPassword = await verifyPassword(password, user.passwordHash);
 
     if (!validPassword) {
-      return res.status(401).json({ error: 'Invalid password' });
+      return res.status(401).json({ error: "Invalid password" });
     }
 
     user.mfaEnabled = false;
     user.mfaSecret = null;
     await user.save();
 
-    res.json({ message: 'MFA disabled successfully' });
+    res.json({ message: "MFA disabled successfully" });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to disable MFA' });
+    res.status(500).json({ error: "Failed to disable MFA" });
   }
 });
 
@@ -552,18 +568,18 @@ if (validPassword) {
     const { mfaToken } = req.body;
 
     if (!mfaToken) {
-      return res.status(400).json({ error: 'MFA token required' });
+      return res.status(400).json({ error: "MFA token required" });
     }
 
     const verified = speakeasy.totp.verify({
       secret: user.mfaSecret,
-      encoding: 'base32',
+      encoding: "base32",
       token: mfaToken,
-      window: 2
+      window: 2,
     });
 
     if (!verified) {
-      return res.status(401).json({ error: 'Invalid MFA code' });
+      return res.status(401).json({ error: "Invalid MFA code" });
     }
   }
 
@@ -577,93 +593,79 @@ if (validPassword) {
 
 ```javascript
 // tests/auth.test.js
-const request = require('supertest');
-const app = require('../app');
-const User = require('../models/User');
+const request = require("supertest");
+const app = require("../app");
+const User = require("../models/User");
 
-describe('Authentication', () => {
+describe("Authentication", () => {
   beforeEach(async () => {
     await User.deleteMany({});
   });
 
-  test('Register user', async () => {
-    const res = await request(app)
-      .post('/api/auth/register')
-      .send({
-        email: 'test@example.com',
-        password: 'SecurePass123!',
-        name: 'Test User'
-      });
+  test("Register user", async () => {
+    const res = await request(app).post("/api/auth/register").send({
+      email: "test@example.com",
+      password: "SecurePass123!",
+      name: "Test User",
+    });
 
     expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty('accessToken');
-    expect(res.body.user.email).toBe('test@example.com');
+    expect(res.body).toHaveProperty("accessToken");
+    expect(res.body.user.email).toBe("test@example.com");
   });
 
-  test('Login with valid credentials', async () => {
+  test("Login with valid credentials", async () => {
     // Create user
-    await request(app)
-      .post('/api/auth/register')
-      .send({
-        email: 'test@example.com',
-        password: 'SecurePass123!',
-        name: 'Test User'
-      });
+    await request(app).post("/api/auth/register").send({
+      email: "test@example.com",
+      password: "SecurePass123!",
+      name: "Test User",
+    });
 
     // Login
-    const res = await request(app)
-      .post('/api/auth/login')
-      .send({
-        email: 'test@example.com',
-        password: 'SecurePass123!'
-      });
+    const res = await request(app).post("/api/auth/login").send({
+      email: "test@example.com",
+      password: "SecurePass123!",
+    });
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('accessToken');
+    expect(res.body).toHaveProperty("accessToken");
   });
 
-  test('Reject weak password', async () => {
-    const res = await request(app)
-      .post('/api/auth/register')
-      .send({
-        email: 'test@example.com',
-        password: 'weak',
-        name: 'Test User'
-      });
+  test("Reject weak password", async () => {
+    const res = await request(app).post("/api/auth/register").send({
+      email: "test@example.com",
+      password: "weak",
+      name: "Test User",
+    });
 
     expect(res.status).toBe(400);
   });
 
-  test('Lock account after failed attempts', async () => {
+  test("Lock account after failed attempts", async () => {
     // Create user
-    await request(app)
-      .post('/api/auth/register')
-      .send({
-        email: 'test@example.com',
-        password: 'SecurePass123!',
-        name: 'Test User'
-      });
+    await request(app).post("/api/auth/register").send({
+      email: "test@example.com",
+      password: "SecurePass123!",
+      name: "Test User",
+    });
 
     // 5 failed login attempts
     for (let i = 0; i < 5; i++) {
-      await request(app)
-        .post('/api/auth/login')
-        .send({
-          email: 'test@example.com',
-          password: 'WrongPassword'
-        });
+      await request(app).post("/api/auth/login").send({
+        email: "test@example.com",
+        password: "WrongPassword",
+      });
     }
 
     // 6th attempt should be locked
-    const res = await request(app)
-      .post('/api/auth/login')
-      .send({
-        email: 'test@example.com',
-        password: 'SecurePass123!'
-      });
+    const res = await request(app).post("/api/auth/login").send({
+      email: "test@example.com",
+      password: "SecurePass123!",
+    });
 
     expect(res.status).toBe(429);
-    expect(res.body.error).toContain('Account locked');
+    expect(res.body.error).toContain("Account locked");
   });
 });
 ```

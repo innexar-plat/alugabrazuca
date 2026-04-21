@@ -15,6 +15,7 @@ OpenAPI Specification (OAS) is a **machine-readable format** for describing REST
 - [SEARCH] **API linting** (Spectral)
 
 **Version History:**
+
 - OpenAPI 3.1 (2021) - Latest, JSON Schema compatible
 - OpenAPI 3.0 (2017) - Major rewrite
 - Swagger 2.0 (2014) - Legacy (avoid for new APIs)
@@ -24,21 +25,21 @@ OpenAPI Specification (OAS) is a **machine-readable format** for describing REST
 ## Basic Structure
 
 ```yaml
-openapi: 3.1.0                    # Required: OAS version
-info:                              # Required: API metadata
+openapi: 3.1.0 # Required: OAS version
+info: # Required: API metadata
   title: My API
   version: 1.0.0
   description: API description
-servers:                           # Optional: API servers
+servers: # Optional: API servers
   - url: https://api.example.com/v1
-paths:                             # Required: API endpoints
+paths: # Required: API endpoints
   /users:
     get:
       summary: List users
       responses:
-        '200':
+        "200":
           description: Success
-components:                        # Optional: Reusable schemas
+components: # Optional: Reusable schemas
   schemas:
     User:
       type: object
@@ -84,8 +85,8 @@ paths:
       tags:
         - users
       parameters:
-        - $ref: '#/components/parameters/LimitParam'
-        - $ref: '#/components/parameters/OffsetParam'
+        - $ref: "#/components/parameters/LimitParam"
+        - $ref: "#/components/parameters/OffsetParam"
         - name: status
           in: query
           description: Filter by user status
@@ -100,7 +101,7 @@ paths:
             default: created_at
             example: -created_at
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
@@ -110,9 +111,9 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/User'
+                      $ref: "#/components/schemas/User"
                   meta:
-                    $ref: '#/components/schemas/PaginationMeta'
+                    $ref: "#/components/schemas/PaginationMeta"
               examples:
                 success:
                   summary: Successful user list
@@ -127,10 +128,10 @@ paths:
                       total: 1500
                       limit: 20
                       offset: 0
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '429':
-          $ref: '#/components/responses/RateLimitError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "429":
+          $ref: "#/components/responses/RateLimitError"
       security:
         - bearerAuth: []
 
@@ -145,7 +146,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUserRequest'
+              $ref: "#/components/schemas/CreateUserRequest"
             examples:
               basic:
                 summary: Basic user creation
@@ -154,7 +155,7 @@ paths:
                   name: "Jane Smith"
                   password: "SecureP@ssw0rd"
       responses:
-        '201':
+        "201":
           description: User created successfully
           headers:
             Location:
@@ -166,17 +167,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '422':
-          $ref: '#/components/responses/ValidationError'
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
       security:
         - bearerAuth: []
 
   /users/{userId}:
     parameters:
-      - $ref: '#/components/parameters/UserIdParam'
+      - $ref: "#/components/parameters/UserIdParam"
 
     get:
       summary: Get user
@@ -185,14 +186,14 @@ paths:
       tags:
         - users
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+                $ref: "#/components/schemas/User"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
       security:
         - bearerAuth: []
 
@@ -207,18 +208,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateUserRequest'
+              $ref: "#/components/schemas/UpdateUserRequest"
       responses:
-        '200':
+        "200":
           description: User updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '422':
-          $ref: '#/components/responses/ValidationError'
+                $ref: "#/components/schemas/User"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
       security:
         - bearerAuth: []
 
@@ -229,10 +230,10 @@ paths:
       tags:
         - users
       responses:
-        '204':
+        "204":
           description: User deleted successfully
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+        "404":
+          $ref: "#/components/responses/NotFoundError"
       security:
         - bearerAuth: []
 
@@ -260,7 +261,7 @@ paths:
                   type: string
                   format: password
       responses:
-        '200':
+        "200":
           description: Login successful
           content:
             application/json:
@@ -277,8 +278,8 @@ paths:
                     type: integer
                     description: Access token expiration in seconds
                     example: 900
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
 components:
   schemas:
@@ -465,7 +466,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             status: 400
             message: "Invalid JSON syntax"
@@ -475,7 +476,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             status: 401
             message: "Authentication required"
@@ -485,7 +486,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             status: 404
             message: "User not found"
@@ -495,7 +496,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             type: "https://api.example.com/errors/validation-error"
             title: "Validation Error"
@@ -532,7 +533,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             status: 429
             message: "Rate limit exceeded. Try again in 60 seconds."
@@ -552,11 +553,13 @@ components:
 ### 1. Reusable Components
 
 **Benefits:**
+
 - DRY (Don't Repeat Yourself)
 - Consistent schemas across endpoints
 - Easier maintenance
 
 **Usage:**
+
 ```yaml
 components:
   schemas:
@@ -570,11 +573,11 @@ paths:
   /users/{id}:
     get:
       responses:
-        '200':
+        "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
 ```
 
 ### 2. Request Bodies
@@ -583,7 +586,7 @@ paths:
 requestBody:
   required: true
   content:
-    application/json:            # Content type
+    application/json: # Content type
       schema:
         type: object
         required:
@@ -592,7 +595,7 @@ requestBody:
           email:
             type: string
             format: email
-      examples:                  # Multiple examples
+      examples: # Multiple examples
         basic:
           value: { email: "user@example.com" }
         admin:
@@ -603,12 +606,12 @@ requestBody:
 
 ```yaml
 responses:
-  '200':
+  "200":
     description: Success
     content:
       application/json:
         schema:
-          $ref: '#/components/schemas/User'
+          $ref: "#/components/schemas/User"
         examples:
           success:
             summary: Successful response
@@ -620,6 +623,7 @@ responses:
 ### 4. Security Schemes
 
 **Bearer Token (JWT):**
+
 ```yaml
 components:
   securitySchemes:
@@ -632,10 +636,11 @@ paths:
   /users:
     get:
       security:
-        - bearerAuth: []      # Requires auth
+        - bearerAuth: [] # Requires auth
 ```
 
 **API Key:**
+
 ```yaml
 components:
   securitySchemes:
@@ -646,6 +651,7 @@ components:
 ```
 
 **OAuth2:**
+
 ```yaml
 components:
   securitySchemes:
@@ -670,16 +676,17 @@ components:
 paths:
   /users:
     get:
-      operationId: listUsers      # GOOD: Used for SDK method names
+      operationId: listUsers # GOOD: Used for SDK method names
 ```
 
 Generates SDK code:
+
 ```javascript
 // JavaScript SDK
 api.listUsers({ limit: 20 });
 
 // Python SDK
-api.list_users(limit=20)
+api.list_users((limit = 20));
 ```
 
 ### 2. Include Examples
@@ -688,20 +695,20 @@ api.list_users(limit=20)
 schema:
   type: string
   format: email
-  example: "user@example.com"    # GOOD: Shows expected format
+  example: "user@example.com" # GOOD: Shows expected format
 ```
 
 ### 3. Document Error Responses
 
 ```yaml
 responses:
-  '422':
+  "422":
     description: Validation error
     content:
       application/json:
         schema:
-          $ref: '#/components/schemas/Error'
-        example:                    # GOOD: Show error format
+          $ref: "#/components/schemas/Error"
+        example: # GOOD: Show error format
           status: 422
           message: "Invalid email"
 ```
@@ -719,7 +726,7 @@ paths:
   /users:
     get:
       tags:
-        - users                     # GOOD: Groups endpoints in docs
+        - users # GOOD: Groups endpoints in docs
 ```
 
 ### 5. Document Deprecations
@@ -728,7 +735,7 @@ paths:
 paths:
   /legacy-endpoint:
     get:
-      deprecated: true              # GOOD: Marks as deprecated
+      deprecated: true # GOOD: Marks as deprecated
       description: |
         **DEPRECATED:** Use /v2/endpoint instead.
         This endpoint will be removed on 2025-06-01.
@@ -749,6 +756,7 @@ spectral lint openapi.yaml
 ```
 
 **Common Rules:**
+
 - operation-operationId: Every operation must have operationId
 - operation-description: Every operation must have description
 - operation-tags: Every operation must have tags
@@ -756,16 +764,17 @@ spectral lint openapi.yaml
 - no-$ref-siblings: Don't mix $ref with other properties
 
 **Custom Rules (.spectral.yaml):**
+
 ```yaml
 rules:
   operation-2xx-response:
     description: Every operation must have at least one 2xx response
     given: $.paths[*][*].responses
     then:
-      field: '@key'
+      field: "@key"
       function: pattern
       functionOptions:
-        match: '^2'
+        match: "^2"
 ```
 
 ### OpenAPI Validator
@@ -786,20 +795,23 @@ docker run -p 8080:8080 swaggerapi/swagger-editor
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-  <title>API Docs</title>
-  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist/swagger-ui.css">
-</head>
-<body>
-  <div id="swagger-ui"></div>
-  <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
-  <script>
-    SwaggerUIBundle({
-      url: '/openapi.yaml',
-      dom_id: '#swagger-ui'
-    });
-  </script>
-</body>
+  <head>
+    <title>API Docs</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/swagger-ui-dist/swagger-ui.css"
+    />
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
+    <script>
+      SwaggerUIBundle({
+        url: "/openapi.yaml",
+        dom_id: "#swagger-ui",
+      });
+    </script>
+  </body>
 </html>
 ```
 
@@ -808,13 +820,13 @@ docker run -p 8080:8080 swaggerapi/swagger-editor
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-  <title>API Docs</title>
-</head>
-<body>
-  <redoc spec-url='/openapi.yaml'></redoc>
-  <script src="https://cdn.jsdelivr.net/npm/redoc/bundles/redoc.standalone.js"></script>
-</body>
+  <head>
+    <title>API Docs</title>
+  </head>
+  <body>
+    <redoc spec-url="/openapi.yaml"></redoc>
+    <script src="https://cdn.jsdelivr.net/npm/redoc/bundles/redoc.standalone.js"></script>
+  </body>
 </html>
 ```
 
@@ -837,20 +849,25 @@ openapi-generator generate \
 ## Tools & Resources
 
 **Editors:**
+
 - [Swagger Editor](https://editor.swagger.io/)
 - [Stoplight Studio](https://stoplight.io/studio)
 
 **Documentation:**
+
 - [Swagger UI](https://swagger.io/tools/swagger-ui/)
 - [Redoc](https://redocly.com/redoc)
 
 **Validation:**
+
 - [Spectral](https://stoplight.io/open-source/spectral)
 - [OpenAPI Validator](https://github.com/IBM/openapi-validator)
 
 **Code Generation:**
+
 - [OpenAPI Generator](https://openapi-generator.tech/)
 - [Swagger Codegen](https://github.com/swagger-api/swagger-codegen)
 
 **Official Spec:**
+
 - [OpenAPI 3.1 Specification](https://spec.openapis.org/oas/latest.html)

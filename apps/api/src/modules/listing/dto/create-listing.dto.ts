@@ -15,8 +15,8 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
   ValidationArguments,
-} from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+} from "class-validator";
+import { Transform, Type } from "class-transformer";
 import {
   PropertyType,
   ListingType,
@@ -30,9 +30,9 @@ import {
   SmokingPolicy,
   VisitorPolicy,
   Currency,
-} from '@prisma/client';
+} from "@prisma/client";
 
-@ValidatorConstraint({ name: 'isAfterField', async: false })
+@ValidatorConstraint({ name: "isAfterField", async: false })
 class IsAfterAvailableFrom implements ValidatorConstraintInterface {
   validate(value: string, args: ValidationArguments) {
     const obj = args.object as any;
@@ -40,7 +40,7 @@ class IsAfterAvailableFrom implements ValidatorConstraintInterface {
     return new Date(value) >= new Date(obj.availableFrom);
   }
   defaultMessage() {
-    return 'availableTo must be equal to or after availableFrom';
+    return "availableTo must be equal to or after availableFrom";
   }
 }
 
@@ -416,7 +416,7 @@ export class CreateListingDto {
   @IsString()
   @MaxLength(1000)
   @Transform(({ value }) =>
-    typeof value === 'string' ? value.replace(/<[^>]*>/g, '') : value,
+    typeof value === "string" ? value.replace(/<[^>]*>/g, "") : value,
   )
   additionalRules?: string;
 

@@ -36,45 +36,45 @@ Activate this skill when:
 
 ## Quick Reference Table
 
-| Security Task | Tool/Pattern | Implementation | When to Use |
-|---------------|--------------|----------------|-------------|
-| **Primary Auth** | Passkeys/WebAuthn | `navigator.credentials.create()` | New apps (2026+), phishing-resistant, broad platform support |
-| Password Storage | bcrypt/Argon2 | `bcrypt.hash(password, 12)` | Legacy auth fallback (never store plaintext) |
-| Input Validation | Allowlist regex | `/^[a-zA-Z0-9_]{3,20}$/` | All user input (SQL, XSS, command injection prevention) |
-| SQL Queries | Parameterized queries | `db.execute(query, [userId])` | All database operations (prevent SQL injection) |
-| API Authentication | OAuth 2.1 + PKCE | `oauth.authorize({ code_challenge })` | Third-party auth, API access (deprecates implicit flow) |
-| Token Auth | JWT (short-lived) | `jwt.sign(payload, secret, { expiresIn: '15m' })` | Stateless APIs (always validate, 15-30 min expiry) |
-| Data Encryption | AES-256-GCM | `crypto.createCipheriv('aes-256-gcm')` | Sensitive data at rest (PII, financial, health) |
-| HTTPS/TLS | TLS 1.3 | Force HTTPS redirects | All production traffic (data in transit) |
-| Access Control | RBAC/ABAC | `requireRole('admin', 'moderator')` | Resource authorization (APIs, admin panels) |
-| Rate Limiting | express-rate-limit | `limiter({ windowMs: 15min, max: 100 })` | Public APIs, auth endpoints (DoS prevention) |
-| Security Requirements | OWASP ASVS | Choose L1/L2/L3 | Security requirements baseline + test scope |
+| Security Task         | Tool/Pattern          | Implementation                                    | When to Use                                                  |
+| --------------------- | --------------------- | ------------------------------------------------- | ------------------------------------------------------------ |
+| **Primary Auth**      | Passkeys/WebAuthn     | `navigator.credentials.create()`                  | New apps (2026+), phishing-resistant, broad platform support |
+| Password Storage      | bcrypt/Argon2         | `bcrypt.hash(password, 12)`                       | Legacy auth fallback (never store plaintext)                 |
+| Input Validation      | Allowlist regex       | `/^[a-zA-Z0-9_]{3,20}$/`                          | All user input (SQL, XSS, command injection prevention)      |
+| SQL Queries           | Parameterized queries | `db.execute(query, [userId])`                     | All database operations (prevent SQL injection)              |
+| API Authentication    | OAuth 2.1 + PKCE      | `oauth.authorize({ code_challenge })`             | Third-party auth, API access (deprecates implicit flow)      |
+| Token Auth            | JWT (short-lived)     | `jwt.sign(payload, secret, { expiresIn: '15m' })` | Stateless APIs (always validate, 15-30 min expiry)           |
+| Data Encryption       | AES-256-GCM           | `crypto.createCipheriv('aes-256-gcm')`            | Sensitive data at rest (PII, financial, health)              |
+| HTTPS/TLS             | TLS 1.3               | Force HTTPS redirects                             | All production traffic (data in transit)                     |
+| Access Control        | RBAC/ABAC             | `requireRole('admin', 'moderator')`               | Resource authorization (APIs, admin panels)                  |
+| Rate Limiting         | express-rate-limit    | `limiter({ windowMs: 15min, max: 100 })`          | Public APIs, auth endpoints (DoS prevention)                 |
+| Security Requirements | OWASP ASVS            | Choose L1/L2/L3                                   | Security requirements baseline + test scope                  |
 
 ## Authentication Decision Matrix (Jan 2026)
 
-| Method | Use Case | Token Lifetime | Security Level | Notes |
-|--------|----------|----------------|----------------|-------|
-| **Passkeys/WebAuthn** | Primary auth (2026+) | N/A (cryptographic) | Highest | Phishing-resistant, broad platform support |
-| OAuth 2.1 + PKCE | Third-party auth | 5-15 min access | High | Replaces implicit flow, mandatory PKCE |
-| Session cookies | Traditional web apps | 30 min - 4 hrs | Medium-High | HttpOnly, Secure, SameSite=Strict |
-| JWT stateless | APIs, microservices | 15-30 min | Medium | Always validate signature, short expiry |
-| API keys | Machine-to-machine | Long-lived | Low-Medium | Rotate regularly, scope permissions |
+| Method                | Use Case             | Token Lifetime      | Security Level | Notes                                      |
+| --------------------- | -------------------- | ------------------- | -------------- | ------------------------------------------ |
+| **Passkeys/WebAuthn** | Primary auth (2026+) | N/A (cryptographic) | Highest        | Phishing-resistant, broad platform support |
+| OAuth 2.1 + PKCE      | Third-party auth     | 5-15 min access     | High           | Replaces implicit flow, mandatory PKCE     |
+| Session cookies       | Traditional web apps | 30 min - 4 hrs      | Medium-High    | HttpOnly, Secure, SameSite=Strict          |
+| JWT stateless         | APIs, microservices  | 15-30 min           | Medium         | Always validate signature, short expiry    |
+| API keys              | Machine-to-machine   | Long-lived          | Low-Medium     | Rotate regularly, scope permissions        |
 
 **Jurisdiction notes (verify):** Authentication assurance requirements vary by country, industry, and buyer. Prefer passkeys/FIDO2; treat SMS OTP as recovery-only/low assurance unless you can justify it.
 
 ## OWASP Top 10:2025 Quick Checklist
 
-| # | Risk | Key Controls | Test |
-|---|------|--------------|------|
-| A01 | Broken Access Control | RBAC/ABAC, deny by default, CORS allowlist | BOLA, BFLA, privilege escalation |
-| A02 | Security Misconfiguration | Harden defaults, disable unused features, error handling | Default creds, stack traces, headers |
-| A03 | **Supply Chain Failures** (NEW) | SBOM, dependency scanning, SLSA, code signing | Outdated deps, typosquatting, compromised packages |
-| A04 | Cryptographic Failures | TLS 1.3, AES-256-GCM, key rotation, no MD5/SHA1 | Weak ciphers, exposed secrets, cert validation |
-| A05 | Injection | Parameterized queries, input validation, output encoding | SQLi, XSS, command injection, LDAP injection |
-| A06 | Insecure Design | Threat modeling, secure design patterns, abuse cases | Design flaws, missing controls, trust boundaries |
-| A07 | Authentication Failures | MFA/passkeys, rate limiting, secure password storage | Credential stuffing, brute force, session fixation |
-| A08 | Integrity Failures | Code signing, CI/CD pipeline security, SRI | Unsigned updates, pipeline poisoning, CDN tampering |
-| A09 | Logging Failures | Structured JSON, SIEM integration, correlation IDs | Missing logs, PII in logs, no alerting |
+| #   | Risk                             | Key Controls                                                  | Test                                                |
+| --- | -------------------------------- | ------------------------------------------------------------- | --------------------------------------------------- |
+| A01 | Broken Access Control            | RBAC/ABAC, deny by default, CORS allowlist                    | BOLA, BFLA, privilege escalation                    |
+| A02 | Security Misconfiguration        | Harden defaults, disable unused features, error handling      | Default creds, stack traces, headers                |
+| A03 | **Supply Chain Failures** (NEW)  | SBOM, dependency scanning, SLSA, code signing                 | Outdated deps, typosquatting, compromised packages  |
+| A04 | Cryptographic Failures           | TLS 1.3, AES-256-GCM, key rotation, no MD5/SHA1               | Weak ciphers, exposed secrets, cert validation      |
+| A05 | Injection                        | Parameterized queries, input validation, output encoding      | SQLi, XSS, command injection, LDAP injection        |
+| A06 | Insecure Design                  | Threat modeling, secure design patterns, abuse cases          | Design flaws, missing controls, trust boundaries    |
+| A07 | Authentication Failures          | MFA/passkeys, rate limiting, secure password storage          | Credential stuffing, brute force, session fixation  |
+| A08 | Integrity Failures               | Code signing, CI/CD pipeline security, SRI                    | Unsigned updates, pipeline poisoning, CDN tampering |
+| A09 | Logging Failures                 | Structured JSON, SIEM integration, correlation IDs            | Missing logs, PII in logs, no alerting              |
 | A10 | **Exceptional Conditions** (NEW) | Fail-safe defaults, complete error recovery, input validation | Error handling gaps, fail-open, resource exhaustion |
 
 ## Decision Tree: Security Implementation
@@ -119,22 +119,22 @@ Security investment justification and compliance-driven revenue. Full framework:
 
 Indicative figures (source: IBM Cost of a Data Breach 2024; refresh for current year): https://www.ibm.com/reports/data-breach
 
-| Metric | Global Avg | US Avg | Impact |
-|--------|------------|--------|--------|
-| Avg breach cost | $4.88M | $9.36M | Budget justification baseline |
-| Cost per record | $165 | $194 | Data classification priority |
-| Detection time | 204 days | 191 days | SIEM/monitoring ROI |
-| DevSecOps adoption | -$1.68M | -34% | Shift-left justification |
-| IR team | -$2.26M | -46% | Highest ROI control |
+| Metric             | Global Avg | US Avg   | Impact                        |
+| ------------------ | ---------- | -------- | ----------------------------- |
+| Avg breach cost    | $4.88M     | $9.36M   | Budget justification baseline |
+| Cost per record    | $165       | $194     | Data classification priority  |
+| Detection time     | 204 days   | 191 days | SIEM/monitoring ROI           |
+| DevSecOps adoption | -$1.68M    | -34%     | Shift-left justification      |
+| IR team            | -$2.26M    | -46%     | Highest ROI control           |
 
 ### Compliance → Enterprise Sales
 
-| Certification | Deals Unlocked | Sales Impact |
-|---------------|----------------|--------------|
-| SOC 2 Type II | $100K+ enterprise | Typically reduces security questionnaire friction |
-| ISO 27001 | $250K+ EU enterprise | Preferred vendor status |
-| HIPAA | Healthcare vertical | Market access |
-| FedRAMP | $1M+ government | US gov market entry |
+| Certification | Deals Unlocked       | Sales Impact                                      |
+| ------------- | -------------------- | ------------------------------------------------- |
+| SOC 2 Type II | $100K+ enterprise    | Typically reduces security questionnaire friction |
+| ISO 27001     | $250K+ EU enterprise | Preferred vendor status                           |
+| HIPAA         | Healthcare vertical  | Market access                                     |
+| FedRAMP       | $1M+ government      | US gov market entry                               |
 
 ### ROI Formula (Quick Reference)
 
@@ -151,23 +151,23 @@ Example: 15% × $4.88M × 46% = $337K/year risk reduction
 
 ### Security Incident Playbook
 
-| Phase | Actions |
-|-------|---------|
-| **Detect** | Alert fires, user report, automated scan |
-| **Contain** | Isolate affected systems, revoke compromised credentials |
-| **Investigate** | Collect logs, determine scope, identify root cause |
-| **Remediate** | Patch vulnerability, rotate secrets, update defenses |
-| **Recover** | Restore services, verify fixes, update monitoring |
-| **Learn** | Post-mortem, update playbooks, share lessons |
+| Phase           | Actions                                                  |
+| --------------- | -------------------------------------------------------- |
+| **Detect**      | Alert fires, user report, automated scan                 |
+| **Contain**     | Isolate affected systems, revoke compromised credentials |
+| **Investigate** | Collect logs, determine scope, identify root cause       |
+| **Remediate**   | Patch vulnerability, rotate secrets, update defenses     |
+| **Recover**     | Restore services, verify fixes, update monitoring        |
+| **Learn**       | Post-mortem, update playbooks, share lessons             |
 
 ### Security Logging Requirements
 
-| What to Log | Format | Retention |
-|-------------|--------|-----------|
-| Authentication events | JSON with correlation ID | 90 days minimum |
-| Authorization failures | JSON with user context | 90 days minimum |
-| Data access (sensitive) | JSON with resource ID | 1 year minimum |
-| Security scan results | SARIF format | 1 year minimum |
+| What to Log             | Format                   | Retention       |
+| ----------------------- | ------------------------ | --------------- |
+| Authentication events   | JSON with correlation ID | 90 days minimum |
+| Authorization failures  | JSON with user context   | 90 days minimum |
+| Data access (sensitive) | JSON with resource ID    | 1 year minimum  |
+| Security scan results   | SARIF format             | 1 year minimum  |
 
 **Do:**
 
@@ -183,16 +183,16 @@ Example: 15% × $4.88M × 46% = $337K/year risk reduction
 
 ### Common Security Mistakes
 
-| FAIL Bad Practice | PASS Correct Approach | Risk |
-| --------------- | ------------------- | ---- |
-| `query = "SELECT * FROM users WHERE id=" + userId` | `db.execute("SELECT * FROM users WHERE id=?", [userId])` | SQL injection |
-| Storing passwords in plaintext or MD5 | `bcrypt.hash(password, 12)` or Argon2 | Credential theft |
-| `res.send(userInput)` without encoding | `res.send(DOMPurify.sanitize(userInput))` | XSS |
-| Hardcoded API keys in source code | Environment variables + secrets manager | Secret exposure |
-| `Access-Control-Allow-Origin: *` | Explicit origin allowlist | CORS bypass |
-| JWT with no expiration | `expiresIn: '15m'` + refresh tokens | Token hijacking |
-| Generic error messages to logs | Structured JSON with correlation IDs | Debugging blind spots |
-| SMS OTP as primary factor | Passkeys/WebAuthn or TOTP (keep SMS for recovery-only) | Credential phishing |
+| FAIL Bad Practice                                  | PASS Correct Approach                                    | Risk                  |
+| -------------------------------------------------- | -------------------------------------------------------- | --------------------- |
+| `query = "SELECT * FROM users WHERE id=" + userId` | `db.execute("SELECT * FROM users WHERE id=?", [userId])` | SQL injection         |
+| Storing passwords in plaintext or MD5              | `bcrypt.hash(password, 12)` or Argon2                    | Credential theft      |
+| `res.send(userInput)` without encoding             | `res.send(DOMPurify.sanitize(userInput))`                | XSS                   |
+| Hardcoded API keys in source code                  | Environment variables + secrets manager                  | Secret exposure       |
+| `Access-Control-Allow-Origin: *`                   | Explicit origin allowlist                                | CORS bypass           |
+| JWT with no expiration                             | `expiresIn: '15m'` + refresh tokens                      | Token hijacking       |
+| Generic error messages to logs                     | Structured JSON with correlation IDs                     | Debugging blind spots |
+| SMS OTP as primary factor                          | Passkeys/WebAuthn or TOTP (keep SMS for recovery-only)   | Credential phishing   |
 
 ---
 
@@ -202,20 +202,20 @@ Example: 15% × $4.88M × 46% = $337K/year risk reduction
 
 #### LLM Security Patterns
 
-| Threat | Mitigation |
-|--------|------------|
-| Prompt injection | Input validation, output filtering, sandboxed execution |
-| Data exfiltration | Output scanning, PII detection |
-| Model theft | API rate limiting, watermarking |
-| Jailbreaking | Constitutional AI, guardrails |
+| Threat            | Mitigation                                              |
+| ----------------- | ------------------------------------------------------- |
+| Prompt injection  | Input validation, output filtering, sandboxed execution |
+| Data exfiltration | Output scanning, PII detection                          |
+| Model theft       | API rate limiting, watermarking                         |
+| Jailbreaking      | Constitutional AI, guardrails                           |
 
 #### AI-Assisted Security Tools
 
-| Tool | Use Case |
-|------|----------|
-| Semgrep | Static analysis with AI rules |
-| Snyk Code | AI-powered vulnerability detection |
-| GitHub CodeQL | Semantic code analysis |
+| Tool          | Use Case                           |
+| ------------- | ---------------------------------- |
+| Semgrep       | Static analysis with AI rules      |
+| Snyk Code     | AI-powered vulnerability detection |
+| GitHub CodeQL | Semantic code analysis             |
 
 ---
 
@@ -361,6 +361,7 @@ Before building any feature that involves storage, uploads, or user-generated co
 Building storage/upload features without upfront security constraints leads to retroactive hardening that is more expensive and error-prone.
 
 ## Operational Playbooks
+
 - [references/operational-playbook.md](references/operational-playbook.md) — Core security principles, OWASP summaries, authentication patterns, and detailed code examples
 
 ## Fact-Checking

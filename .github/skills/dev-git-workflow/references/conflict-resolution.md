@@ -24,6 +24,7 @@ Comprehensive guide to preventing, understanding, and resolving Git merge confli
 ### What Causes Conflicts?
 
 Git conflicts occur when:
+
 1. Two branches modify the **same lines** in the same file
 2. One branch modifies a file, another deletes it
 3. Both branches add a file with the same name but different content
@@ -39,6 +40,7 @@ const API_URL = "https://api.staging.com";
 ```
 
 **Components**:
+
 - `<<<<<<<` - Start of conflict
 - `=======` - Divider between versions
 - `>>>>>>>` - End of conflict
@@ -52,6 +54,7 @@ const API_URL = "https://api.staging.com";
 ### 1. Merge/Rebase Frequently
 
 **Pull from main daily**:
+
 ```bash
 # At start of day
 git checkout feature/my-feature
@@ -67,6 +70,7 @@ git merge origin/main
 ### 2. Communicate with Team
 
 **Before refactoring**:
+
 - Announce in team chat: "Refactoring auth module today"
 - Check who else is working on same area
 - Coordinate to avoid overlapping changes
@@ -74,6 +78,7 @@ git merge origin/main
 ### 3. Small, Focused PRs
 
 **Good** (small, focused):
+
 ```bash
 # PR 1: Refactor auth service
 # PR 2: Add OAuth2 (depends on PR 1)
@@ -81,6 +86,7 @@ git merge origin/main
 ```
 
 **Bad** (large, overlapping):
+
 ```bash
 # PR 1: Huge rewrite touching 50 files
 # PR 2: Another huge rewrite overlapping 30 files
@@ -90,6 +96,7 @@ git merge origin/main
 ### 4. Use Feature Flags
 
 **Avoid conflicts in shared files**:
+
 ```javascript
 // Instead of modifying shared config directly
 export const config = {
@@ -99,9 +106,9 @@ export const config = {
 
 // Use feature flags
 export const config = {
-  apiUrl: featureFlags.isEnabled('newApi')
-    ? 'https://api-v2.com'
-    : 'https://api-v1.com',
+  apiUrl: featureFlags.isEnabled("newApi")
+    ? "https://api-v2.com"
+    : "https://api-v1.com",
 };
 ```
 
@@ -114,18 +121,21 @@ export const config = {
 **Use when**: One version is clearly correct.
 
 **Keep your changes**:
+
 ```bash
 git checkout --ours path/to/file
 git add path/to/file
 ```
 
 **Keep their changes**:
+
 ```bash
 git checkout --theirs path/to/file
 git add path/to/file
 ```
 
 **Example**:
+
 ```bash
 # Conflict in config file
 # You: production URL
@@ -142,6 +152,7 @@ git commit -m "merge: resolve conflict, keep production API URL"
 **Use when**: Need both changes or custom solution.
 
 **Steps**:
+
 1. Open file in editor
 2. Find conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`)
 3. Edit to combine or choose parts
@@ -149,6 +160,7 @@ git commit -m "merge: resolve conflict, keep production API URL"
 5. Stage and commit
 
 **Example - Before**:
+
 ```javascript
 <<<<<<< HEAD
 function calculateTotal(items) {
@@ -163,9 +175,10 @@ function calculateTotal(items) {
 ```
 
 **After - Combined**:
+
 ```javascript
 function calculateTotal(items) {
-  return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 }
 ```
 
@@ -174,6 +187,7 @@ function calculateTotal(items) {
 **Visual conflict resolution** with 3-way diff.
 
 **Configure merge tool**:
+
 ```bash
 # VS Code
 git config --global merge.tool vscode
@@ -184,6 +198,7 @@ git mergetool
 ```
 
 **Usage**:
+
 ```bash
 # When conflict occurs
 git mergetool
@@ -205,12 +220,14 @@ git commit
 ### When to Use Merge
 
 **Use merge when**:
+
 - Working on shared branch
 - History preservation is important
 - Multiple developers on same branch
 - Conflicts are complex (easier to track in merge commit)
 
 **Command**:
+
 ```bash
 git checkout feature/my-feature
 git merge main
@@ -221,6 +238,7 @@ git commit -m "merge: resolve conflicts with main"
 ```
 
 **Result**:
+
 ```
 *   merge commit
 |\
@@ -235,12 +253,14 @@ git commit -m "merge: resolve conflicts with main"
 ### When to Use Rebase
 
 **Use rebase when**:
+
 - Working on solo feature branch
 - Want clean linear history
 - Preparing for PR (clean up commits)
 - Conflicts are simple
 
 **Command**:
+
 ```bash
 git checkout feature/my-feature
 git rebase main
@@ -253,6 +273,7 @@ git rebase --continue
 ```
 
 **Result** (linear history):
+
 ```
 * feature commit 2 (rebased)
 * feature commit 1 (rebased)
@@ -297,6 +318,7 @@ git rebase --abort  # Cancel and go back to before rebase
 ### Scenario 1: Same Line Modified
 
 **Conflict**:
+
 ```javascript
 <<<<<<< HEAD
 const timeout = 5000;
@@ -306,9 +328,10 @@ const timeout = 3000;
 ```
 
 **Resolution** (decide which value or combine):
+
 ```javascript
 // Option 1: Choose one
-const timeout = 3000;  // Use their value
+const timeout = 3000; // Use their value
 
 // Option 2: Use config
 const timeout = process.env.TIMEOUT || 5000;
@@ -317,6 +340,7 @@ const timeout = process.env.TIMEOUT || 5000;
 ### Scenario 2: Function Modified Differently
 
 **Conflict**:
+
 ```javascript
 <<<<<<< HEAD
 function authenticate(username, password) {
@@ -330,6 +354,7 @@ function authenticate(username, password, token) {
 ```
 
 **Resolution** (keep 2FA version):
+
 ```javascript
 function authenticate(username, password, token) {
   const passwordValid = bcrypt.compare(password, user.passwordHash);
@@ -341,6 +366,7 @@ function authenticate(username, password, token) {
 ### Scenario 3: Import Statements
 
 **Conflict**:
+
 ```javascript
 <<<<<<< HEAD
 import { useState, useEffect } from 'react';
@@ -352,19 +378,22 @@ import { fetchUser, fetchPosts } from './api';
 ```
 
 **Resolution** (combine both):
+
 ```javascript
-import { useState, useEffect } from 'react';
-import { fetchUser, fetchPosts } from './api';
+import { useState, useEffect } from "react";
+import { fetchUser, fetchPosts } from "./api";
 ```
 
 ### Scenario 4: File Deleted in One Branch
 
 **Conflict**:
+
 ```
 CONFLICT (modify/delete): legacy-api.ts deleted in their branch and modified in HEAD.
 ```
 
 **Resolution options**:
+
 ```bash
 # Keep the file (your modification)
 git add legacy-api.ts
@@ -374,6 +403,7 @@ git rm legacy-api.ts
 ```
 
 **Decision factors**:
+
 - Is the file still needed?
 - Were the modifications important?
 - Can functionality move elsewhere?
@@ -381,6 +411,7 @@ git rm legacy-api.ts
 ### Scenario 5: Same File Added Differently
 
 **Conflict**:
+
 ```
 CONFLICT (add/add): Merge conflict in config.ts
 ```
@@ -388,6 +419,7 @@ CONFLICT (add/add): Merge conflict in config.ts
 Both branches added `config.ts` with different content.
 
 **Resolution**:
+
 ```bash
 # View both versions
 git show :2:config.ts  # Your version
@@ -422,6 +454,7 @@ pick ghi789 feat: add feature C
 ### Cherry-Pick with Conflict
 
 **Pick specific commits from another branch**:
+
 ```bash
 # Cherry-pick commit from feature branch
 git cherry-pick abc123
@@ -437,6 +470,7 @@ git cherry-pick --abort
 ### Recursive Theirs/Ours Strategy
 
 **Auto-resolve conflicts** (use with caution):
+
 ```bash
 # Merge with "ours" strategy (keep your changes on conflict)
 git merge -X ours feature-branch
@@ -449,6 +483,7 @@ git rebase -X theirs main
 ```
 
 **When to use**:
+
 - Mass refactoring where you know your version is correct
 - Reverting temporary changes
 - Emergency hotfix where conflicts are expected
@@ -506,6 +541,7 @@ git commit --amend --no-edit
 ### Manual Testing
 
 **For complex conflicts**:
+
 1. Start application locally
 2. Test affected features manually
 3. Verify no regressions
@@ -518,6 +554,7 @@ git commit --amend --no-edit
 ### Pair on Complex Conflicts
 
 **When conflicts are complex**:
+
 ```bash
 # Screen share with team member who made conflicting changes
 git merge feature/their-branch
@@ -528,6 +565,7 @@ git merge feature/their-branch
 ### Document Resolution Decisions
 
 **In merge commit message**:
+
 ```bash
 git commit -m "merge: resolve conflicts between auth refactor and OAuth feature
 
@@ -542,6 +580,7 @@ Tested manually: login, OAuth, token refresh all working"
 ### Code Review After Resolution
 
 **For critical conflicts**:
+
 ```bash
 # Don't merge directly
 # Create PR with conflict resolution
@@ -662,6 +701,7 @@ git config --global rerere.enabled true
 ```
 
 **When useful**:
+
 - Rebasing frequently
 - Recurring conflicts in long-lived branches
 
@@ -686,6 +726,7 @@ git log feature-branch..HEAD
 ### Undo Merge
 
 **If merge went wrong**:
+
 ```bash
 # Immediately after merge (before other commits)
 git reset --hard HEAD~1
@@ -698,6 +739,7 @@ git reset --hard HEAD@{2}  # Go back to before merge
 ### Undo Rebase
 
 **If rebase went wrong**:
+
 ```bash
 # Abort during rebase
 git rebase --abort
@@ -710,6 +752,7 @@ git reset --hard HEAD@{5}  # Go back to before rebase
 ### Recover Lost Work
 
 **If you lost changes during conflict resolution**:
+
 ```bash
 # View reflog
 git reflog

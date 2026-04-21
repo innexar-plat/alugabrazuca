@@ -21,6 +21,7 @@ Use binary search across commit history to find the exact commit that introduced
 ## When to Use Bisect
 
 Use `git bisect` when:
+
 - Something worked before and now it does not ("it was fine last week")
 - You cannot identify the breaking change by reading recent commits
 - The regression is in a range of many commits (10+)
@@ -99,11 +100,11 @@ git bisect start HEAD v2.3.0 -- && git bisect run npm test
 
 The script must use specific exit codes:
 
-| Exit Code | Meaning |
-|-----------|---------|
-| `0` | Good commit (no bug) |
-| `1-124`, `126-127` | Bad commit (bug present) |
-| `125` | Skip (cannot test this commit, e.g. build failure) |
+| Exit Code          | Meaning                                            |
+| ------------------ | -------------------------------------------------- |
+| `0`                | Good commit (no bug)                               |
+| `1-124`, `126-127` | Bad commit (bug present)                           |
+| `125`              | Skip (cannot test this commit, e.g. build failure) |
 
 ### Example: Test a specific behavior
 
@@ -172,11 +173,13 @@ git bisect run ./scripts/bisect-test.sh
 ```
 
 **When to use `--first-parent`**:
+
 - Repository uses merge commits (no rebase workflow)
 - You want to find which PR/merge introduced the regression
 - Feature branch internals are not relevant to the search
 
 **When to skip `--first-parent`**:
+
 - Repository uses squash merges (each commit is already atomic)
 - You need to find the exact commit within a feature branch
 
@@ -325,6 +328,7 @@ git bisect reset <branch>          # Return to specific branch
 ## Do / Avoid
 
 **DO**:
+
 - [OK] Write a reliable repro script before starting bisect
 - [OK] Use `exit 125` in scripts for untestable commits (build failures)
 - [OK] Narrow the good/bad range with `git log` before bisecting
@@ -334,6 +338,7 @@ git bisect reset <branch>          # Return to specific branch
 - [OK] Use path restrictions (`-- src/`) when you know which area regressed
 
 **AVOID**:
+
 - [FAIL] Running bisect without a reproducible test (manual "does it feel right" is unreliable)
 - [FAIL] Marking a commit as bad when the failure is unrelated (use skip instead)
 - [FAIL] Bisecting across thousands of commits without narrowing first

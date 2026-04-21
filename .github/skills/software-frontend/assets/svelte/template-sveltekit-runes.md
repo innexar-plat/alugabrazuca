@@ -134,8 +134,8 @@ my-app/
 
 ```typescript
 // src/routes/blog/[slug]/+page.server.ts
-import type { PageServerLoad } from './$types';
-import { prisma } from '$lib/server/prisma';
+import type { PageServerLoad } from "./$types";
+import { prisma } from "$lib/server/prisma";
 
 export const load: PageServerLoad = async ({ params }) => {
   const post = await prisma.post.findUnique({
@@ -143,7 +143,7 @@ export const load: PageServerLoad = async ({ params }) => {
   });
 
   if (!post) {
-    throw error(404, 'Post not found');
+    throw error(404, "Post not found");
   }
 
   return { post };
@@ -192,20 +192,20 @@ export const load: PageServerLoad = async ({ params }) => {
 
 ```typescript
 // src/routes/login/+page.server.ts
-import { fail, redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
-import { z } from 'zod';
+import { fail, redirect } from "@sveltejs/kit";
+import type { Actions } from "./$types";
+import { z } from "zod";
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 export const actions: Actions = {
   default: async ({ request, cookies }) => {
     const formData = await request.formData();
-    const email = formData.get('email');
-    const password = formData.get('password');
+    const email = formData.get("email");
+    const password = formData.get("password");
 
     const result = loginSchema.safeParse({ email, password });
 
@@ -220,20 +220,20 @@ export const actions: Actions = {
 
     if (!user) {
       return fail(401, {
-        errors: { email: 'Invalid credentials' },
+        errors: { email: "Invalid credentials" },
       });
     }
 
     // Set session
-    cookies.set('session', user.sessionToken, {
-      path: '/',
+    cookies.set("session", user.sessionToken, {
+      path: "/",
       httpOnly: true,
       secure: true,
-      sameSite: 'strict',
+      sameSite: "strict",
       maxAge: 60 * 60 * 24 * 7, // 1 week
     });
 
-    throw redirect(303, '/dashboard');
+    throw redirect(303, "/dashboard");
   },
 };
 ```
@@ -242,18 +242,18 @@ export const actions: Actions = {
 
 ```typescript
 // src/routes/api/posts/+server.ts
-import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
-import { prisma } from '$lib/server/prisma';
+import { json } from "@sveltejs/kit";
+import type { RequestHandler } from "./$types";
+import { prisma } from "$lib/server/prisma";
 
 export const GET: RequestHandler = async ({ url }) => {
-  const page = Number(url.searchParams.get('page')) || 1;
-  const limit = Number(url.searchParams.get('limit')) || 10;
+  const page = Number(url.searchParams.get("page")) || 1;
+  const limit = Number(url.searchParams.get("limit")) || 10;
 
   const posts = await prisma.post.findMany({
     skip: (page - 1) * limit,
     take: limit,
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
   });
 
   const total = await prisma.post.count();
@@ -288,9 +288,15 @@ export function createAuthStore() {
   let isAuthenticated = $derived(!!user);
 
   return {
-    get user() { return user; },
-    get token() { return token; },
-    get isAuthenticated() { return isAuthenticated; },
+    get user() {
+      return user;
+    },
+    get token() {
+      return token;
+    },
+    get isAuthenticated() {
+      return isAuthenticated;
+    },
 
     login(newUser: User, newToken: string) {
       user = newUser;
@@ -309,6 +315,7 @@ export const authStore = createAuthStore();
 ```
 
 Usage:
+
 ```svelte
 <script lang="ts">
   import { authStore } from '$lib/stores/auth.svelte';
@@ -332,19 +339,19 @@ Usage:
 
 ```typescript
 // src/lib/components/Counter.test.ts
-import { render, screen, fireEvent } from '@testing-library/svelte';
-import { describe, it, expect } from 'vitest';
-import Counter from './Counter.svelte';
+import { render, screen, fireEvent } from "@testing-library/svelte";
+import { describe, it, expect } from "vitest";
+import Counter from "./Counter.svelte";
 
-describe('Counter', () => {
-  it('renders initial count', () => {
+describe("Counter", () => {
+  it("renders initial count", () => {
     render(Counter);
     expect(screen.getByText(/Count: 0/)).toBeInTheDocument();
   });
 
-  it('increments count', async () => {
+  it("increments count", async () => {
     render(Counter);
-    const button = screen.getByText('+');
+    const button = screen.getByText("+");
     await fireEvent.click(button);
     expect(screen.getByText(/Count: 1/)).toBeInTheDocument();
   });

@@ -3,7 +3,7 @@
 **Status:** ✅ Completo  
 **Data:** 2025-07-20  
 **Módulo anterior:** M02 Listing  
-**Próximo módulo:** M04 Landing  
+**Próximo módulo:** M04 Landing
 
 ---
 
@@ -11,71 +11,72 @@
 
 ### Backend (NestJS)
 
-| Arquivo | Descrição |
-|---------|-----------|
+| Arquivo                                                   | Descrição                                                                    |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | `apps/api/src/modules/listing/dto/search-listings.dto.ts` | DTO com todos os filtros de busca (20+ campos com validação class-validator) |
-| `apps/api/src/modules/listing/search.service.ts` | Service com `search()`, `getCities()`, `getSuggestions()` |
-| `apps/api/src/modules/listing/search.controller.ts` | Controller público com 3 endpoints |
-| `apps/api/src/modules/listing/listing.module.ts` | Atualizado — registra SearchController + SearchService |
+| `apps/api/src/modules/listing/search.service.ts`          | Service com `search()`, `getCities()`, `getSuggestions()`                    |
+| `apps/api/src/modules/listing/search.controller.ts`       | Controller público com 3 endpoints                                           |
+| `apps/api/src/modules/listing/listing.module.ts`          | Atualizado — registra SearchController + SearchService                       |
 
 ### Frontend (Next.js)
 
-| Arquivo | Descrição |
-|---------|-----------|
+| Arquivo                                             | Descrição                                                        |
+| --------------------------------------------------- | ---------------------------------------------------------------- |
 | `apps/web/src/app/[locale]/(public)/rooms/page.tsx` | Página de busca com filtros, autocomplete, paginação e ordenação |
-| `apps/web/src/messages/pt.json` | +58 chaves `search.*` |
-| `apps/web/src/messages/en.json` | +58 chaves `search.*` |
-| `apps/web/src/messages/es.json` | +58 chaves `search.*` |
+| `apps/web/src/messages/pt.json`                     | +58 chaves `search.*`                                            |
+| `apps/web/src/messages/en.json`                     | +58 chaves `search.*`                                            |
+| `apps/web/src/messages/es.json`                     | +58 chaves `search.*`                                            |
 
 ---
 
 ## 2. Endpoints
 
-| Método | Rota | Auth | Descrição |
-|--------|------|------|-----------|
-| `GET` | `/api/v1/listings/search` | Público | Busca com filtros, paginação e ordenação |
-| `GET` | `/api/v1/listings/cities` | Público | Cidades com anúncios ativos (groupBy com count) |
-| `GET` | `/api/v1/listings/suggestions` | Público | Autocomplete por cidade/bairro/estado/CEP |
+| Método | Rota                           | Auth    | Descrição                                       |
+| ------ | ------------------------------ | ------- | ----------------------------------------------- |
+| `GET`  | `/api/v1/listings/search`      | Público | Busca com filtros, paginação e ordenação        |
+| `GET`  | `/api/v1/listings/cities`      | Público | Cidades com anúncios ativos (groupBy com count) |
+| `GET`  | `/api/v1/listings/suggestions` | Público | Autocomplete por cidade/bairro/estado/CEP       |
 
 ### GET /listings/search — Query Parameters
 
-| Param | Tipo | Default | Descrição |
-|-------|------|---------|-----------|
-| `page` | int | 1 | Página atual |
-| `limit` | int | 20 | Itens por página (max 100) |
-| `sortBy` | string | createdAt | Campo de ordenação (createdAt, pricePerMonth, viewCount) |
-| `order` | string | desc | Direção (asc/desc) |
-| `query` | string | — | Busca por título, cidade, bairro, estado, CEP |
-| `country` | string | — | Filtro por país (case-insensitive) |
-| `state` | string | — | Filtro por estado |
-| `city` | string | — | Filtro por cidade |
-| `neighborhood` | string | — | Filtro por bairro (contains) |
-| `zipCode` | string | — | Filtro por CEP (startsWith) |
-| `minPrice` | number | — | Preço mínimo |
-| `maxPrice` | number | — | Preço máximo |
-| `listingType` | enum | — | Tipo de quarto |
-| `roomSize` | enum | — | Tamanho do quarto |
-| `bedType` | enum | — | Tipo de cama |
-| `bathroomType` | enum | — | Tipo de banheiro |
-| `kitchenAccess` | enum | — | Acesso à cozinha |
-| `laundryAccess` | enum | — | Acesso à lavanderia |
-| `isFurnished` | boolean | — | Mobiliado |
-| `hasWindow` | boolean | — | Tem janela |
-| `hasLock` | boolean | — | Tem tranca |
-| `utilitiesIncluded` | boolean | — | Contas inclusas |
-| `internetIncluded` | boolean | — | Internet inclusa |
-| `allowsPets` | boolean | — | Aceita pets (≠ PetPolicy.no) |
-| `allowsSmoking` | boolean | — | Permite fumar (≠ SmokingPolicy.no) |
-| `allowsCouples` | boolean | — | Aceita casais |
-| `allowsChildren` | boolean | — | Aceita crianças |
-| `lgbtFriendly` | boolean | — | LGBT+ friendly |
-| `availableFrom` | date | — | Disponível até esta data |
-| `minimumStayMax` | int | — | Estadia mínima máx (meses) |
-| `hasParking` | boolean | — | Tem estacionamento (≠ ParkingType.none) |
-| `hasPool` | boolean | — | Tem piscina |
-| `hasContract` | boolean | — | Com contrato |
+| Param               | Tipo    | Default   | Descrição                                                |
+| ------------------- | ------- | --------- | -------------------------------------------------------- |
+| `page`              | int     | 1         | Página atual                                             |
+| `limit`             | int     | 20        | Itens por página (max 100)                               |
+| `sortBy`            | string  | createdAt | Campo de ordenação (createdAt, pricePerMonth, viewCount) |
+| `order`             | string  | desc      | Direção (asc/desc)                                       |
+| `query`             | string  | —         | Busca por título, cidade, bairro, estado, CEP            |
+| `country`           | string  | —         | Filtro por país (case-insensitive)                       |
+| `state`             | string  | —         | Filtro por estado                                        |
+| `city`              | string  | —         | Filtro por cidade                                        |
+| `neighborhood`      | string  | —         | Filtro por bairro (contains)                             |
+| `zipCode`           | string  | —         | Filtro por CEP (startsWith)                              |
+| `minPrice`          | number  | —         | Preço mínimo                                             |
+| `maxPrice`          | number  | —         | Preço máximo                                             |
+| `listingType`       | enum    | —         | Tipo de quarto                                           |
+| `roomSize`          | enum    | —         | Tamanho do quarto                                        |
+| `bedType`           | enum    | —         | Tipo de cama                                             |
+| `bathroomType`      | enum    | —         | Tipo de banheiro                                         |
+| `kitchenAccess`     | enum    | —         | Acesso à cozinha                                         |
+| `laundryAccess`     | enum    | —         | Acesso à lavanderia                                      |
+| `isFurnished`       | boolean | —         | Mobiliado                                                |
+| `hasWindow`         | boolean | —         | Tem janela                                               |
+| `hasLock`           | boolean | —         | Tem tranca                                               |
+| `utilitiesIncluded` | boolean | —         | Contas inclusas                                          |
+| `internetIncluded`  | boolean | —         | Internet inclusa                                         |
+| `allowsPets`        | boolean | —         | Aceita pets (≠ PetPolicy.no)                             |
+| `allowsSmoking`     | boolean | —         | Permite fumar (≠ SmokingPolicy.no)                       |
+| `allowsCouples`     | boolean | —         | Aceita casais                                            |
+| `allowsChildren`    | boolean | —         | Aceita crianças                                          |
+| `lgbtFriendly`      | boolean | —         | LGBT+ friendly                                           |
+| `availableFrom`     | date    | —         | Disponível até esta data                                 |
+| `minimumStayMax`    | int     | —         | Estadia mínima máx (meses)                               |
+| `hasParking`        | boolean | —         | Tem estacionamento (≠ ParkingType.none)                  |
+| `hasPool`           | boolean | —         | Tem piscina                                              |
+| `hasContract`       | boolean | —         | Com contrato                                             |
 
 ### Resposta padrão (search)
+
 ```json
 {
   "data": [
@@ -126,11 +127,12 @@
 
 ## 4. Páginas Frontend
 
-| Rota | Descrição |
-|------|-----------|
+| Rota     | Descrição                                                                                              |
+| -------- | ------------------------------------------------------------------------------------------------------ |
 | `/rooms` | Página de busca com barra de pesquisa, autocomplete, filtros avançados, grid de resultados e paginação |
 
 ### Funcionalidades da página /rooms
+
 - **Search bar** com autocomplete (suggestions API)
 - **Filtros avançados** colapsáveis: preço, tipo, localização, mobiliado, contas, internet, regras, comodidades
 - **Grid responsivo** 1→2→3 colunas

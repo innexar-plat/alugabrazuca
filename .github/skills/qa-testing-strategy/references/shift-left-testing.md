@@ -20,6 +20,7 @@ Shift-left testing means starting testing early in the development lifecycle—d
 ## Why Shift-Left?
 
 **Traditional approach** (Shift-Right):
+
 ```
 Requirements → Design → Development → Testing → Deployment
                                          ↑
@@ -28,6 +29,7 @@ Requirements → Design → Development → Testing → Deployment
 ```
 
 **Shift-Left approach**:
+
 ```
 Requirements → Design → Development → Deployment
     ↓            ↓           ↓
@@ -36,6 +38,7 @@ Requirements → Design → Development → Deployment
 ```
 
 **Benefits**:
+
 - Often much cheaper to fix bugs in design/development than after release
 - **Faster feedback** loops (minutes vs days)
 - **Better quality** built-in, not inspected-in
@@ -47,6 +50,7 @@ Requirements → Design → Development → Deployment
 ### 1. Testing in Requirements Phase
 
 **Behavior-Driven Development (BDD)**:
+
 ```gherkin
 # Feature file written BEFORE implementation
 Feature: User Login
@@ -72,39 +76,41 @@ Feature: User Login
 ```
 
 **Implementation with Cucumber**:
+
 ```typescript
 // steps/login.steps.ts
-import { Given, When, Then } from '@cucumber/cucumber';
+import { Given, When, Then } from "@cucumber/cucumber";
 
-Given('I am on the login page', async function () {
-  await this.page.goto('/login');
+Given("I am on the login page", async function () {
+  await this.page.goto("/login");
 });
 
-When('I enter email {string}', async function (email: string) {
+When("I enter email {string}", async function (email: string) {
   await this.page.fill('input[name="email"]', email);
 });
 
-When('I enter password {string}', async function (password: string) {
+When("I enter password {string}", async function (password: string) {
   await this.page.fill('input[name="password"]', password);
 });
 
-When('I click the {string} button', async function (buttonText: string) {
+When("I click the {string} button", async function (buttonText: string) {
   await this.page.click(`button:has-text("${buttonText}")`);
 });
 
-Then('I should see my dashboard', async function () {
-  await expect(this.page.locator('.dashboard')).toBeVisible();
+Then("I should see my dashboard", async function () {
+  await expect(this.page.locator(".dashboard")).toBeVisible();
 });
 
-Then('I should see {string}', async function (text: string) {
-  await expect(this.page.locator('body')).toContainText(text);
+Then("I should see {string}", async function (text: string) {
+  await expect(this.page.locator("body")).toContainText(text);
 });
 ```
 
 **Acceptance Criteria as Tests**:
+
 ```typescript
 // Write tests from acceptance criteria BEFORE implementation
-describe('Shopping Cart', () => {
+describe("Shopping Cart", () => {
   // AC1: Users can add items to cart
   it('should add item to cart when "Add to Cart" clicked', async () => {
     await page.click('[data-testid="add-to-cart"]');
@@ -112,15 +118,15 @@ describe('Shopping Cart', () => {
   });
 
   // AC2: Cart shows total price
-  it('should display correct total price', async () => {
+  it("should display correct total price", async () => {
     await addItemToCart({ price: 29.99 });
     await addItemToCart({ price: 19.99 });
     expect(await getCartTotal()).toBe(49.98);
   });
 
   // AC3: Users can remove items
-  it('should remove item when remove button clicked', async () => {
-    await addItemToCart({ id: '123' });
+  it("should remove item when remove button clicked", async () => {
+    await addItemToCart({ id: "123" });
     await page.click('[data-testid="remove-item-123"]');
     expect(await getCartCount()).toBe(0);
   });
@@ -130,6 +136,7 @@ describe('Shopping Cart', () => {
 ### 2. Testing in Design Phase
 
 **API Design Testing (Contract-First)**:
+
 ```yaml
 # openapi.yml - Written BEFORE implementation
 openapi: 3.0.0
@@ -157,42 +164,51 @@ paths:
                   minLength: 2
                   maxLength: 100
       responses:
-        '201':
+        "201":
           description: User created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '400':
+                $ref: "#/components/schemas/User"
+        "400":
           description: Invalid input
 ```
 
 **Generate tests from OpenAPI**:
+
 ```typescript
 // Auto-generated test from OpenAPI spec
-import { validateAgainstSchema } from 'openapi-validator';
+import { validateAgainstSchema } from "openapi-validator";
 
-describe('POST /users', () => {
-  it('should match OpenAPI schema', async () => {
+describe("POST /users", () => {
+  it("should match OpenAPI schema", async () => {
     const response = await request(app)
-      .post('/users')
-      .send({ email: 'test@example.com', name: 'Test User' });
+      .post("/users")
+      .send({ email: "test@example.com", name: "Test User" });
 
     // Validate response against OpenAPI schema
-    const validation = validateAgainstSchema(response, openApiSpec, '/users', 'post');
+    const validation = validateAgainstSchema(
+      response,
+      openApiSpec,
+      "/users",
+      "post",
+    );
     expect(validation.valid).toBe(true);
   });
 });
 ```
 
 **Architecture Decision Records (ADRs) with Test Implications**:
+
 ```markdown
 # ADR-005: Use Event-Driven Architecture for Order Processing
 
 ## Decision
+
 We will use event-driven architecture with message queues for order processing.
 
 ## Test Strategy
+
 - **Unit tests**: Event handlers in isolation
 - **Integration tests**: Message queue interactions
 - **E2E tests**: Complete order flow with events
@@ -200,11 +216,13 @@ We will use event-driven architecture with message queues for order processing.
 - **Ordering tests**: Event sequence correctness
 
 ## Test Doubles
+
 - Mock message queue for unit tests
 - In-memory queue for integration tests
 - Real queue (RabbitMQ) for E2E tests
 
 ## Coverage Targets
+
 - Event handlers: 100% (critical path)
 - Queue integration: 90%
 - Retry logic: 100%
@@ -215,18 +233,19 @@ We will use event-driven architecture with message queues for order processing.
 **Red-Green-Refactor Cycle**:
 
 **Step 1: Red (Write failing test)**:
+
 ```typescript
 // Test written FIRST
-describe('UserService', () => {
-  it('should hash password before saving', async () => {
+describe("UserService", () => {
+  it("should hash password before saving", async () => {
     const service = new UserService();
     const user = await service.createUser({
-      email: 'test@example.com',
-      password: 'PlainTextPassword'
+      email: "test@example.com",
+      password: "PlainTextPassword",
     });
 
     // Password should be hashed, not stored as plaintext
-    expect(user.password).not.toBe('PlainTextPassword');
+    expect(user.password).not.toBe("PlainTextPassword");
     expect(user.password).toMatch(/^\$2[aby]\$.{56}$/); // bcrypt format
   });
 });
@@ -235,6 +254,7 @@ describe('UserService', () => {
 ```
 
 **Step 2: Green (Make it pass)**:
+
 ```typescript
 // Minimal implementation to pass test
 class UserService {
@@ -243,7 +263,7 @@ class UserService {
 
     return {
       email: data.email,
-      password: hashedPassword
+      password: hashedPassword,
     };
   }
 }
@@ -252,12 +272,13 @@ class UserService {
 ```
 
 **Step 3: Refactor (Improve code)**:
+
 ```typescript
 // Refactored for better design
 class UserService {
   constructor(
     private passwordHasher: PasswordHasher,
-    private userRepository: UserRepository
+    private userRepository: UserRepository,
   ) {}
 
   async createUser(data: CreateUserDTO): Promise<User> {
@@ -265,7 +286,7 @@ class UserService {
 
     const user = new User({
       ...data,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
     return this.userRepository.save(user);
@@ -276,6 +297,7 @@ class UserService {
 ```
 
 **TDD Benefits**:
+
 - Forces thinking about interface before implementation
 - Ensures testable code (dependency injection, small functions)
 - Provides immediate feedback
@@ -327,6 +349,7 @@ jobs:
 ```
 
 **Benefits of preview environments**:
+
 - Test changes in production-like environment
 - Catch integration issues early
 - Enable stakeholder review before merge
@@ -334,6 +357,7 @@ jobs:
 - Verify deployment process
 
 **Example with AWS/Kubernetes**:
+
 ```yaml
 # deploy-preview.yml
 apiVersion: v1
@@ -351,11 +375,11 @@ spec:
   template:
     spec:
       containers:
-      - name: app
-        image: myapp:pr-{{ PR_NUMBER }}
-        env:
-        - name: DATABASE_URL
-          value: postgres://preview-{{ PR_NUMBER }}.db:5432
+        - name: app
+          image: myapp:pr-{{ PR_NUMBER }}
+          env:
+            - name: DATABASE_URL
+              value: postgres://preview-{{ PR_NUMBER }}.db:5432
 ```
 
 ### 5. Continuous Testing in CI/CD
@@ -439,6 +463,7 @@ deploy-staging:
 ```
 
 **Fast feedback optimization**:
+
 ```yaml
 # Parallel test execution
 test:
@@ -455,6 +480,7 @@ test:
 ### 6. Static Analysis (Pre-Development)
 
 **TypeScript for compile-time safety**:
+
 ```typescript
 // Catch errors at compile time, not runtime
 interface User {
@@ -469,33 +495,35 @@ function sendEmail(user: User) {
 }
 
 // BAD: Compile error
-sendEmail({ id: '123', email: 123 });  // email should be string
+sendEmail({ id: "123", email: 123 }); // email should be string
 
 // GOOD: Compile success
-sendEmail({ id: '123', email: 'test@example.com', age: 30 });
+sendEmail({ id: "123", email: "test@example.com", age: 30 });
 ```
 
 **ESLint rules for security**:
+
 ```javascript
 // .eslintrc.js
 module.exports = {
-  plugins: ['security'],
-  extends: ['plugin:security/recommended'],
+  plugins: ["security"],
+  extends: ["plugin:security/recommended"],
   rules: {
-    'security/detect-object-injection': 'error',
-    'security/detect-non-literal-regexp': 'error',
-    'security/detect-unsafe-regex': 'error',
-    'no-eval': 'error',
-    'no-implied-eval': 'error',
-  }
+    "security/detect-object-injection": "error",
+    "security/detect-non-literal-regexp": "error",
+    "security/detect-unsafe-regex": "error",
+    "no-eval": "error",
+    "no-implied-eval": "error",
+  },
 };
 
 // Catches security issues during development
 const userInput = getUserInput();
-eval(userInput);  // BAD: ESLint error: no-eval
+eval(userInput); // BAD: ESLint error: no-eval
 ```
 
 **SonarQube quality gates**:
+
 ```yaml
 # sonar-project.properties
 sonar.qualitygate.wait=true
@@ -548,30 +576,35 @@ Target: <1 day for low-risk changes
 ## Shift-Left Anti-Patterns
 
 ### BAD: "We'll add tests later"
+
 ```
 Problem: Tests never get written, or written as afterthought
 Solution: TDD - write tests first
 ```
 
 ### BAD: Manual testing in dev environment
+
 ```
 Problem: Slow, not repeatable, doesn't scale
 Solution: Automated tests in CI/CD
 ```
 
 ### BAD: Testing only happy paths
+
 ```
 Problem: Edge cases and errors discovered in production
 Solution: Test edge cases, errors, boundaries from day 1
 ```
 
 ### BAD: No test ownership
+
 ```
 Problem: Developers write code, QA writes tests (handoff delay)
 Solution: Developers own quality - write tests for own code
 ```
 
 ### BAD: Skipping tests to meet deadlines
+
 ```
 Problem: Technical debt accumulates, velocity decreases over time
 Solution: Tests are non-negotiable part of "done"
@@ -580,6 +613,7 @@ Solution: Tests are non-negotiable part of "done"
 ## Shift-Left Checklist
 
 ### Requirements Phase
+
 - [ ] Acceptance criteria defined for all stories
 - [ ] BDD scenarios written (Given-When-Then)
 - [ ] Test data requirements identified
@@ -587,6 +621,7 @@ Solution: Tests are non-negotiable part of "done"
 - [ ] Security requirements documented
 
 ### Design Phase
+
 - [ ] API contracts defined (OpenAPI/GraphQL schema)
 - [ ] Test strategy documented in ADRs
 - [ ] Testability considered in architecture
@@ -594,6 +629,7 @@ Solution: Tests are non-negotiable part of "done"
 - [ ] Mock/stub strategy defined
 
 ### Development Phase
+
 - [ ] TDD practiced (test written before code)
 - [ ] Unit tests for all business logic
 - [ ] Integration tests for external dependencies
@@ -601,12 +637,14 @@ Solution: Tests are non-negotiable part of "done"
 - [ ] Security scanner passing (no high vulnerabilities)
 
 ### Pre-Commit
+
 - [ ] All tests passing locally
 - [ ] Code coverage meets threshold
 - [ ] No linter errors
 - [ ] Git hooks running successfully
 
 ### CI/CD Pipeline
+
 - [ ] Automated tests run on every commit
 - [ ] Preview environment deployed for PRs
 - [ ] E2E tests run against preview
@@ -614,6 +652,7 @@ Solution: Tests are non-negotiable part of "done"
 - [ ] Security scans completed
 
 ### Pre-Merge
+
 - [ ] All pipeline checks passing
 - [ ] Code review completed (including tests)
 - [ ] No failing or flaky tests
@@ -622,22 +661,26 @@ Solution: Tests are non-negotiable part of "done"
 ## Tools for Shift-Left Testing
 
 **Requirements & Design**:
+
 - Cucumber / Gherkin (BDD)
 - OpenAPI / Swagger (API contracts)
 - Figma / Storybook (UI component testing)
 
 **Development**:
+
 - Jest / Vitest (Unit testing)
 - Playwright / Cypress (E2E testing)
 - Supertest (API testing)
 - Docker Compose (Local integration testing)
 
 **Pre-Commit**:
+
 - Husky (Git hooks)
 - lint-staged (Incremental linting)
 - commitlint (Commit message validation)
 
 **CI/CD**:
+
 - GitHub Actions / GitLab CI
 - Vercel / Netlify (Preview environments)
 - SonarQube (Quality gates)

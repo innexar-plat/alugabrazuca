@@ -7,6 +7,7 @@ Production-ready template for building modern Angular applications with standalo
 ## Overview
 
 This template provides a modern Angular 21 setup with:
+
 - **Angular 21** - Latest Angular with zoneless change detection, esbuild, and standalone components
 - **Signals** - Angular's fine-grained reactivity system
 - **TypeScript** - Strict type safety
@@ -115,13 +116,13 @@ my-app/
 
 ```typescript
 // src/main.ts
-import { bootstrapApplication } from '@angular/platform-browser';
-import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { provideAnimations } from '@angular/platform-browser/animations';
-import { AppComponent } from './app/app.component';
-import { routes } from './app/app.routes';
-import { authInterceptor } from './app/core/interceptors/auth.interceptor';
+import { bootstrapApplication } from "@angular/platform-browser";
+import { provideRouter } from "@angular/router";
+import { provideHttpClient, withInterceptors } from "@angular/common/http";
+import { provideAnimations } from "@angular/platform-browser/animations";
+import { AppComponent } from "./app/app.component";
+import { routes } from "./app/app.routes";
+import { authInterceptor } from "./app/core/interceptors/auth.interceptor";
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -136,12 +137,12 @@ bootstrapApplication(AppComponent, {
 
 ```typescript
 // src/app/app.config.ts
-import { ApplicationConfig } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { provideAnimations } from '@angular/platform-browser/animations';
-import { routes } from './app.routes';
-import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { ApplicationConfig } from "@angular/core";
+import { provideRouter } from "@angular/router";
+import { provideHttpClient, withInterceptors } from "@angular/common/http";
+import { provideAnimations } from "@angular/platform-browser/animations";
+import { routes } from "./app.routes";
+import { authInterceptor } from "./core/interceptors/auth.interceptor";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -156,40 +157,40 @@ export const appConfig: ApplicationConfig = {
 
 ```typescript
 // src/app/app.routes.ts
-import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
+import { Routes } from "@angular/router";
+import { authGuard } from "./core/guards/auth.guard";
 
 export const routes: Routes = [
   {
-    path: '',
+    path: "",
     loadComponent: () =>
-      import('./features/home/home.component').then((m) => m.HomeComponent),
+      import("./features/home/home.component").then((m) => m.HomeComponent),
   },
   {
-    path: 'login',
+    path: "login",
     loadComponent: () =>
-      import('./features/auth/login/login.component').then(
-        (m) => m.LoginComponent
+      import("./features/auth/login/login.component").then(
+        (m) => m.LoginComponent,
       ),
   },
   {
-    path: 'dashboard',
+    path: "dashboard",
     loadComponent: () =>
-      import('./features/dashboard/dashboard.component').then(
-        (m) => m.DashboardComponent
+      import("./features/dashboard/dashboard.component").then(
+        (m) => m.DashboardComponent,
       ),
     canActivate: [authGuard],
   },
   {
-    path: 'blog',
+    path: "blog",
     loadChildren: () =>
-      import('./features/blog/blog.routes').then((m) => m.BLOG_ROUTES),
+      import("./features/blog/blog.routes").then((m) => m.BLOG_ROUTES),
   },
   {
-    path: '**',
+    path: "**",
     loadComponent: () =>
-      import('./shared/components/not-found/not-found.component').then(
-        (m) => m.NotFoundComponent
+      import("./shared/components/not-found/not-found.component").then(
+        (m) => m.NotFoundComponent,
       ),
   },
 ];
@@ -241,11 +242,11 @@ export const routes: Routes = [
 
 ```typescript
 // src/app/features/counter/counter.component.ts
-import { Component, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, signal, computed } from "@angular/core";
+import { CommonModule } from "@angular/common";
 
 @Component({
-  selector: 'app-counter',
+  selector: "app-counter",
   standalone: true,
   imports: [CommonModule],
   template: `
@@ -257,16 +258,18 @@ import { CommonModule } from '@angular/common';
       <button (click)="reset()">Reset</button>
     </div>
   `,
-  styles: [`
-    .counter {
-      text-align: center;
-      padding: 2rem;
-    }
-    button {
-      margin: 0 0.5rem;
-      padding: 0.5rem 1rem;
-    }
-  `],
+  styles: [
+    `
+      .counter {
+        text-align: center;
+        padding: 2rem;
+      }
+      button {
+        margin: 0 0.5rem;
+        padding: 0.5rem 1rem;
+      }
+    `,
+  ],
 })
 export class CounterComponent {
   // Signal for reactive state
@@ -276,11 +279,11 @@ export class CounterComponent {
   doubleCount = computed(() => this.count() * 2);
 
   increment() {
-    this.count.update(value => value + 1);
+    this.count.update((value) => value + 1);
   }
 
   decrement() {
-    this.count.update(value => value - 1);
+    this.count.update((value) => value - 1);
   }
 
   reset() {
@@ -293,13 +296,13 @@ export class CounterComponent {
 
 ```typescript
 // src/app/features/blog/blog-list/blog-list.component.ts
-import { Component, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { BlogService } from '../blog.service';
-import { Blog } from '@shared/models/blog.model';
+import { Component, OnInit, signal } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { BlogService } from "../blog.service";
+import { Blog } from "@shared/models/blog.model";
 
 @Component({
-  selector: 'app-blog-list',
+  selector: "app-blog-list",
   standalone: true,
   imports: [CommonModule],
   template: `
@@ -327,18 +330,20 @@ import { Blog } from '@shared/models/blog.model';
       }
     </div>
   `,
-  styles: [`
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 2rem;
-    }
-    .blog-card {
-      padding: 1.5rem;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-    }
-  `],
+  styles: [
+    `
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+      }
+      .blog-card {
+        padding: 1.5rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+    `,
+  ],
 })
 export class BlogListComponent implements OnInit {
   blogs = signal<Blog[]>([]);
@@ -359,7 +364,7 @@ export class BlogListComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set('Failed to load blogs');
+        this.error.set("Failed to load blogs");
         this.loading.set(false);
       },
     });
@@ -371,17 +376,17 @@ export class BlogListComponent implements OnInit {
 
 ```typescript
 // src/app/core/services/auth.service.ts
-import { Injectable, signal, computed } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
-import { User } from '@shared/models/user.model';
+import { Injectable, signal, computed } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Router } from "@angular/router";
+import { Observable, tap } from "rxjs";
+import { User } from "@shared/models/user.model";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class AuthService {
-  private readonly API_URL = 'https://api.example.com';
+  private readonly API_URL = "https://api.example.com";
 
   // Signals for reactive state
   private userSignal = signal<User | null>(null);
@@ -393,7 +398,7 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
   ) {
     this.loadFromStorage();
   }
@@ -403,20 +408,20 @@ export class AuthService {
       tap((response: any) => {
         this.userSignal.set(response.user);
         this.tokenSignal.set(response.token);
-        localStorage.setItem('token', response.token);
-      })
+        localStorage.setItem("token", response.token);
+      }),
     );
   }
 
   logout() {
     this.userSignal.set(null);
     this.tokenSignal.set(null);
-    localStorage.removeItem('token');
-    this.router.navigate(['/login']);
+    localStorage.removeItem("token");
+    this.router.navigate(["/login"]);
   }
 
   private loadFromStorage() {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       this.tokenSignal.set(token);
       this.fetchCurrentUser().subscribe();
@@ -424,9 +429,9 @@ export class AuthService {
   }
 
   private fetchCurrentUser(): Observable<User> {
-    return this.http.get<User>(`${this.API_URL}/auth/me`).pipe(
-      tap((user) => this.userSignal.set(user))
-    );
+    return this.http
+      .get<User>(`${this.API_URL}/auth/me`)
+      .pipe(tap((user) => this.userSignal.set(user)));
   }
 }
 ```
@@ -435,9 +440,9 @@ export class AuthService {
 
 ```typescript
 // src/app/core/guards/auth.guard.ts
-import { inject } from '@angular/core';
-import { Router, CanActivateFn } from '@angular/router';
-import { AuthService } from '@core/services/auth.service';
+import { inject } from "@angular/core";
+import { Router, CanActivateFn } from "@angular/router";
+import { AuthService } from "@core/services/auth.service";
 
 export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
@@ -448,7 +453,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   }
 
   // Redirect to login
-  return router.createUrlTree(['/login'], {
+  return router.createUrlTree(["/login"], {
     queryParams: { returnUrl: state.url },
   });
 };
@@ -458,13 +463,13 @@ export const authGuard: CanActivateFn = (route, state) => {
 
 ```typescript
 // src/app/core/interceptors/auth.interceptor.ts
-import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { AuthService } from '@core/services/auth.service';
+import { HttpInterceptorFn } from "@angular/common/http";
+import { inject } from "@angular/core";
+import { AuthService } from "@core/services/auth.service";
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   if (token) {
     req = req.clone({
@@ -482,14 +487,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
 ```typescript
 // src/app/features/auth/login/login.component.ts
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AuthService } from '@core/services/auth.service';
+import { Component } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { ReactiveFormsModule, FormBuilder, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
+import { AuthService } from "@core/services/auth.service";
 
 @Component({
-  selector: 'app-login',
+  selector: "app-login",
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
@@ -506,10 +511,10 @@ import { AuthService } from '@core/services/auth.service';
           />
           @if (email?.invalid && email?.touched) {
             <span class="error-message">
-              @if (email?.errors?.['required']) {
+              @if (email?.errors?.["required"]) {
                 Email is required
               }
-              @if (email?.errors?.['email']) {
+              @if (email?.errors?.["email"]) {
                 Invalid email format
               }
             </span>
@@ -532,7 +537,7 @@ import { AuthService } from '@core/services/auth.service';
         </div>
 
         <button type="submit" [disabled]="loginForm.invalid || submitting">
-          {{ submitting ? 'Logging in...' : 'Login' }}
+          {{ submitting ? "Logging in..." : "Login" }}
         </button>
 
         @if (error) {
@@ -541,23 +546,25 @@ import { AuthService } from '@core/services/auth.service';
       </form>
     </div>
   `,
-  styles: [`
-    .form-group {
-      margin-bottom: 1rem;
-    }
-    input.error {
-      border-color: red;
-    }
-    .error-message {
-      color: red;
-      font-size: 0.875rem;
-    }
-  `],
+  styles: [
+    `
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      input.error {
+        border-color: red;
+      }
+      .error-message {
+        color: red;
+        font-size: 0.875rem;
+      }
+    `,
+  ],
 })
 export class LoginComponent {
   loginForm = this.fb.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    email: ["", [Validators.required, Validators.email]],
+    password: ["", [Validators.required, Validators.minLength(8)]],
   });
 
   submitting = false;
@@ -565,17 +572,17 @@ export class LoginComponent {
 
   // Getters for form controls
   get email() {
-    return this.loginForm.get('email');
+    return this.loginForm.get("email");
   }
 
   get password() {
-    return this.loginForm.get('password');
+    return this.loginForm.get("password");
   }
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   onSubmit() {
@@ -587,11 +594,11 @@ export class LoginComponent {
     this.authService.login(this.loginForm.getRawValue()).subscribe({
       next: () => {
         this.submitting = false;
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(["/dashboard"]);
       },
       error: (err) => {
         this.submitting = false;
-        this.error = 'Login failed. Please check your credentials.';
+        this.error = "Login failed. Please check your credentials.";
       },
     });
   }
@@ -602,10 +609,10 @@ export class LoginComponent {
 
 ```typescript
 // src/app/shared/pipes/date-ago.pipe.ts
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform } from "@angular/core";
 
 @Pipe({
-  name: 'dateAgo',
+  name: "dateAgo",
   standalone: true,
 })
 export class DateAgoPipe implements PipeTransform {
@@ -614,7 +621,7 @@ export class DateAgoPipe implements PipeTransform {
     const now = new Date();
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (seconds < 60) return 'just now';
+    if (seconds < 60) return "just now";
     if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
     if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
     if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
@@ -632,10 +639,10 @@ export class DateAgoPipe implements PipeTransform {
 
 ```typescript
 // src/app/features/counter/counter.component.spec.ts
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CounterComponent } from './counter.component';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { CounterComponent } from "./counter.component";
 
-describe('CounterComponent', () => {
+describe("CounterComponent", () => {
   let component: CounterComponent;
   let fixture: ComponentFixture<CounterComponent>;
 
@@ -649,27 +656,27 @@ describe('CounterComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 
-  it('should increment count', () => {
+  it("should increment count", () => {
     component.increment();
     expect(component.count()).toBe(1);
   });
 
-  it('should decrement count', () => {
+  it("should decrement count", () => {
     component.decrement();
     expect(component.count()).toBe(-1);
   });
 
-  it('should reset count', () => {
+  it("should reset count", () => {
     component.count.set(5);
     component.reset();
     expect(component.count()).toBe(0);
   });
 
-  it('should compute double count', () => {
+  it("should compute double count", () => {
     component.count.set(5);
     expect(component.doubleCount()).toBe(10);
   });
@@ -680,11 +687,14 @@ describe('CounterComponent', () => {
 
 ```typescript
 // src/app/core/services/auth.service.spec.ts
-import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { AuthService } from './auth.service';
+import { TestBed } from "@angular/core/testing";
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from "@angular/common/http/testing";
+import { AuthService } from "./auth.service";
 
-describe('AuthService', () => {
+describe("AuthService", () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
 
@@ -701,20 +711,22 @@ describe('AuthService', () => {
     httpMock.verify();
   });
 
-  it('should be created', () => {
+  it("should be created", () => {
     expect(service).toBeTruthy();
   });
 
-  it('should login and set user', () => {
+  it("should login and set user", () => {
     const mockResponse = {
-      user: { id: 1, email: 'test@example.com' },
-      token: 'fake-token',
+      user: { id: 1, email: "test@example.com" },
+      token: "fake-token",
     };
 
-    service.login({ email: 'test@example.com', password: 'password' }).subscribe();
+    service
+      .login({ email: "test@example.com", password: "password" })
+      .subscribe();
 
-    const req = httpMock.expectOne('https://api.example.com/auth/login');
-    expect(req.request.method).toBe('POST');
+    const req = httpMock.expectOne("https://api.example.com/auth/login");
+    expect(req.request.method).toBe("POST");
     req.flush(mockResponse);
 
     expect(service.user()).toEqual(mockResponse.user);
@@ -728,6 +740,7 @@ describe('AuthService', () => {
 ## Production Checklist
 
 ### Performance
+
 - [ ] Enable production mode in `environment.prod.ts`
 - [ ] Use `OnPush` change detection for performance-critical components
 - [ ] Lazy load feature modules with `loadChildren`
@@ -735,12 +748,14 @@ describe('AuthService', () => {
 - [ ] Use trackBy in `@for` loops
 
 ### Build Configuration
+
 - [ ] Run `ng build --configuration production`
 - [ ] Enable AOT compilation (enabled by default)
 - [ ] Enable build optimization
 - [ ] Configure budget limits in `angular.json`
 
 ### Security
+
 - [ ] Sanitize user input to prevent XSS
 - [ ] Use HTTP interceptors for auth tokens
 - [ ] Implement CSRF protection
@@ -748,6 +763,7 @@ describe('AuthService', () => {
 - [ ] Use environment variables for sensitive data
 
 ### Testing
+
 - [ ] Maintain 80%+ test coverage
 - [ ] Run E2E tests before deployment
 - [ ] Test accessibility with axe-core

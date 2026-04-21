@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
-import Link from 'next/link';
-import { useRouter, useParams } from 'next/navigation';
-import { api, resolveMediaUrl } from '@/lib/api';
+import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useRouter, useParams } from "next/navigation";
+import { api, resolveMediaUrl } from "@/lib/api";
 
 interface InquiryItem {
   id: string;
@@ -36,16 +36,16 @@ interface InquiriesResponse {
 }
 
 const statusColor: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  accepted: 'bg-green-100 text-green-800',
-  rejected: 'bg-red-100 text-red-800',
-  expired: 'bg-gray-100 text-gray-500',
-  cancelled: 'bg-gray-100 text-gray-500',
-  completed: 'bg-blue-100 text-blue-800',
+  pending: "bg-yellow-100 text-yellow-800",
+  accepted: "bg-green-100 text-green-800",
+  rejected: "bg-red-100 text-red-800",
+  expired: "bg-gray-100 text-gray-500",
+  cancelled: "bg-gray-100 text-gray-500",
+  completed: "bg-blue-100 text-blue-800",
 };
 
 export default function MyInquiriesPage() {
-  const t = useTranslations('inquiry');
+  const t = useTranslations("inquiry");
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string;
@@ -62,13 +62,19 @@ export default function MyInquiriesPage() {
   async function loadInquiries(page = 1) {
     try {
       setLoading(true);
-      const res = await api.get<InquiriesResponse>(`/inquiries/sent?page=${page}&limit=20`);
+      const res = await api.get<InquiriesResponse>(
+        `/inquiries/sent?page=${page}&limit=20`,
+      );
       if (page === 1) {
         setInquiries(res.data);
       } else {
         setInquiries((prev) => [...prev, ...res.data]);
       }
-      setMeta({ total: res.meta.total, page: res.meta.page, totalPages: res.meta.totalPages });
+      setMeta({
+        total: res.meta.total,
+        page: res.meta.page,
+        totalPages: res.meta.totalPages,
+      });
     } catch {
       router.push(`/${locale}/login`);
     } finally {
@@ -90,16 +96,20 @@ export default function MyInquiriesPage() {
     <div className="mx-auto max-w-4xl px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">{t('sentTitle')}</h1>
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
+            {t("sentTitle")}
+          </h1>
           <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-            {meta.total} {t('title').toLowerCase()}
+            {meta.total} {t("title").toLowerCase()}
           </p>
         </div>
       </div>
 
       {inquiries.length === 0 ? (
         <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-12 text-center">
-          <p className="text-[hsl(var(--muted-foreground))]">{t('emptySent')}</p>
+          <p className="text-[hsl(var(--muted-foreground))]">
+            {t("emptySent")}
+          </p>
           <Link
             href={`/${locale}/rooms`}
             className="mt-4 inline-block rounded-lg bg-[hsl(var(--primary))] px-6 py-2 text-sm font-semibold text-[hsl(var(--primary-foreground))] hover:opacity-90 transition-opacity"
@@ -119,12 +129,16 @@ export default function MyInquiriesPage() {
                 <div className="h-20 w-28 flex-shrink-0 overflow-hidden rounded-lg bg-[hsl(var(--muted))]">
                   {inquiry.listing.photos[0] ? (
                     <img
-                      src={resolveMediaUrl(inquiry.listing.photos[0].thumbnailUrl)}
+                      src={resolveMediaUrl(
+                        inquiry.listing.photos[0].thumbnailUrl,
+                      )}
                       alt={inquiry.listing.title}
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-full items-center justify-center text-2xl">🏠</div>
+                    <div className="flex h-full items-center justify-center text-2xl">
+                      🏠
+                    </div>
                   )}
                 </div>
 
@@ -139,29 +153,33 @@ export default function MyInquiriesPage() {
                         {inquiry.listing.title}
                       </Link>
                       <p className="text-xs text-[hsl(var(--muted-foreground))]">
-                        {inquiry.listing.city}, {inquiry.listing.state} · {inquiry.listing.currency}{' '}
-                        {Number(inquiry.listing.pricePerMonth).toLocaleString()}/mo
+                        {inquiry.listing.city}, {inquiry.listing.state} ·{" "}
+                        {inquiry.listing.currency}{" "}
+                        {Number(inquiry.listing.pricePerMonth).toLocaleString()}
+                        /mo
                       </p>
                     </div>
                     <span
-                      className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${statusColor[inquiry.status] || 'bg-gray-100 text-gray-700'}`}
+                      className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${statusColor[inquiry.status] || "bg-gray-100 text-gray-700"}`}
                     >
                       {t(`status.${inquiry.status}`)}
                     </span>
                   </div>
 
-                  <p className="line-clamp-2 text-sm text-[hsl(var(--muted-foreground))]">{inquiry.message}</p>
+                  <p className="line-clamp-2 text-sm text-[hsl(var(--muted-foreground))]">
+                    {inquiry.message}
+                  </p>
 
                   <div className="flex items-center justify-between mt-1">
                     <span className="text-xs text-[hsl(var(--muted-foreground))]">
-                      {t('type.' + inquiry.type)} · {t('sentAt')}{' '}
+                      {t("type." + inquiry.type)} · {t("sentAt")}{" "}
                       {new Date(inquiry.createdAt).toLocaleDateString()}
                     </span>
                     <Link
                       href={`/${locale}/inquiries/${inquiry.id}`}
                       className="text-xs font-medium text-[hsl(var(--primary))] hover:underline"
                     >
-                      {t('viewDetail')} →
+                      {t("viewDetail")} →
                     </Link>
                   </div>
                 </div>
@@ -176,7 +194,7 @@ export default function MyInquiriesPage() {
                 disabled={loading}
                 className="rounded-lg border border-[hsl(var(--border))] px-6 py-2 text-sm font-medium hover:bg-[hsl(var(--muted))] transition-colors disabled:opacity-50"
               >
-                {loading ? t('loading', { ns: 'common' }) : t('loadMore')}
+                {loading ? t("loading", { ns: "common" }) : t("loadMore")}
               </button>
             </div>
           )}

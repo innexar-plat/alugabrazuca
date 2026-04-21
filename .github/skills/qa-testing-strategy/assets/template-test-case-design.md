@@ -1,4 +1,4 @@
-# Test Case Design Template (Given/When/Then + Oracles)
+﻿# Test Case Design Template (Given/When/Then + Oracles)
 
 Use this template for any test layer (unit/integration/contract/E2E) by filling only what applies.
 
@@ -6,54 +6,60 @@ Use this template for any test layer (unit/integration/contract/E2E) by filling 
 
 ### Metadata
 
-- ID: __________________________
-- Title: _______________________
-- Owner: _______________________
+- ID: \***\*\*\*\*\*\*\***\_\_\***\*\*\*\*\*\*\***
+- Title: \***\*\*\*\*\***\_\_\_\***\*\*\*\*\***
+- Owner: \***\*\*\*\*\***\_\_\_\***\*\*\*\*\***
 - Layer: unit / component / contract / integration / E2E / exploratory
 - Priority: P0 / P1 / P2 / P3
 - Risk addressed: journey + failure mode(s)
 
 ### Goal (What This Test Proves)
 
-- Hypothesis: _______________________________________________
-- Why now: _________________________________________________
+- Hypothesis: \***\*\*\*\*\***\*\*\***\*\*\*\*\***\_\_\_\***\*\*\*\*\***\*\*\***\*\*\*\*\***
+- Why now: \***\*\*\*\*\***\*\*\*\*\***\*\*\*\*\***\_\***\*\*\*\*\***\*\*\*\*\***\*\*\*\*\***
 
 ### Preconditions
 
 - Environment: local / CI / staging
-- Feature flags/config: _____________________________________
-- Auth/user roles: __________________________________________
+- Feature flags/config: **\*\*\*\***\*\***\*\*\*\***\_**\*\*\*\***\*\***\*\*\*\***
+- Auth/user roles: **\*\*\*\***\*\*\*\***\*\*\*\***\_\_**\*\*\*\***\*\*\*\***\*\*\*\***
 
 ### Test Data
 
 - Data setup method: fixtures / factories / seed / API setup
-- Data identifiers (IDs/keys): _______________________________
-- Cleanup/reset plan: _______________________________________
+- Data identifiers (IDs/keys): **\*\***\*\***\*\***\_\_\_**\*\***\*\***\*\***
+- Cleanup/reset plan: **\*\*\*\***\*\***\*\*\*\***\_\_\_**\*\*\*\***\*\***\*\*\*\***
 
 ### Steps (Given / When / Then)
 
 Given:
-- ___________________________________________________________
+
+- ***
 
 When:
-- ___________________________________________________________
+
+- ***
 
 Then:
-- ___________________________________________________________
 
-### Oracles (How You Know It’s Correct)
+- ***
+
+### Oracles (How You Know ItÔÇÖs Correct)
 
 Functional oracles:
-- Expected state/output: _____________________________________
-- Contract/schema: __________________________________________
+
+- Expected state/output: **\*\*\*\***\*\***\*\*\*\***\_**\*\*\*\***\*\***\*\*\*\***
+- Contract/schema: **\*\*\*\***\*\*\*\***\*\*\*\***\_\_**\*\*\*\***\*\*\*\***\*\*\*\***
 
 Quality oracles (if applicable):
+
 - Security: authz/authn, sensitive data not exposed
 - Accessibility: roles/labels, focus order, keyboard paths
 - Performance: budget (p95/p99) and no significant regression
 
 Negative oracles:
-- What must NOT happen: _____________________________________
+
+- What must NOT happen: **\*\*\*\***\*\***\*\*\*\***\_**\*\*\*\***\*\***\*\*\*\***
 
 ### Observability (Debugging Ergonomics)
 
@@ -66,28 +72,30 @@ Negative oracles:
 
 ### Flake Control (Determinism)
 
-- Time control: timezone/locale/frozen time? ________________
-- Network control: mocked/stubbed boundaries? _______________
-- Retries policy: ___________________________________________
-- Timeout budget: ___________________________________________
+- Time control: timezone/locale/frozen time? **\*\***\_\_\_\_**\*\***
+- Network control: mocked/stubbed boundaries? **\*\***\_\_\_**\*\***
+- Retries policy: **\*\*\*\***\*\*\*\***\*\*\*\***\_\_\_**\*\*\*\***\*\*\*\***\*\*\*\***
+- Timeout budget: **\*\*\*\***\*\*\*\***\*\*\*\***\_\_\_**\*\*\*\***\*\*\*\***\*\*\*\***
 
 ### Automation Notes
 
-- What to mock vs keep real: ________________________________
-- Lowest layer alternative: can this be tested lower? ________
-- CI execution: PR gate / nightly / release _________________
+- What to mock vs keep real: **\*\***\*\***\*\***\_\_\_\_**\*\***\*\***\*\***
+- Lowest layer alternative: can this be tested lower? **\_\_\_\_**
+- CI execution: PR gate / nightly / release **\*\*\*\***\_**\*\*\*\***
 
 ### Pass/Fail Criteria
 
-- Pass criteria: ____________________________________________
-- Fail criteria: ____________________________________________
+- Pass criteria: **\*\*\*\***\*\*\*\***\*\*\*\***\_\_\_\_**\*\*\*\***\*\*\*\***\*\*\*\***
+- Fail criteria: **\*\*\*\***\*\*\*\***\*\*\*\***\_\_\_\_**\*\*\*\***\*\*\*\***\*\*\*\***
 
 ## Optional: AI / Automation
 
 Do:
+
 - Use AI to propose edge cases and variations (boundaries, auth roles, locales).
 - Use AI to draft Given/When/Then steps and candidate oracles, then validate manually.
 
 Avoid:
+
 - Copying AI-generated assertions without verifying the oracle and failure mode.
 - Generating large combinatorial suites without a risk-based selection.

@@ -15,12 +15,14 @@ This guide provides production-ready patterns for implementing pagination, filte
 **Best for:** Static datasets, reporting, admin interfaces
 
 **Pros:**
+
 - Simple to implement
 - Easy to understand
 - Jump to any page
 - Total count available
 
 **Cons:**
+
 - Performance degrades with large offsets
 - Data inconsistency if records added/deleted during pagination
 - Not ideal for real-time feeds
@@ -32,6 +34,7 @@ GET /api/v1/users?limit=20&offset=40
 ```
 
 **Query Parameters:**
+
 - `limit` - Number of items per page (default: 20, max: 100)
 - `offset` - Number of items to skip
 
@@ -69,6 +72,7 @@ GET /api/v1/users?limit=20&offset=40
 ### Implementation Examples
 
 **SQL (PostgreSQL):**
+
 ```sql
 SELECT * FROM users
 ORDER BY created_at DESC
@@ -76,6 +80,7 @@ LIMIT 20 OFFSET 40;
 ```
 
 **FastAPI (Python):**
+
 ```python
 @app.get("/api/v1/users")
 async def list_users(
@@ -111,12 +116,14 @@ async def list_users(
 **Best for:** Real-time feeds, social media, infinite scroll, large datasets
 
 **Pros:**
+
 - Consistent results even when data changes
 - Excellent performance (uses indexed columns)
 - No duplicate or missing items
 - Scalable to billions of records
 
 **Cons:**
+
 - Can't jump to arbitrary page
 - Slightly more complex implementation
 - Total count expensive to compute
@@ -128,6 +135,7 @@ GET /api/v1/users?limit=20&cursor=eyJpZCI6MTIzLCJjcmVhdGVkQXQiOiIyMDI1LTAxLTE1In
 ```
 
 **Query Parameters:**
+
 - `limit` - Number of items to return
 - `cursor` - Base64-encoded cursor (opaque to client)
 
@@ -153,6 +161,7 @@ GET /api/v1/users?limit=20&cursor=eyJpZCI6MTIzLCJjcmVhdGVkQXQiOiIyMDI1LTAxLTE1In
 ### Cursor Structure
 
 **Encode cursor as JSON:**
+
 ```json
 {
   "id": 123,
@@ -161,6 +170,7 @@ GET /api/v1/users?limit=20&cursor=eyJpZCI6MTIzLCJjcmVhdGVkQXQiOiIyMDI1LTAxLTE1In
 ```
 
 **Base64 encode to produce:**
+
 ```
 eyJpZCI6MTIzLCJjcmVhdGVkQXQiOiIyMDI1LTAxLTE1VDEwOjAwOjAwWiJ9
 ```
@@ -168,6 +178,7 @@ eyJpZCI6MTIzLCJjcmVhdGVkQXQiOiIyMDI1LTAxLTE1VDEwOjAwOjAwWiJ9
 ### Implementation Examples
 
 **SQL (PostgreSQL):**
+
 ```sql
 -- First page (no cursor)
 SELECT * FROM users
@@ -182,6 +193,7 @@ LIMIT 20;
 ```
 
 **FastAPI (Python):**
+
 ```python
 import base64
 import json
@@ -275,6 +287,7 @@ GET /api/v1/users?page=3&per_page=20
 ### Query Parameter Filtering
 
 **Basic equality:**
+
 ```
 GET /api/v1/users?status=active
 GET /api/v1/users?role=admin
@@ -282,6 +295,7 @@ GET /api/v1/users?status=active&role=admin
 ```
 
 **Comparison operators:**
+
 ```
 GET /api/v1/users?created_after=2025-01-01
 GET /api/v1/users?created_before=2025-12-31
@@ -290,6 +304,7 @@ GET /api/v1/users?age_lte=65
 ```
 
 **Pattern matching:**
+
 ```
 GET /api/v1/users?email_contains=@example.com
 GET /api/v1/users?name_startswith=John
@@ -297,6 +312,7 @@ GET /api/v1/users?name_endswith=Smith
 ```
 
 **In/Not in:**
+
 ```
 GET /api/v1/users?status_in=active,pending
 GET /api/v1/users?role_not_in=guest,banned
@@ -304,18 +320,18 @@ GET /api/v1/users?role_not_in=guest,banned
 
 ### Filter Operator Conventions
 
-| Suffix | Meaning | Example |
-|--------|---------|---------|
-| (none) | Exact match | `?status=active` |
-| `_gt` | Greater than | `?age_gt=18` |
-| `_gte` | Greater than or equal | `?age_gte=18` |
-| `_lt` | Less than | `?price_lt=100` |
-| `_lte` | Less than or equal | `?price_lte=100` |
-| `_contains` | Contains substring | `?email_contains=@gmail` |
-| `_startswith` | Starts with | `?name_startswith=John` |
-| `_endswith` | Ends with | `?name_endswith=Smith` |
-| `_in` | In list | `?status_in=active,pending` |
-| `_not_in` | Not in list | `?role_not_in=guest,banned` |
+| Suffix        | Meaning               | Example                     |
+| ------------- | --------------------- | --------------------------- |
+| (none)        | Exact match           | `?status=active`            |
+| `_gt`         | Greater than          | `?age_gt=18`                |
+| `_gte`        | Greater than or equal | `?age_gte=18`               |
+| `_lt`         | Less than             | `?price_lt=100`             |
+| `_lte`        | Less than or equal    | `?price_lte=100`            |
+| `_contains`   | Contains substring    | `?email_contains=@gmail`    |
+| `_startswith` | Starts with           | `?name_startswith=John`     |
+| `_endswith`   | Ends with             | `?name_endswith=Smith`      |
+| `_in`         | In list               | `?status_in=active,pending` |
+| `_not_in`     | Not in list           | `?role_not_in=guest,banned` |
 
 ### Advanced Filtering with JSON
 
@@ -365,20 +381,22 @@ GET /api/v1/users?sort=name,-created_at
 
 ### Sort Direction Conventions
 
-| Pattern | Direction | Example |
-|---------|-----------|---------|
-| `?sort=field` | Ascending | `?sort=name` |
-| `?sort=-field` | Descending | `?sort=-created_at` |
-| `?sort=field1,field2` | Multi-field | `?sort=name,-age` |
+| Pattern               | Direction   | Example             |
+| --------------------- | ----------- | ------------------- |
+| `?sort=field`         | Ascending   | `?sort=name`        |
+| `?sort=-field`        | Descending  | `?sort=-created_at` |
+| `?sort=field1,field2` | Multi-field | `?sort=name,-age`   |
 
 ### Alternative Sort Syntax
 
 **Explicit direction:**
+
 ```
 GET /api/v1/users?sort_by=created_at&order=desc
 ```
 
 **Array format:**
+
 ```
 GET /api/v1/users?sort[]=name:asc&sort[]=created_at:desc
 ```
@@ -388,11 +406,13 @@ GET /api/v1/users?sort[]=name:asc&sort[]=created_at:desc
 ## Combining Pagination, Filtering & Sorting
 
 **Full example:**
+
 ```
 GET /api/v1/users?status=active&role=admin&sort=-created_at&limit=20&cursor=eyJpZCI6MTIzfQ
 ```
 
 **Response:**
+
 ```json
 {
   "data": [
@@ -432,12 +452,12 @@ limit: int = Query(20, le=100)  # Default 20, max 100
 ```json
 {
   "meta": {
-    "total": 1500,         // Total count (optional, expensive)
-    "limit": 20,           // Items per page
-    "offset": 40,          // Current offset
-    "hasMore": true,       // More results available
-    "nextCursor": "...",   // Cursor for next page
-    "prevCursor": "..."    // Cursor for previous page
+    "total": 1500, // Total count (optional, expensive)
+    "limit": 20, // Items per page
+    "offset": 40, // Current offset
+    "hasMore": true, // More results available
+    "nextCursor": "...", // Cursor for next page
+    "prevCursor": "..." // Cursor for previous page
   }
 }
 ```
@@ -476,7 +496,7 @@ CREATE INDEX idx_users_created_at ON users(created_at DESC);
 CREATE INDEX idx_users_status_created_at ON users(status, created_at DESC);
 ```
 
-### Avoid COUNT(*) for Large Tables
+### Avoid COUNT(\*) for Large Tables
 
 ```python
 # BAD: Expensive for millions of records
@@ -557,14 +577,14 @@ GET /api/v1/users?cursor=eyJpZCI6MTIzfQ
 
 ## Decision Matrix: Which Pagination Strategy?
 
-| Use Case | Strategy | Reason |
-|----------|----------|--------|
-| Social media feed | Cursor-based | Real-time, consistent results |
-| Admin dashboard | Offset-based | Jump to pages, total count needed |
-| Infinite scroll | Cursor-based | Performance, no duplicate items |
-| Report with page numbers | Page-based | User-friendly navigation |
+| Use Case                         | Strategy     | Reason                             |
+| -------------------------------- | ------------ | ---------------------------------- |
+| Social media feed                | Cursor-based | Real-time, consistent results      |
+| Admin dashboard                  | Offset-based | Jump to pages, total count needed  |
+| Infinite scroll                  | Cursor-based | Performance, no duplicate items    |
+| Report with page numbers         | Page-based   | User-friendly navigation           |
 | Large dataset (millions of rows) | Cursor-based | Offset degrades with large offsets |
-| Small dataset (<1000 rows) | Offset-based | Simpler, sufficient performance |
+| Small dataset (<1000 rows)       | Offset-based | Simpler, sufficient performance    |
 
 ---
 

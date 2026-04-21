@@ -4,22 +4,22 @@ Ephemeral, privacy-safe test data reduces reliance on static datasets and helps 
 
 ## Why Synthetic Data
 
-| Static Data | Synthetic Data |
-| ----------- | -------------- |
-| Privacy risks (PII) | GDPR-compliant |
-| Stale, outdated | Generated on demand |
-| Storage costs | Ephemeral, disposable |
-| Limited edge cases | Unlimited variations |
+| Static Data         | Synthetic Data        |
+| ------------------- | --------------------- |
+| Privacy risks (PII) | GDPR-compliant        |
+| Stale, outdated     | Generated on demand   |
+| Storage costs       | Ephemeral, disposable |
+| Limited edge cases  | Unlimited variations  |
 
 ## Synthetic Data Tools (2026)
 
-| Tool | Best For | Features |
-| ---- | -------- | -------- |
-| **K2view** | Enterprise TDM | Subsetting, masking, synthetic |
-| **MOSTLY AI** | Privacy-first synthetic | GDPR compliance, ML-based |
-| **Synthesized** | CI/CD integration | API-first, ephemeral |
-| **YData** | Data science teams | Profiling, quality scoring |
-| **Faker.js** | Simple fixtures | Deterministic, lightweight |
+| Tool            | Best For                | Features                       |
+| --------------- | ----------------------- | ------------------------------ |
+| **K2view**      | Enterprise TDM          | Subsetting, masking, synthetic |
+| **MOSTLY AI**   | Privacy-first synthetic | GDPR compliance, ML-based      |
+| **Synthesized** | CI/CD integration       | API-first, ephemeral           |
+| **YData**       | Data science teams      | Profiling, quality scoring     |
+| **Faker.js**    | Simple fixtures         | Deterministic, lightweight     |
 
 ## CI/CD Integration Pattern
 
@@ -39,7 +39,7 @@ jobs:
         run: npm test
 
       - name: Cleanup
-        run: rm -rf ./fixtures  # Ephemeral, no storage
+        run: rm -rf ./fixtures # Ephemeral, no storage
 ```
 
 ## Best Practices
@@ -53,7 +53,7 @@ jobs:
 
 ```typescript
 // Reproducible test data with seed
-import { faker } from '@faker-js/faker';
+import { faker } from "@faker-js/faker";
 
 faker.seed(12345); // Same seed = same data
 
@@ -72,12 +72,12 @@ beforeEach(() => {
 
 ## Privacy Compliance
 
-| Requirement | Solution |
-| ----------- | -------- |
+| Requirement           | Solution                      |
+| --------------------- | ----------------------------- |
 | GDPR Right to Erasure | Ephemeral data (auto-deleted) |
-| Data Minimization | Generate only needed fields |
-| Pseudonymization | Synthetic replaces real PII |
-| Cross-border Transfer | No real data leaves region |
+| Data Minimization     | Generate only needed fields   |
+| Pseudonymization      | Synthetic replaces real PII   |
+| Cross-border Transfer | No real data leaves region    |
 
 ## When to Use Synthetic vs Real Data
 

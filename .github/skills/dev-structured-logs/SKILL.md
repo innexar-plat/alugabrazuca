@@ -18,6 +18,7 @@ python .codex/skills/dev-structured-logs/scripts/structured_logs.py --path <repo
 ```
 
 2. Review:
+
 - `<repo>/patch.diff`
 - `<repo>/preview-report.json`
 
@@ -54,6 +55,7 @@ Support these options:
 ```
 
 Behavior:
+
 - Default mode is dry-run when `--apply` is not provided.
 - CommandHandler scope insertion is disabled by default; enable it explicitly with `--enable-handler-scope`.
 - Do not touch excluded/generated folders: `bin/`, `obj/`, `node_modules/`, `packages/`, `.git/`, `.vs/`.
@@ -62,6 +64,7 @@ Behavior:
 ## Part 1: Logging Transformation Rules
 
 Rewrite only `logger.Log*` and `_logger.Log*` style invocations where message argument uses:
+
 - String concatenation
 - `String.Format(...)`
 - String interpolation (`$"..."`)
@@ -70,10 +73,12 @@ Transform to message templates with properties and argument list.
 Preserve interpolation expressions as argument expressions (including ternary expressions).
 
 Preserve:
+
 - Exception overload ordering (`LogError(ex, "...", args...)`)
 - Original expression order
 
 If any message argument has potential side effects (method call, `new`, increment/decrement, compound assignment):
+
 - Extract expression to temporary variable before logging call
 - Mark change as manual review in report
 
@@ -82,18 +87,22 @@ Do not attempt risky cross-statement rewrites. Keep changes local to call sites.
 ## Part 2: CommandHandler Scope Rules
 
 Detect handlers by either:
+
 - Class implementing `ICommandHandler<T>`
 - Public methods matching handler pattern (default `Handle|HandleAsync`) with first parameter treated as command object
 
 When `--enable-handler-scope` is set, at method start insert scope when missing:
+
 - Build dictionary from command key properties: `UserId`, `TransactionId`, `TransferId`, `VerificationId`, `SessionId`, `Id`
 - Initialize scope items with dictionary collection initializer style, for example:
+
 ```csharp
 var __scopeItems = new Dictionary<string, object>
 {
     ["Property1"] = command.Property1
 };
 ```
+
 - Use `using var _scope = _logger.BeginScope(__scopeItems);`
 
 Skip if an equivalent command-property `BeginScope` block already exists in method prologue.
@@ -106,6 +115,7 @@ If any `*.csproj` file contains one of those package names, treat repository as 
 If Serilog is detected, inspect all `appsettings.json` files in the repository.
 
 For each Serilog `File` sink with object `Args` (including nested `WriteTo` pipelines such as `Async` -> `Logger` -> `configureLogger` -> `WriteTo`):
+
 - Ensure `Args.path` ends with `.json`
 - If `Args.path` is a debug log file path (for example `*.debug`), rename it to `.debug.json`
 - Set `Args.formatter` to:
@@ -118,6 +128,7 @@ If Serilog section or File sink does not exist, do nothing.
 ## Outputs
 
 Always produce in repo root:
+
 - `patch.diff` unified diff
 - `preview-report.json` entries:
   - `file`
@@ -128,6 +139,7 @@ Always produce in repo root:
   - `reason`
 
 When applying:
+
 - Create backups in `--backup-dir` or `.codex/skills/dev-structured-logs/backups`
 - Apply file updates
 - If `--commit-msg` is supplied, attempt git commit
@@ -135,6 +147,7 @@ When applying:
 ## Examples
 
 Use files in `examples/` to validate behavior:
+
 - `concatenation.before.cs` / `concatenation.after.cs`
 - `string-format.before.cs` / `string-format.after.cs`
 - `interpolation.before.cs` / `interpolation.after.cs`

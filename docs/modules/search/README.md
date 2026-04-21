@@ -1,6 +1,7 @@
 # Módulo 3 — Busca Pública (`search`)
 
 ## Visão Geral
+
 Busca de quartos disponíveis com filtros avançados, mapa interativo e resultados paginados. Acessível sem login.
 
 ---
@@ -9,88 +10,96 @@ Busca de quartos disponíveis com filtros avançados, mapa interativo e resultad
 
 ### Barra de busca rápida
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| `query` | string | Busca textual (cidade, bairro, ZIP) |
-| `country` | enum | País |
-| `city` | string | Cidade |
+| Campo     | Tipo   | Descrição                           |
+| --------- | ------ | ----------------------------------- |
+| `query`   | string | Busca textual (cidade, bairro, ZIP) |
+| `country` | enum   | País                                |
+| `city`    | string | Cidade                              |
 
 ### Filtros avançados
 
 #### Localização
-| Filtro | Tipo | Opções |
-|--------|------|--------|
-| `country` | select | Lista de países suportados |
-| `state` | select | Dinâmico por país |
-| `city` | autocomplete | Dinâmico por estado |
-| `neighborhood` | autocomplete | Dinâmico por cidade |
-| `zipCode` | string | ZIP/CEP |
-| `radius` | enum | 5mi, 10mi, 25mi, 50mi |
-| `nearLocation` | string | Perto de (endereço/ponto) |
+
+| Filtro         | Tipo         | Opções                     |
+| -------------- | ------------ | -------------------------- |
+| `country`      | select       | Lista de países suportados |
+| `state`        | select       | Dinâmico por país          |
+| `city`         | autocomplete | Dinâmico por estado        |
+| `neighborhood` | autocomplete | Dinâmico por cidade        |
+| `zipCode`      | string       | ZIP/CEP                    |
+| `radius`       | enum         | 5mi, 10mi, 25mi, 50mi      |
+| `nearLocation` | string       | Perto de (endereço/ponto)  |
 
 #### Preço
-| Filtro | Tipo | Padrão |
-|--------|------|--------|
-| `minPrice` | integer | 0 |
-| `maxPrice` | integer | sem limite |
-| `utilitiesIncluded` | boolean | qualquer |
+
+| Filtro              | Tipo    | Padrão     |
+| ------------------- | ------- | ---------- |
+| `minPrice`          | integer | 0          |
+| `maxPrice`          | integer | sem limite |
+| `utilitiesIncluded` | boolean | qualquer   |
 
 #### Quarto
-| Filtro | Tipo | Opções |
-|--------|------|--------|
+
+| Filtro        | Tipo         | Opções                                        |
+| ------------- | ------------ | --------------------------------------------- |
 | `listingType` | multi-select | `private_room`, `shared_room`, `entire_place` |
-| `roomSize` | multi-select | `small`, `medium`, `large`, `extra_large` |
-| `bedType` | multi-select | todos os tipos |
-| `isFurnished` | boolean | |
-| `hasWindow` | boolean | |
-| `hasLock` | boolean | |
+| `roomSize`    | multi-select | `small`, `medium`, `large`, `extra_large`     |
+| `bedType`     | multi-select | todos os tipos                                |
+| `isFurnished` | boolean      |                                               |
+| `hasWindow`   | boolean      |                                               |
+| `hasLock`     | boolean      |                                               |
 
 #### Banheiro
-| Filtro | Tipo | Opções |
-|--------|------|--------|
+
+| Filtro         | Tipo         | Opções                                             |
+| -------------- | ------------ | -------------------------------------------------- |
 | `bathroomType` | multi-select | `private_ensuite`, `private_not_ensuite`, `shared` |
 
 #### Cozinha e Lavanderia
-| Filtro | Tipo | Opções |
-|--------|------|--------|
-| `kitchenAccess` | multi-select | `full`, `limited`, `scheduled` |
+
+| Filtro          | Tipo         | Opções                             |
+| --------------- | ------------ | ---------------------------------- |
+| `kitchenAccess` | multi-select | `full`, `limited`, `scheduled`     |
 | `laundryAccess` | multi-select | `in_unit`, `in_building`, `nearby` |
 
 #### Regras
-| Filtro | Tipo |
-|--------|------|
-| `allowsPets` | boolean |
-| `allowsSmoking` | boolean |
-| `allowsCouples` | boolean |
+
+| Filtro           | Tipo    |
+| ---------------- | ------- |
+| `allowsPets`     | boolean |
+| `allowsSmoking`  | boolean |
+| `allowsCouples`  | boolean |
 | `allowsChildren` | boolean |
-| `lgbtFriendly` | boolean |
+| `lgbtFriendly`   | boolean |
 
 #### Disponibilidade
-| Filtro | Tipo |
-|--------|------|
-| `availableFrom` | date |
+
+| Filtro           | Tipo                |
+| ---------------- | ------------------- |
+| `availableFrom`  | date                |
 | `minimumStayMax` | integer (max meses) |
 
 #### Outros
-| Filtro | Tipo |
-|--------|------|
-| `hasParking` | boolean |
-| `hasPool` | boolean |
-| `hostVerified` | boolean |
+
+| Filtro             | Tipo    |
+| ------------------ | ------- |
+| `hasParking`       | boolean |
+| `hasPool`          | boolean |
+| `hostVerified`     | boolean |
 | `internetIncluded` | boolean |
-| `hasContract` | boolean |
+| `hasContract`      | boolean |
 
 ---
 
 ## 3.2 Ordenação
 
-| Opção | Valor | Padrão |
-|-------|-------|--------|
-| Mais recentes | `createdAt:desc` | ✅ |
-| Preço: menor → maior | `pricePerMonth:asc` | |
-| Preço: maior → menor | `pricePerMonth:desc` | |
-| Mais populares | `viewCount:desc` | |
-| Melhor avaliados | `avgRating:desc` | |
+| Opção                | Valor                | Padrão |
+| -------------------- | -------------------- | ------ |
+| Mais recentes        | `createdAt:desc`     | ✅     |
+| Preço: menor → maior | `pricePerMonth:asc`  |        |
+| Preço: maior → menor | `pricePerMonth:desc` |        |
+| Mais populares       | `viewCount:desc`     |        |
+| Melhor avaliados     | `avgRating:desc`     |        |
 
 ---
 
@@ -99,6 +108,7 @@ Busca de quartos disponíveis com filtros avançados, mapa interativo e resultad
 ### Card do anúncio (lista)
 
 Informações exibidas no card de resultado:
+
 - Foto de capa
 - Título
 - Cidade, Estado, País
@@ -114,6 +124,7 @@ Informações exibidas no card de resultado:
 - Disponível a partir de
 
 ### Visualizações
+
 - **Lista** — cards em grid (padrão)
 - **Mapa** — mapa interativo com pins + mini-cards
 
@@ -162,15 +173,16 @@ Ao clicar em um anúncio, mostra:
 
 ## 3.7 Endpoints
 
-| Método | Rota | Descrição | Auth |
-|--------|------|-----------|------|
-| GET | `/api/v1/listings/search` | Busca com filtros | ❌ |
-| GET | `/api/v1/listings/:id/public` | Detalhe público | ❌ |
-| GET | `/api/v1/listings/cities` | Cidades com anúncios | ❌ |
-| GET | `/api/v1/listings/suggestions` | Autocomplete busca | ❌ |
-| POST | `/api/v1/listings/:id/view` | Registrar visualização | ❌ |
+| Método | Rota                           | Descrição              | Auth |
+| ------ | ------------------------------ | ---------------------- | ---- |
+| GET    | `/api/v1/listings/search`      | Busca com filtros      | ❌   |
+| GET    | `/api/v1/listings/:id/public`  | Detalhe público        | ❌   |
+| GET    | `/api/v1/listings/cities`      | Cidades com anúncios   | ❌   |
+| GET    | `/api/v1/listings/suggestions` | Autocomplete busca     | ❌   |
+| POST   | `/api/v1/listings/:id/view`    | Registrar visualização | ❌   |
 
 ### Query params da busca
+
 ```
 GET /api/v1/listings/search?
   country=US&
@@ -191,8 +203,8 @@ GET /api/v1/listings/search?
 
 ## 3.8 Páginas Frontend
 
-| Rota | Página | Auth |
-|------|--------|------|
-| `/rooms` | Busca principal | ❌ |
-| `/rooms/:city` | Busca por cidade | ❌ |
-| `/rooms/:city/:slug` | Detalhe do anúncio | ❌ |
+| Rota                 | Página             | Auth |
+| -------------------- | ------------------ | ---- |
+| `/rooms`             | Busca principal    | ❌   |
+| `/rooms/:city`       | Busca por cidade   | ❌   |
+| `/rooms/:city/:slug` | Detalhe do anúncio | ❌   |

@@ -1,4 +1,4 @@
-# Code Review Automation Tools & Setup 
+# Code Review Automation Tools & Setup
 
 Modern code review combines automated checks with manual review for maximum effectiveness. **Automation finds 60-70% of issues**, letting human reviewers focus on architecture, logic, and business concerns.
 
@@ -7,16 +7,19 @@ Modern code review combines automated checks with manual review for maximum effe
 ### Three-Layer Approach
 
 **Layer 1: Pre-commit checks (Local)**
+
 - Runs on developer machine before commit
 - Fast feedback (seconds)
 - Catches obvious issues early
 
 **Layer 2: PR checks (CI/CD)**
+
 - Runs on every pull request
 - Comprehensive analysis (minutes)
 - Blocks merge if critical issues found
 
 **Layer 3: Continuous monitoring (Production)**
+
 - Runs on deployed code
 - Security scanning, dependency updates
 - Weekly reports
@@ -26,6 +29,7 @@ Modern code review combines automated checks with manual review for maximum effe
 ### 1. Code Linters
 
 **JavaScript/TypeScript**:
+
 ```json
 // .eslintrc.json
 {
@@ -45,6 +49,7 @@ Modern code review combines automated checks with manual review for maximum effe
 ```
 
 **Python**:
+
 ```toml
 # pyproject.toml
 [tool.ruff]
@@ -57,6 +62,7 @@ max-complexity = 10
 ```
 
 **Go**:
+
 ```bash
 # .golangci.yml
 linters:
@@ -72,6 +78,7 @@ linters:
 ### 2. Code Formatters
 
 **JavaScript/TypeScript** - Prettier:
+
 ```json
 // .prettierrc
 {
@@ -84,6 +91,7 @@ linters:
 ```
 
 **Python** - Black:
+
 ```toml
 [tool.black]
 line-length = 100
@@ -91,6 +99,7 @@ target-version = ['py311']
 ```
 
 **Go** - gofmt (built-in):
+
 ```bash
 gofmt -w .
 ```
@@ -98,6 +107,7 @@ gofmt -w .
 ### 3. Static Analysis
 
 **SonarQube/SonarCloud** (Multi-language):
+
 ```yaml
 # sonar-project.properties
 sonar.projectKey=my-project
@@ -112,6 +122,7 @@ sonar.qualitygate.timeout=300
 ```
 
 **CodeClimate** (Multi-language):
+
 ```yaml
 # .codeclimate.yml
 version: "2"
@@ -139,6 +150,7 @@ checks:
 ```
 
 **ESLint Plugin Security** (JavaScript):
+
 ```bash
 npm install --save-dev eslint-plugin-security
 ```
@@ -146,6 +158,7 @@ npm install --save-dev eslint-plugin-security
 ### 4. Security Scanners
 
 **Snyk** (Dependency vulnerabilities):
+
 ```yaml
 # .github/workflows/security.yml
 name: Security Scan
@@ -163,11 +176,13 @@ jobs:
 ```
 
 **Trivy** (Container security):
+
 ```bash
 trivy image --severity HIGH,CRITICAL myimage:latest
 ```
 
 **Semgrep** (Code patterns):
+
 ```yaml
 # .semgrep.yml
 rules:
@@ -181,6 +196,7 @@ rules:
 ### 5. Test Coverage Tools
 
 **JavaScript** - Istanbul/NYC:
+
 ```json
 // package.json
 {
@@ -192,6 +208,7 @@ rules:
 ```
 
 **Python** - Coverage.py:
+
 ```toml
 [tool.coverage.run]
 source = ["src"]
@@ -203,6 +220,7 @@ show_missing = true
 ```
 
 **Go** - Built-in:
+
 ```bash
 go test -coverprofile=coverage.out ./...
 go tool cover -html=coverage.out
@@ -211,12 +229,14 @@ go tool cover -html=coverage.out
 ### 6. AI-Powered Review Tools ()
 
 **GitHub Copilot for Pull Requests**:
+
 - Generates PR summaries
 - Suggests reviewers
 - Identifies potential issues
 - Free for GitHub Enterprise
 
 **Qodo (formerly Codium)**:
+
 ```yaml
 # .qodo.yml
 features:
@@ -231,11 +251,13 @@ pr_reviewer:
 ```
 
 **CodeRabbit**:
+
 - AI code reviews
 - Learning from team patterns
 - Context-aware suggestions
 
 **Amazon CodeGuru**:
+
 ```yaml
 # buildspec.yml
 phases:
@@ -248,6 +270,7 @@ phases:
 ### 7. Dependency Management
 
 **Dependabot** (GitHub):
+
 ```yaml
 # .github/dependabot.yml
 version: 2
@@ -264,6 +287,7 @@ updates:
 ```
 
 **Renovate** (Multi-platform):
+
 ```json
 {
   "extends": ["config:base"],
@@ -332,11 +356,11 @@ sl submit # Submit stack for review
 
 **Measured Benefits**:
 
-| Team | Improvement | Source |
-|------|-------------|--------|
-| Ramp | 74% faster merges, 3x velocity | Graphite case study |
-| Asana | 7 hours/week saved per engineer | Graphite blog |
-| Shopify | 15-25% CI cost savings | Projected savings |
+| Team    | Improvement                     | Source              |
+| ------- | ------------------------------- | ------------------- |
+| Ramp    | 74% faster merges, 3x velocity  | Graphite case study |
+| Asana   | 7 hours/week saved per engineer | Graphite blog       |
+| Shopify | 15-25% CI cost savings          | Projected savings   |
 
 **When to Use**:
 
@@ -364,7 +388,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
       - run: npm ci
       - run: npm run lint
 
@@ -512,20 +536,20 @@ repos:
     rev: 1.7.6
     hooks:
       - id: bandit
-        args: ['-c', 'pyproject.toml']
+        args: ["-c", "pyproject.toml"]
 ```
 
 ## Tool Selection Matrix
 
-| Tool Category | Small Teams (< 10) | Medium Teams (10-50) | Large Teams (50+) |
-|--------------|-------------------|---------------------|-------------------|
-| **Linter** | ESLint/Pylint | ESLint + plugins | ESLint + SonarQube |
-| **Formatter** | Prettier/Black | Prettier/Black | Prettier/Black |
-| **Static Analysis** | ESLint plugins | CodeClimate | SonarQube Enterprise |
-| **Security** | npm audit/pip-audit | Snyk | Snyk + Semgrep |
-| **Coverage** | Built-in | Built-in + Codecov | SonarQube + Codecov |
-| **AI Review** | GitHub Copilot | Qodo/CodeRabbit | CodeRabbit Enterprise |
-| **Dependencies** | Dependabot | Dependabot + Renovate | Renovate + Snyk |
+| Tool Category       | Small Teams (< 10)  | Medium Teams (10-50)  | Large Teams (50+)     |
+| ------------------- | ------------------- | --------------------- | --------------------- |
+| **Linter**          | ESLint/Pylint       | ESLint + plugins      | ESLint + SonarQube    |
+| **Formatter**       | Prettier/Black      | Prettier/Black        | Prettier/Black        |
+| **Static Analysis** | ESLint plugins      | CodeClimate           | SonarQube Enterprise  |
+| **Security**        | npm audit/pip-audit | Snyk                  | Snyk + Semgrep        |
+| **Coverage**        | Built-in            | Built-in + Codecov    | SonarQube + Codecov   |
+| **AI Review**       | GitHub Copilot      | Qodo/CodeRabbit       | CodeRabbit Enterprise |
+| **Dependencies**    | Dependabot          | Dependabot + Renovate | Renovate + Snyk       |
 
 ## Configuration Best Practices
 
@@ -572,16 +596,19 @@ jobs:
 ### 4. Progressive Enhancement
 
 **Phase 1**: Basic checks (week 1)
+
 - Linter
 - Formatter
 - Basic tests
 
 **Phase 2**: Quality gates (week 2-3)
+
 - Coverage requirements
 - Security scanning
 - Static analysis
 
 **Phase 3**: Advanced automation (month 2+)
+
 - AI-powered review
 - Automated dependency updates
 - Performance regression testing
@@ -617,18 +644,21 @@ performance:
 ### Visualization Tools
 
 **SonarQube Dashboard**:
+
 - Technical debt ratio
 - Code smells
 - Security hotspots
 - Coverage trends
 
 **CodeClimate Dashboard**:
+
 - Maintainability grade
 - Test coverage
 - Code duplication
 - Complexity trends
 
 **Custom Grafana Dashboard**:
+
 ```sql
 -- PR metrics
 SELECT
@@ -644,17 +674,20 @@ GROUP BY DATE(created_at)
 ## Cost Considerations
 
 ### Open Source (Free)
+
 - ESLint, Prettier, Black
 - GitHub Actions (2000 min/month)
 - Dependabot
 - SonarCloud (public repos)
 
 ### Small Team ($50-200/month)
+
 - GitHub Team ($4/user)
 - Snyk ($25/month)
 - CodeClimate ($249/month for small team)
 
 ### Enterprise ($500+/month)
+
 - SonarQube Enterprise
 - Snyk Enterprise
 - CodeRabbit Teams
@@ -665,6 +698,7 @@ GROUP BY DATE(created_at)
 ### Common Issues
 
 **False Positives**:
+
 ```javascript
 // Suppress specific rules when necessary
 /* eslint-disable-next-line security/detect-object-injection */
@@ -672,6 +706,7 @@ const value = obj[dynamicKey];
 ```
 
 **Slow CI**:
+
 ```yaml
 # Cache everything possible
 - uses: actions/cache@v3
@@ -683,6 +718,7 @@ const value = obj[dynamicKey];
 ```
 
 **Flaky Tests**:
+
 ```javascript
 // Retry flaky tests automatically
 jest.retryTimes(3, { logErrorsBeforeRetry: true });

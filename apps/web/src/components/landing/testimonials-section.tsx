@@ -17,7 +17,9 @@ interface TestimonialsSectionProps {
   testimonials: Testimonial[];
 }
 
-export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) {
+export function TestimonialsSection({
+  testimonials,
+}: TestimonialsSectionProps) {
   const t = useTranslations("home.testimonials");
   const [current, setCurrent] = useState(0);
 

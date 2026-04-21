@@ -20,12 +20,14 @@ Both are critical for API security and must work together.
 **Best for:** Stateless authentication, microservices, mobile/web apps
 
 **Pros:**
+
 - Stateless (no server-side session storage)
 - Self-contained (carries user claims)
 - Works across services
 - Easy to scale horizontally
 
 **Cons:**
+
 - Can't revoke before expiration (use short TTLs + refresh tokens)
 - Token size larger than session IDs
 - Sensitive to XSS (store securely)
@@ -79,6 +81,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -94,6 +97,7 @@ Content-Type: application/json
 ### JWT Structure
 
 **Header:**
+
 ```json
 {
   "alg": "HS256",
@@ -102,6 +106,7 @@ Content-Type: application/json
 ```
 
 **Payload (Claims):**
+
 ```json
 {
   "sub": "user-123",
@@ -113,6 +118,7 @@ Content-Type: application/json
 ```
 
 **Signature:**
+
 ```
 HMACSHA256(
   base64UrlEncode(header) + "." + base64UrlEncode(payload),
@@ -125,6 +131,7 @@ HMACSHA256(
 ### JWT Best Practices
 
 **1. Short Access Token TTL**
+
 ```
 Access Token: 15-60 minutes
 Refresh Token: 7-30 days
@@ -175,12 +182,14 @@ Don't include sensitive data (passwords, credit cards) in JWTs.
 **Best for:** Third-party integrations, social login (Google, GitHub)
 
 **Pros:**
+
 - Industry standard
 - Delegated authorization
 - Scoped permissions
 - Supports single sign-on
 
 **Cons:**
+
 - More complex than JWT
 - Requires redirect flow
 - Not suitable for server-to-server
@@ -222,6 +231,7 @@ grant_type=authorization_code
 ```
 
 **Response:**
+
 ```json
 {
   "access_token": "eyJhbGc...",
@@ -246,12 +256,14 @@ Authorization: Bearer eyJhbGc...
 **Best for:** Server-to-server APIs, webhooks, public APIs with rate limits
 
 **Pros:**
+
 - Simple to implement
 - Easy to rotate
 - Per-key rate limiting
 - Good for service accounts
 
 **Cons:**
+
 - No user context
 - Must be stored securely
 - All-or-nothing permissions
@@ -321,6 +333,7 @@ Authorization: Bearer <user_token>
 ```
 
 Response:
+
 ```json
 {
   "newKey": "sk_live_xyz789uvw456",
@@ -348,6 +361,7 @@ X-RateLimit-Reset: 1640000000
 **Concept:** Users have roles; roles have permissions.
 
 **Example Roles:**
+
 - `guest` - Read public content
 - `user` - Read/write own content
 - `moderator` - Moderate content
@@ -532,7 +546,7 @@ http://api.example.com/login  # Credentials sent in clear text
 
 ```javascript
 // Bad - Client decides if user is admin
-if (user.role === 'admin') {
+if (user.role === "admin") {
   // Show admin panel
 }
 ```
@@ -604,21 +618,23 @@ async def get_me(user = Depends(get_current_user)):
 ### Express.js (TypeScript) - JWT Auth
 
 ```typescript
-import express from 'express';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import express from "express";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
-const SECRET_KEY = 'your-secret-key';
-const ACCESS_TOKEN_EXPIRE = '30m';
+const SECRET_KEY = "your-secret-key";
+const ACCESS_TOKEN_EXPIRE = "30m";
 
 const createAccessToken = (userId: string, role: string) => {
-  return jwt.sign({ sub: userId, role }, SECRET_KEY, { expiresIn: ACCESS_TOKEN_EXPIRE });
+  return jwt.sign({ sub: userId, role }, SECRET_KEY, {
+    expiresIn: ACCESS_TOKEN_EXPIRE,
+  });
 };
 
 const authenticate = (req, res, next) => {
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Missing or invalid token' });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Missing or invalid token" });
   }
 
   const token = authHeader.substring(7);
@@ -627,23 +643,23 @@ const authenticate = (req, res, next) => {
     req.user = payload;
     next();
   } catch (err) {
-    return res.status(401).json({ error: 'Invalid token' });
+    return res.status(401).json({ error: "Invalid token" });
   }
 };
 
-app.post('/api/v1/auth/login', async (req, res) => {
+app.post("/api/v1/auth/login", async (req, res) => {
   const { email, password } = req.body;
   const user = await db.getUserByEmail(email);
 
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-    return res.status(401).json({ error: 'Invalid credentials' });
+    return res.status(401).json({ error: "Invalid credentials" });
   }
 
   const accessToken = createAccessToken(user.id, user.role);
   res.json({ accessToken, expiresIn: 1800 });
 });
 
-app.get('/api/v1/users/me', authenticate, (req, res) => {
+app.get("/api/v1/users/me", authenticate, (req, res) => {
   res.json(req.user);
 });
 ```

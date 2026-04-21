@@ -19,14 +19,14 @@ Patterns for edge computing, serverless backends, and modern JavaScript runtimes
 
 ## When to Use Edge Computing
 
-| Use Case | Edge | Traditional Server |
-|----------|------|-------------------|
-| Global low-latency APIs | Yes | No |
-| Authentication/JWT validation | Yes | Yes |
-| A/B testing, feature flags | Yes | Yes |
-| Database-heavy CRUD | No | Yes |
-| Long-running processes | No | Yes |
-| WebSocket connections | Limited | Yes |
+| Use Case                      | Edge    | Traditional Server |
+| ----------------------------- | ------- | ------------------ |
+| Global low-latency APIs       | Yes     | No                 |
+| Authentication/JWT validation | Yes     | Yes                |
+| A/B testing, feature flags    | Yes     | Yes                |
+| Database-heavy CRUD           | No      | Yes                |
+| Long-running processes        | No      | Yes                |
+| WebSocket connections         | Limited | Yes                |
 
 **Rule of thumb**: Edge is ideal for stateless, CPU-light operations close to users.
 
@@ -34,13 +34,13 @@ Patterns for edge computing, serverless backends, and modern JavaScript runtimes
 
 ## Platform Decision Matrix
 
-| Platform | Cold Start | Global Locations | Best For |
-|----------|------------|------------------|----------|
-| **Cloudflare Workers** | <1ms (V8 isolates) | 300+ | Pure edge logic, APIs |
-| **Vercel Edge Functions** | ~50ms | 20+ | Next.js integration |
-| **AWS Lambda@Edge** | ~100ms | CloudFront POPs | AWS ecosystem |
-| **Deno Deploy** | <10ms | 35+ | Deno/Fresh apps |
-| **Fly.io** | ~50ms | 30+ | Containers at edge |
+| Platform                  | Cold Start         | Global Locations | Best For              |
+| ------------------------- | ------------------ | ---------------- | --------------------- |
+| **Cloudflare Workers**    | <1ms (V8 isolates) | 300+             | Pure edge logic, APIs |
+| **Vercel Edge Functions** | ~50ms              | 20+              | Next.js integration   |
+| **AWS Lambda@Edge**       | ~100ms             | CloudFront POPs  | AWS ecosystem         |
+| **Deno Deploy**           | <10ms              | 35+              | Deno/Fresh apps       |
+| **Fly.io**                | ~50ms              | 30+              | Containers at edge    |
 
 ### Cloudflare Workers
 
@@ -48,18 +48,18 @@ Patterns for edge computing, serverless backends, and modern JavaScript runtimes
 
 ```typescript
 // Hono on Cloudflare Workers
-import { Hono } from 'hono'
+import { Hono } from "hono";
 
-const app = new Hono()
+const app = new Hono();
 
-app.get('/api/user/:id', async (c) => {
-  const id = c.req.param('id')
+app.get("/api/user/:id", async (c) => {
+  const id = c.req.param("id");
   // Use Cloudflare KV or D1 for data
-  const user = await c.env.USERS_KV.get(id, 'json')
-  return c.json(user)
-})
+  const user = await c.env.USERS_KV.get(id, "json");
+  return c.json(user);
+});
 
-export default app
+export default app;
 ```
 
 **Limitations**: No Node.js APIs, 128MB memory, 30s CPU time (paid), no native WebSockets.
@@ -70,12 +70,12 @@ export default app
 
 ```typescript
 // Next.js Edge API Route
-export const config = { runtime: 'edge' }
+export const config = { runtime: "edge" };
 
 export default function handler(req: Request) {
-  return new Response(JSON.stringify({ message: 'Hello from edge' }), {
-    headers: { 'content-type': 'application/json' },
-  })
+  return new Response(JSON.stringify({ message: "Hello from edge" }), {
+    headers: { "content-type": "application/json" },
+  });
 }
 ```
 
@@ -85,11 +85,11 @@ export default function handler(req: Request) {
 
 ## Runtime Comparison (Verify Versions)
 
-| Runtime | TypeScript | Package Manager | Best For |
-|---------|------------|-----------------|----------|
-| **Node.js (current LTS)** | Via transpile/runtime loaders | npm/pnpm/yarn | Production stability, broad ecosystem |
-| **Bun** | Native | bun | Perf-sensitive services (verify constraints) |
-| **Deno** | Native | deno add | Security-focused deployments (verify platform support) |
+| Runtime                   | TypeScript                    | Package Manager | Best For                                               |
+| ------------------------- | ----------------------------- | --------------- | ------------------------------------------------------ |
+| **Node.js (current LTS)** | Via transpile/runtime loaders | npm/pnpm/yarn   | Production stability, broad ecosystem                  |
+| **Bun**                   | Native                        | bun             | Perf-sensitive services (verify constraints)           |
+| **Deno**                  | Native                        | deno add        | Security-focused deployments (verify platform support) |
 
 ### Bun Quick Start
 
@@ -136,27 +136,27 @@ Prefer OS/container sandboxing (containers, seccomp, gVisor, Firecracker) for un
 **Best for**: Cloudflare Workers, multi-runtime deployment.
 
 ```typescript
-import { Hono } from 'hono'
-import { cors } from 'hono/cors'
-import { jwt } from 'hono/jwt'
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { jwt } from "hono/jwt";
 
-const app = new Hono()
+const app = new Hono();
 
 // Middleware
-app.use('*', cors())
-app.use('/api/*', jwt({ secret: 'your-secret' }))
+app.use("*", cors());
+app.use("/api/*", jwt({ secret: "your-secret" }));
 
 // Routes
-app.get('/api/health', (c) => c.json({ status: 'ok' }))
+app.get("/api/health", (c) => c.json({ status: "ok" }));
 
-app.post('/api/users', async (c) => {
-  const body = await c.req.json()
+app.post("/api/users", async (c) => {
+  const body = await c.req.json();
   // Validate with Zod
-  const user = userSchema.parse(body)
-  return c.json(user, 201)
-})
+  const user = userSchema.parse(body);
+  return c.json(user, 201);
+});
 
-export default app
+export default app;
 ```
 
 ### Elysia (Bun-native)
@@ -164,19 +164,19 @@ export default app
 **Best for**: Maximum performance on Bun, end-to-end type safety.
 
 ```typescript
-import { Elysia, t } from 'elysia'
+import { Elysia, t } from "elysia";
 
 const app = new Elysia()
-  .get('/api/health', () => ({ status: 'ok' }))
-  .post('/api/users', ({ body }) => body, {
+  .get("/api/health", () => ({ status: "ok" }))
+  .post("/api/users", ({ body }) => body, {
     body: t.Object({
-      email: t.String({ format: 'email' }),
+      email: t.String({ format: "email" }),
       name: t.String({ minLength: 2 }),
     }),
   })
-  .listen(3000)
+  .listen(3000);
 
-console.log(`Running at ${app.server?.hostname}:${app.server?.port}`)
+console.log(`Running at ${app.server?.hostname}:${app.server?.port}`);
 ```
 
 ---
@@ -194,56 +194,56 @@ console.log(`Running at ${app.server?.hostname}:${app.server?.port}`)
 
 ```typescript
 // server/trpc.ts
-import { initTRPC } from '@trpc/server'
-import { z } from 'zod'
+import { initTRPC } from "@trpc/server";
+import { z } from "zod";
 
-const t = initTRPC.create()
+const t = initTRPC.create();
 
-export const router = t.router
-export const publicProcedure = t.procedure
+export const router = t.router;
+export const publicProcedure = t.procedure;
 
 // server/routers/user.ts
 export const userRouter = router({
-  getById: publicProcedure
-    .input(z.string())
-    .query(async ({ input }) => {
-      return db.user.findUnique({ where: { id: input } })
-    }),
+  getById: publicProcedure.input(z.string()).query(async ({ input }) => {
+    return db.user.findUnique({ where: { id: input } });
+  }),
 
   create: publicProcedure
-    .input(z.object({
-      email: z.string().email(),
-      name: z.string().min(2),
-    }))
+    .input(
+      z.object({
+        email: z.string().email(),
+        name: z.string().min(2),
+      }),
+    )
     .mutation(async ({ input }) => {
-      return db.user.create({ data: input })
+      return db.user.create({ data: input });
     }),
-})
+});
 ```
 
 ### Client Usage
 
 ```typescript
 // Client automatically infers types from server
-const user = await trpc.user.getById.query('user-123')
+const user = await trpc.user.getById.query("user-123");
 // ^? User | null (inferred from server return type)
 
 await trpc.user.create.mutate({
-  email: 'test@example.com',
-  name: 'Test User',
-})
+  email: "test@example.com",
+  name: "Test User",
+});
 // TypeScript error if fields don't match server schema
 ```
 
 ### tRPC vs REST vs GraphQL
 
-| Aspect | tRPC | REST | GraphQL |
-|--------|------|------|---------|
-| Type Safety | Full (inference) | Manual (OpenAPI) | Partial (codegen) |
-| Schema | None needed | OpenAPI/Swagger | SDL required |
-| Bundle Size | ~2kb | N/A | ~20kb+ |
-| Learning Curve | Low | Low | Medium |
-| Public API | Not ideal | Yes | Yes |
+| Aspect         | tRPC             | REST             | GraphQL           |
+| -------------- | ---------------- | ---------------- | ----------------- |
+| Type Safety    | Full (inference) | Manual (OpenAPI) | Partial (codegen) |
+| Schema         | None needed      | OpenAPI/Swagger  | SDL required      |
+| Bundle Size    | ~2kb             | N/A              | ~20kb+            |
+| Learning Curve | Low              | Low              | Medium            |
+| Public API     | Not ideal        | Yes              | Yes               |
 
 **Use tRPC when**: Full-stack TypeScript, internal APIs, monorepos.
 **Use REST when**: Public APIs, multi-language clients, OpenAPI requirement.
@@ -253,29 +253,32 @@ await trpc.user.create.mutate({
 
 ## Edge-Compatible Databases
 
-| Database | Type | Edge Support | Best For |
-|----------|------|--------------|----------|
-| **Cloudflare D1** | SQLite | Native | Cloudflare Workers |
-| **Turso** | SQLite (libSQL) | Yes | Multi-region SQLite |
-| **Neon** | PostgreSQL | Yes (HTTP) | Serverless Postgres |
-| **PlanetScale** | MySQL | Yes | Serverless MySQL |
-| **Upstash Redis** | Redis | Yes | Caching, sessions |
+| Database          | Type            | Edge Support | Best For            |
+| ----------------- | --------------- | ------------ | ------------------- |
+| **Cloudflare D1** | SQLite          | Native       | Cloudflare Workers  |
+| **Turso**         | SQLite (libSQL) | Yes          | Multi-region SQLite |
+| **Neon**          | PostgreSQL      | Yes (HTTP)   | Serverless Postgres |
+| **PlanetScale**   | MySQL           | Yes          | Serverless MySQL    |
+| **Upstash Redis** | Redis           | Yes          | Caching, sessions   |
 
 ### Drizzle + Turso Example
 
 ```typescript
-import { drizzle } from 'drizzle-orm/libsql'
-import { createClient } from '@libsql/client'
+import { drizzle } from "drizzle-orm/libsql";
+import { createClient } from "@libsql/client";
 
 const client = createClient({
   url: process.env.TURSO_DATABASE_URL!,
   authToken: process.env.TURSO_AUTH_TOKEN,
-})
+});
 
-const db = drizzle(client)
+const db = drizzle(client);
 
 // Type-safe queries
-const users = await db.select().from(usersTable).where(eq(usersTable.id, '123'))
+const users = await db
+  .select()
+  .from(usersTable)
+  .where(eq(usersTable.id, "123"));
 ```
 
 ---
@@ -288,35 +291,38 @@ In 2026, every request is adversarial until proven otherwise.
 
 ```typescript
 // JWT validation at edge (Hono)
-import { jwt } from 'hono/jwt'
+import { jwt } from "hono/jwt";
 
-app.use('/api/*', jwt({
-  secret: process.env.JWT_SECRET!,
-  cookie: 'token', // Also check cookies
-}))
+app.use(
+  "/api/*",
+  jwt({
+    secret: process.env.JWT_SECRET!,
+    cookie: "token", // Also check cookies
+  }),
+);
 
 // Access claims in handlers
-app.get('/api/me', (c) => {
-  const payload = c.get('jwtPayload')
-  return c.json({ userId: payload.sub })
-})
+app.get("/api/me", (c) => {
+  const payload = c.get("jwtPayload");
+  return c.json({ userId: payload.sub });
+});
 ```
 
 ### Rate Limiting at Edge
 
 ```typescript
 // Using Cloudflare Workers + Durable Objects
-app.use('/api/*', async (c, next) => {
-  const ip = c.req.header('CF-Connecting-IP')
-  const rateLimiter = c.env.RATE_LIMITER.get(c.env.RATE_LIMITER.idFromName(ip))
+app.use("/api/*", async (c, next) => {
+  const ip = c.req.header("CF-Connecting-IP");
+  const rateLimiter = c.env.RATE_LIMITER.get(c.env.RATE_LIMITER.idFromName(ip));
 
-  const { allowed } = await rateLimiter.check()
+  const { allowed } = await rateLimiter.check();
   if (!allowed) {
-    return c.json({ error: 'Rate limited' }, 429)
+    return c.json({ error: "Rate limited" }, 429);
   }
 
-  await next()
-})
+  await next();
+});
 ```
 
 ### Security Checklist
@@ -337,23 +343,23 @@ app.use('/api/*', async (c, next) => {
 ### OpenTelemetry Integration
 
 ```typescript
-import { trace } from '@opentelemetry/api'
+import { trace } from "@opentelemetry/api";
 
-const tracer = trace.getTracer('edge-api')
+const tracer = trace.getTracer("edge-api");
 
-app.use('*', async (c, next) => {
-  const span = tracer.startSpan(`${c.req.method} ${c.req.path}`)
+app.use("*", async (c, next) => {
+  const span = tracer.startSpan(`${c.req.method} ${c.req.path}`);
 
   try {
-    await next()
-    span.setStatus({ code: 1 }) // OK
+    await next();
+    span.setStatus({ code: 1 }); // OK
   } catch (error) {
-    span.setStatus({ code: 2, message: error.message }) // ERROR
-    throw error
+    span.setStatus({ code: 2, message: error.message }); // ERROR
+    throw error;
   } finally {
-    span.end()
+    span.end();
   }
-})
+});
 ```
 
 ### Structured Logging
@@ -361,24 +367,26 @@ app.use('*', async (c, next) => {
 ```typescript
 // Edge-compatible logging (no Pino/Winston)
 const log = (level: string, message: string, meta?: object) => {
-  console.log(JSON.stringify({
-    timestamp: new Date().toISOString(),
-    level,
-    message,
-    ...meta,
-  }))
-}
+  console.log(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      level,
+      message,
+      ...meta,
+    }),
+  );
+};
 
-app.use('*', async (c, next) => {
-  const start = Date.now()
-  await next()
-  log('info', 'Request completed', {
+app.use("*", async (c, next) => {
+  const start = Date.now();
+  await next();
+  log("info", "Request completed", {
     method: c.req.method,
     path: c.req.path,
     status: c.res.status,
     duration: Date.now() - start,
-  })
-})
+  });
+});
 ```
 
 ---
@@ -396,16 +404,16 @@ app.use('*', async (c, next) => {
 
 ```typescript
 // Express
-app.get('/users/:id', async (req, res) => {
-  const user = await getUser(req.params.id)
-  res.json(user)
-})
+app.get("/users/:id", async (req, res) => {
+  const user = await getUser(req.params.id);
+  res.json(user);
+});
 
 // Hono (almost identical)
-app.get('/users/:id', async (c) => {
-  const user = await getUser(c.req.param('id'))
-  return c.json(user)
-})
+app.get("/users/:id", async (c) => {
+  const user = await getUser(c.req.param("id"));
+  return c.json(user);
+});
 ```
 
 ### Prisma to Drizzle (for edge)

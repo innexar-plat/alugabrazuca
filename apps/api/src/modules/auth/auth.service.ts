@@ -5,18 +5,18 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
-} from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
-import * as crypto from 'crypto';
-import { PrismaService } from '../../prisma/prisma.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { UpdateProfileDto } from './dto/update-profile.dto';
-import { JwtPayload } from './strategies/jwt.strategy';
+} from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
+import * as bcrypt from "bcrypt";
+import * as crypto from "crypto";
+import { PrismaService } from "../../prisma/prisma.service";
+import { RegisterDto } from "./dto/register.dto";
+import { LoginDto } from "./dto/login.dto";
+import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { ChangePasswordDto } from "./dto/change-password.dto";
+import { UpdateProfileDto } from "./dto/update-profile.dto";
+import { JwtPayload } from "./strategies/jwt.strategy";
 
 const BCRYPT_SALT_ROUNDS = 12;
 const MAX_LOGIN_ATTEMPTS = 5;
@@ -36,14 +36,14 @@ export class AuthService {
 
   async register(dto: RegisterDto) {
     if (!dto.acceptTerms) {
-      throw new BadRequestException('You must accept the terms of service');
+      throw new BadRequestException("You must accept the terms of service");
     }
 
     const existing = await this.prisma.user.findUnique({
       where: { email: dto.email.toLowerCase() },
     });
     if (existing) {
-      throw new ConflictException('Email already registered');
+      throw new ConflictException("Email already registered");
     }
 
     const passwordHash = await bcrypt.hash(dto.password, BCRYPT_SALT_ROUNDS);
@@ -62,7 +62,7 @@ export class AuthService {
     const emailToken = this.generateEmailVerificationToken(user.id);
 
     return {
-      message: 'Registration successful. Please verify your email.',
+      message: "Registration successful. Please verify your email.",
       userId: user.id,
       emailVerificationToken: emailToken, // Temporário — em prod vai por e-mail
     };
@@ -82,23 +82,26 @@ export class AuthService {
 
     if (!user || !user.passwordHash) {
       await this.recordLoginAttempt(email, ip, false, userAgent);
-      throw new UnauthorizedException('Invalid email or password');
+      throw new UnauthorizedException("Invalid email or password");
     }
 
-    const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(
+      dto.password,
+      user.passwordHash,
+    );
     if (!isPasswordValid) {
       await this.recordLoginAttempt(email, ip, false, userAgent);
-      throw new UnauthorizedException('Invalid email or password');
+      throw new UnauthorizedException("Invalid email or password");
     }
 
     if (!user.emailVerified) {
       throw new ForbiddenException(
-        'Email not verified. Please check your inbox.',
+        "Email not verified. Please check your inbox.",
       );
     }
 
-    if (user.status !== 'active') {
-      throw new ForbiddenException('Account is suspended or banned');
+    if (user.status !== "active") {
+      throw new ForbiddenException("Account is suspended or banned");
     }
 
     await this.recordLoginAttempt(email, ip, true, userAgent);
@@ -132,7 +135,7 @@ export class AuthService {
       where: { userId, isRevoked: false },
       data: { isRevoked: true },
     });
-    return { message: 'Logged out successfully' };
+    return { message: "Logged out successfully" };
   }
 
   // ─── Refresh Token ─────────────────────────────────────────────────
@@ -146,11 +149,11 @@ export class AuthService {
     });
 
     if (!stored || stored.expiresAt < new Date()) {
-      throw new UnauthorizedException('Invalid or expired refresh token');
+      throw new UnauthorizedException("Invalid or expired refresh token");
     }
 
-    if (stored.user.status !== 'active') {
-      throw new ForbiddenException('Account is suspended or banned');
+    if (stored.user.status !== "active") {
+      throw new ForbiddenException("Account is suspended or banned");
     }
 
     // Rotate: revoke old, create new
@@ -177,14 +180,14 @@ export class AuthService {
     let payload: { sub: string; type: string };
     try {
       payload = this.jwt.verify(token, {
-        secret: this.config.getOrThrow<string>('JWT_SECRET'),
+        secret: this.config.getOrThrow<string>("JWT_SECRET"),
       });
     } catch {
-      throw new BadRequestException('Invalid or expired verification token');
+      throw new BadRequestException("Invalid or expired verification token");
     }
 
-    if (payload.type !== 'email_verification') {
-      throw new BadRequestException('Invalid token type');
+    if (payload.type !== "email_verification") {
+      throw new BadRequestException("Invalid token type");
     }
 
     const user = await this.prisma.user.findUnique({
@@ -192,11 +195,11 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User not found");
     }
 
     if (user.emailVerified) {
-      return { message: 'Email already verified' };
+      return { message: "Email already verified" };
     }
 
     await this.prisma.user.update({
@@ -204,7 +207,7 @@ export class AuthService {
       data: { emailVerified: true },
     });
 
-    return { message: 'Email verified successfully' };
+    return { message: "Email verified successfully" };
   }
 
   // ─── Forgot Password ──────────────────────────────────────────────
@@ -218,27 +221,25 @@ export class AuthService {
     if (!user) {
       return {
         message:
-          'If an account with that email exists, a reset link has been sent.',
+          "If an account with that email exists, a reset link has been sent.",
       };
     }
 
-    const rawToken = crypto.randomBytes(32).toString('hex');
+    const rawToken = crypto.randomBytes(32).toString("hex");
     const tokenHash = this.hashToken(rawToken);
 
     await this.prisma.passwordReset.create({
       data: {
         userId: user.id,
         tokenHash,
-        expiresAt: new Date(
-          Date.now() + PASSWORD_RESET_HOURS * 60 * 60 * 1000,
-        ),
+        expiresAt: new Date(Date.now() + PASSWORD_RESET_HOURS * 60 * 60 * 1000),
       },
     });
 
     // TODO: Enviar e-mail com link de reset (módulo de email futuro)
     return {
       message:
-        'If an account with that email exists, a reset link has been sent.',
+        "If an account with that email exists, a reset link has been sent.",
       resetToken: rawToken, // Temporário — em prod vai por e-mail
     };
   }
@@ -253,7 +254,7 @@ export class AuthService {
     });
 
     if (!resetRecord || resetRecord.expiresAt < new Date()) {
-      throw new BadRequestException('Invalid or expired reset token');
+      throw new BadRequestException("Invalid or expired reset token");
     }
 
     const passwordHash = await bcrypt.hash(dto.password, BCRYPT_SALT_ROUNDS);
@@ -276,7 +277,7 @@ export class AuthService {
       }),
     ]);
 
-    return { message: 'Password reset successfully' };
+    return { message: "Password reset successfully" };
   }
 
   // ─── Google OAuth ──────────────────────────────────────────────────
@@ -298,13 +299,13 @@ export class AuthService {
           firstName: profile.firstName,
           lastName: profile.lastName,
           email: profile.email.toLowerCase(),
-          provider: 'google',
+          provider: "google",
           providerId: profile.providerId,
           avatarUrl: profile.avatarUrl,
           emailVerified: true, // Google verified
         },
       });
-    } else if (user.provider === 'email' && !user.providerId) {
+    } else if (user.provider === "email" && !user.providerId) {
       // Link Google account to existing email account
       await this.prisma.user.update({
         where: { id: user.id },
@@ -365,7 +366,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User not found");
     }
 
     return user;
@@ -373,7 +374,7 @@ export class AuthService {
 
   async getPublicProfile(userId: string) {
     const user = await this.prisma.user.findUnique({
-      where: { id: userId, deletedAt: null, status: 'active' },
+      where: { id: userId, deletedAt: null, status: "active" },
       select: {
         id: true,
         displayName: true,
@@ -387,7 +388,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User not found");
     }
 
     return user;
@@ -432,13 +433,16 @@ export class AuthService {
 
     if (!user || !user.passwordHash) {
       throw new BadRequestException(
-        'Cannot change password for OAuth accounts',
+        "Cannot change password for OAuth accounts",
       );
     }
 
-    const isValid = await bcrypt.compare(dto.currentPassword, user.passwordHash);
+    const isValid = await bcrypt.compare(
+      dto.currentPassword,
+      user.passwordHash,
+    );
     if (!isValid) {
-      throw new UnauthorizedException('Current password is incorrect');
+      throw new UnauthorizedException("Current password is incorrect");
     }
 
     const passwordHash = await bcrypt.hash(dto.newPassword, BCRYPT_SALT_ROUNDS);
@@ -454,7 +458,7 @@ export class AuthService {
       data: { isRevoked: true },
     });
 
-    return { message: 'Password changed successfully' };
+    return { message: "Password changed successfully" };
   }
 
   // ─── Private Helpers ───────────────────────────────────────────────
@@ -463,11 +467,11 @@ export class AuthService {
     const payload: JwtPayload = { sub: userId, email, role };
 
     const accessToken = this.jwt.sign(payload, {
-      secret: this.config.getOrThrow<string>('JWT_SECRET'),
-      expiresIn: this.config.get('JWT_EXPIRES_IN', '15m'),
+      secret: this.config.getOrThrow<string>("JWT_SECRET"),
+      expiresIn: this.config.get("JWT_EXPIRES_IN", "15m"),
     });
 
-    const rawRefreshToken = crypto.randomBytes(32).toString('hex');
+    const rawRefreshToken = crypto.randomBytes(32).toString("hex");
     const tokenHash = this.hashToken(rawRefreshToken);
 
     await this.prisma.refreshToken.create({
@@ -485,16 +489,16 @@ export class AuthService {
 
   private generateEmailVerificationToken(userId: string): string {
     return this.jwt.sign(
-      { sub: userId, type: 'email_verification' },
+      { sub: userId, type: "email_verification" },
       {
-        secret: this.config.getOrThrow<string>('JWT_SECRET'),
-        expiresIn: '24h',
+        secret: this.config.getOrThrow<string>("JWT_SECRET"),
+        expiresIn: "24h",
       },
     );
   }
 
   private hashToken(token: string): string {
-    return crypto.createHash('sha256').update(token).digest('hex');
+    return crypto.createHash("sha256").update(token).digest("hex");
   }
 
   private async checkLoginRateLimit(email: string) {
@@ -528,9 +532,9 @@ export class AuthService {
 
   private sanitizeText(text: string): string {
     return text
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#x27;');
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#x27;");
   }
 }

@@ -8,12 +8,12 @@ Use this template to standardize branching, PRs, releases, and hotfixes.
 
 ## 1) Choose a Model (Decision Matrix)
 
-| Team/Product Constraint | Recommended Model |
-|------------------------|-------------------|
-| Continuous deploy, strong CI, feature flags available | Trunk-based |
+| Team/Product Constraint                                     | Recommended Model           |
+| ----------------------------------------------------------- | --------------------------- |
+| Continuous deploy, strong CI, feature flags available       | Trunk-based                 |
 | Many devs, many daily merges, strong CI, need fast feedback | Trunk-based (+ merge queue) |
-| Scheduled releases, multiple supported versions | GitFlow |
-| Low CI maturity, manual releases, strict release gates | GitFlow (temporary) |
+| Scheduled releases, multiple supported versions             | GitFlow                     |
+| Low CI maturity, manual releases, strict release gates      | GitFlow (temporary)         |
 
 ---
 
@@ -73,11 +73,11 @@ Use this template to standardize branching, PRs, releases, and hotfixes.
 
 ## 4) Merge Strategy (Pick and Enforce)
 
-| Strategy | Pros | Cons | Recommended Use |
-|----------|------|------|-----------------|
-| Squash merge | Clean history, easy reverts | Loses commit granularity | Most product repos |
-| Merge commit | Preserves branch context | Noisier history | Repos needing branch topology |
-| Rebase merge | Linear history | Risky for shared branches | Small teams with strong git discipline |
+| Strategy     | Pros                        | Cons                      | Recommended Use                        |
+| ------------ | --------------------------- | ------------------------- | -------------------------------------- |
+| Squash merge | Clean history, easy reverts | Loses commit granularity  | Most product repos                     |
+| Merge commit | Preserves branch context    | Noisier history           | Repos needing branch topology          |
+| Rebase merge | Linear history              | Risky for shared branches | Small teams with strong git discipline |
 
 Rules:
 

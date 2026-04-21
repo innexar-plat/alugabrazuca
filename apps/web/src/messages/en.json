@@ -468,7 +468,8 @@
       "photos": "Photos",
       "location": "Location",
       "approximateArea": "Approximate area — exact address after accepted contact"
-    }  },
+    }
+  },
   "profile": {
     "title": "My Profile",
     "subtitle": "Manage your personal information",
@@ -498,7 +499,8 @@
     "publicProfile": "Public profile",
     "publicProfileDesc": "Information visible to other users",
     "listings": "listings",
-    "joinedIn": "Joined in"  },
+    "joinedIn": "Joined in"
+  },
   "search": {
     "metaTitle": "Search Rooms",
     "metaDescription": "Find rooms for rent in the USA and Europe. Filter by price, city, amenities and more.",

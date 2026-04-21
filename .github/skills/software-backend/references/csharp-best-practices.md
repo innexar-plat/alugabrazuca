@@ -31,6 +31,7 @@ Comprehensive guide for building production-grade backend services with C# 14 / 
 ### Modern C# Idioms (C# 12–14)
 
 **Prefer Records for DTOs and Value Objects**
+
 ```csharp
 // Good: Immutable record with value equality
 public record UserDto(int Id, string Email, string FullName);
@@ -52,6 +53,7 @@ public class UserDto
 ```
 
 **Use Pattern Matching**
+
 ```csharp
 // Good: Switch expression with pattern matching
 public string GetStatusMessage(OrderStatus status) => status switch
@@ -74,6 +76,7 @@ public decimal CalculateDiscount(Customer customer) => customer switch
 ```
 
 **Nullable Reference Types (NRT)**
+
 ```csharp
 // Enable in .csproj: <Nullable>enable</Nullable>
 
@@ -90,6 +93,7 @@ var name = user!.Name; // Suppresses warning but hides bugs
 ```
 
 **Primary Constructors (C# 12)**
+
 ```csharp
 // Good: Concise DI with primary constructors
 public class UserService(
@@ -105,6 +109,7 @@ public class UserService(
 ```
 
 **Collection Expressions (C# 12)**
+
 ```csharp
 // Good: Clean collection initialization
 int[] numbers = [1, 2, 3, 4, 5];
@@ -262,6 +267,7 @@ public partial class UserEntity
 ### async/await Best Practices
 
 **Async All the Way**
+
 ```csharp
 // Good: Async from controller to data access
 public async Task<IActionResult> GetUser(int id)
@@ -279,6 +285,7 @@ public IActionResult GetUser(int id)
 ```
 
 **ConfigureAwait in Library Code**
+
 ```csharp
 // Good: Library/shared code should not capture context
 public async Task<byte[]> DownloadAsync(string url)
@@ -292,6 +299,7 @@ public async Task<byte[]> DownloadAsync(string url)
 ```
 
 **Cancellation Token Propagation**
+
 ```csharp
 // Good: Accept and forward CancellationToken everywhere
 public async Task<User?> GetByIdAsync(int id, CancellationToken ct = default)
@@ -310,6 +318,7 @@ public async Task<IActionResult> GetUser(int id, CancellationToken ct)
 ```
 
 **Parallel Async Operations**
+
 ```csharp
 // Good: Run independent tasks in parallel
 public async Task<DashboardData> GetDashboardAsync(int userId, CancellationToken ct)
@@ -332,6 +341,7 @@ var orders = await _orderService.GetRecentAsync(userId, ct); // Unnecessary wait
 ```
 
 **ValueTask for Hot Paths**
+
 ```csharp
 // Good: Use ValueTask when result is often synchronous (cached)
 public ValueTask<User?> GetCachedUserAsync(int id)
@@ -972,13 +982,13 @@ public class ProductService(HybridCache cache, IProductRepository repo)
 }
 ```
 
-| Feature | IMemoryCache | IDistributedCache | HybridCache |
-|---------|-------------|-------------------|-------------|
-| L1 (in-process) | Yes | No | Yes |
-| L2 (Redis) | No | Yes | Yes |
-| Stampede protection | No | No | Yes |
-| Tag-based invalidation | No | No | Yes |
-| Single API | Yes | Yes | Yes |
+| Feature                | IMemoryCache | IDistributedCache | HybridCache |
+| ---------------------- | ------------ | ----------------- | ----------- |
+| L1 (in-process)        | Yes          | No                | Yes         |
+| L2 (Redis)             | No           | Yes               | Yes         |
+| Stampede protection    | No           | No                | Yes         |
+| Tag-based invalidation | No           | No                | Yes         |
+| Single API             | Yes          | Yes               | Yes         |
 
 ---
 
@@ -1025,12 +1035,12 @@ builder.Services.AddHttpClient("PaymentGateway", client =>
 });
 ```
 
-| Do | Avoid |
-|----|-------|
-| Use `AddStandardResilienceHandler()` as default | Writing manual retry loops |
-| Configure per-client resilience pipelines | Global retry policies for all clients |
-| Set explicit timeouts on every HTTP client | Unbounded HTTP calls |
-| Use `AddResilienceHandler` for custom policies | Raw `Polly.Policy` (legacy v7 API) |
+| Do                                              | Avoid                                 |
+| ----------------------------------------------- | ------------------------------------- |
+| Use `AddStandardResilienceHandler()` as default | Writing manual retry loops            |
+| Configure per-client resilience pipelines       | Global retry policies for all clients |
+| Set explicit timeouts on every HTTP client      | Unbounded HTTP calls                  |
+| Use `AddResilienceHandler` for custom policies  | Raw `Polly.Policy` (legacy v7 API)    |
 
 ---
 

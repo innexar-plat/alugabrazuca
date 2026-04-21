@@ -60,12 +60,12 @@ Igual ao backend — cada módulo é independente e autocontido:
 
 ## 3. Atomic Design (Padrão de Componentização)
 
-| Nível | O que é | Exemplos |
-|-------|---------|---------|
-| **Atoms** | Elementos base, sem dependências | `Button`, `Input`, `Badge`, `Avatar` |
-| **Molecules** | Combinação de atoms | `FormField`, `SearchBar`, `UserCard` |
-| **Organisms** | Seções completas de UI | `UserTable`, `LeadsKanban`, `Sidebar` |
-| **Pages** | Tela final — só composição, zero lógica | `LeadsPage`, `DashboardPage` |
+| Nível         | O que é                                 | Exemplos                              |
+| ------------- | --------------------------------------- | ------------------------------------- |
+| **Atoms**     | Elementos base, sem dependências        | `Button`, `Input`, `Badge`, `Avatar`  |
+| **Molecules** | Combinação de atoms                     | `FormField`, `SearchBar`, `UserCard`  |
+| **Organisms** | Seções completas de UI                  | `UserTable`, `LeadsKanban`, `Sidebar` |
+| **Pages**     | Tela final — só composição, zero lógica | `LeadsPage`, `DashboardPage`          |
 
 ```
 /components
@@ -96,35 +96,38 @@ Igual ao backend — cada módulo é independente e autocontido:
 ```
 
 ### Tamanho ideal
-| Tipo | Linhas |
-|------|--------|
-| Componente | 50–150 linhas |
-| Hook | até 100 linhas |
-| Service | até 80 linhas |
-| Função | até 30 linhas |
+
+| Tipo       | Linhas         |
+| ---------- | -------------- |
+| Componente | 50–150 linhas  |
+| Hook       | até 100 linhas |
+| Service    | até 80 linhas  |
+| Função     | até 30 linhas  |
 
 ---
 
 ## 5. Princípios Obrigatórios (CORE)
 
 ### DRY (Don't Repeat Yourself)
+
 - Proibido duplicar componentes
 - Criar componentes reutilizáveis antes de copiar
 - Verificar se já existe antes de criar
 
 ### KISS (Keep It Simple, Stupid)
+
 - UI simples > UI complexa
 - Evitar lógica desnecessária no JSX/template
 - Se está difícil de ler, refatorar
 
 ### Separation of Concerns
 
-| Responsabilidade | Onde fica |
-|-----------------|-----------|
+| Responsabilidade  | Onde fica                  |
+| ----------------- | -------------------------- |
 | UI e renderização | Componente (`.jsx`/`.tsx`) |
-| Lógica e estado | Hook (`use*.js`) |
-| Chamadas de API | Service (`*.service.js`) |
-| Estado global | Store (Zustand/Redux) |
+| Lógica e estado   | Hook (`use*.js`)           |
+| Chamadas de API   | Service (`*.service.js`)   |
+| Estado global     | Store (Zustand/Redux)      |
 
 **Nunca chamar API diretamente dentro de um componente grande.**
 
@@ -162,7 +165,9 @@ function useLeads() {
     setIsLoading(false);
   };
 
-  useEffect(() => { fetchLeads(); }, []);
+  useEffect(() => {
+    fetchLeads();
+  }, []);
 
   return { leads, isLoading, createLead };
 }
@@ -171,8 +176,8 @@ function useLeads() {
 ```javascript
 // ✅ Service — só chamadas de API
 const leadsService = {
-  findAll: () => api.get('/leads'),
-  create: (data) => api.post('/leads', data),
+  findAll: () => api.get("/leads"),
+  create: (data) => api.post("/leads", data),
   update: (id, data) => api.patch(`/leads/${id}`, data),
   delete: (id) => api.delete(`/leads/${id}`),
 };
@@ -182,14 +187,15 @@ const leadsService = {
 
 ## 7. Gerenciamento de Estado
 
-| Escopo | Solução |
-|--------|---------|
-| Local do componente | `useState` |
-| Compartilhado entre componentes próximos | `props` / `context` |
-| Global (auth, tema, carrinho) | Store (Zustand ou Redux) |
-| Cache de servidor | React Query / SWR |
+| Escopo                                   | Solução                  |
+| ---------------------------------------- | ------------------------ |
+| Local do componente                      | `useState`               |
+| Compartilhado entre componentes próximos | `props` / `context`      |
+| Global (auth, tema, carrinho)            | Store (Zustand ou Redux) |
+| Cache de servidor                        | React Query / SWR        |
 
 ### Regras
+
 - **Preferir estado local** — mover para global só quando necessário
 - **Zustand** para projetos pequenos/médios (simples, leve)
 - **Redux Toolkit** para projetos grandes com estado complexo
@@ -203,14 +209,15 @@ Toda lógica de negócio vai em hooks customizados:
 
 ```javascript
 // Nomenclatura: use + Domínio + Ação (opcional)
-useUser()           // dados e ações do usuário atual
-useAuth()           // autenticação
-useLeads()          // CRUD de leads
-useLeadFilters()    // filtros de leads
-usePermissions()    // verificação de permissões
+useUser(); // dados e ações do usuário atual
+useAuth(); // autenticação
+useLeads(); // CRUD de leads
+useLeadFilters(); // filtros de leads
+usePermissions(); // verificação de permissões
 ```
 
 ### Regras de hooks
+
 - Um hook = uma responsabilidade
 - Nunca retornar JSX de um hook
 - Testar hooks separadamente dos componentes
@@ -230,10 +237,10 @@ usePermissions()    // verificação de permissões
 
 ```jsx
 // ✅ Lazy loading de páginas
-const LeadsPage = React.lazy(() => import('./modules/crm/pages/LeadsPage'));
+const LeadsPage = React.lazy(() => import("./modules/crm/pages/LeadsPage"));
 
 // ✅ Virtualização para listas grandes
-import { useVirtualizer } from '@tanstack/react-virtual';
+import { useVirtualizer } from "@tanstack/react-virtual";
 ```
 
 ---
@@ -251,16 +258,16 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 
 ## 11. Naming Conventions
 
-| Elemento | Padrão | Exemplo |
-|----------|--------|---------|
-| Arquivos de componente | PascalCase | `UserCard.jsx`, `LeadList.tsx` |
-| Arquivos de hook | camelCase com `use` | `useLeads.js`, `useAuth.ts` |
-| Arquivos de service | kebab-case com `.service` | `leads.service.js` |
-| Arquivos de store | kebab-case com `.store` | `auth.store.ts` |
-| Funções/variáveis | camelCase | `handleSubmit`, `isLoading` |
-| Constantes | UPPER_SNAKE_CASE | `MAX_ITEMS_PER_PAGE` |
-| Tipos/Interfaces | PascalCase | `LeadData`, `UserProps` |
-| CSS classes | kebab-case | `lead-card`, `user-avatar` |
+| Elemento               | Padrão                    | Exemplo                        |
+| ---------------------- | ------------------------- | ------------------------------ |
+| Arquivos de componente | PascalCase                | `UserCard.jsx`, `LeadList.tsx` |
+| Arquivos de hook       | camelCase com `use`       | `useLeads.js`, `useAuth.ts`    |
+| Arquivos de service    | kebab-case com `.service` | `leads.service.js`             |
+| Arquivos de store      | kebab-case com `.store`   | `auth.store.ts`                |
+| Funções/variáveis      | camelCase                 | `handleSubmit`, `isLoading`    |
+| Constantes             | UPPER_SNAKE_CASE          | `MAX_ITEMS_PER_PAGE`           |
+| Tipos/Interfaces       | PascalCase                | `LeadData`, `UserProps`        |
+| CSS classes            | kebab-case                | `lead-card`, `user-avatar`     |
 
 ---
 
@@ -282,11 +289,13 @@ Tendências obrigatórias em produtos profissionais:
 A IA NUNCA deve gerar código sem seguir a estrutura acima.
 
 Para cada feature, sempre gerar:
+
 1. `Component` — UI pura, sem lógica de negócio
 2. `Hook` (`use*.js`) — lógica e estado
 3. `Service` (`*.service.js`) — chamadas de API
 
 Validar código gerado para:
+
 - Lógica de negócio NÃO está no JSX
 - API NÃO é chamada diretamente no componente
 - Sem duplicação de código

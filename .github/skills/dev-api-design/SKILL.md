@@ -27,19 +27,19 @@ Use this skill to design, implement, and document production-grade APIs (REST, G
 
 ## Quick Reference
 
-| Task | Pattern/Tool | Key Elements | When to Use |
-|------|--------------|--------------|-------------|
-| **Design REST API** | RESTful Design | Nouns (not verbs), HTTP methods, proper status codes | Resource-based APIs, CRUD operations |
-| **Version API** | URL Versioning | `/api/v1/resource`, `/api/v2/resource` | Breaking changes, client migration |
-| **Paginate results** | Cursor-Based | `cursor=eyJpZCI6MTIzfQ&limit=20` | Real-time data, large collections |
-| **Handle errors** | RFC 9457 Problem Details | `type`, `title`, `status`, `detail`, `errors[]` | Consistent error responses |
-| **Authenticate** | JWT Bearer | `Authorization: Bearer <token>` | Stateless auth, microservices |
-| **Rate limit** | Token Bucket | `X-RateLimit-*` headers, 429 responses | Prevent abuse, fair usage |
-| **Document API** | OpenAPI 3.1 | Swagger UI, Redoc, code samples | Interactive docs, client SDKs |
-| **Flexible queries** | GraphQL | Schema-first, resolvers, DataLoader | Client-driven data fetching |
-| **High-performance** | gRPC + Protobuf | Binary protocol, streaming | Internal microservices |
-| **TypeScript-first** | tRPC | End-to-end type safety, no codegen | Monorepos, internal tools |
-| **AI agent APIs** | REST + MCP | Agent experience, machine-readable | LLM/agent consumption |
+| Task                 | Pattern/Tool             | Key Elements                                         | When to Use                          |
+| -------------------- | ------------------------ | ---------------------------------------------------- | ------------------------------------ |
+| **Design REST API**  | RESTful Design           | Nouns (not verbs), HTTP methods, proper status codes | Resource-based APIs, CRUD operations |
+| **Version API**      | URL Versioning           | `/api/v1/resource`, `/api/v2/resource`               | Breaking changes, client migration   |
+| **Paginate results** | Cursor-Based             | `cursor=eyJpZCI6MTIzfQ&limit=20`                     | Real-time data, large collections    |
+| **Handle errors**    | RFC 9457 Problem Details | `type`, `title`, `status`, `detail`, `errors[]`      | Consistent error responses           |
+| **Authenticate**     | JWT Bearer               | `Authorization: Bearer <token>`                      | Stateless auth, microservices        |
+| **Rate limit**       | Token Bucket             | `X-RateLimit-*` headers, 429 responses               | Prevent abuse, fair usage            |
+| **Document API**     | OpenAPI 3.1              | Swagger UI, Redoc, code samples                      | Interactive docs, client SDKs        |
+| **Flexible queries** | GraphQL                  | Schema-first, resolvers, DataLoader                  | Client-driven data fetching          |
+| **High-performance** | gRPC + Protobuf          | Binary protocol, streaming                           | Internal microservices               |
+| **TypeScript-first** | tRPC                     | End-to-end type safety, no codegen                   | Monorepos, internal tools            |
+| **AI agent APIs**    | REST + MCP               | Agent experience, machine-readable                   | LLM/agent consumption                |
 
 ---
 
@@ -239,15 +239,15 @@ Production-ready, copy-paste API implementations with authentication, database, 
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|--------------|---------|-----|
-| **Instant deprecation** | Breaks clients | 90-day minimum sunset period |
-| **Action endpoints** | Inconsistent API | Use resources + HTTP verbs |
-| **Version in body** | Hard to route, debug | Version in URL or header |
-| **Generic errors** | Poor DX | Specific error codes + messages |
-| **No rate limit headers** | Clients can't back off | Include X-RateLimit-* |
-| **Tenant ID in URL only** | Forgery risk | Validate against auth token |
-| **Leaky abstractions** | Tight coupling | Design stable contracts |
+| Anti-Pattern              | Problem                | Fix                             |
+| ------------------------- | ---------------------- | ------------------------------- |
+| **Instant deprecation**   | Breaks clients         | 90-day minimum sunset period    |
+| **Action endpoints**      | Inconsistent API       | Use resources + HTTP verbs      |
+| **Version in body**       | Hard to route, debug   | Version in URL or header        |
+| **Generic errors**        | Poor DX                | Specific error codes + messages |
+| **No rate limit headers** | Clients can't back off | Include X-RateLimit-\*          |
+| **Tenant ID in URL only** | Forgery risk           | Validate against auth token     |
+| **Leaky abstractions**    | Tight coupling         | Design stable contracts         |
 
 ---
 

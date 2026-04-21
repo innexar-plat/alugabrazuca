@@ -7,9 +7,11 @@ Comprehensive security audit checklist for blockchain smart contracts focusing o
 ## OWASP Smart Contract Top 10
 
 ### SC-1: Reentrancy
+
 **Description:** External contract calls that allow attackers to recursively call back into the calling contract.
 
 **Detection:**
+
 ```solidity
 // VULNERABLE PATTERN
 function withdraw() public {
@@ -20,17 +22,20 @@ function withdraw() public {
 ```
 
 **Exploit Scenario:**
+
 1. Attacker calls `withdraw()`
 2. During the `.call()`, attacker's fallback is triggered
 3. Fallback calls `withdraw()` again before balance is zeroed
 4. Attacker drains contract
 
 **Mitigation:**
+
 - Use Checks-Effects-Interactions pattern
 - Apply ReentrancyGuard modifier
 - Update state before external calls
 
 **Test:**
+
 ```solidity
 function testReentrancyAttack() public {
     // Deploy attack contract
@@ -41,9 +46,11 @@ function testReentrancyAttack() public {
 ---
 
 ### SC-2: Access Control
+
 **Description:** Missing or improper access control on privileged functions.
 
 **Vulnerable Patterns:**
+
 ```solidity
 // BAD: No access control
 function mint(address to, uint amount) public {
@@ -57,6 +64,7 @@ function withdraw() public {
 ```
 
 **Mitigation:**
+
 ```solidity
 // GOOD: Proper access control
 import "@openzeppelin/contracts/access/AccessControl.sol";
@@ -73,14 +81,17 @@ contract Secure is AccessControl {
 ---
 
 ### SC-3: Arithmetic Issues
+
 **Description:** Integer overflow/underflow vulnerabilities.
 
 **Detection:**
+
 - Solidity <0.8: Check for SafeMath usage
 - Solidity ≥0.8: Verify appropriate use of `unchecked`
 - Look for unchecked blocks with user input
 
 **Vulnerable:**
+
 ```solidity
 // Solidity 0.7.x
 uint256 balance = 100;
@@ -88,6 +99,7 @@ balance = balance - 200;  // Underflows to MAX_UINT256
 ```
 
 **Secure:**
+
 ```solidity
 // Solidity 0.8+
 uint256 balance = 100;
@@ -97,15 +109,18 @@ balance = balance - 200;  // Reverts automatically
 ---
 
 ### SC-4: Unchecked Return Values
+
 **Description:** Not checking return values of external calls.
 
 **Vulnerable:**
+
 ```solidity
 // BAD: Ignores return value
 token.transfer(recipient, amount);
 ```
 
 **Secure:**
+
 ```solidity
 // GOOD: Checks return value
 require(token.transfer(recipient, amount), "Transfer failed");
@@ -120,9 +135,11 @@ token.safeTransfer(recipient, amount);
 ---
 
 ### SC-5: Denial of Service
+
 **Description:** Attackers cause contract functions to become unusable.
 
 **Patterns:**
+
 ```solidity
 // BAD: VULNERABLE: Unbounded loop
 function distributeRewards() public {
@@ -140,6 +157,7 @@ function withdraw() public {
 ```
 
 **Mitigation:**
+
 ```solidity
 // GOOD: Pull over push
 mapping(address => uint) public pendingRewards;
@@ -154,14 +172,17 @@ function claimReward() public {
 ---
 
 ### SC-6: Front-Running / MEV
+
 **Description:** Attackers observe pending transactions and submit their own with higher gas to profit.
 
 **Vulnerable Scenarios:**
+
 - DEX trades without slippage protection
 - Dutch auctions
 - Commit-reveal schemes without proper implementation
 
 **Mitigation:**
+
 ```solidity
 // Commit-Reveal Pattern
 mapping(address => bytes32) public commitments;
@@ -185,11 +206,13 @@ function swap(uint amountIn, uint minAmountOut) public {
 ---
 
 ### SC-7: Time Manipulation
+
 **Description:** Reliance on `block.timestamp` for critical logic.
 
 **Risk:** Miners can manipulate timestamp by ~15 seconds.
 
 **Vulnerable:**
+
 ```solidity
 // BAD: Using timestamp for short periods
 function claim() public {
@@ -198,6 +221,7 @@ function claim() public {
 ```
 
 **Secure:**
+
 ```solidity
 // GOOD: Use block.number for short periods
 function claim() public {
@@ -208,9 +232,11 @@ function claim() public {
 ---
 
 ### SC-8: Delegatecall to Untrusted Callee
+
 **Description:** Using delegatecall with user-controlled addresses.
 
 **Vulnerable:**
+
 ```solidity
 // BAD: CRITICAL VULNERABILITY
 function execute(address target, bytes memory data) public {
@@ -219,6 +245,7 @@ function execute(address target, bytes memory data) public {
 ```
 
 **Secure:**
+
 ```solidity
 // GOOD: Whitelist approved implementations
 mapping(address => bool) public approvedImplementations;
@@ -232,15 +259,18 @@ function execute(address target, bytes memory data) public {
 ---
 
 ### SC-9: Insufficient Gas Griefing
+
 **Description:** Relying on gas stipends that can be insufficient.
 
 **Vulnerable:**
+
 ```solidity
 // BAD: Using .transfer() or .send()
 payable(recipient).transfer(amount);  // Only 2300 gas
 ```
 
 **Secure:**
+
 ```solidity
 // GOOD: Using .call() with error handling
 (bool success,) = payable(recipient).call{value: amount}("");
@@ -250,14 +280,17 @@ require(success, "Transfer failed");
 ---
 
 ### SC-10: Flash Loan Attacks
+
 **Description:** Exploiting protocols using borrowed funds within single transaction.
 
 **Attack Vectors:**
+
 - Price oracle manipulation
 - Governance manipulation
 - Liquidity pool manipulation
 
 **Mitigation:**
+
 ```solidity
 // GOOD: Check balances at transaction end
 uint256 balanceBefore = token.balanceOf(address(this));
@@ -277,6 +310,7 @@ function getPrice() public view returns (uint256) {
 ## DeFi-Specific Vulnerabilities
 
 ### Price Oracle Manipulation
+
 ```solidity
 // BAD: VULNERABLE: Using spot price
 uint price = token0.balanceOf(pair) / token1.balanceOf(pair);
@@ -303,6 +337,7 @@ function getLatestPrice() public view returns (int) {
 ```
 
 ### Rounding Errors
+
 ```solidity
 // BAD: VULNERABLE: Rounds in favor of user
 uint fee = (amount * 3) / 1000;  // 0.3% fee rounds down
@@ -316,6 +351,7 @@ uint fee = (amount * 3 + 999) / 1000;  // Rounds up
 ## Upgradeable Contract Vulnerabilities
 
 ### Storage Collision
+
 ```solidity
 // BAD: VULNERABLE: Reordering variables
 contract V1 {
@@ -336,6 +372,7 @@ contract V2 is V1 {
 ```
 
 ### Uninitialized Implementation
+
 ```solidity
 // BAD: VULNERABLE: No constructor protection
 contract Implementation {
@@ -362,6 +399,7 @@ contract Implementation {
 ## Solana-Specific Vulnerabilities
 
 ### Missing Signer Checks
+
 ```rust
 // BAD: VULNERABLE
 pub fn transfer(ctx: Context<Transfer>, amount: u64) -> Result<()> {
@@ -379,6 +417,7 @@ pub struct Transfer<'info> {
 ```
 
 ### Account Validation
+
 ```rust
 // BAD: VULNERABLE: No ownership check
 let token_account = &ctx.accounts.token_account;
@@ -396,6 +435,7 @@ require_keys_eq!(
 ## Automated Security Tools
 
 ### Static Analysis
+
 ```bash
 # Slither - Static analysis framework
 slither contracts/
@@ -408,6 +448,7 @@ manticore contracts/Token.sol
 ```
 
 ### Fuzzing
+
 ```bash
 # Echidna - Property-based fuzzer
 echidna-test contracts/ --contract Token --config echidna.yaml
@@ -417,6 +458,7 @@ forge test --match-contract Invariant
 ```
 
 ### Formal Verification
+
 ```bash
 # Certora Prover
 certoraRun contracts/Token.sol --verify Token:specs/Token.spec
@@ -461,26 +503,31 @@ certoraRun contracts/Token.sol --verify Token:specs/Token.spec
 ## Severity Classification
 
 **Critical (9.0-10.0):**
+
 - Direct loss of funds
 - Unauthorized access to funds
 - Protocol manipulation
 
 **High (7.0-8.9):**
+
 - Potential loss of funds under specific conditions
 - Smart contract freezing
 - Unauthorized state changes
 
 **Medium (4.0-6.9):**
+
 - State inconsistency
 - Failure to deliver promised functionality
 - Suboptimal design patterns
 
 **Low (1.0-3.9):**
+
 - Code quality issues
 - Gas inefficiencies
 - Best practice violations
 
 **Informational (0.0):**
+
 - Code style
 - Documentation
 - Suggestions

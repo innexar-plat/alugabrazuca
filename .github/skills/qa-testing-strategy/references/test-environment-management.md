@@ -23,14 +23,14 @@ Test environment provisioning, configuration, lifecycle management, and cost opt
 
 ## Environment Types
 
-| Environment | Purpose | Data | Lifecycle | Who Uses It |
-|-------------|---------|------|-----------|-------------|
-| **Local** | Developer testing | Synthetic/seeded | Persistent | Individual devs |
-| **CI** | Automated tests | Synthetic, ephemeral | Per-pipeline | CI system |
-| **Preview/PR** | Feature review | Seeded from template | Per-PR, ephemeral | Devs + reviewers |
-| **Staging** | Integration testing | Sanitized prod subset | Long-lived | QA team |
-| **Pre-prod** | Release validation | Prod-like volume | Long-lived | QA + Ops |
-| **Prod** | Live users | Real data | Permanent | Everyone |
+| Environment    | Purpose             | Data                  | Lifecycle         | Who Uses It      |
+| -------------- | ------------------- | --------------------- | ----------------- | ---------------- |
+| **Local**      | Developer testing   | Synthetic/seeded      | Persistent        | Individual devs  |
+| **CI**         | Automated tests     | Synthetic, ephemeral  | Per-pipeline      | CI system        |
+| **Preview/PR** | Feature review      | Seeded from template  | Per-PR, ephemeral | Devs + reviewers |
+| **Staging**    | Integration testing | Sanitized prod subset | Long-lived        | QA team          |
+| **Pre-prod**   | Release validation  | Prod-like volume      | Long-lived        | QA + Ops         |
+| **Prod**       | Live users          | Real data             | Permanent         | Everyone         |
 
 ### Environment Maturity Model
 
@@ -84,7 +84,7 @@ services:
     volumes:
       - ./scripts/seed.sql:/docker-entrypoint-initdb.d/seed.sql
     tmpfs:
-      - /var/lib/postgresql/data  # RAM disk for speed
+      - /var/lib/postgresql/data # RAM disk for speed
 
   cache:
     image: redis:7-alpine
@@ -92,7 +92,7 @@ services:
   mailhog:
     image: mailhog/mailhog
     ports:
-      - "8025:8025"  # Web UI for email testing
+      - "8025:8025" # Web UI for email testing
 ```
 
 ```bash
@@ -168,7 +168,7 @@ export function createTestEnvironment(name: string) {
 
 ```typescript
 // scripts/seed-test-data.ts
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -182,19 +182,19 @@ async function seed() {
   // Seed users
   const admin = await prisma.user.create({
     data: {
-      email: 'admin@test.example.com',
-      name: 'Test Admin',
-      role: 'ADMIN',
-      password: '$2b$10$hashedpassword', // pre-hashed
+      email: "admin@test.example.com",
+      name: "Test Admin",
+      role: "ADMIN",
+      password: "$2b$10$hashedpassword", // pre-hashed
     },
   });
 
   const user = await prisma.user.create({
     data: {
-      email: 'user@test.example.com',
-      name: 'Test User',
-      role: 'USER',
-      password: '$2b$10$hashedpassword',
+      email: "user@test.example.com",
+      name: "Test User",
+      role: "USER",
+      password: "$2b$10$hashedpassword",
     },
   });
 
@@ -207,8 +207,8 @@ async function seed() {
           price: (i + 1) * 9.99,
           stock: 100,
         },
-      })
-    )
+      }),
+    ),
   );
 
   console.log(`Seeded: ${2} users, ${products.length} products`);
@@ -223,25 +223,28 @@ seed()
 
 ```typescript
 // test/factories/user.factory.ts
-import { faker } from '@faker-js/faker';
+import { faker } from "@faker-js/faker";
 
 export function buildUser(overrides: Partial<User> = {}): User {
   return {
     id: faker.string.uuid(),
     name: faker.person.fullName(),
     email: faker.internet.email(),
-    role: 'USER',
+    role: "USER",
     createdAt: new Date().toISOString(),
     ...overrides,
   };
 }
 
-export function buildUsers(count: number, overrides: Partial<User> = {}): User[] {
+export function buildUsers(
+  count: number,
+  overrides: Partial<User> = {},
+): User[] {
   return Array.from({ length: count }, () => buildUser(overrides));
 }
 
 // Usage in tests
-const adminUser = buildUser({ role: 'ADMIN' });
+const adminUser = buildUser({ role: "ADMIN" });
 const regularUsers = buildUsers(5);
 ```
 
@@ -301,24 +304,28 @@ services:
 
 ```typescript
 // test/mocks/setup-mockserver.ts
-import { MockServerClient } from 'mockserver-client';
+import { MockServerClient } from "mockserver-client";
 
-const mockServer = new MockServerClient('localhost', 1080);
+const mockServer = new MockServerClient("localhost", 1080);
 
 export async function setupExternalMocks() {
   // Mock email service
   await mockServer.mockSimpleResponse(
-    '/api/send-email',
-    { success: true, messageId: 'mock-123' },
-    200
+    "/api/send-email",
+    { success: true, messageId: "mock-123" },
+    200,
   );
 
   // Mock geolocation API
   await mockServer.mockAnyResponse({
-    httpRequest: { path: '/api/geoip/.*', method: 'GET' },
+    httpRequest: { path: "/api/geoip/.*", method: "GET" },
     httpResponse: {
       statusCode: 200,
-      body: JSON.stringify({ country: 'US', region: 'CA', city: 'San Francisco' }),
+      body: JSON.stringify({
+        country: "US",
+        region: "CA",
+        city: "San Francisco",
+      }),
     },
   });
 }
@@ -326,15 +333,15 @@ export async function setupExternalMocks() {
 
 ### When to Virtualize
 
-| External Service | Virtualize? | Rationale |
-|-----------------|-------------|-----------|
-| Payment gateway (Stripe, etc.) | Yes, always | Cost, rate limits, side effects |
-| Email service (SendGrid, etc.) | Yes, always | Side effects (spam), delivery delays |
-| SMS provider | Yes, always | Cost, side effects |
-| Auth provider (Auth0, etc.) | Usually | Rate limits; test mode may suffice |
-| Analytics (Segment, etc.) | Yes | Irrelevant to test, slows execution |
-| Database | No | Use real instance (Docker) |
-| Message queue | Sometimes | Use real for integration, mock for unit |
+| External Service               | Virtualize? | Rationale                               |
+| ------------------------------ | ----------- | --------------------------------------- |
+| Payment gateway (Stripe, etc.) | Yes, always | Cost, rate limits, side effects         |
+| Email service (SendGrid, etc.) | Yes, always | Side effects (spam), delivery delays    |
+| SMS provider                   | Yes, always | Cost, side effects                      |
+| Auth provider (Auth0, etc.)    | Usually     | Rate limits; test mode may suffice      |
+| Analytics (Segment, etc.)      | Yes         | Irrelevant to test, slows execution     |
+| Database                       | No          | Use real instance (Docker)              |
+| Message queue                  | Sometimes   | Use real for integration, mock for unit |
 
 ---
 
@@ -392,13 +399,13 @@ Recommendation: Separate databases for staging/pre-prod;
 
 ## Shared vs Dedicated Environments
 
-| Dimension | Shared | Dedicated |
-|-----------|--------|-----------|
-| **Cost** | Low (1 env, many teams) | High (1 env per team/feature) |
-| **Isolation** | Low (data conflicts possible) | High (full independence) |
-| **Stability** | Lower (broken by other teams) | Higher (self-controlled) |
-| **Maintenance** | Lower (one set of infra) | Higher (many environments) |
-| **Best for** | Manual QA, demo | Automated testing, CI |
+| Dimension       | Shared                        | Dedicated                     |
+| --------------- | ----------------------------- | ----------------------------- |
+| **Cost**        | Low (1 env, many teams)       | High (1 env per team/feature) |
+| **Isolation**   | Low (data conflicts possible) | High (full independence)      |
+| **Stability**   | Lower (broken by other teams) | Higher (self-controlled)      |
+| **Maintenance** | Lower (one set of infra)      | Higher (many environments)    |
+| **Best for**    | Manual QA, demo               | Automated testing, CI         |
 
 ### Hybrid Approach
 
@@ -621,24 +628,24 @@ kind: CronJob
 metadata:
   name: cleanup-preview-envs
 spec:
-  schedule: "0 */6 * * *"  # Every 6 hours
+  schedule: "0 */6 * * *" # Every 6 hours
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-          - name: cleanup
-            image: bitnami/kubectl
-            command:
-            - /bin/sh
-            - -c
-            - |
-              # Delete namespaces older than 48 hours with auto-cleanup label
-              kubectl get namespaces -l auto-cleanup=true -o json | \
-                jq -r '.items[] | select(
-                  (.metadata.creationTimestamp | fromdateiso8601) < (now - 172800)
-                ) | .metadata.name' | \
-                xargs -r kubectl delete namespace
+            - name: cleanup
+              image: bitnami/kubectl
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  # Delete namespaces older than 48 hours with auto-cleanup label
+                  kubectl get namespaces -l auto-cleanup=true -o json | \
+                    jq -r '.items[] | select(
+                      (.metadata.creationTimestamp | fromdateiso8601) < (now - 172800)
+                    ) | .metadata.name' | \
+                    xargs -r kubectl delete namespace
 ```
 
 ### GitHub Actions: Cleanup on PR Close
@@ -667,17 +674,17 @@ jobs:
 
 ```typescript
 // health.ts - comprehensive health check
-app.get('/health', async (req, res) => {
+app.get("/health", async (req, res) => {
   const checks = {
     database: await checkDatabase(),
     redis: await checkRedis(),
     externalApi: await checkExternalApi(),
   };
 
-  const healthy = Object.values(checks).every(c => c.status === 'ok');
+  const healthy = Object.values(checks).every((c) => c.status === "ok");
 
   res.status(healthy ? 200 : 503).json({
-    status: healthy ? 'healthy' : 'unhealthy',
+    status: healthy ? "healthy" : "unhealthy",
     timestamp: new Date().toISOString(),
     checks,
   });
@@ -704,14 +711,14 @@ Alerts:
 
 ## Cost Optimization
 
-| Strategy | Savings | Implementation Effort |
-|----------|---------|----------------------|
-| Auto-shutdown non-prod at night | 40-60% | Low (cron/lambda) |
-| Right-size test instances | 20-40% | Medium (monitoring) |
-| Spot/preemptible instances for CI | 60-80% | Medium (retry logic) |
-| Share staging across teams | 30-50% | Low (scheduling) |
-| Ephemeral PR environments | Variable | High (automation) |
-| RAM disk for test databases | Speed, not $ | Low (tmpfs config) |
+| Strategy                          | Savings      | Implementation Effort |
+| --------------------------------- | ------------ | --------------------- |
+| Auto-shutdown non-prod at night   | 40-60%       | Low (cron/lambda)     |
+| Right-size test instances         | 20-40%       | Medium (monitoring)   |
+| Spot/preemptible instances for CI | 60-80%       | Medium (retry logic)  |
+| Share staging across teams        | 30-50%       | Low (scheduling)      |
+| Ephemeral PR environments         | Variable     | High (automation)     |
+| RAM disk for test databases       | Speed, not $ | Low (tmpfs config)    |
 
 ```bash
 # Auto-shutdown staging at 8pm, start at 7am (weekdays)

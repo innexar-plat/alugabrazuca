@@ -1,28 +1,28 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { api } from '@/lib/api';
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { api } from "@/lib/api";
 
 export default function ResetPasswordPage() {
-  const t = useTranslations('auth.resetPassword');
+  const t = useTranslations("auth.resetPassword");
   const searchParams = useSearchParams();
-  const token = searchParams.get('token') || '';
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const token = searchParams.get("token") || "";
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
-      await api.post('/auth/reset-password', {
+      await api.post("/auth/reset-password", {
         token,
         password,
         confirmPassword,
@@ -30,7 +30,7 @@ export default function ResetPasswordPage() {
       setSuccess(true);
     } catch (err: unknown) {
       const apiErr = err as { status?: number };
-      if (apiErr.status === 400) setError(t('invalidToken'));
+      if (apiErr.status === 400) setError(t("invalidToken"));
       else setError((err as Error).message);
     } finally {
       setLoading(false);
@@ -41,23 +41,23 @@ export default function ResetPasswordPage() {
     <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-8 shadow-lg">
       <div className="mb-6 text-center">
         <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
-          {t('title')}
+          {t("title")}
         </h1>
         <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-          {t('subtitle')}
+          {t("subtitle")}
         </p>
       </div>
 
       {success ? (
         <div className="space-y-4">
           <div className="rounded-lg bg-[hsl(var(--success)/0.1)] p-3 text-sm text-[hsl(var(--success))]">
-            {t('success')}
+            {t("success")}
           </div>
           <Link
             href="/login"
             className="block text-center text-sm font-medium text-[hsl(var(--primary))] hover:underline"
           >
-            {t('submit')}
+            {t("submit")}
           </Link>
         </div>
       ) : (
@@ -73,7 +73,7 @@ export default function ResetPasswordPage() {
               htmlFor="password"
               className="mb-1 block text-sm font-medium text-[hsl(var(--foreground))]"
             >
-              {t('password')}
+              {t("password")}
             </label>
             <input
               id="password"
@@ -91,7 +91,7 @@ export default function ResetPasswordPage() {
               htmlFor="confirmPassword"
               className="mb-1 block text-sm font-medium text-[hsl(var(--foreground))]"
             >
-              {t('confirmPassword')}
+              {t("confirmPassword")}
             </label>
             <input
               id="confirmPassword"
@@ -108,7 +108,7 @@ export default function ResetPasswordPage() {
             disabled={loading}
             className="w-full rounded-lg bg-[hsl(var(--primary))] px-4 py-2.5 text-sm font-semibold text-[hsl(var(--primary-foreground))] transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            {loading ? '...' : t('submit')}
+            {loading ? "..." : t("submit")}
           </button>
         </form>
       )}

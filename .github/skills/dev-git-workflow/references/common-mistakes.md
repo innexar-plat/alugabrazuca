@@ -26,6 +26,7 @@ Learn from common pitfalls and antipatterns in Git collaboration workflows.
 **Symptom**: PR with 2000 lines mixing features, refactoring, and bug fixes
 
 **Why it's bad**:
+
 - Impossible to review thoroughly
 - Takes days or weeks to get approved
 - High risk of bugs slipping through
@@ -78,6 +79,7 @@ git push origin docs/auth-guide
 ```
 
 **Benefits**:
+
 - Each PR reviewed in 30-60 minutes instead of 2-3 hours
 - Reviewers can focus on one concern at a time
 - Can merge incrementally
@@ -92,6 +94,7 @@ git push origin docs/auth-guide
 **Symptom**: Commits like `git commit -m "fix stuff"`, `git commit -m "WIP"`, `git commit -m "update"`
 
 **Why it's bad**:
+
 - No context for future developers
 - Can't generate meaningful changelogs
 - Difficult to find specific changes
@@ -137,6 +140,7 @@ Performance improvement: 250ms -> 25ms average response time"
 ```
 
 **Conventional commit format**:
+
 ```
 <type>(<scope>): <short description>
 
@@ -156,6 +160,7 @@ Performance improvement: 250ms -> 25ms average response time"
 **Symptom**: Force pushing to shared branches or main
 
 **Why it's bad**:
+
 - Breaks everyone's local branches
 - Can lose commits permanently
 - Causes confusion and merge conflicts
@@ -189,6 +194,7 @@ git push --force-with-lease origin feature-branch  # Safer than --force
 ```
 
 **Golden Rules**:
+
 - [OK] Rebase your feature branches
 - [OK] Merge into main/develop
 - [FAIL] Never rebase main/develop/master
@@ -203,6 +209,7 @@ git push --force-with-lease origin feature-branch  # Safer than --force
 **Symptom**: Merging PR without addressing reviewer feedback
 
 **Why it's bad**:
+
 - Bugs slip into production
 - Technical debt accumulates
 - Disrespects reviewers' time
@@ -222,32 +229,37 @@ Author: [Merges PR]
 
 ### Fix: Address All Feedback
 
-```markdown
+````markdown
 # GOOD: Good: Engage with feedback
 
 Reviewer: "This needs error handling for null values"
 Author: "Added try-catch in commit abc123. Good catch! Here's the updated code:
+
 ```typescript
 try {
   const user = await getUserById(id);
   return user.profile;
 } catch (error) {
-  logger.error('Failed to fetch user profile', { id, error });
+  logger.error("Failed to fetch user profile", { id, error });
   throw new NotFoundError(`User ${id} not found`);
 }
 ```
+````
+
 "
 
 # GOOD: Good: Discuss disagreements respectfully
 
 Reviewer: "This should use dependency injection"
 Author: "I considered that, but decided against it because:
+
 1. This is a utility function with no external dependencies
 2. Adding DI would complicate the interface for minimal benefit
 3. Current implementation is easier to test with mocks
 
 Happy to discuss further if you feel strongly. What do you think?"
-```
+
+````
 
 **Best Practices**:
 - [OK] Respond to every comment
@@ -282,7 +294,7 @@ git push origin feature/new-api
 
 # Teammate merged a database schema change yesterday
 # Your code uses old schema, will break in production
-```
+````
 
 ### Fix: Always Pull First
 
@@ -310,6 +322,7 @@ git rebase origin/main  # Keep feature branch up-to-date
 **Symptom**: Hardcoded API keys, passwords, tokens in code
 
 **Why it's bad**:
+
 - Security breach (secrets exposed in Git history)
 - Can't rotate credentials easily
 - Violates compliance regulations
@@ -320,9 +333,9 @@ git rebase origin/main  # Keep feature branch up-to-date
 ```javascript
 // BAD: DANGEROUS: Secrets in code
 const config = {
-  apiKey: 'sk_live_ABC123XYZ789',  // Stripe production key
-  dbPassword: 'SuperSecret123!',
-  jwtSecret: 'my-secret-key'
+  apiKey: "sk_live_ABC123XYZ789", // Stripe production key
+  dbPassword: "SuperSecret123!",
+  jwtSecret: "my-secret-key",
 };
 ```
 
@@ -373,6 +386,7 @@ git reflog expire --expire=now --all && git gc --prune=now --aggressive
 **Symptom**: PR that adds feature AND refactors unrelated code
 
 **Why it's bad**:
+
 - Impossible to review properly
 - Can't isolate bugs if issues arise
 - Can't cherry-pick feature without refactoring
@@ -422,6 +436,7 @@ git push origin feat/notifications
 **Symptom**: Push code that breaks CI/CD
 
 **Why it's bad**:
+
 - Blocks other developers
 - CI/CD queue backed up
 - Wastes team time
@@ -477,6 +492,7 @@ npx husky install
 **Symptom**: PR description says "Fixed bug" with no context
 
 **Why it's bad**:
+
 - Reviewers waste time investigating
 - Can't understand impact of changes
 - No record of why change was made
@@ -486,6 +502,7 @@ npx husky install
 
 ```markdown
 # BAD: Bad PR description
+
 Title: Fix bug
 
 Description: Fixed the bug in the code.
@@ -501,35 +518,42 @@ Description: Fixed the bug in the code.
 Title: fix(auth): prevent duplicate user creation on concurrent requests
 
 ## What
+
 Adds database constraint and transaction handling to prevent duplicate
 user records when registration requests arrive concurrently.
 
 ## Why
+
 We've seen 47 duplicate user records in production over the last week,
 causing login failures and support tickets. Root cause: race condition
 between checking if user exists and creating user record.
 
 ## How
+
 1. Add unique constraint on email field in database
 2. Wrap user creation in transaction
 3. Handle unique constraint violation with proper error
 
 Technical details:
+
 - Uses PostgreSQL transaction isolation level READ COMMITTED
 - Returns 409 Conflict if email already exists
 - Maintains backward compatibility with existing API
 
 ## Testing
+
 - Added integration test for concurrent requests
 - Tested manually with 100 concurrent requests
 - Zero duplicates created in 1000 test runs
 
 ## Deployment Notes
+
 - Database migration required (backward compatible)
 - No downtime needed
 - Can rollback by reverting migration
 
 ## Related
+
 Fixes #234
 Relates to #456 (broader authentication improvements)
 ```
@@ -543,6 +567,7 @@ Relates to #456 (broader authentication improvements)
 **Symptom**: Using `git push --force` and overwriting teammate's work
 
 **Why it's bad**:
+
 - Can permanently delete others' commits
 - No safety check for remote changes
 - Causes data loss
@@ -580,18 +605,18 @@ git log origin/feature-branch
 
 ## Summary: Quick Reference
 
-| Mistake | Fix |
-|---------|-----|
-| Large PRs | Split into < 400 line focused PRs |
-| Vague commits | Use conventional commits |
-| Rewrite public history | Never rebase main/master |
-| Ignore reviews | Address all feedback |
-| Stale branch | Pull before starting work |
-| Commit secrets | Use environment variables |
-| Mix concerns | Separate refactoring from features |
-| Skip testing | Test locally before pushing |
-| Unclear PRs | Use complete PR template |
-| Force push | Use `--force-with-lease` |
+| Mistake                | Fix                                |
+| ---------------------- | ---------------------------------- |
+| Large PRs              | Split into < 400 line focused PRs  |
+| Vague commits          | Use conventional commits           |
+| Rewrite public history | Never rebase main/master           |
+| Ignore reviews         | Address all feedback               |
+| Stale branch           | Pull before starting work          |
+| Commit secrets         | Use environment variables          |
+| Mix concerns           | Separate refactoring from features |
+| Skip testing           | Test locally before pushing        |
+| Unclear PRs            | Use complete PR template           |
+| Force push             | Use `--force-with-lease`           |
 
 ---
 

@@ -6,8 +6,8 @@ import {
   MinLength,
   Matches,
   IsArray,
-} from 'class-validator';
-import { Transform } from 'class-transformer';
+} from "class-validator";
+import { Transform } from "class-transformer";
 
 export class UpdateProfileDto {
   @IsOptional()
@@ -29,17 +29,21 @@ export class UpdateProfileDto {
 
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => typeof value === 'string' ? value.replace(/[\s()\-./]/g, '') : value)
+  @Transform(({ value }) =>
+    typeof value === "string" ? value.replace(/[\s()\-./]/g, "") : value,
+  )
   @Matches(/^\+\d{7,15}$/, {
-    message: 'phone must be in international format (e.g. +14079855662)',
+    message: "phone must be in international format (e.g. +14079855662)",
   })
   phone?: string;
 
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => typeof value === 'string' ? value.replace(/[\s()\-./]/g, '') : value)
+  @Transform(({ value }) =>
+    typeof value === "string" ? value.replace(/[\s()\-./]/g, "") : value,
+  )
   @Matches(/^\+\d{7,15}$/, {
-    message: 'whatsapp must be in international format (e.g. +14079855662)',
+    message: "whatsapp must be in international format (e.g. +14079855662)",
   })
   whatsapp?: string;
 
@@ -69,6 +73,6 @@ export class UpdateProfileDto {
   currentCountry?: string;
 
   @IsOptional()
-  @IsEnum(['pt', 'en', 'es'])
-  preferredLang?: 'pt' | 'en' | 'es';
+  @IsEnum(["pt", "en", "es"])
+  preferredLang?: "pt" | "en" | "es";
 }

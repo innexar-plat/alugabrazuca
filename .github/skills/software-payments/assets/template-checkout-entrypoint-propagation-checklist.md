@@ -10,13 +10,13 @@ Use this when checkout API contract changes (status/error/payload).
 
 ## Entrypoint Audit
 
-| Surface | File/Component | Calls Checkout API | Handles Contract Status | Uses Shared Recovery UI | i18n Ready | Analytics Owner | Targeted Test |
-|---|---|---|---|---|---|---|---|
-| Subscription modal |  | [ ] | [ ] | [ ] | [ ] | client / server | [ ] |
-| One-time purchase card |  | [ ] | [ ] | [ ] | [ ] | client / server | [ ] |
-| Embedded paywall CTA |  | [ ] | [ ] | [ ] | [ ] | client / server | [ ] |
-| Upsell CTA |  | [ ] | [ ] | [ ] | [ ] | client / server | [ ] |
-| Other |  | [ ] | [ ] | [ ] | [ ] | client / server | [ ] |
+| Surface                | File/Component | Calls Checkout API | Handles Contract Status | Uses Shared Recovery UI | i18n Ready | Analytics Owner | Targeted Test |
+| ---------------------- | -------------- | ------------------ | ----------------------- | ----------------------- | ---------- | --------------- | ------------- |
+| Subscription modal     |                | [ ]                | [ ]                     | [ ]                     | [ ]        | client / server | [ ]           |
+| One-time purchase card |                | [ ]                | [ ]                     | [ ]                     | [ ]        | client / server | [ ]           |
+| Embedded paywall CTA   |                | [ ]                | [ ]                     | [ ]                     | [ ]        | client / server | [ ]           |
+| Upsell CTA             |                | [ ]                | [ ]                     | [ ]                     | [ ]        | client / server | [ ]           |
+| Other                  |                | [ ]                | [ ]                     | [ ]                     | [ ]        | client / server | [ ]           |
 
 ## Telemetry Consistency
 

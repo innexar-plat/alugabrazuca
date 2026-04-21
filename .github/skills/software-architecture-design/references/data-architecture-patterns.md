@@ -20,14 +20,14 @@ Comprehensive guide to data architecture patterns for distributed systems: CQRS,
 
 ### When to Use CQRS
 
-| Indicator | Strength |
-|-----------|----------|
-| Read/write ratio > 10:1 | Strong signal |
-| Read and write models differ structurally | Strong signal |
-| Independent scaling of reads vs writes needed | Strong signal |
-| Simple CRUD with uniform access | Do NOT use CQRS |
-| Small team, single database | Do NOT use CQRS |
-| Prototype or MVP stage | Do NOT use CQRS |
+| Indicator                                     | Strength        |
+| --------------------------------------------- | --------------- |
+| Read/write ratio > 10:1                       | Strong signal   |
+| Read and write models differ structurally     | Strong signal   |
+| Independent scaling of reads vs writes needed | Strong signal   |
+| Simple CRUD with uniform access               | Do NOT use CQRS |
+| Small team, single database                   | Do NOT use CQRS |
+| Prototype or MVP stage                        | Do NOT use CQRS |
 
 ### CQRS Variants
 
@@ -40,8 +40,8 @@ Simplest form. Single database with distinct read/write code paths.
 class OrderCommandHandler {
   async createOrder(cmd: CreateOrderCommand): Promise<void> {
     const order = Order.create(cmd.customerId, cmd.items);
-    await this.writeRepo.save(order);          // normalized tables
-    await this.eventBus.publish(order.events);  // domain events
+    await this.writeRepo.save(order); // normalized tables
+    await this.eventBus.publish(order.events); // domain events
   }
 }
 
@@ -72,12 +72,12 @@ Write side stores events as source of truth. Read side projects events into quer
 
 ### Synchronization Strategies
 
-| Strategy | Latency | Complexity | Use When |
-|----------|---------|------------|----------|
-| Synchronous (same transaction) | Zero | Low | Same-DB variant, simple reads |
-| Async via domain events | Seconds | Medium | Separate DBs, eventual consistency OK |
-| Change Data Capture (CDC) | Sub-second | Medium | Existing DB, no event bus yet |
-| Polling projectors | Seconds–minutes | Low | Batch reporting, analytics |
+| Strategy                       | Latency         | Complexity | Use When                              |
+| ------------------------------ | --------------- | ---------- | ------------------------------------- |
+| Synchronous (same transaction) | Zero            | Low        | Same-DB variant, simple reads         |
+| Async via domain events        | Seconds         | Medium     | Separate DBs, eventual consistency OK |
+| Change Data Capture (CDC)      | Sub-second      | Medium     | Existing DB, no event bus yet         |
+| Polling projectors             | Seconds–minutes | Low        | Batch reporting, analytics            |
 
 ### Projection Patterns
 
@@ -88,7 +88,7 @@ class OrderProjection {
     await this.readDb.customerOrders.upsert({
       customerId: event.customerId,
       orderId: event.orderId,
-      status: 'created',
+      status: "created",
       total: event.total,
       itemCount: event.items.length,
       createdAt: event.timestamp,
@@ -98,14 +98,14 @@ class OrderProjection {
   async handleOrderShipped(event: OrderShippedEvent): Promise<void> {
     await this.readDb.customerOrders.update(
       { orderId: event.orderId },
-      { status: 'shipped', shippedAt: event.timestamp }
+      { status: "shipped", shippedAt: event.timestamp },
     );
   }
 
   // Rebuild: replay all events from the event store
   async rebuild(): Promise<void> {
     await this.readDb.customerOrders.truncate();
-    const events = await this.eventStore.readAll('Order');
+    const events = await this.eventStore.readAll("Order");
     for (const event of events) {
       await this.handle(event);
     }
@@ -130,41 +130,41 @@ Current State = fold(initialState, events)
 
 ### When to Use Event Sourcing
 
-| Good Fit | Poor Fit |
-|----------|----------|
-| Audit trail is a business requirement | Simple CRUD with no audit needs |
-| Need to answer "how did we get here?" | High-throughput writes with no read-back |
-| Complex domain with temporal queries | Team unfamiliar with event-driven design |
-| Event-driven architecture already in place | Tight latency requirements on reads (without CQRS) |
-| Regulatory compliance (financial, healthcare) | Schema changes are frequent and unpredictable |
+| Good Fit                                      | Poor Fit                                           |
+| --------------------------------------------- | -------------------------------------------------- |
+| Audit trail is a business requirement         | Simple CRUD with no audit needs                    |
+| Need to answer "how did we get here?"         | High-throughput writes with no read-back           |
+| Complex domain with temporal queries          | Team unfamiliar with event-driven design           |
+| Event-driven architecture already in place    | Tight latency requirements on reads (without CQRS) |
+| Regulatory compliance (financial, healthcare) | Schema changes are frequent and unpredictable      |
 
 ### Event Store Design
 
 ```typescript
 interface DomainEvent {
-  eventId: string;          // UUID, globally unique
-  aggregateId: string;      // Entity this event belongs to
-  aggregateType: string;    // e.g., 'Order', 'Account'
-  eventType: string;        // e.g., 'OrderCreated', 'ItemAdded'
-  version: number;          // Monotonic per aggregate
-  timestamp: string;        // ISO 8601
-  data: Record<string, unknown>;  // Event payload
+  eventId: string; // UUID, globally unique
+  aggregateId: string; // Entity this event belongs to
+  aggregateType: string; // e.g., 'Order', 'Account'
+  eventType: string; // e.g., 'OrderCreated', 'ItemAdded'
+  version: number; // Monotonic per aggregate
+  timestamp: string; // ISO 8601
+  data: Record<string, unknown>; // Event payload
   metadata: {
-    correlationId: string;  // Trace through the system
-    causationId: string;    // Which command caused this
-    userId?: string;        // Who triggered it
+    correlationId: string; // Trace through the system
+    causationId: string; // Which command caused this
+    userId?: string; // Who triggered it
   };
 }
 ```
 
 **Storage options:**
 
-| Store | Strengths | Trade-offs |
-|-------|-----------|------------|
-| EventStoreDB | Purpose-built, projections, subscriptions | Operational overhead of specialized DB |
-| PostgreSQL (append-only table) | Familiar, ACID, good tooling | Must build projection infrastructure |
-| DynamoDB / Cosmos DB | Managed, scalable | Ordering guarantees require careful key design |
-| Kafka (as event store) | High throughput, retention | Not a true event store (no per-aggregate reads) |
+| Store                          | Strengths                                 | Trade-offs                                      |
+| ------------------------------ | ----------------------------------------- | ----------------------------------------------- |
+| EventStoreDB                   | Purpose-built, projections, subscriptions | Operational overhead of specialized DB          |
+| PostgreSQL (append-only table) | Familiar, ACID, good tooling              | Must build projection infrastructure            |
+| DynamoDB / Cosmos DB           | Managed, scalable                         | Ordering guarantees require careful key design  |
+| Kafka (as event store)         | High throughput, retention                | Not a true event store (no per-aggregate reads) |
 
 ### Snapshots
 
@@ -187,7 +187,7 @@ class OrderAggregate {
     // 2. Replay events AFTER the snapshot
     const events = await this.eventStore.readFrom(
       aggregateId,
-      this.version + 1
+      this.version + 1,
     );
     for (const event of events) {
       this.apply(event);
@@ -221,8 +221,8 @@ Events are immutable once stored. Handle schema changes with:
 ```typescript
 // Upcaster example
 function upcast(event: DomainEvent): DomainEvent {
-  if (event.eventType === 'OrderCreated' && !event.data.currency) {
-    return { ...event, data: { ...event.data, currency: 'USD' } };
+  if (event.eventType === "OrderCreated" && !event.data.currency) {
+    return { ...event, data: { ...event.data, currency: "USD" } };
   }
   return event;
 }
@@ -236,12 +236,12 @@ function upcast(event: DomainEvent): DomainEvent {
 
 Data mesh treats data as a product, owned by domain teams rather than a centralized data team.
 
-| Principle | Description |
-|-----------|-------------|
-| Domain ownership | Each domain team owns, produces, and serves its data |
-| Data as a product | Data has SLOs, documentation, discoverability, quality guarantees |
-| Self-serve platform | Central platform provides tooling, not data pipelines |
-| Federated governance | Standards are global, enforcement is local |
+| Principle            | Description                                                       |
+| -------------------- | ----------------------------------------------------------------- |
+| Domain ownership     | Each domain team owns, produces, and serves its data              |
+| Data as a product    | Data has SLOs, documentation, discoverability, quality guarantees |
+| Self-serve platform  | Central platform provides tooling, not data pipelines             |
+| Federated governance | Standards are global, enforcement is local                        |
 
 ### Data Product Structure
 
@@ -273,13 +273,13 @@ orders-domain/
 
 ### Federated Governance Model
 
-| Global Standards (Central) | Local Standards (Domain) |
-|---------------------------|-------------------------|
-| Naming conventions | Schema design choices |
-| Security and access policies | Transformation logic |
-| Data classification (PII, etc.) | Refresh cadence |
-| Interoperability formats | Internal storage format |
-| Quality SLO minimums | Quality SLO targets above minimum |
+| Global Standards (Central)      | Local Standards (Domain)          |
+| ------------------------------- | --------------------------------- |
+| Naming conventions              | Schema design choices             |
+| Security and access policies    | Transformation logic              |
+| Data classification (PII, etc.) | Refresh cadence                   |
+| Interoperability formats        | Internal storage format           |
+| Quality SLO minimums            | Quality SLO targets above minimum |
 
 ---
 
@@ -287,17 +287,17 @@ orders-domain/
 
 ### Choosing the Right Database Per Service
 
-| Use Case | Recommended Store | Why |
-|----------|-------------------|-----|
-| Transactional business data | PostgreSQL / MySQL | ACID, relational integrity, mature tooling |
-| Document-oriented, flexible schema | MongoDB / DynamoDB | Schema flexibility, horizontal scaling |
-| Full-text search | Elasticsearch / Typesense | Inverted index, relevance scoring |
-| Caching, sessions, real-time | Redis / Valkey / Dragonfly | Sub-ms latency, pub/sub, TTL |
-| Time-series metrics | TimescaleDB / InfluxDB | Time-partitioned storage, rollups |
-| Graph relationships | Neo4j / Amazon Neptune | Traversal queries, relationship-first |
-| Event streams | Kafka / Redpanda | Ordered append-only log, high throughput |
-| Analytics / OLAP | ClickHouse / BigQuery / Snowflake | Columnar storage, fast aggregations |
-| Binary/object storage | S3 / GCS / R2 | Cheap, durable, scalable blob storage |
+| Use Case                           | Recommended Store                 | Why                                        |
+| ---------------------------------- | --------------------------------- | ------------------------------------------ |
+| Transactional business data        | PostgreSQL / MySQL                | ACID, relational integrity, mature tooling |
+| Document-oriented, flexible schema | MongoDB / DynamoDB                | Schema flexibility, horizontal scaling     |
+| Full-text search                   | Elasticsearch / Typesense         | Inverted index, relevance scoring          |
+| Caching, sessions, real-time       | Redis / Valkey / Dragonfly        | Sub-ms latency, pub/sub, TTL               |
+| Time-series metrics                | TimescaleDB / InfluxDB            | Time-partitioned storage, rollups          |
+| Graph relationships                | Neo4j / Amazon Neptune            | Traversal queries, relationship-first      |
+| Event streams                      | Kafka / Redpanda                  | Ordered append-only log, high throughput   |
+| Analytics / OLAP                   | ClickHouse / BigQuery / Snowflake | Columnar storage, fast aggregations        |
+| Binary/object storage              | S3 / GCS / R2                     | Cheap, durable, scalable blob storage      |
 
 ### Decision Criteria
 
@@ -322,13 +322,13 @@ Choosing a database:
 
 ### Operational Considerations
 
-| Factor | Impact |
-|--------|--------|
-| Backup and restore | Each DB has different tooling; automate all |
-| Connection management | Pooling differs per store; budget connections |
-| Monitoring | Unified dashboards across heterogeneous stores |
-| Schema migrations | Coordinate across services during deploys |
-| Team expertise | Each new DB adds cognitive load |
+| Factor                | Impact                                         |
+| --------------------- | ---------------------------------------------- |
+| Backup and restore    | Each DB has different tooling; automate all    |
+| Connection management | Pooling differs per store; budget connections  |
+| Monitoring            | Unified dashboards across heterogeneous stores |
+| Schema migrations     | Coordinate across services during deploys      |
+| Team expertise        | Each new DB adds cognitive load                |
 
 **Rule of thumb:** Start with one database (usually PostgreSQL). Add specialized stores only when PostgreSQL demonstrably cannot meet a specific access pattern or performance requirement.
 
@@ -338,14 +338,14 @@ Choosing a database:
 
 ### Orchestration vs Choreography
 
-| Aspect | Orchestration | Choreography |
-|--------|---------------|--------------|
-| Coordination | Central orchestrator directs steps | Each service listens and reacts |
-| Coupling | Services coupled to orchestrator | Services coupled to event schema |
-| Visibility | Single place to see the flow | Flow is distributed across services |
-| Error handling | Orchestrator manages compensation | Each service manages its own rollback |
-| Best for | Complex, multi-step business processes | Simple, loosely coupled workflows |
-| Debugging | Easier — single flow view | Harder — distributed trace needed |
+| Aspect         | Orchestration                          | Choreography                          |
+| -------------- | -------------------------------------- | ------------------------------------- |
+| Coordination   | Central orchestrator directs steps     | Each service listens and reacts       |
+| Coupling       | Services coupled to orchestrator       | Services coupled to event schema      |
+| Visibility     | Single place to see the flow           | Flow is distributed across services   |
+| Error handling | Orchestrator manages compensation      | Each service manages its own rollback |
+| Best for       | Complex, multi-step business processes | Simple, loosely coupled workflows     |
+| Debugging      | Easier — single flow view              | Harder — distributed trace needed     |
 
 ### Orchestration Example
 
@@ -355,17 +355,17 @@ class OrderSaga {
   async execute(orderId: string): Promise<SagaResult> {
     const steps: SagaStep[] = [
       {
-        name: 'reserveInventory',
+        name: "reserveInventory",
         execute: () => this.inventoryService.reserve(orderId),
         compensate: () => this.inventoryService.release(orderId),
       },
       {
-        name: 'processPayment',
+        name: "processPayment",
         execute: () => this.paymentService.charge(orderId),
         compensate: () => this.paymentService.refund(orderId),
       },
       {
-        name: 'shipOrder',
+        name: "shipOrder",
         execute: () => this.shippingService.schedule(orderId),
         compensate: () => this.shippingService.cancel(orderId),
       },
@@ -382,11 +382,11 @@ class OrderSaga {
         for (const completed of completedSteps.reverse()) {
           await completed.compensate();
         }
-        return { status: 'failed', failedStep: step.name, error };
+        return { status: "failed", failedStep: step.name, error };
       }
     }
 
-    return { status: 'completed' };
+    return { status: "completed" };
   }
 }
 ```
@@ -403,9 +403,9 @@ class InventoryEventHandler {
       await this.inventoryRepo.reserve(event.orderId, event.items);
       await this.eventBus.publish(new InventoryReservedEvent(event.orderId));
     } catch (error) {
-      await this.eventBus.publish(new InventoryReservationFailedEvent(
-        event.orderId, error.message
-      ));
+      await this.eventBus.publish(
+        new InventoryReservationFailedEvent(event.orderId, error.message),
+      );
     }
   }
 
@@ -422,9 +422,9 @@ class PaymentEventHandler {
       await this.paymentProcessor.charge(event.orderId);
       await this.eventBus.publish(new PaymentProcessedEvent(event.orderId));
     } catch (error) {
-      await this.eventBus.publish(new PaymentFailedEvent(
-        event.orderId, error.message
-      ));
+      await this.eventBus.publish(
+        new PaymentFailedEvent(event.orderId, error.message),
+      );
     }
   }
 }
@@ -449,14 +449,14 @@ OrderSaga States:
 
 ### Comparison
 
-| Model | Guarantee | Latency | Use When |
-|-------|-----------|---------|----------|
-| Strong (linearizable) | Latest write always visible | Higher | Financial transactions, inventory counts |
-| Sequential | Operations appear in agreed order | Medium | Distributed locks, leader election |
-| Causal | Cause-and-effect order preserved | Medium | Chat messages, comment threads |
-| Read-your-writes | Writer sees own writes immediately | Low | User profile updates, settings |
-| Eventual | All replicas converge given time | Lowest | Social feeds, analytics, caches |
-| Monotonic reads | Reader never sees older data after newer | Low | Dashboard displays, reporting |
+| Model                 | Guarantee                                | Latency | Use When                                 |
+| --------------------- | ---------------------------------------- | ------- | ---------------------------------------- |
+| Strong (linearizable) | Latest write always visible              | Higher  | Financial transactions, inventory counts |
+| Sequential            | Operations appear in agreed order        | Medium  | Distributed locks, leader election       |
+| Causal                | Cause-and-effect order preserved         | Medium  | Chat messages, comment threads           |
+| Read-your-writes      | Writer sees own writes immediately       | Low     | User profile updates, settings           |
+| Eventual              | All replicas converge given time         | Lowest  | Social feeds, analytics, caches          |
+| Monotonic reads       | Reader never sees older data after newer | Low     | Dashboard displays, reporting            |
 
 ### Read-Your-Writes Implementation
 
@@ -468,12 +468,14 @@ class UserProfileService {
     await this.primaryDb.users.update(userId, data);
 
     // Set a "read-from-primary" marker with short TTL
-    await this.cache.set(`read-primary:${userId}`, '1', 'EX', 5);
+    await this.cache.set(`read-primary:${userId}`, "1", "EX", 5);
   }
 
   async getProfile(userId: string, requestingUserId: string): Promise<Profile> {
     // If the requesting user just wrote, read from primary
-    const readFromPrimary = await this.cache.get(`read-primary:${requestingUserId}`);
+    const readFromPrimary = await this.cache.get(
+      `read-primary:${requestingUserId}`,
+    );
 
     if (readFromPrimary || userId === requestingUserId) {
       return this.primaryDb.users.findById(userId);
@@ -487,12 +489,12 @@ class UserProfileService {
 
 ### Conflict Resolution Strategies
 
-| Strategy | Description | Use When |
-|----------|-------------|----------|
-| Last-write-wins (LWW) | Timestamp determines winner | Low-conflict data, user preferences |
-| Merge (CRDTs) | Automatic conflict-free merge | Collaborative editing, counters |
-| Application-level | Custom business logic resolves | Shopping carts, inventory |
-| Manual | Flag conflict for human review | Legal documents, financial records |
+| Strategy              | Description                    | Use When                            |
+| --------------------- | ------------------------------ | ----------------------------------- |
+| Last-write-wins (LWW) | Timestamp determines winner    | Low-conflict data, user preferences |
+| Merge (CRDTs)         | Automatic conflict-free merge  | Collaborative editing, counters     |
+| Application-level     | Custom business logic resolves | Shopping carts, inventory           |
+| Manual                | Flag conflict for human review | Legal documents, financial records  |
 
 ---
 

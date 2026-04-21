@@ -46,25 +46,25 @@ Comprehensive guide to commit message conventions and automated versioning.
 
 ### Standard Types
 
-| Type | Purpose | SemVer Impact | Changelog Section |
-|------|---------|---------------|-------------------|
-| `feat` | New feature | MINOR (0.1.0) | Features |
-| `fix` | Bug fix | PATCH (0.0.1) | Bug Fixes |
-| `docs` | Documentation only | None | Documentation |
-| `style` | Code style (formatting, whitespace) | None | - |
-| `refactor` | Code refactoring | None | - |
-| `perf` | Performance improvement | PATCH | Performance |
-| `test` | Tests only | None | - |
-| `build` | Build system, dependencies | None | Build System |
-| `ci` | CI configuration | None | - |
-| `chore` | Maintenance tasks | None | - |
-| `revert` | Revert previous commit | Depends | - |
+| Type       | Purpose                             | SemVer Impact | Changelog Section |
+| ---------- | ----------------------------------- | ------------- | ----------------- |
+| `feat`     | New feature                         | MINOR (0.1.0) | Features          |
+| `fix`      | Bug fix                             | PATCH (0.0.1) | Bug Fixes         |
+| `docs`     | Documentation only                  | None          | Documentation     |
+| `style`    | Code style (formatting, whitespace) | None          | -                 |
+| `refactor` | Code refactoring                    | None          | -                 |
+| `perf`     | Performance improvement             | PATCH         | Performance       |
+| `test`     | Tests only                          | None          | -                 |
+| `build`    | Build system, dependencies          | None          | Build System      |
+| `ci`       | CI configuration                    | None          | -                 |
+| `chore`    | Maintenance tasks                   | None          | -                 |
+| `revert`   | Revert previous commit              | Depends       | -                 |
 
 ### Breaking Changes
 
-| Marker | SemVer Impact | Example |
-|--------|---------------|---------|
-| `BREAKING CHANGE:` in footer | MAJOR (1.0.0) | See below |
+| Marker                            | SemVer Impact | Example              |
+| --------------------------------- | ------------- | -------------------- |
+| `BREAKING CHANGE:` in footer      | MAJOR (1.0.0) | See below            |
 | Exclamation mark after type/scope | MAJOR (1.0.0) | feat!: remove API v1 |
 
 ---
@@ -74,16 +74,19 @@ Comprehensive guide to commit message conventions and automated versioning.
 ### Feature (MINOR version bump)
 
 **Simple Feature**:
+
 ```bash
 git commit -m "feat: add user profile page"
 ```
 
 **With Scope**:
+
 ```bash
 git commit -m "feat(auth): add OAuth2 social login"
 ```
 
 **With Body**:
+
 ```bash
 git commit -m "feat(api): add pagination to user list endpoint
 
@@ -94,6 +97,7 @@ Returns total count in response headers for client pagination UI."
 ```
 
 **With Issue Reference**:
+
 ```bash
 git commit -m "feat(dashboard): add metrics visualization
 
@@ -103,11 +107,13 @@ Closes #234"
 ### Bug Fix (PATCH version bump)
 
 **Simple Fix**:
+
 ```bash
 git commit -m "fix: resolve null pointer in login"
 ```
 
 **With Root Cause**:
+
 ```bash
 git commit -m "fix(auth): prevent duplicate user creation on concurrent requests
 
@@ -119,6 +125,7 @@ Fixes #456"
 ```
 
 **With Testing Notes**:
+
 ```bash
 git commit -m "fix(api): handle 404 errors for deleted resources
 
@@ -131,6 +138,7 @@ Added integration tests to verify error handling."
 ### Breaking Change (MAJOR version bump)
 
 **With Footer**:
+
 ```bash
 git commit -m "feat(api): migrate to REST API v2
 
@@ -142,6 +150,7 @@ to v2 API. See migration guide: docs/api-v2-migration.md"
 ```
 
 **With ! Marker**:
+
 ```bash
 git commit -m "feat(auth)!: change JWT payload structure
 
@@ -150,6 +159,7 @@ Existing tokens will be invalidated. Users must re-login."
 ```
 
 **Multiple Breaking Changes**:
+
 ```bash
 git commit -m "refactor!: restructure database schema
 
@@ -264,6 +274,7 @@ Pagination caused performance issues in production."
 ### Common Scopes by Project Type
 
 **Backend API**:
+
 - `auth` - Authentication/authorization
 - `api` - API endpoints
 - `db` - Database, migrations
@@ -272,6 +283,7 @@ Pagination caused performance issues in production."
 - `utils` - Utility functions
 
 **Frontend**:
+
 - `ui` - UI components
 - `pages` - Page components
 - `store` - State management
@@ -280,18 +292,21 @@ Pagination caused performance issues in production."
 - `routes` - Routing
 
 **Mobile**:
+
 - `ios` - iOS specific code
 - `android` - Android specific code
 - `navigation` - Navigation
 - `screens` - Screen components
 
 **Infrastructure**:
+
 - `infra` - Infrastructure code
 - `deploy` - Deployment scripts
 - `monitoring` - Monitoring setup
 - `security` - Security config
 
 **Monorepo**:
+
 - `packages/auth` - Auth package
 - `apps/web` - Web application
 - `apps/mobile` - Mobile application
@@ -305,6 +320,7 @@ Pagination caused performance issues in production."
 **Use imperative mood** in description (like giving a command).
 
 **Good** (imperative):
+
 ```bash
 feat: add user authentication
 fix: resolve memory leak
@@ -312,6 +328,7 @@ docs: update installation guide
 ```
 
 **Bad** (past tense):
+
 ```bash
 feat: added user authentication
 fix: resolved memory leak
@@ -324,6 +341,7 @@ docs: updated installation guide
 ### Be Specific
 
 **Good** (specific):
+
 ```bash
 fix(auth): prevent race condition in token refresh
 
@@ -332,6 +350,7 @@ from creating duplicate tokens.
 ```
 
 **Bad** (vague):
+
 ```bash
 fix: fix bug
 ```
@@ -341,6 +360,7 @@ fix: fix bug
 The diff shows **what** changed. The message should explain **why**.
 
 **Good** (explains why):
+
 ```bash
 perf(api): add Redis caching for user profile endpoint
 
@@ -350,6 +370,7 @@ from 200ms to 20ms.
 ```
 
 **Bad** (just what):
+
 ```bash
 perf: add caching
 ```
@@ -357,12 +378,14 @@ perf: add caching
 ### Use Body for Context
 
 **When to use body**:
+
 - Complex changes that need explanation
 - Non-obvious solutions or trade-offs
 - Multiple related changes
 - Breaking changes
 
 **Example**:
+
 ```bash
 feat(search): implement fuzzy search with Elasticsearch
 
@@ -395,11 +418,11 @@ MAJOR.MINOR.PATCH
 
 ### Version Increments
 
-| Change Type | Increment | Example | Description |
-|-------------|-----------|---------|-------------|
-| **Breaking change** | MAJOR | 2.3.1 -> 3.0.0 | Incompatible API changes |
-| **New feature** | MINOR | 2.3.1 -> 2.4.0 | Backward-compatible functionality |
-| **Bug fix** | PATCH | 2.3.1 -> 2.3.2 | Backward-compatible fixes |
+| Change Type         | Increment | Example        | Description                       |
+| ------------------- | --------- | -------------- | --------------------------------- |
+| **Breaking change** | MAJOR     | 2.3.1 -> 3.0.0 | Incompatible API changes          |
+| **New feature**     | MINOR     | 2.3.1 -> 2.4.0 | Backward-compatible functionality |
+| **Bug fix**         | PATCH     | 2.3.1 -> 2.3.2 | Backward-compatible fixes         |
 
 ### Pre-release Versions
 
@@ -430,6 +453,7 @@ feat!: breaking change  ->  1.2.2 -> 2.0.0 (MAJOR)
 **Enforce commit conventions** in git hooks or CI/CD.
 
 **Install**:
+
 ```bash
 npm install --save-dev @commitlint/cli @commitlint/config-conventional
 
@@ -438,6 +462,7 @@ echo "export default {extends: ['@commitlint/config-conventional']};" > commitli
 ```
 
 **Husky Hook** (validate commits locally):
+
 ```bash
 npm install --save-dev husky
 
@@ -446,6 +471,7 @@ npx husky add .husky/commit-msg 'npx commitlint --edit $1'
 ```
 
 **CI/CD** (GitHub Actions):
+
 ```yaml
 - name: Validate PR title
   uses: amannn/action-semantic-pull-request@v5
@@ -458,11 +484,13 @@ npx husky add .husky/commit-msg 'npx commitlint --edit $1'
 **Automate changelog and version bumps** (manual trigger).
 
 **Install**:
+
 ```bash
 npm install --save-dev standard-version
 ```
 
 **Usage**:
+
 ```bash
 # Generate changelog and bump version
 npm run release
@@ -475,6 +503,7 @@ npm run release -- --prerelease alpha
 ```
 
 **What it does**:
+
 1. Analyzes commits since last tag
 2. Determines next version (SemVer)
 3. Updates CHANGELOG.md
@@ -486,11 +515,13 @@ npm run release -- --prerelease alpha
 **Fully automated** version management (triggers on CI/CD).
 
 **Install**:
+
 ```bash
 npm install --save-dev semantic-release
 ```
 
 **Configuration** (`.releaserc.json`):
+
 ```json
 {
   "branches": ["main"],
@@ -506,6 +537,7 @@ npm install --save-dev semantic-release
 ```
 
 **GitHub Actions**:
+
 ```yaml
 name: Release
 
@@ -527,6 +559,7 @@ jobs:
 ```
 
 **What it does**:
+
 1. Analyzes commits on main branch
 2. Determines next version
 3. Generates release notes
@@ -587,6 +620,7 @@ All notable changes to this project will be documented in this file.
 Each commit should be a **single logical change**.
 
 **Good** (atomic):
+
 ```bash
 git commit -m "feat: add user authentication"
 git commit -m "test: add auth integration tests"
@@ -594,6 +628,7 @@ git commit -m "docs: document auth API"
 ```
 
 **Bad** (mixing changes):
+
 ```bash
 git commit -m "Add auth, fix bug, update docs"
 ```
@@ -603,12 +638,14 @@ git commit -m "Add auth, fix bug, update docs"
 **Commit often**, but keep commits meaningful.
 
 **Good rhythm**:
+
 - Implement feature -> commit
 - Write tests -> commit
 - Fix discovered bug -> commit
 - Update docs -> commit
 
 **Too frequent** (bad):
+
 ```bash
 git commit -m "WIP"
 git commit -m "fix typo"
@@ -639,6 +676,7 @@ git rebase -i --autosquash main
 ### Local Enforcement (Git Hooks)
 
 **Pre-commit hook** (format check):
+
 ```bash
 #!/bin/bash
 # .git/hooks/pre-commit
@@ -648,6 +686,7 @@ npm run test:quick
 ```
 
 **Commit-msg hook** (commitlint):
+
 ```bash
 #!/bin/bash
 # .git/hooks/commit-msg
@@ -658,6 +697,7 @@ npx commitlint --edit $1
 ### CI/CD Enforcement
 
 **GitHub Actions**:
+
 ```yaml
 name: Commit Checks
 
@@ -677,6 +717,7 @@ jobs:
 ```
 
 **GitLab CI**:
+
 ```yaml
 commitlint:
   stage: test
@@ -695,16 +736,19 @@ commitlint:
 ### Gradual Rollout
 
 **Phase 1: Education** (Week 1-2)
+
 - Share commit convention guide
 - Demo tools (commitlint, semantic-release)
 - Show benefits (automated changelogs)
 
 **Phase 2: Soft Enforcement** (Week 3-4)
+
 - Add commitlint warnings (not blocking)
 - Encourage conventional commits in PRs
 - Team reviews examples together
 
 **Phase 3: Hard Enforcement** (Week 5+)
+
 - Enable commitlint in CI/CD (blocking)
 - Require conventional commits for all PRs
 - Reject non-conforming commits
@@ -712,6 +756,7 @@ commitlint:
 ### Commit Message Templates
 
 **Create git template**:
+
 ```bash
 # ~/.gitmessage
 # <type>[optional scope]: <description>
@@ -734,11 +779,13 @@ Now `git commit` opens editor with template filled in.
 ### Mistake 1: Vague Types
 
 **Bad**:
+
 ```bash
 git commit -m "chore: update stuff"
 ```
 
 **Good**:
+
 ```bash
 git commit -m "build(deps): upgrade React from 17 to 18"
 ```
@@ -746,11 +793,13 @@ git commit -m "build(deps): upgrade React from 17 to 18"
 ### Mistake 2: Missing Scope
 
 **Bad**:
+
 ```bash
 git commit -m "feat: add feature"
 ```
 
 **Good**:
+
 ```bash
 git commit -m "feat(auth): add OAuth2 social login"
 ```
@@ -758,11 +807,13 @@ git commit -m "feat(auth): add OAuth2 social login"
 ### Mistake 3: Past Tense
 
 **Bad**:
+
 ```bash
 git commit -m "fixed bug in login"
 ```
 
 **Good**:
+
 ```bash
 git commit -m "fix(auth): resolve race condition in login"
 ```
@@ -770,11 +821,13 @@ git commit -m "fix(auth): resolve race condition in login"
 ### Mistake 4: No Context
 
 **Bad**:
+
 ```bash
 git commit -m "fix: bug"
 ```
 
 **Good**:
+
 ```bash
 git commit -m "fix(api): prevent null pointer when user not found
 

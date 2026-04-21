@@ -34,13 +34,14 @@ Each template should follow this structure:
 ```markdown
 # Backend Engineering - [Tech Stack Name] Template
 
-*Purpose: Brief description of when to use this stack*
+_Purpose: Brief description of when to use this stack_
 
 ---
 
 # When to Use
 
 Use this template when building:
+
 - [Use case 1]
 - [Use case 2]
 - [Use case 3]
@@ -50,17 +51,29 @@ Use this template when building:
 # TEMPLATE STARTS HERE
 
 # 1. Project Overview
+
 # 2. Project Structure
+
 # 3. Environment Configuration
+
 # 4. Database Setup
+
 # 5. Application Setup
+
 # 6. Authentication Implementation
+
 # 7. API Routes & Controllers
+
 # 8. Repository Pattern / Data Access
+
 # 9. Testing
+
 # 10. Docker Setup
+
 # 11. Production Checklist
+
 # 12. API Documentation
+
 # END
 ```
 
@@ -69,30 +82,35 @@ Use this template when building:
 ## Sections Explained
 
 ### 1. Project Overview
+
 - Project name placeholder
 - Tech stack components
 - Team roles
 - Timeline
 
 ### 2. Project Structure
+
 - Directory tree
 - File organization
 - Module structure
 - Naming conventions
 
 ### 3. Environment Configuration
+
 - `.env.example` file
 - Environment validation
 - Configuration management
 - Secrets handling
 
 ### 4. Database Setup
+
 - Schema definition
 - Migration workflow
 - ORM/Database client setup
 - Connection configuration
 
 ### 5. Application Setup
+
 - Framework initialization
 - Middleware configuration
 - Security setup
@@ -100,6 +118,7 @@ Use this template when building:
 - Graceful shutdown
 
 ### 6. Authentication Implementation
+
 - Auth service
 - Middleware/guards
 - Token generation
@@ -109,18 +128,21 @@ Use this template when building:
 **Implementation Reference**: See [auth-utilities.md](../../software-clean-code-standard/utilities/auth-utilities.md) for Argon2id password hashing, jose JWT, and OAuth 2.1/PKCE patterns.
 
 ### 7. API Routes & Controllers
+
 - Route definitions
 - Controller implementations
 - Request handlers
 - Response formatting
 
 ### 8. Repository Pattern / Data Access
+
 - Repository interfaces
 - Data access implementations
 - Query methods
 - Transaction handling
 
 ### 9. Testing
+
 - Unit test examples
 - Integration test examples
 - E2E test examples
@@ -130,18 +152,21 @@ Use this template when building:
 **Implementation Reference**: See [testing-utilities.md](../../software-clean-code-standard/utilities/testing-utilities.md) for Vitest, MSW v2, factories, and fixtures.
 
 ### 10. Docker Setup
+
 - Dockerfile
 - Multi-stage builds
 - docker-compose.yml
 - Environment configuration
 
 ### 11. Production Checklist
+
 - Security checklist
 - Performance checklist
 - Monitoring checklist
 - Deployment checklist
 
 ### 12. API Documentation
+
 - Documentation setup
 - Schema definitions
 - Example endpoints
@@ -157,13 +182,14 @@ Use this template when building:
 ```markdown
 # Backend Engineering - Python + FastAPI + SQLAlchemy Template
 
-*Purpose: Production-grade Python APIs with FastAPI and PostgreSQL*
+_Purpose: Production-grade Python APIs with FastAPI and PostgreSQL_
 
 ---
 
 # When to Use
 
 Use this template when building:
+
 - High-performance Python APIs
 - Data science backends
 - ML model serving
@@ -176,6 +202,7 @@ Use this template when building:
 # 1. Project Overview
 
 **Tech Stack:**
+
 - [ ] Python 3.11+
 - [ ] FastAPI
 - [ ] SQLAlchemy 2.0
@@ -187,22 +214,22 @@ Use this template when building:
 ---
 
 # 2. Project Structure
-
 ```
+
 project-root/
 |-- app/
-|   |-- api/
-|   |   |-- routes/
-|   |   |-- dependencies/
-|   |   `-- schemas/
+| |-- api/
+| | |-- routes/
+| | |-- dependencies/
+| | `-- schemas/
 |   |-- core/
 |   |   |-- config.py
 |   |   |-- security.py
 |   |   `-- database.py
-|   |-- models/
-|   |-- services/
-|   |-- repositories/
-|   `-- main.py
+| |-- models/
+| |-- services/
+| |-- repositories/
+| `-- main.py
 |-- tests/
 |-- alembic/
 |-- requirements/
@@ -212,6 +239,7 @@ project-root/
 |-- Dockerfile
 |-- docker-compose.yml
 `-- pyproject.toml
+
 ```
 
 [Continue with remaining sections...]
@@ -272,6 +300,7 @@ Add to "Supported Tech Stacks" section:
 
 ```markdown
 ### Supported Tech Stacks
+
 [OK] **Node.js + Prisma + PostgreSQL** (complete)
 [OK] **Python + FastAPI + SQLAlchemy** (complete)
 ```
@@ -296,15 +325,15 @@ See `assets/` directory for tech-stack-specific implementations:
 
 When creating a new template, consider this comparison:
 
-| Aspect | Node.js + Prisma | Python + FastAPI | Go + GORM | Ruby on Rails |
-|--------|------------------|------------------|-----------|---------------|
-| **Performance** | High (async) | High (async) | Very High | Medium |
-| **Type Safety** | TypeScript | Pydantic | Native | Sorbet |
-| **Learning Curve** | Medium | Low-Medium | Medium-High | Low |
-| **Ecosystem** | npm (huge) | PyPI (large) | Go modules | RubyGems |
-| **Best For** | APIs, real-time | ML/DS backends | Microservices | Full-stack web |
-| **ORM** | Prisma | SQLAlchemy | GORM | ActiveRecord |
-| **Concurrency** | Event loop | asyncio | Goroutines | Threads |
+| Aspect             | Node.js + Prisma | Python + FastAPI | Go + GORM     | Ruby on Rails  |
+| ------------------ | ---------------- | ---------------- | ------------- | -------------- |
+| **Performance**    | High (async)     | High (async)     | Very High     | Medium         |
+| **Type Safety**    | TypeScript       | Pydantic         | Native        | Sorbet         |
+| **Learning Curve** | Medium           | Low-Medium       | Medium-High   | Low            |
+| **Ecosystem**      | npm (huge)       | PyPI (large)     | Go modules    | RubyGems       |
+| **Best For**       | APIs, real-time  | ML/DS backends   | Microservices | Full-stack web |
+| **ORM**            | Prisma           | SQLAlchemy       | GORM          | ActiveRecord   |
+| **Concurrency**    | Event loop       | asyncio          | Goroutines    | Threads        |
 
 ---
 
@@ -313,6 +342,7 @@ When creating a new template, consider this comparison:
 Every template must include:
 
 ### Core Patterns [OK]
+
 - [x] Project structure
 - [x] Environment configuration
 - [x] Database setup and migrations
@@ -322,6 +352,7 @@ Every template must include:
 - [x] Data access layer
 
 ### Security [OK]
+
 - [x] Authentication implementation
 - [x] Authorization/RBAC
 - [x] Password hashing
@@ -331,6 +362,7 @@ Every template must include:
 - [x] CORS configuration
 
 ### Performance [OK]
+
 - [x] Database query optimization
 - [x] Caching strategy
 - [x] Pagination implementation
@@ -338,6 +370,7 @@ Every template must include:
 - [x] Connection pooling
 
 ### Testing [OK]
+
 - [x] Unit test examples
 - [x] Integration test examples
 - [x] E2E test examples
@@ -345,6 +378,7 @@ Every template must include:
 - [x] Mocking strategies
 
 ### Operations [OK]
+
 - [x] Docker configuration
 - [x] docker-compose for local dev
 - [x] Health check endpoint
@@ -353,6 +387,7 @@ Every template must include:
 - [x] Error tracking setup
 
 ### Documentation [OK]
+
 - [x] API documentation setup
 - [x] README with setup steps
 - [x] Environment variable docs
@@ -366,6 +401,7 @@ Every template must include:
 Before submitting a new template:
 
 ### Code Quality
+
 - [ ] All code examples are tested and working
 - [ ] Follows language-specific conventions
 - [ ] Type safety enabled where available
@@ -373,6 +409,7 @@ Before submitting a new template:
 - [ ] Proper error handling in all examples
 
 ### Completeness
+
 - [ ] All 12 sections are filled out
 - [ ] Real-world code examples provided
 - [ ] Configuration files are complete
@@ -380,6 +417,7 @@ Before submitting a new template:
 - [ ] Tests cover critical paths
 
 ### Documentation
+
 - [ ] Clear explanations for each pattern
 - [ ] "When to Use" guidance provided
 - [ ] Checklists for validation
@@ -387,6 +425,7 @@ Before submitting a new template:
 - [ ] Common pitfalls mentioned
 
 ### Integration
+
 - [ ] Referenced in README.md
 - [ ] Resources added to sources.json
 - [ ] Mentioned in skill.md templates section
@@ -403,6 +442,7 @@ template-<language>-<framework>-<database>.md
 ```
 
 Examples:
+
 - [OK] `template-nodejs-prisma-postgres.md`
 - [OK] `template-python-fastapi-sqlalchemy.md`
 - [OK] `template-go-fiber-gorm.md`
@@ -417,18 +457,21 @@ Examples:
 Ideas for additional templates:
 
 ### High Priority
+
 - [ ] Python + FastAPI + SQLAlchemy + PostgreSQL
 - [ ] Go + Fiber + GORM + PostgreSQL
 - [ ] Java + Spring Boot + JPA + PostgreSQL
 - [ ] C# + ASP.NET Core + EF Core + PostgreSQL
 
 ### Medium Priority
+
 - [ ] Ruby on Rails + PostgreSQL
 - [ ] PHP + Laravel + Eloquent + PostgreSQL
 - [ ] Rust + Actix + Diesel + PostgreSQL
 - [ ] Kotlin + Ktor + Exposed + PostgreSQL
 
 ### Specialized
+
 - [ ] Node.js + GraphQL + Prisma + PostgreSQL
 - [ ] Python + Django REST Framework + PostgreSQL
 - [ ] Elixir + Phoenix + Ecto + PostgreSQL

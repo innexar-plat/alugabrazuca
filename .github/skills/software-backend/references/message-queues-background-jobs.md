@@ -23,97 +23,105 @@ Comprehensive guide for message queue patterns, background job design, broker co
 ### Basic Job Processing
 
 ```typescript
-import { Queue, Worker, QueueEvents } from 'bullmq';
-import IORedis from 'ioredis';
+import { Queue, Worker, QueueEvents } from "bullmq";
+import IORedis from "ioredis";
 
 const connection = new IORedis({
   host: process.env.REDIS_HOST,
   port: 6379,
-  maxRetriesPerRequest: null,  // Required for BullMQ
+  maxRetriesPerRequest: null, // Required for BullMQ
 });
 
 // Producer: add jobs to queue
-const emailQueue = new Queue('email', { connection });
+const emailQueue = new Queue("email", { connection });
 
-await emailQueue.add('send-welcome', {
-  userId: 'user-123',
-  templateId: 'welcome-email',
-}, {
-  attempts: 3,
-  backoff: { type: 'exponential', delay: 1000 },
-  removeOnComplete: { count: 1000 },  // Keep last 1000 completed jobs
-  removeOnFail: { count: 5000 },      // Keep last 5000 failed jobs
-});
+await emailQueue.add(
+  "send-welcome",
+  {
+    userId: "user-123",
+    templateId: "welcome-email",
+  },
+  {
+    attempts: 3,
+    backoff: { type: "exponential", delay: 1000 },
+    removeOnComplete: { count: 1000 }, // Keep last 1000 completed jobs
+    removeOnFail: { count: 5000 }, // Keep last 5000 failed jobs
+  },
+);
 
 // Consumer: process jobs
-const worker = new Worker('email', async (job) => {
-  const { userId, templateId } = job.data;
+const worker = new Worker(
+  "email",
+  async (job) => {
+    const { userId, templateId } = job.data;
 
-  await job.updateProgress(10);
-  const user = await getUserById(userId);
+    await job.updateProgress(10);
+    const user = await getUserById(userId);
 
-  await job.updateProgress(50);
-  await sendEmail(user.email, templateId);
+    await job.updateProgress(50);
+    await sendEmail(user.email, templateId);
 
-  await job.updateProgress(100);
-  return { sentTo: user.email };
-}, {
-  connection,
-  concurrency: 5,          // Process 5 jobs in parallel
-  limiter: {
-    max: 10,               // Max 10 jobs
-    duration: 1000,         // Per second (rate limiting)
+    await job.updateProgress(100);
+    return { sentTo: user.email };
   },
+  {
+    connection,
+    concurrency: 5, // Process 5 jobs in parallel
+    limiter: {
+      max: 10, // Max 10 jobs
+      duration: 1000, // Per second (rate limiting)
+    },
+  },
+);
+
+worker.on("completed", (job, result) => {
+  logger.info({ jobId: job.id, result }, "Job completed");
 });
 
-worker.on('completed', (job, result) => {
-  logger.info({ jobId: job.id, result }, 'Job completed');
-});
-
-worker.on('failed', (job, err) => {
-  logger.error({ jobId: job?.id, err }, 'Job failed');
+worker.on("failed", (job, err) => {
+  logger.error({ jobId: job?.id, err }, "Job failed");
 });
 ```
 
 ### Job Types and Patterns
 
-| Pattern | BullMQ Feature | Use When |
-|---------|---------------|----------|
-| Simple job | `queue.add()` | One-off tasks (send email, resize image) |
-| Delayed job | `delay` option | Future execution (reminder in 24h) |
-| Repeatable job | `repeat` option | Recurring tasks (daily report) |
-| Priority job | `priority` option | Urgent tasks first |
-| Flow (parent-child) | `FlowProducer` | Multi-step workflows with dependencies |
-| Bulk add | `queue.addBulk()` | Batch insertion of many jobs |
-| Rate limited | `limiter` option | API rate limit compliance |
+| Pattern             | BullMQ Feature    | Use When                                 |
+| ------------------- | ----------------- | ---------------------------------------- |
+| Simple job          | `queue.add()`     | One-off tasks (send email, resize image) |
+| Delayed job         | `delay` option    | Future execution (reminder in 24h)       |
+| Repeatable job      | `repeat` option   | Recurring tasks (daily report)           |
+| Priority job        | `priority` option | Urgent tasks first                       |
+| Flow (parent-child) | `FlowProducer`    | Multi-step workflows with dependencies   |
+| Bulk add            | `queue.addBulk()` | Batch insertion of many jobs             |
+| Rate limited        | `limiter` option  | API rate limit compliance                |
 
 ### Flow (Parent-Child Dependencies)
 
 ```typescript
-import { FlowProducer } from 'bullmq';
+import { FlowProducer } from "bullmq";
 
 const flowProducer = new FlowProducer({ connection });
 
 // Parent job depends on child jobs completing first
 await flowProducer.add({
-  name: 'generate-report',
-  queueName: 'reports',
-  data: { reportId: 'rpt-001' },
+  name: "generate-report",
+  queueName: "reports",
+  data: { reportId: "rpt-001" },
   children: [
     {
-      name: 'fetch-sales-data',
-      queueName: 'data-fetch',
-      data: { source: 'sales', reportId: 'rpt-001' },
+      name: "fetch-sales-data",
+      queueName: "data-fetch",
+      data: { source: "sales", reportId: "rpt-001" },
     },
     {
-      name: 'fetch-inventory-data',
-      queueName: 'data-fetch',
-      data: { source: 'inventory', reportId: 'rpt-001' },
+      name: "fetch-inventory-data",
+      queueName: "data-fetch",
+      data: { source: "inventory", reportId: "rpt-001" },
     },
     {
-      name: 'fetch-customer-data',
-      queueName: 'data-fetch',
-      data: { source: 'customers', reportId: 'rpt-001' },
+      name: "fetch-customer-data",
+      queueName: "data-fetch",
+      data: { source: "customers", reportId: "rpt-001" },
     },
   ],
 });
@@ -136,25 +144,25 @@ async function shutdown() {
   await connection.quit();
 }
 
-process.on('SIGTERM', shutdown);
-process.on('SIGINT', shutdown);
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
 ```
 
 ---
 
 ## Message Broker Comparison
 
-| Feature | Redis / BullMQ | SQS | Kafka | RabbitMQ |
-|---------|---------------|-----|-------|----------|
-| Model | Job queue | Message queue | Event log | Message broker |
-| Ordering | FIFO per queue | FIFO (optional) | Per-partition ordering | Per-queue FIFO |
-| Delivery | At-least-once | At-least-once | At-least-once (configurable) | At-least-once / at-most-once |
-| Retention | Configurable (Redis memory) | 4 days (configurable to 14) | Configurable (days/size/forever) | Until consumed |
-| Throughput | 10K-100K/s | 3K/s (standard), 30K/s (FIFO) | 1M+/s per cluster | 50K-100K/s |
-| Replay | Limited (requires event store) | No replay | Full replay from any offset | No replay |
-| Scaling | Redis cluster | Automatic (managed) | Partition-based | Prefetch + consumers |
-| Managed options | Upstash, AWS ElastiCache | AWS native | Confluent, MSK, Redpanda | CloudAMQP, AmazonMQ |
-| Best for | Background jobs, task queues | AWS-native workflows, serverless | Event streaming, log aggregation | Complex routing, pub/sub |
+| Feature         | Redis / BullMQ                 | SQS                              | Kafka                            | RabbitMQ                     |
+| --------------- | ------------------------------ | -------------------------------- | -------------------------------- | ---------------------------- |
+| Model           | Job queue                      | Message queue                    | Event log                        | Message broker               |
+| Ordering        | FIFO per queue                 | FIFO (optional)                  | Per-partition ordering           | Per-queue FIFO               |
+| Delivery        | At-least-once                  | At-least-once                    | At-least-once (configurable)     | At-least-once / at-most-once |
+| Retention       | Configurable (Redis memory)    | 4 days (configurable to 14)      | Configurable (days/size/forever) | Until consumed               |
+| Throughput      | 10K-100K/s                     | 3K/s (standard), 30K/s (FIFO)    | 1M+/s per cluster                | 50K-100K/s                   |
+| Replay          | Limited (requires event store) | No replay                        | Full replay from any offset      | No replay                    |
+| Scaling         | Redis cluster                  | Automatic (managed)              | Partition-based                  | Prefetch + consumers         |
+| Managed options | Upstash, AWS ElastiCache       | AWS native                       | Confluent, MSK, Redpanda         | CloudAMQP, AmazonMQ          |
+| Best for        | Background jobs, task queues   | AWS-native workflows, serverless | Event streaming, log aggregation | Complex routing, pub/sub     |
 
 ### Selection Decision Tree
 
@@ -208,7 +216,7 @@ async function processPayment(job: Job) {
   // Check if already processed
   const existing = await redis.get(`idem:payment:${idempotencyKey}`);
   if (existing) {
-    logger.info({ idempotencyKey }, 'Payment already processed, skipping');
+    logger.info({ idempotencyKey }, "Payment already processed, skipping");
     return JSON.parse(existing);
   }
 
@@ -219,8 +227,8 @@ async function processPayment(job: Job) {
   await redis.set(
     `idem:payment:${idempotencyKey}`,
     JSON.stringify(result),
-    'EX',
-    86400 * 7  // 7 days
+    "EX",
+    86400 * 7, // 7 days
   );
 
   return result;
@@ -239,8 +247,9 @@ async function processOrder(job: Job) {
       data: { eventId, processedAt: new Date() },
     });
   } catch (error) {
-    if (error.code === 'P2002') {  // Prisma unique constraint violation
-      logger.info({ eventId }, 'Event already processed');
+    if (error.code === "P2002") {
+      // Prisma unique constraint violation
+      logger.info({ eventId }, "Event already processed");
       return;
     }
     throw error;
@@ -278,24 +287,24 @@ WHERE id = $1 AND status = 'paid';
 
 ```typescript
 // Configure retry behavior per job
-await queue.add('process-webhook', webhookData, {
+await queue.add("process-webhook", webhookData, {
   attempts: 5,
   backoff: {
-    type: 'exponential',
-    delay: 2000,  // 2s, 4s, 8s, 16s, 32s
+    type: "exponential",
+    delay: 2000, // 2s, 4s, 8s, 16s, 32s
   },
 });
 
 // Custom backoff strategy
-await queue.add('critical-job', data, {
+await queue.add("critical-job", data, {
   attempts: 10,
   backoff: {
-    type: 'custom',
+    type: "custom",
   },
 });
 
 // In worker: implement custom backoff
-const worker = new Worker('critical', processor, {
+const worker = new Worker("critical", processor, {
   settings: {
     backoffStrategy: (attemptsMade: number) => {
       // Fibonacci backoff: 1s, 1s, 2s, 3s, 5s, 8s, 13s, 21s, 34s, 55s
@@ -310,17 +319,17 @@ const worker = new Worker('critical', processor, {
 
 ```typescript
 // Monitor failed jobs and move to DLQ after exhausting retries
-const queueEvents = new QueueEvents('orders', { connection });
+const queueEvents = new QueueEvents("orders", { connection });
 
-queueEvents.on('failed', async ({ jobId, failedReason }) => {
+queueEvents.on("failed", async ({ jobId, failedReason }) => {
   const job = await Job.fromId(queue, jobId);
   if (!job) return;
 
   // If all retries exhausted, move to DLQ
   if (job.attemptsMade >= job.opts.attempts!) {
-    await dlqQueue.add('failed-order', {
+    await dlqQueue.add("failed-order", {
       originalJobId: jobId,
-      originalQueue: 'orders',
+      originalQueue: "orders",
       data: job.data,
       failedReason,
       attempts: job.attemptsMade,
@@ -328,9 +337,9 @@ queueEvents.on('failed', async ({ jobId, failedReason }) => {
     });
 
     // Alert on DLQ growth
-    const dlqSize = await dlqQueue.getJobCounts('waiting');
+    const dlqSize = await dlqQueue.getJobCounts("waiting");
     if (dlqSize.waiting > 100) {
-      await alerting.critical('DLQ size exceeds threshold', { dlqSize });
+      await alerting.critical("DLQ size exceeds threshold", { dlqSize });
     }
   }
 });
@@ -338,18 +347,18 @@ queueEvents.on('failed', async ({ jobId, failedReason }) => {
 
 ### Failure Classification
 
-| Failure Type | Retry? | Example |
-|-------------|--------|---------|
-| Transient (network timeout) | Yes, with backoff | HTTP 503, connection reset |
-| Rate limited | Yes, with longer backoff | HTTP 429, API quota exceeded |
-| Bad input (validation) | No (fix data, re-submit) | Invalid email format |
-| Business logic error | No (requires investigation) | Insufficient funds |
-| Infrastructure failure | Yes, after fix | Database down, Redis unavailable |
-| Poison message | No (move to DLQ) | Unparseable payload, corrupted data |
+| Failure Type                | Retry?                      | Example                             |
+| --------------------------- | --------------------------- | ----------------------------------- |
+| Transient (network timeout) | Yes, with backoff           | HTTP 503, connection reset          |
+| Rate limited                | Yes, with longer backoff    | HTTP 429, API quota exceeded        |
+| Bad input (validation)      | No (fix data, re-submit)    | Invalid email format                |
+| Business logic error        | No (requires investigation) | Insufficient funds                  |
+| Infrastructure failure      | Yes, after fix              | Database down, Redis unavailable    |
+| Poison message              | No (move to DLQ)            | Unparseable payload, corrupted data |
 
 ```typescript
 // Classify errors in worker to decide retry behavior
-const worker = new Worker('orders', async (job) => {
+const worker = new Worker("orders", async (job) => {
   try {
     await processOrder(job.data);
   } catch (error) {
@@ -376,20 +385,28 @@ const worker = new Worker('orders', async (job) => {
 
 ```typescript
 // Cron-based repeatable jobs
-await queue.add('daily-report', { reportType: 'sales' }, {
-  repeat: {
-    pattern: '0 8 * * *',  // Every day at 8 AM UTC
-    tz: 'America/New_York', // Timezone-aware
+await queue.add(
+  "daily-report",
+  { reportType: "sales" },
+  {
+    repeat: {
+      pattern: "0 8 * * *", // Every day at 8 AM UTC
+      tz: "America/New_York", // Timezone-aware
+    },
+    jobId: "daily-sales-report", // Stable ID prevents duplicates
   },
-  jobId: 'daily-sales-report',  // Stable ID prevents duplicates
-});
+);
 
-await queue.add('cleanup-expired', {}, {
-  repeat: {
-    every: 60_000,  // Every 60 seconds
+await queue.add(
+  "cleanup-expired",
+  {},
+  {
+    repeat: {
+      every: 60_000, // Every 60 seconds
+    },
+    jobId: "cleanup-expired-sessions",
   },
-  jobId: 'cleanup-expired-sessions',
-});
+);
 
 // List all repeatable jobs
 const repeatableJobs = await queue.getRepeatableJobs();
@@ -399,21 +416,21 @@ await queue.removeRepeatableByKey(repeatableJobs[0].key);
 
 ### Scheduling Best Practices
 
-| Concern | Recommendation |
-|---------|---------------|
-| Timezone | Always specify timezone explicitly; UTC is safest for server jobs |
-| Overlap prevention | Use a stable `jobId` so BullMQ deduplicates |
-| Distributed cron | Only ONE instance should create repeatable jobs (use advisory lock or leader election) |
-| Missed schedules | BullMQ does NOT catch up missed runs; if the process was down, those runs are skipped |
-| Long-running crons | Set `timeout` on jobs; monitor for stuck jobs |
+| Concern            | Recommendation                                                                         |
+| ------------------ | -------------------------------------------------------------------------------------- |
+| Timezone           | Always specify timezone explicitly; UTC is safest for server jobs                      |
+| Overlap prevention | Use a stable `jobId` so BullMQ deduplicates                                            |
+| Distributed cron   | Only ONE instance should create repeatable jobs (use advisory lock or leader election) |
+| Missed schedules   | BullMQ does NOT catch up missed runs; if the process was down, those runs are skipped  |
+| Long-running crons | Set `timeout` on jobs; monitor for stuck jobs                                          |
 
 ### Distributed Cron Locking
 
 ```typescript
 // Ensure only one instance registers repeatable jobs
-import { Mutex } from 'redis-semaphore';
+import { Mutex } from "redis-semaphore";
 
-const mutex = new Mutex(connection, 'cron-registration-lock', {
+const mutex = new Mutex(connection, "cron-registration-lock", {
   lockTimeout: 30_000,
   acquireTimeout: 5_000,
 });
@@ -421,15 +438,19 @@ const mutex = new Mutex(connection, 'cron-registration-lock', {
 async function registerCronJobs() {
   const acquired = await mutex.tryAcquire();
   if (!acquired) {
-    logger.info('Another instance is registering cron jobs');
+    logger.info("Another instance is registering cron jobs");
     return;
   }
 
   try {
-    await queue.add('daily-report', {}, {
-      repeat: { pattern: '0 8 * * *' },
-      jobId: 'daily-report',
-    });
+    await queue.add(
+      "daily-report",
+      {},
+      {
+        repeat: { pattern: "0 8 * * *" },
+        jobId: "daily-report",
+      },
+    );
   } finally {
     await mutex.release();
   }
@@ -442,45 +463,51 @@ async function registerCronJobs() {
 
 ### Key Metrics
 
-| Metric | Description | Alert On |
-|--------|-------------|----------|
-| `queue.waiting` | Jobs waiting to be processed | Growing queue (consumers too slow) |
-| `queue.active` | Jobs currently being processed | Stuck jobs (no movement) |
-| `queue.completed` | Completed jobs per time window | Rate drop (processing issues) |
-| `queue.failed` | Failed jobs per time window | Spike (upstream error) |
-| `queue.delayed` | Delayed jobs count | Unexpected growth |
-| `job.duration` | Processing time per job | P95 exceeding threshold |
-| `job.attempts` | Retry count per job | Average > 1 (reliability issue) |
-| `dlq.size` | Dead letter queue depth | Any growth |
+| Metric            | Description                    | Alert On                           |
+| ----------------- | ------------------------------ | ---------------------------------- |
+| `queue.waiting`   | Jobs waiting to be processed   | Growing queue (consumers too slow) |
+| `queue.active`    | Jobs currently being processed | Stuck jobs (no movement)           |
+| `queue.completed` | Completed jobs per time window | Rate drop (processing issues)      |
+| `queue.failed`    | Failed jobs per time window    | Spike (upstream error)             |
+| `queue.delayed`   | Delayed jobs count             | Unexpected growth                  |
+| `job.duration`    | Processing time per job        | P95 exceeding threshold            |
+| `job.attempts`    | Retry count per job            | Average > 1 (reliability issue)    |
+| `dlq.size`        | Dead letter queue depth        | Any growth                         |
 
 ### Structured Logging for Jobs
 
 ```typescript
-const worker = new Worker('orders', async (job) => {
+const worker = new Worker("orders", async (job) => {
   const startTime = Date.now();
   const logContext = {
     jobId: job.id,
     jobName: job.name,
-    queue: 'orders',
+    queue: "orders",
     attempt: job.attemptsMade + 1,
-    data: { orderId: job.data.orderId },  // Log safe fields only
+    data: { orderId: job.data.orderId }, // Log safe fields only
   };
 
-  logger.info(logContext, 'Job started');
+  logger.info(logContext, "Job started");
 
   try {
     const result = await processOrder(job.data);
     const duration = Date.now() - startTime;
 
-    logger.info({ ...logContext, duration, result: 'success' }, 'Job completed');
-    metrics.histogram('job.duration', duration, { queue: 'orders', name: job.name });
-    metrics.increment('job.completed', { queue: 'orders' });
+    logger.info(
+      { ...logContext, duration, result: "success" },
+      "Job completed",
+    );
+    metrics.histogram("job.duration", duration, {
+      queue: "orders",
+      name: job.name,
+    });
+    metrics.increment("job.completed", { queue: "orders" });
 
     return result;
   } catch (error) {
     const duration = Date.now() - startTime;
-    logger.error({ ...logContext, duration, error }, 'Job failed');
-    metrics.increment('job.failed', { queue: 'orders' });
+    logger.error({ ...logContext, duration, error }, "Job failed");
+    metrics.increment("job.failed", { queue: "orders" });
     throw error;
   }
 });
@@ -489,24 +516,25 @@ const worker = new Worker('orders', async (job) => {
 ### OpenTelemetry Integration
 
 ```typescript
-import { trace, SpanKind } from '@opentelemetry/api';
+import { trace, SpanKind } from "@opentelemetry/api";
 
-const tracer = trace.getTracer('background-jobs');
+const tracer = trace.getTracer("background-jobs");
 
-const worker = new Worker('orders', async (job) => {
+const worker = new Worker("orders", async (job) => {
   const span = tracer.startSpan(`job:${job.name}`, {
     kind: SpanKind.CONSUMER,
     attributes: {
-      'job.id': job.id!,
-      'job.name': job.name,
-      'job.queue': 'orders',
-      'job.attempt': job.attemptsMade + 1,
+      "job.id": job.id!,
+      "job.name": job.name,
+      "job.queue": "orders",
+      "job.attempt": job.attemptsMade + 1,
     },
   });
 
   try {
-    const result = await trace.getTracer('background-jobs')
-      .startActiveSpan('process-order', async (childSpan) => {
+    const result = await trace
+      .getTracer("background-jobs")
+      .startActiveSpan("process-order", async (childSpan) => {
         const result = await processOrder(job.data);
         childSpan.end();
         return result;
@@ -532,10 +560,16 @@ const worker = new Worker('orders', async (job) => {
 // Publish one event, multiple queues consume it
 async function onOrderPlaced(order: Order) {
   await Promise.all([
-    emailQueue.add('order-confirmation', { orderId: order.id }),
-    inventoryQueue.add('reserve-items', { orderId: order.id, items: order.items }),
-    analyticsQueue.add('track-purchase', { orderId: order.id, total: order.total }),
-    notificationQueue.add('push-notification', { userId: order.userId }),
+    emailQueue.add("order-confirmation", { orderId: order.id }),
+    inventoryQueue.add("reserve-items", {
+      orderId: order.id,
+      items: order.items,
+    }),
+    analyticsQueue.add("track-purchase", {
+      orderId: order.id,
+      total: order.total,
+    }),
+    notificationQueue.add("push-notification", { userId: order.userId }),
   ]);
 }
 ```
@@ -545,18 +579,18 @@ async function onOrderPlaced(order: Order) {
 ```typescript
 // Use BullMQ flows for fan-in
 const flow = await flowProducer.add({
-  name: 'aggregate-report',
-  queueName: 'reports',
-  data: { reportId: 'monthly-2026-01' },
+  name: "aggregate-report",
+  queueName: "reports",
+  data: { reportId: "monthly-2026-01" },
   children: [
-    { name: 'fetch-region', queueName: 'data-fetch', data: { region: 'us' } },
-    { name: 'fetch-region', queueName: 'data-fetch', data: { region: 'eu' } },
-    { name: 'fetch-region', queueName: 'data-fetch', data: { region: 'apac' } },
+    { name: "fetch-region", queueName: "data-fetch", data: { region: "us" } },
+    { name: "fetch-region", queueName: "data-fetch", data: { region: "eu" } },
+    { name: "fetch-region", queueName: "data-fetch", data: { region: "apac" } },
   ],
 });
 
 // Parent job: aggregate when all children complete
-const reportWorker = new Worker('reports', async (job) => {
+const reportWorker = new Worker("reports", async (job) => {
   const childResults = await job.getChildrenValues();
   // childResults contains all region data
   const report = aggregateRegions(Object.values(childResults));
@@ -589,7 +623,7 @@ async function flushBatch() {
 
   clearTimeout(timer);
   const items = batch.splice(0);
-  await processBatch(items);  // Bulk insert, bulk API call, etc.
+  await processBatch(items); // Bulk insert, bulk API call, etc.
 }
 ```
 
@@ -599,11 +633,11 @@ async function flushBatch() {
 
 ### Comparison
 
-| Guarantee | Description | Achievable With |
-|-----------|-------------|-----------------|
-| At-most-once | Message processed 0 or 1 times. Fastest, lossy. | Fire-and-forget, no ACK |
-| At-least-once | Message processed 1 or more times. Requires idempotency. | ACK after processing + retries |
-| Exactly-once | Message processed exactly 1 time. Hard to achieve. | Idempotent consumer + transactional outbox |
+| Guarantee     | Description                                              | Achievable With                            |
+| ------------- | -------------------------------------------------------- | ------------------------------------------ |
+| At-most-once  | Message processed 0 or 1 times. Fastest, lossy.          | Fire-and-forget, no ACK                    |
+| At-least-once | Message processed 1 or more times. Requires idempotency. | ACK after processing + retries             |
+| Exactly-once  | Message processed exactly 1 time. Hard to achieve.       | Idempotent consumer + transactional outbox |
 
 ### At-Least-Once (Default for BullMQ, SQS, Kafka)
 
@@ -630,7 +664,7 @@ async function placeOrder(orderData: CreateOrderData) {
     await tx.outboxEvent.create({
       data: {
         aggregateId: order.id,
-        eventType: 'OrderPlaced',
+        eventType: "OrderPlaced",
         payload: JSON.stringify(order),
         published: false,
       },
@@ -643,7 +677,7 @@ async function placeOrder(orderData: CreateOrderData) {
 async function publishOutboxEvents() {
   const events = await db.outboxEvent.findMany({
     where: { published: false },
-    orderBy: { createdAt: 'asc' },
+    orderBy: { createdAt: "asc" },
     take: 100,
   });
 
@@ -661,16 +695,16 @@ async function publishOutboxEvents() {
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|-------------|---------|-----|
-| No idempotency | Duplicate processing on retries | Idempotency key + dedup check |
-| Unbounded retries | Broken jobs retry forever, wasting resources | Set `attempts` limit, use DLQ |
-| Large payloads in jobs | Redis memory bloat, slow serialization | Store data in DB, pass ID in job |
-| No job timeout | Stuck jobs block workers | Set `timeout` per job type |
-| Shared queue for everything | Priority inversion, noisy neighbors | Separate queues per concern |
-| No DLQ monitoring | Failed jobs silently accumulate | Alert on DLQ depth |
-| Fire-and-forget without logging | Lost jobs, no debugging trail | Always log job lifecycle |
-| Processing without tracing | Cannot correlate jobs with requests | Pass `correlationId`, use OTel |
+| Anti-Pattern                    | Problem                                      | Fix                              |
+| ------------------------------- | -------------------------------------------- | -------------------------------- |
+| No idempotency                  | Duplicate processing on retries              | Idempotency key + dedup check    |
+| Unbounded retries               | Broken jobs retry forever, wasting resources | Set `attempts` limit, use DLQ    |
+| Large payloads in jobs          | Redis memory bloat, slow serialization       | Store data in DB, pass ID in job |
+| No job timeout                  | Stuck jobs block workers                     | Set `timeout` per job type       |
+| Shared queue for everything     | Priority inversion, noisy neighbors          | Separate queues per concern      |
+| No DLQ monitoring               | Failed jobs silently accumulate              | Alert on DLQ depth               |
+| Fire-and-forget without logging | Lost jobs, no debugging trail                | Always log job lifecycle         |
+| Processing without tracing      | Cannot correlate jobs with requests          | Pass `correlationId`, use OTel   |
 
 ---
 

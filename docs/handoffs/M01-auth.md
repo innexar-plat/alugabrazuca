@@ -8,6 +8,7 @@
 ## O que foi entregue
 
 ### Banco de Dados
+
 - **4 tabelas** criadas via Prisma migration `m1_auth_tables`:
   - `users` — 22 campos (UUID pk, nome, email, passwordHash, phone, whatsapp, avatar, bio, nationality, languages[], currentCity, currentCountry, preferredLang, role enum, status enum, isVerified, emailVerified, provider, providerId, lastLoginAt, timestamps, softDelete)
   - `refresh_tokens` — rotação segura de tokens (tokenHash, expiresAt, isRevoked)
@@ -16,6 +17,7 @@
 - **Enums:** `UserRole` (tenant/host/admin), `UserStatus` (active/suspended/banned), `AuthProvider` (email/google), `Locale` (pt/en/es)
 
 ### Backend (NestJS)
+
 - **AuthModule** registrado no AppModule com PassportModule + JwtModule
 - **AuthService** — lógica completa:
   - `register()` — bcrypt (12 rounds), email único, token de verificação JWT
@@ -40,6 +42,7 @@
 - Sanitização XSS no campo `bio`
 
 ### Frontend (Next.js)
+
 - **8 páginas** implementadas:
   - **6 páginas auth** (grupo `(auth)`):
     - `/login` — formulário com email/senha, links, tratamento de erros específicos
@@ -56,6 +59,7 @@
 - **API client** (`lib/api.ts`) — fetch wrapper com auth headers, cookies, error handling
 
 ### Infraestrutura
+
 - Docker Compose rodando: PostgreSQL 16, Redis 7, MinIO (todos healthy)
 - Migration aplicada no banco
 
@@ -63,21 +67,21 @@
 
 ## Endpoints disponíveis
 
-| Método | Rota | Auth |
-|--------|------|------|
-| POST | `/api/v1/auth/register` | ❌ |
-| POST | `/api/v1/auth/login` | ❌ |
-| POST | `/api/v1/auth/logout` | ✅ |
-| POST | `/api/v1/auth/refresh` | ❌ (cookie) |
-| POST | `/api/v1/auth/forgot-password` | ❌ |
-| POST | `/api/v1/auth/reset-password` | ❌ (token) |
-| GET | `/api/v1/auth/verify-email/:token` | ❌ |
-| GET | `/api/v1/auth/google` | ❌ |
-| GET | `/api/v1/auth/google/callback` | ❌ |
-| GET | `/api/v1/users/me` | ✅ |
-| PATCH | `/api/v1/users/me` | ✅ |
-| PATCH | `/api/v1/users/me/password` | ✅ |
-| GET | `/api/v1/users/:id/public` | ❌ |
+| Método | Rota                               | Auth        |
+| ------ | ---------------------------------- | ----------- |
+| POST   | `/api/v1/auth/register`            | ❌          |
+| POST   | `/api/v1/auth/login`               | ❌          |
+| POST   | `/api/v1/auth/logout`              | ✅          |
+| POST   | `/api/v1/auth/refresh`             | ❌ (cookie) |
+| POST   | `/api/v1/auth/forgot-password`     | ❌          |
+| POST   | `/api/v1/auth/reset-password`      | ❌ (token)  |
+| GET    | `/api/v1/auth/verify-email/:token` | ❌          |
+| GET    | `/api/v1/auth/google`              | ❌          |
+| GET    | `/api/v1/auth/google/callback`     | ❌          |
+| GET    | `/api/v1/users/me`                 | ✅          |
+| PATCH  | `/api/v1/users/me`                 | ✅          |
+| PATCH  | `/api/v1/users/me/password`        | ✅          |
+| GET    | `/api/v1/users/:id/public`         | ❌          |
 
 ---
 

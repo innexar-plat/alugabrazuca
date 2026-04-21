@@ -25,7 +25,11 @@ Example:
   "retryable": false,
   "trace_id": "01JFDY9W9Q8Y2W7A9JY3VJQ3Z0",
   "errors": [
-    { "field": "email", "code": "invalid_format", "message": "Email must be valid" }
+    {
+      "field": "email",
+      "code": "invalid_format",
+      "message": "Email must be valid"
+    }
   ]
 }
 ```
@@ -41,15 +45,15 @@ Rules:
 
 Registry template:
 
-| code | http_status | retryable | type | title | Client action |
-|------|-------------|-----------|------|-------|---------------|
-| `validation_error` | 422 | No | `/problems/validation-error` | Validation Error | Fix request and retry |
-| `authentication_required` | 401 | No | `/problems/unauthorized` | Unauthorized | Re-authenticate |
-| `permission_denied` | 403 | No | `/problems/forbidden` | Forbidden | Stop, request access |
-| `resource_not_found` | 404 | No | `/problems/not-found` | Not Found | Stop or create |
-| `conflict` | 409 | No | `/problems/conflict` | Conflict | Resolve state, retry |
-| `rate_limited` | 429 | Yes | `/problems/rate-limited` | Too Many Requests | Backoff, respect Retry-After |
-| `upstream_unavailable` | 503 | Yes | `/problems/unavailable` | Service Unavailable | Retry with backoff/jitter |
+| code                      | http_status | retryable | type                         | title               | Client action                |
+| ------------------------- | ----------- | --------- | ---------------------------- | ------------------- | ---------------------------- |
+| `validation_error`        | 422         | No        | `/problems/validation-error` | Validation Error    | Fix request and retry        |
+| `authentication_required` | 401         | No        | `/problems/unauthorized`     | Unauthorized        | Re-authenticate              |
+| `permission_denied`       | 403         | No        | `/problems/forbidden`        | Forbidden           | Stop, request access         |
+| `resource_not_found`      | 404         | No        | `/problems/not-found`        | Not Found           | Stop or create               |
+| `conflict`                | 409         | No        | `/problems/conflict`         | Conflict            | Resolve state, retry         |
+| `rate_limited`            | 429         | Yes       | `/problems/rate-limited`     | Too Many Requests   | Backoff, respect Retry-After |
+| `upstream_unavailable`    | 503         | Yes       | `/problems/unavailable`      | Service Unavailable | Retry with backoff/jitter    |
 
 ### 3) HTTP Header Requirements
 

@@ -1,18 +1,20 @@
-# Modern Software Architecture Patterns 
+# Modern Software Architecture Patterns
 
-Comprehensive guide to contemporary architecture patterns based on  industry trends and practices.
+Comprehensive guide to contemporary architecture patterns based on industry trends and practices.
 
 ## Top Architecture Patterns
 
 ### 1. Microservices Architecture
 
 **When to use**:
+
 - Multiple independent teams
 - Need independent deployment and scaling
 - Different technologies for different services
 - Clear bounded contexts
 
 **Structure**:
+
 ```
 ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
 │   Service   │  │   Service   │  │   Service   │
@@ -29,6 +31,7 @@ Comprehensive guide to contemporary architecture patterns based on  industry tre
 ```
 
 **Best practices**:
+
 - **Service discovery**: Use Consul, Eureka, or Kubernetes DNS
 - **API Gateway**: Single entry point, authentication, rate limiting
 - **Communication**: REST for synchronous, message queues for async
@@ -36,6 +39,7 @@ Comprehensive guide to contemporary architecture patterns based on  industry tre
 - **Deployment**: Containerization (Docker) + orchestration (Kubernetes)
 
 **Challenges**:
+
 - Distributed system complexity
 - Network latency and failures
 - Data consistency across services
@@ -43,6 +47,7 @@ Comprehensive guide to contemporary architecture patterns based on  industry tre
 - Operational overhead
 
 **Mitigation**:
+
 ```yaml
 # Service mesh (Istio/Linkerd) for:
 - Service-to-service authentication
@@ -55,12 +60,14 @@ Comprehensive guide to contemporary architecture patterns based on  industry tre
 ### 2. Event-Driven Architecture (EDA)
 
 **When to use**:
+
 - Real-time data processing
 - Asynchronous workflows
 - Decoupled systems
 - High scalability requirements
 
 **Structure**:
+
 ```
 ┌──────────┐       ┌──────────────┐       ┌──────────┐
 │ Producer │──────▶│ Event Broker │──────▶│ Consumer │
@@ -74,6 +81,7 @@ Comprehensive guide to contemporary architecture patterns based on  industry tre
 **Event patterns**:
 
 **Event Notification**:
+
 ```json
 {
   "eventType": "OrderPlaced",
@@ -83,27 +91,30 @@ Comprehensive guide to contemporary architecture patterns based on  industry tre
 ```
 
 **Event-Carried State Transfer**:
+
 ```json
 {
   "eventType": "OrderPlaced",
   "orderId": "12345",
-  "customer": {"id": "C123", "name": "John"},
-  "items": [{"id": "P456", "qty": 2}],
+  "customer": { "id": "C123", "name": "John" },
+  "items": [{ "id": "P456", "qty": 2 }],
   "total": 99.99,
   "timestamp": "2023-06-15T10:30:00Z"
 }
 ```
 
 **Event Sourcing**:
+
 ```json
 [
-  {"event": "OrderCreated", "orderId": "12345", "seq": 1},
-  {"event": "ItemAdded", "orderId": "12345", "itemId": "P456", "seq": 2},
-  {"event": "OrderPaid", "orderId": "12345", "amount": 99.99, "seq": 3}
+  { "event": "OrderCreated", "orderId": "12345", "seq": 1 },
+  { "event": "ItemAdded", "orderId": "12345", "itemId": "P456", "seq": 2 },
+  { "event": "OrderPaid", "orderId": "12345", "amount": 99.99, "seq": 3 }
 ]
 ```
 
 **Best practices**:
+
 - **Idempotency**: Handle duplicate events gracefully
 - **Schema evolution**: Use versioned event schemas
 - **Error handling**: Dead letter queues for failed events
@@ -111,6 +122,7 @@ Comprehensive guide to contemporary architecture patterns based on  industry tre
 - **Ordering**: Use partition keys for ordered processing
 
 **Tools**:
+
 - Apache Kafka - High-throughput distributed streaming
 - RabbitMQ - Flexible message broker
 - AWS EventBridge - Serverless event bus
@@ -119,12 +131,14 @@ Comprehensive guide to contemporary architecture patterns based on  industry tre
 ### 3. Serverless Architecture
 
 **When to use**:
+
 - Variable/unpredictable load
 - Event-driven workloads
 - Rapid development and deployment
 - Cost optimization (pay per use)
 
 **Structure**:
+
 ```
 ┌─────────┐      ┌──────────────┐      ┌─────────┐
 │  Event  │─────▶│   Function   │─────▶│  Store  │
@@ -140,6 +154,7 @@ Event Sources:
 ```
 
 **Best practices**:
+
 - **Cold start mitigation**: Keep functions warm with provisioned concurrency
 - **Stateless design**: Use external state stores (Redis, DynamoDB)
 - **Granular functions**: Single responsibility (≤300 LOC)
@@ -147,6 +162,7 @@ Event Sources:
 - **Observability**: Use X-Ray, CloudWatch, or DataDog
 
 **Example - AWS Lambda**:
+
 ```javascript
 // Optimized function structure
 export const handler = async (event) => {
@@ -159,8 +175,8 @@ export const handler = async (event) => {
   // Response
   return {
     statusCode: 200,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(result)
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(result),
   };
 };
 
@@ -169,6 +185,7 @@ const db = initDatabase();
 ```
 
 **Cost optimization**:
+
 - Use ARM-based functions (Graviton) - 20% cheaper
 - Right-size memory allocation
 - Use step functions for orchestration
@@ -177,12 +194,14 @@ const db = initDatabase();
 ### 4. Layered (N-Tier) Architecture
 
 **When to use**:
+
 - Monolithic applications
 - Clear separation of concerns needed
 - Team familiar with traditional patterns
 - Moderate complexity
 
 **Classic layers**:
+
 ```
 ┌──────────────────────────┐
 │  Presentation Layer      │  ← Controllers, Views, API endpoints
@@ -198,6 +217,7 @@ const db = initDatabase();
 **Dependency rule**: Outer layers depend on inner layers only
 
 **Example structure**:
+
 ```
 src/
 ├── controllers/          # HTTP request handlers
@@ -213,6 +233,7 @@ src/
 ```
 
 **Best practices**:
+
 - **Dependency injection**: Pass dependencies, don't hardcode
 - **Interface segregation**: Define clear contracts between layers
 - **Error propagation**: Handle errors at appropriate layer
@@ -221,12 +242,14 @@ src/
 ### 5. Hexagonal Architecture (Ports & Adapters)
 
 **When to use**:
+
 - Need high testability
 - Multiple interfaces (REST, GraphQL, CLI)
 - Business logic must be technology-agnostic
 - Long-term maintainability priority
 
 **Structure**:
+
 ```
         ┌─────────────────────────┐
         │   Application Core      │
@@ -251,6 +274,7 @@ src/
 ```
 
 **Implementation**:
+
 ```typescript
 // Core domain (technology-agnostic)
 interface UserRepository {
@@ -263,7 +287,7 @@ class UserService {
 
   async activateUser(id: string): Promise<User> {
     const user = await this.userRepo.findById(id);
-    user.activate();  // Business logic
+    user.activate(); // Business logic
     await this.userRepo.save(user);
     return user;
   }
@@ -272,12 +296,12 @@ class UserService {
 // Adapters (technology-specific)
 class PostgresUserRepository implements UserRepository {
   async findById(id: string): Promise<User> {
-    const row = await db.query('SELECT * FROM users WHERE id = $1', [id]);
+    const row = await db.query("SELECT * FROM users WHERE id = $1", [id]);
     return User.fromDatabase(row);
   }
 
   async save(user: User): Promise<void> {
-    await db.query('UPDATE users SET ...', user.toDatabase());
+    await db.query("UPDATE users SET ...", user.toDatabase());
   }
 }
 
@@ -294,12 +318,14 @@ class RestAdapter {
 ### 6. CQRS (Command Query Responsibility Segregation)
 
 **When to use**:
+
 - Read and write patterns are very different
 - High read:write ratio
 - Complex reporting requirements
 - Need independent scaling of reads and writes
 
 **Structure**:
+
 ```
            ┌─────────────┐
            │   Command   │
@@ -323,12 +349,13 @@ class RestAdapter {
 ```
 
 **Example**:
+
 ```typescript
 // Command (Write)
 class CreateOrderCommand {
   constructor(
     public customerId: string,
-    public items: OrderItem[]
+    public items: OrderItem[],
   ) {}
 }
 
@@ -351,7 +378,7 @@ class OrderQueryHandler {
   async handle(query: GetCustomerOrdersQuery) {
     // Read from optimized read model
     return await readDb.customerOrders.find({
-      customerId: query.customerId
+      customerId: query.customerId,
     });
   }
 }
@@ -373,12 +400,14 @@ class OrderCreatedEventHandler {
 ### 7. Modular Monolith
 
 **When to use**:
+
 - Team size 5-30 developers
 - Want clear boundaries without microservices overhead
 - Need faster development than microservices
 - Shared domain concepts across modules
 
 **Structure**:
+
 ```
 monolith/
 ├── modules/
@@ -400,6 +429,7 @@ monolith/
 ```
 
 **Module boundaries**:
+
 ```typescript
 // orders/api/OrdersModule.ts (public API)
 export class OrdersModule {
@@ -413,7 +443,7 @@ export class OrdersModule {
 }
 
 // payments/PaymentsService.ts
-import { OrdersModule } from '../orders/api/OrdersModule';
+import { OrdersModule } from "../orders/api/OrdersModule";
 
 class PaymentsService {
   async processPayment(orderId: string) {
@@ -425,6 +455,7 @@ class PaymentsService {
 ```
 
 **Advantages over microservices**:
+
 - Single deployment (simpler CI/CD)
 - No network latency between modules
 - Shared transactions possible
@@ -433,6 +464,7 @@ class PaymentsService {
 ### 8. Micro-Frontend Architecture
 
 **When to use**:
+
 - Multiple teams working on different features
 - Different technology stacks for different parts
 - Independent deployment of UI components
@@ -441,6 +473,7 @@ class PaymentsService {
 **Approaches**:
 
 **A) Server-side composition (SSR)**:
+
 ```nginx
 # Nginx routes different paths to different apps
 location /products {
@@ -452,39 +485,41 @@ location /checkout {
 ```
 
 **B) Build-time composition (Module Federation)**:
+
 ```javascript
 // Webpack Module Federation
 module.exports = {
   plugins: [
     new ModuleFederationPlugin({
-      name: 'products',
-      filename: 'remoteEntry.js',
+      name: "products",
+      filename: "remoteEntry.js",
       exposes: {
-        './ProductList': './src/components/ProductList'
+        "./ProductList": "./src/components/ProductList",
       },
-      shared: ['react', 'react-dom']
-    })
-  ]
+      shared: ["react", "react-dom"],
+    }),
+  ],
 };
 
 // Host app imports remote component
-const ProductList = React.lazy(() => import('products/ProductList'));
+const ProductList = React.lazy(() => import("products/ProductList"));
 ```
 
 **C) Runtime composition (Single-SPA)**:
+
 ```javascript
-import { registerApplication, start } from 'single-spa';
+import { registerApplication, start } from "single-spa";
 
 registerApplication({
-  name: 'products',
-  app: () => import('./products/main.js'),
-  activeWhen: location => location.pathname.startsWith('/products')
+  name: "products",
+  app: () => import("./products/main.js"),
+  activeWhen: (location) => location.pathname.startsWith("/products"),
 });
 
 registerApplication({
-  name: 'checkout',
-  app: () => import('./checkout/main.js'),
-  activeWhen: '/checkout'
+  name: "checkout",
+  app: () => import("./checkout/main.js"),
+  activeWhen: "/checkout",
 });
 
 start();
@@ -493,12 +528,14 @@ start();
 ### 9. Service Mesh Architecture
 
 **When to use**:
+
 - Microservices at scale (10+ services)
 - Need advanced traffic management
 - Security and observability are critical
 - Polyglot microservices
 
 **Structure**:
+
 ```
 Service A ──▶ Sidecar Proxy (Envoy)
                │                    ──▶ Sidecar Proxy ──▶ Service B
@@ -510,11 +547,13 @@ Service A ──▶ Sidecar Proxy (Envoy)
 ```
 
 **Features**:
+
 - **Traffic management**: Load balancing, circuit breaking, retries
 - **Security**: Mutual TLS, authorization policies
 - **Observability**: Distributed tracing, metrics, logging
 
 **Example - Istio**:
+
 ```yaml
 # Virtual Service (traffic routing)
 apiVersion: networking.istio.io/v1beta1
@@ -561,12 +600,14 @@ spec:
 ### 10. Edge Computing Architecture
 
 **When to use**:
+
 - Need ultra-low latency
 - IoT applications
 - Content delivery
 - Real-time processing
 
 **Structure**:
+
 ```
 ┌─────────────────────────────────────────┐
 │         Cloud (Central)                 │
@@ -592,14 +633,16 @@ spec:
 ```
 
 **Use cases**:
+
 - CDN edge workers (Cloudflare Workers, Lambda@Edge)
 - Smart city sensors
 - Industrial IoT
 - Autonomous vehicles
 
 **Example - Cloudflare Worker**:
+
 ```javascript
-addEventListener('fetch', event => {
+addEventListener("fetch", (event) => {
   event.respondWith(handleRequest(event.request));
 });
 
@@ -650,30 +693,40 @@ Start: What are you building?
 ## Anti-Patterns to Avoid
 
 ### 1. Distributed Monolith
+
 Microservices that are tightly coupled:
+
 ```
 [FAIL] Service A calls Service B, which calls Service C, which calls Service A
 [OK] Use message queues or events to decouple
 ```
 
 ### 2. God Service
+
 One service that does everything:
+
 ```
 [FAIL] UserOrderPaymentShippingService
 [OK] UserService, OrderService, PaymentService, ShippingService
 ```
 
 ### 3. Anemic Domain Model
+
 Models with no behavior, just getters/setters:
+
 ```typescript
-[FAIL] // Anemic
+[FAIL]; // Anemic
 class Order {
   items: OrderItem[];
-  getItems() { return this.items; }
-  setItems(items) { this.items = items; }
+  getItems() {
+    return this.items;
+  }
+  setItems(items) {
+    this.items = items;
+  }
 }
 
-[OK] // Rich domain model
+[OK]; // Rich domain model
 class Order {
   private items: OrderItem[];
 
@@ -684,13 +737,15 @@ class Order {
   }
 
   canBeCancelled(): boolean {
-    return this.status === 'pending' && !this.isPaid;
+    return this.status === "pending" && !this.isPaid;
   }
 }
 ```
 
 ### 4. Chatty APIs
+
 Too many network calls:
+
 ```
 [FAIL] GET /users/1, GET /users/1/orders, GET /orders/1/items
 [OK] GET /users/1?include=orders.items

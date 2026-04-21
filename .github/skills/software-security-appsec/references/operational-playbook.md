@@ -36,30 +36,30 @@ See [references/owasp-top-10.md](owasp-top-10.md) for detailed prevention strate
 
 ```javascript
 // Good: Secure JWT implementation
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 // Generate token
 const token = jwt.sign(
   { userId: user.id, role: user.role },
   process.env.JWT_SECRET,
   {
-    expiresIn: '15m',
-    algorithm: 'HS256',
-    issuer: 'your-app',
-    audience: 'your-api'
-  }
+    expiresIn: "15m",
+    algorithm: "HS256",
+    issuer: "your-app",
+    audience: "your-api",
+  },
 );
 
 // Verify token
 const verifyToken = (token) => {
   try {
     return jwt.verify(token, process.env.JWT_SECRET, {
-      algorithms: ['HS256'],
-      issuer: 'your-app',
-      audience: 'your-api'
+      algorithms: ["HS256"],
+      issuer: "your-app",
+      audience: "your-api",
     });
   } catch (error) {
-    throw new AuthenticationError('Invalid token');
+    throw new AuthenticationError("Invalid token");
   }
 };
 ```
@@ -100,11 +100,11 @@ See [references/authentication-authorization.md](authentication-authorization.md
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      return res.status(401).json({ error: "Not authenticated" });
     }
 
     if (!allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({ error: 'Insufficient permissions' });
+      return res.status(403).json({ error: "Insufficient permissions" });
     }
 
     next();
@@ -112,10 +112,11 @@ const requireRole = (...allowedRoles) => {
 };
 
 // Usage
-app.delete('/api/users/:id',
+app.delete(
+  "/api/users/:id",
   authenticate,
-  requireRole('admin', 'moderator'),
-  deleteUser
+  requireRole("admin", "moderator"),
+  deleteUser,
 );
 ```
 
@@ -128,18 +129,18 @@ const canAccessResource = (user, resource, action) => {
     subject: {
       userId: user.id,
       role: user.role,
-      department: user.department
+      department: user.department,
     },
     resource: {
       id: resource.id,
       ownerId: resource.ownerId,
-      classification: resource.classification
+      classification: resource.classification,
     },
     action: action,
     context: {
       time: new Date(),
-      ipAddress: user.ipAddress
-    }
+      ipAddress: user.ipAddress,
+    },
   };
 
   return evaluatePolicy(policy);
@@ -147,11 +148,13 @@ const canAccessResource = (user, resource, action) => {
 ```
 
 **Authorization Models:**
+
 - **RBAC**: Simple role-based permissions (admin, user, moderator)
 - **ABAC**: Complex attribute-based rules (time, location, resource attributes)
 - **ReBAC**: Relationship-based (owner, collaborator, viewer)
 
 **When to use:**
+
 - RBAC: Limited, well-defined roles (<10 roles)
 - ABAC: Complex, context-dependent permissions
 - Hybrid: Combine RBAC + ABAC for most systems
@@ -173,7 +176,7 @@ const validateUsername = (username) => {
   const regex = /^[a-zA-Z0-9_]{3,20}$/;
 
   if (!regex.test(username)) {
-    throw new ValidationError('Invalid username format');
+    throw new ValidationError("Invalid username format");
   }
 
   return username;
@@ -184,7 +187,7 @@ const validateEmail = (email) => {
   const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   if (!regex.test(email) || email.length > 254) {
-    throw new ValidationError('Invalid email format');
+    throw new ValidationError("Invalid email format");
   }
 
   return email.toLowerCase();
@@ -198,7 +201,7 @@ const validateEmail = (email) => {
 const query = `SELECT * FROM users WHERE id = ${userId}`;
 
 // Good: Parameterized queries
-const query = 'SELECT * FROM users WHERE id = ?';
+const query = "SELECT * FROM users WHERE id = ?";
 const results = await db.execute(query, [userId]);
 
 // Good: ORM (Sequelize example)
@@ -209,27 +212,27 @@ const user = await User.findOne({ where: { id: userId } });
 
 ```javascript
 // Good: HTML sanitization
-const DOMPurify = require('dompurify');
-const { JSDOM } = require('jsdom');
+const DOMPurify = require("dompurify");
+const { JSDOM } = require("jsdom");
 
 const sanitizeHtml = (dirty) => {
-  const window = new JSDOM('').window;
+  const window = new JSDOM("").window;
   const purify = DOMPurify(window);
 
   return purify.sanitize(dirty, {
-    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p'],
-    ALLOWED_ATTR: ['href']
+    ALLOWED_TAGS: ["b", "i", "em", "strong", "a", "p"],
+    ALLOWED_ATTR: ["href"],
   });
 };
 
 // Good: Output encoding
 const escapeHtml = (text) => {
   const map = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#x27;'
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#x27;",
   };
 
   return text.replace(/[&<>"']/g, (char) => map[char]);
@@ -290,7 +293,7 @@ See [references/input-validation.md](input-validation.md) for comprehensive patt
 
 ```javascript
 // Good: Modern password hashing
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 // Hash password
 const hashPassword = async (password) => {
@@ -304,14 +307,14 @@ const verifyPassword = async (password, hash) => {
 };
 
 // Alternative: Argon2 (recommended for new projects)
-const argon2 = require('argon2');
+const argon2 = require("argon2");
 
 const hashPassword = async (password) => {
   return await argon2.hash(password, {
     type: argon2.argon2id,
     memoryCost: 2 ** 16,
     timeCost: 3,
-    parallelism: 1
+    parallelism: 1,
   });
 };
 ```
@@ -320,41 +323,42 @@ const hashPassword = async (password) => {
 
 ```javascript
 // Good: AES-256-GCM encryption
-const crypto = require('crypto');
+const crypto = require("crypto");
 
 const encrypt = (text, key) => {
   const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
 
-  let encrypted = cipher.update(text, 'utf8', 'hex');
-  encrypted += cipher.final('hex');
+  let encrypted = cipher.update(text, "utf8", "hex");
+  encrypted += cipher.final("hex");
 
   const authTag = cipher.getAuthTag();
 
   return {
     encrypted,
-    iv: iv.toString('hex'),
-    authTag: authTag.toString('hex')
+    iv: iv.toString("hex"),
+    authTag: authTag.toString("hex"),
   };
 };
 
 const decrypt = (encrypted, key, iv, authTag) => {
   const decipher = crypto.createDecipheriv(
-    'aes-256-gcm',
+    "aes-256-gcm",
     key,
-    Buffer.from(iv, 'hex')
+    Buffer.from(iv, "hex"),
   );
 
-  decipher.setAuthTag(Buffer.from(authTag, 'hex'));
+  decipher.setAuthTag(Buffer.from(authTag, "hex"));
 
-  let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-  decrypted += decipher.final('utf8');
+  let decrypted = decipher.update(encrypted, "hex", "utf8");
+  decrypted += decipher.final("utf8");
 
   return decrypted;
 };
 ```
 
 **Cryptography standards:**
+
 - **Password hashing**: bcrypt (cost 12+), scrypt, Argon2id
 - **Symmetric encryption**: AES-256-GCM
 - **Asymmetric encryption**: RSA-2048+ or ECC (secp256r1)
@@ -374,30 +378,32 @@ See [references/cryptography-standards.md](cryptography-standards.md) for detail
 
 ```javascript
 // Good: Comprehensive security headers
-const helmet = require('helmet');
+const helmet = require("helmet");
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", 'data:', 'https:']
-    }
-  },
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true
-  }
-}));
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", "data:", "https:"],
+      },
+    },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+  }),
+);
 
 // Additional headers
 app.use((req, res, next) => {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
   next();
 });
 ```
@@ -406,51 +412,51 @@ app.use((req, res, next) => {
 
 ```javascript
 // Good: Rate limiting
-const rateLimit = require('express-rate-limit');
+const rateLimit = require("express-rate-limit");
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per window
-  message: 'Too many requests, please try again later',
+  message: "Too many requests, please try again later",
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
 });
 
-app.use('/api/', limiter);
+app.use("/api/", limiter);
 
 // Stricter limits for sensitive endpoints
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
-  skipSuccessfulRequests: true
+  skipSuccessfulRequests: true,
 });
 
-app.post('/api/auth/login', authLimiter, loginHandler);
+app.post("/api/auth/login", authLimiter, loginHandler);
 ```
 
 ### CORS Configuration
 
 ```javascript
 // Good: Strict CORS configuration
-const cors = require('cors');
+const cors = require("cors");
 
 const corsOptions = {
   origin: (origin, callback) => {
     const allowedOrigins = [
-      'https://app.example.com',
-      'https://admin.example.com'
+      "https://app.example.com",
+      "https://admin.example.com",
     ];
 
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true,
   optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
@@ -466,21 +472,21 @@ See [assets/api/template-secure-api.md](../assets/api/template-secure-api.md) fo
 
 ```javascript
 // Bad: Unsafe file access
-const filePath = path.join('/uploads', req.params.filename);
+const filePath = path.join("/uploads", req.params.filename);
 
 // Good: Validate and sanitize
 const sanitizeFilename = (filename) => {
   // Remove path separators and null bytes
-  const clean = filename.replace(/[\/\\.\0]/g, '');
+  const clean = filename.replace(/[\/\\.\0]/g, "");
 
   if (clean !== filename || clean.length === 0) {
-    throw new ValidationError('Invalid filename');
+    throw new ValidationError("Invalid filename");
   }
 
   return clean;
 };
 
-const filePath = path.join('/uploads', sanitizeFilename(req.params.filename));
+const filePath = path.join("/uploads", sanitizeFilename(req.params.filename));
 ```
 
 ### Command Injection
@@ -490,15 +496,15 @@ const filePath = path.join('/uploads', sanitizeFilename(req.params.filename));
 exec(`convert ${userInput} output.png`);
 
 // Good: Use libraries or sanitize
-const sharp = require('sharp');
-await sharp(validatedInput).toFile('output.png');
+const sharp = require("sharp");
+await sharp(validatedInput).toFile("output.png");
 
 // If shell is necessary: strict validation + escaping
-const { execFile } = require('child_process');
-const allowedCommands = ['convert', 'ffmpeg'];
+const { execFile } = require("child_process");
+const allowedCommands = ["convert", "ffmpeg"];
 
 if (!allowedCommands.includes(command)) {
-  throw new Error('Invalid command');
+  throw new Error("Invalid command");
 }
 
 execFile(command, [validatedArg1, validatedArg2]);
@@ -516,7 +522,7 @@ const parseData = (input) => {
     const data = JSON.parse(input);
     return validateSchema(data);
   } catch (error) {
-    throw new ValidationError('Invalid data format');
+    throw new ValidationError("Invalid data format");
   }
 };
 ```
@@ -528,6 +534,7 @@ See [references/common-vulnerabilities.md](common-vulnerabilities.md) for compre
 ## Security Testing Checklist
 
 **Authentication:**
+
 - [ ] Password strength requirements enforced
 - [ ] Multi-factor authentication available
 - [ ] Account lockout after failed attempts
@@ -535,6 +542,7 @@ See [references/common-vulnerabilities.md](common-vulnerabilities.md) for compre
 - [ ] Session timeout configured
 
 **Authorization:**
+
 - [ ] Principle of least privilege applied
 - [ ] Authorization checked on every request
 - [ ] Direct object references protected
@@ -542,6 +550,7 @@ See [references/common-vulnerabilities.md](common-vulnerabilities.md) for compre
 - [ ] Horizontal privilege escalation prevented
 
 **Input Validation:**
+
 - [ ] Server-side validation on all inputs
 - [ ] Allowlist validation approach
 - [ ] Output encoding before rendering
@@ -549,6 +558,7 @@ See [references/common-vulnerabilities.md](common-vulnerabilities.md) for compre
 - [ ] File upload validation (type, size, content)
 
 **Data Protection:**
+
 - [ ] Sensitive data encrypted at rest
 - [ ] TLS 1.3 for data in transit
 - [ ] Secrets in environment variables, not code
@@ -556,12 +566,14 @@ See [references/common-vulnerabilities.md](common-vulnerabilities.md) for compre
 - [ ] Secure key management
 
 **Error Handling:**
+
 - [ ] Generic error messages to users
 - [ ] Detailed errors logged server-side
 - [ ] Stack traces not exposed
 - [ ] Failed operations don't leak information
 
 **Logging & Monitoring:**
+
 - [ ] Security events logged
 - [ ] Sensitive data not in logs
 - [ ] Log integrity protected

@@ -28,9 +28,7 @@ export default function FaqPage() {
 
   return (
     <section className="px-4 py-16 sm:py-24">
-      <FaqPageJsonLd
-        faqs={faqs.map((f) => ({ question: f.q, answer: f.a }))}
-      />
+      <FaqPageJsonLd faqs={faqs.map((f) => ({ question: f.q, answer: f.a }))} />
       <div className="mx-auto max-w-3xl">
         <h1 className="text-3xl font-bold text-foreground sm:text-4xl">
           {t("title")}

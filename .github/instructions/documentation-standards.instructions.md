@@ -15,6 +15,7 @@ description: "Use when: writing README, documentation, changelogs, API docs, cod
 > Descrição curta em uma linha.
 
 ## Requisitos
+
 - Node.js >= 20
 - PostgreSQL >= 15
 - Redis >= 7
@@ -32,30 +33,30 @@ npm run dev
 
 ## Variáveis de Ambiente
 
-| Variável | Descrição | Exemplo |
-|----------|-----------|---------|
+| Variável       | Descrição                  | Exemplo                               |
+| -------------- | -------------------------- | ------------------------------------- |
 | `DATABASE_URL` | Connection string do banco | `postgresql://user:pass@localhost/db` |
-| `JWT_SECRET` | Chave secreta para JWT | string aleatória de 64 chars |
-| `PORT` | Porta da aplicação | `3000` |
+| `JWT_SECRET`   | Chave secreta para JWT     | string aleatória de 64 chars          |
+| `PORT`         | Porta da aplicação         | `3000`                                |
 
 ## Scripts disponíveis
 
-| Comando | Descrição |
-|---------|-----------|
-| `npm run dev` | Inicia em modo desenvolvimento |
-| `npm run build` | Gera build de produção |
-| `npm run test` | Executa todos os testes |
-| `npm run test:cov` | Testes com cobertura |
-| `npm run db:migrate` | Executa migrations |
+| Comando              | Descrição                      |
+| -------------------- | ------------------------------ |
+| `npm run dev`        | Inicia em modo desenvolvimento |
+| `npm run build`      | Gera build de produção         |
+| `npm run test`       | Executa todos os testes        |
+| `npm run test:cov`   | Testes com cobertura           |
+| `npm run db:migrate` | Executa migrations             |
 
 ## Estrutura do Projeto
 
 \`\`\`
 src/
-  modules/     ← módulos por domínio
-  common/      ← helpers, decorators, filtros globais
-  config/      ← configurações da aplicação
-  main.ts      ← entry point
+modules/ ← módulos por domínio
+common/ ← helpers, decorators, filtros globais
+config/ ← configurações da aplicação
+main.ts ← entry point
 \`\`\`
 
 ## Contribuição
@@ -68,12 +69,14 @@ Ver [CONTRIBUTING.md](./CONTRIBUTING.md)
 ## 2. Comentários no Código
 
 ### Quando comentar
+
 - Decisões não óbvias (`// Usando setTimeout para evitar race condition com o webhook`)
 - Workarounds com link para issue (`// TODO: remover após fix da lib. Issue: #234`)
 - Regex complexos (`// Valida CPF no formato 000.000.000-00`)
 - Algoritmos não triviais
 
 ### Quando NÃO comentar
+
 - O que o código já diz claramente
 - `// incrementa i por 1` em `i++`
 - Código comentado — deletar, o git guarda o histórico
@@ -96,6 +99,7 @@ async processPayment(orderId: string, paymentData: PaymentDto): Promise<PaymentR
 ```
 
 Usar JSDoc em:
+
 - Funções públicas de services
 - Funções utilitárias compartilhadas
 - Tipos e interfaces complexas
@@ -112,20 +116,25 @@ Seguir o padrão [Keep a Changelog](https://keepachangelog.com):
 ## [2.1.0] - 2026-03-15
 
 ### Added
+
 - Autenticação via Google OAuth
 
 ### Changed
+
 - Limite de rate limiting aumentado para 100 req/min
 
 ### Fixed
+
 - Correção no cálculo de desconto com cupom + promoção
 
 ### Security
+
 - Atualização do bcrypt para versão 5.x (CVE-2023-xxxx)
 
 ## [2.0.0] - 2026-01-10
 
 ### Breaking Changes
+
 - Endpoint `/users` agora requer autenticação
 ```
 
@@ -144,6 +153,7 @@ async createUser(@Body() dto: CreateUserDto) {}
 ```
 
 Documentar em Swagger:
+
 - Todos os endpoints
 - Todos os parâmetros (query, path, body)
 - Todas as respostas possíveis (incluindo erros)

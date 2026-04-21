@@ -14,32 +14,32 @@ Copy-paste ready implementation for RBAC, ABAC, and permission-based authorizati
 // Define permissions
 const PERMISSIONS = {
   // User permissions
-  USERS_READ: 'users:read',
-  USERS_WRITE: 'users:write',
-  USERS_DELETE: 'users:delete',
+  USERS_READ: "users:read",
+  USERS_WRITE: "users:write",
+  USERS_DELETE: "users:delete",
 
   // Post permissions
-  POSTS_READ: 'posts:read',
-  POSTS_WRITE: 'posts:write',
-  POSTS_DELETE: 'posts:delete',
-  POSTS_PUBLISH: 'posts:publish',
+  POSTS_READ: "posts:read",
+  POSTS_WRITE: "posts:write",
+  POSTS_DELETE: "posts:delete",
+  POSTS_PUBLISH: "posts:publish",
 
   // Settings permissions
-  SETTINGS_READ: 'settings:read',
-  SETTINGS_WRITE: 'settings:write',
+  SETTINGS_READ: "settings:read",
+  SETTINGS_WRITE: "settings:write",
 
   // Billing permissions
-  BILLING_READ: 'billing:read',
-  BILLING_WRITE: 'billing:write'
+  BILLING_READ: "billing:read",
+  BILLING_WRITE: "billing:write",
 };
 
 // Define roles
 const ROLES = {
-  ADMIN: 'admin',
-  MODERATOR: 'moderator',
-  EDITOR: 'editor',
-  USER: 'user',
-  GUEST: 'guest'
+  ADMIN: "admin",
+  MODERATOR: "moderator",
+  EDITOR: "editor",
+  USER: "user",
+  GUEST: "guest",
 };
 
 // Role-permission mapping
@@ -55,26 +55,21 @@ const ROLE_PERMISSIONS = {
     PERMISSIONS.SETTINGS_READ,
     PERMISSIONS.SETTINGS_WRITE,
     PERMISSIONS.BILLING_READ,
-    PERMISSIONS.BILLING_WRITE
+    PERMISSIONS.BILLING_WRITE,
   ],
   [ROLES.MODERATOR]: [
     PERMISSIONS.USERS_READ,
     PERMISSIONS.POSTS_READ,
     PERMISSIONS.POSTS_WRITE,
-    PERMISSIONS.POSTS_DELETE
+    PERMISSIONS.POSTS_DELETE,
   ],
   [ROLES.EDITOR]: [
     PERMISSIONS.POSTS_READ,
     PERMISSIONS.POSTS_WRITE,
-    PERMISSIONS.POSTS_PUBLISH
+    PERMISSIONS.POSTS_PUBLISH,
   ],
-  [ROLES.USER]: [
-    PERMISSIONS.POSTS_READ,
-    PERMISSIONS.POSTS_WRITE
-  ],
-  [ROLES.GUEST]: [
-    PERMISSIONS.POSTS_READ
-  ]
+  [ROLES.USER]: [PERMISSIONS.POSTS_READ, PERMISSIONS.POSTS_WRITE],
+  [ROLES.GUEST]: [PERMISSIONS.POSTS_READ],
 };
 
 // Helper functions
@@ -89,12 +84,12 @@ const hasPermission = (role, permission) => {
 
 const hasAnyPermission = (role, requiredPermissions) => {
   const permissions = getRolePermissions(role);
-  return requiredPermissions.some(p => permissions.includes(p));
+  return requiredPermissions.some((p) => permissions.includes(p));
 };
 
 const hasAllPermissions = (role, requiredPermissions) => {
   const permissions = getRolePermissions(role);
-  return requiredPermissions.every(p => permissions.includes(p));
+  return requiredPermissions.every((p) => permissions.includes(p));
 };
 
 module.exports = {
@@ -104,7 +99,7 @@ module.exports = {
   getRolePermissions,
   hasPermission,
   hasAnyPermission,
-  hasAllPermissions
+  hasAllPermissions,
 };
 ```
 
@@ -112,20 +107,20 @@ module.exports = {
 
 ```javascript
 // middleware/authorize.js
-const { hasPermission, hasAllPermissions } = require('../config/permissions');
+const { hasPermission, hasAllPermissions } = require("../config/permissions");
 
 // Require specific role(s)
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      return res.status(401).json({ error: "Not authenticated" });
     }
 
     if (!allowedRoles.includes(req.user.role)) {
       return res.status(403).json({
-        error: 'Insufficient permissions',
+        error: "Insufficient permissions",
         required: allowedRoles,
-        current: req.user.role
+        current: req.user.role,
       });
     }
 
@@ -137,20 +132,20 @@ const requireRole = (...allowedRoles) => {
 const requirePermission = (...requiredPermissions) => {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      return res.status(401).json({ error: "Not authenticated" });
     }
 
     const userPermissions = getRolePermissions(req.user.role);
 
-    const hasRequiredPermissions = requiredPermissions.every(
-      permission => userPermissions.includes(permission)
+    const hasRequiredPermissions = requiredPermissions.every((permission) =>
+      userPermissions.includes(permission),
     );
 
     if (!hasRequiredPermissions) {
       return res.status(403).json({
-        error: 'Insufficient permissions',
+        error: "Insufficient permissions",
         required: requiredPermissions,
-        current: userPermissions
+        current: userPermissions,
       });
     }
 
@@ -162,20 +157,20 @@ const requirePermission = (...requiredPermissions) => {
 const requireAnyPermission = (...permissions) => {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      return res.status(401).json({ error: "Not authenticated" });
     }
 
     const userPermissions = getRolePermissions(req.user.role);
 
-    const hasAnyPermission = permissions.some(
-      permission => userPermissions.includes(permission)
+    const hasAnyPermission = permissions.some((permission) =>
+      userPermissions.includes(permission),
     );
 
     if (!hasAnyPermission) {
       return res.status(403).json({
-        error: 'Insufficient permissions',
+        error: "Insufficient permissions",
         required: permissions,
-        current: userPermissions
+        current: userPermissions,
       });
     }
 
@@ -187,11 +182,11 @@ const requireAnyPermission = (...permissions) => {
 const requireOwnership = (getResourceOwnerId) => {
   return async (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      return res.status(401).json({ error: "Not authenticated" });
     }
 
     // Admins bypass ownership check
-    if (req.user.role === 'admin') {
+    if (req.user.role === "admin") {
       return next();
     }
 
@@ -199,12 +194,14 @@ const requireOwnership = (getResourceOwnerId) => {
       const ownerId = await getResourceOwnerId(req);
 
       if (ownerId !== req.user.userId) {
-        return res.status(403).json({ error: 'Not authorized to access this resource' });
+        return res
+          .status(403)
+          .json({ error: "Not authorized to access this resource" });
       }
 
       next();
     } catch (error) {
-      res.status(500).json({ error: 'Authorization check failed' });
+      res.status(500).json({ error: "Authorization check failed" });
     }
   };
 };
@@ -213,7 +210,7 @@ module.exports = {
   requireRole,
   requirePermission,
   requireAnyPermission,
-  requireOwnership
+  requireOwnership,
 };
 ```
 
@@ -221,41 +218,44 @@ module.exports = {
 
 ```javascript
 // routes/users.js
-const express = require('express');
-const authenticate = require('../middleware/authenticate');
-const { requireRole, requirePermission } = require('../middleware/authorize');
-const { PERMISSIONS, ROLES } = require('../config/permissions');
+const express = require("express");
+const authenticate = require("../middleware/authenticate");
+const { requireRole, requirePermission } = require("../middleware/authorize");
+const { PERMISSIONS, ROLES } = require("../config/permissions");
 
 const router = express.Router();
 
 // List users (requires users:read permission)
-router.get('/',
+router.get(
+  "/",
   authenticate,
   requirePermission(PERMISSIONS.USERS_READ),
   async (req, res) => {
     const users = await User.find();
     res.json(users);
-  }
+  },
 );
 
 // Create user (requires users:write permission)
-router.post('/',
+router.post(
+  "/",
   authenticate,
   requirePermission(PERMISSIONS.USERS_WRITE),
   async (req, res) => {
     const user = await User.create(req.body);
     res.json(user);
-  }
+  },
 );
 
 // Delete user (admin only)
-router.delete('/:id',
+router.delete(
+  "/:id",
   authenticate,
   requireRole(ROLES.ADMIN),
   async (req, res) => {
     await User.findByIdAndDelete(req.params.id);
-    res.json({ message: 'User deleted' });
-  }
+    res.json({ message: "User deleted" });
+  },
 );
 
 module.exports = router;
@@ -263,34 +263,39 @@ module.exports = router;
 
 ```javascript
 // routes/posts.js
-const express = require('express');
-const authenticate = require('../middleware/authenticate');
-const { requirePermission, requireOwnership } = require('../middleware/authorize');
-const { PERMISSIONS } = require('../config/permissions');
+const express = require("express");
+const authenticate = require("../middleware/authenticate");
+const {
+  requirePermission,
+  requireOwnership,
+} = require("../middleware/authorize");
+const { PERMISSIONS } = require("../config/permissions");
 
 const router = express.Router();
 
 // Public: Read posts
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   const posts = await Post.find({ published: true });
   res.json(posts);
 });
 
 // Authenticated: Create post
-router.post('/',
+router.post(
+  "/",
   authenticate,
   requirePermission(PERMISSIONS.POSTS_WRITE),
   async (req, res) => {
     const post = await Post.create({
       ...req.body,
-      authorId: req.user.userId
+      authorId: req.user.userId,
     });
     res.json(post);
-  }
+  },
 );
 
 // Owner or moderator: Update post
-router.put('/:id',
+router.put(
+  "/:id",
   authenticate,
   requireAnyPermission(PERMISSIONS.POSTS_WRITE, PERMISSIONS.POSTS_DELETE),
   requireOwnership(async (req) => {
@@ -298,19 +303,22 @@ router.put('/:id',
     return post.authorId;
   }),
   async (req, res) => {
-    const post = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
     res.json(post);
-  }
+  },
 );
 
 // Moderator or admin: Delete post
-router.delete('/:id',
+router.delete(
+  "/:id",
   authenticate,
   requirePermission(PERMISSIONS.POSTS_DELETE),
   async (req, res) => {
     await Post.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Post deleted' });
-  }
+    res.json({ message: "Post deleted" });
+  },
 );
 
 module.exports = router;
@@ -339,12 +347,12 @@ class PolicyEngine {
       const result = await policy.evaluate(context);
 
       // Explicit allow
-      if (result === 'allow') {
+      if (result === "allow") {
         return true;
       }
 
       // Explicit deny (takes precedence)
-      if (result === 'deny') {
+      if (result === "deny") {
         return false;
       }
 
@@ -363,7 +371,7 @@ class Policy {
   }
 
   async evaluate(context) {
-    throw new Error('evaluate() must be implemented');
+    throw new Error("evaluate() must be implemented");
   }
 }
 
@@ -374,20 +382,20 @@ module.exports = { PolicyEngine, Policy };
 
 ```javascript
 // policies/adminPolicy.js
-const { Policy } = require('../utils/policyEngine');
+const { Policy } = require("../utils/policyEngine");
 
 class AdminPolicy extends Policy {
   constructor() {
-    super('AdminPolicy');
+    super("AdminPolicy");
   }
 
   async evaluate(context) {
     // Admins can do anything
-    if (context.user.role === 'admin') {
-      return 'allow';
+    if (context.user.role === "admin") {
+      return "allow";
     }
 
-    return 'continue';
+    return "continue";
   }
 }
 
@@ -396,26 +404,26 @@ module.exports = AdminPolicy;
 
 ```javascript
 // policies/ownershipPolicy.js
-const { Policy } = require('../utils/policyEngine');
+const { Policy } = require("../utils/policyEngine");
 
 class OwnershipPolicy extends Policy {
   constructor() {
-    super('OwnershipPolicy');
+    super("OwnershipPolicy");
   }
 
   async evaluate(context) {
     const { user, resource, action } = context;
 
     // Owners can edit/delete their own resources
-    if (['edit', 'delete'].includes(action)) {
+    if (["edit", "delete"].includes(action)) {
       if (resource.ownerId === user.userId) {
-        return 'allow';
+        return "allow";
       }
 
-      return 'deny';
+      return "deny";
     }
 
-    return 'continue';
+    return "continue";
   }
 }
 
@@ -424,26 +432,26 @@ module.exports = OwnershipPolicy;
 
 ```javascript
 // policies/timeBasedPolicy.js
-const { Policy } = require('../utils/policyEngine');
+const { Policy } = require("../utils/policyEngine");
 
 class TimeBasedPolicy extends Policy {
   constructor() {
-    super('TimeBasedPolicy');
+    super("TimeBasedPolicy");
   }
 
   async evaluate(context) {
     const { user, action } = context;
 
     // Sensitive operations only during business hours (9 AM - 5 PM)
-    if (action === 'delete' && user.role !== 'admin') {
+    if (action === "delete" && user.role !== "admin") {
       const hour = new Date().getHours();
 
       if (hour < 9 || hour > 17) {
-        return 'deny';
+        return "deny";
       }
     }
 
-    return 'continue';
+    return "continue";
   }
 }
 
@@ -452,26 +460,26 @@ module.exports = TimeBasedPolicy;
 
 ```javascript
 // policies/departmentPolicy.js
-const { Policy } = require('../utils/policyEngine');
+const { Policy } = require("../utils/policyEngine");
 
 class DepartmentPolicy extends Policy {
   constructor() {
-    super('DepartmentPolicy');
+    super("DepartmentPolicy");
   }
 
   async evaluate(context) {
     const { user, resource, action } = context;
 
     // Users can only access resources from their department
-    if (action === 'read') {
+    if (action === "read") {
       if (resource.department === user.department) {
-        return 'allow';
+        return "allow";
       }
 
-      return 'deny';
+      return "deny";
     }
 
-    return 'continue';
+    return "continue";
   }
 }
 
@@ -482,11 +490,11 @@ module.exports = DepartmentPolicy;
 
 ```javascript
 // config/authorization.js
-const { PolicyEngine } = require('../utils/policyEngine');
-const AdminPolicy = require('../policies/adminPolicy');
-const OwnershipPolicy = require('../policies/ownershipPolicy');
-const TimeBasedPolicy = require('../policies/timeBasedPolicy');
-const DepartmentPolicy = require('../policies/departmentPolicy');
+const { PolicyEngine } = require("../utils/policyEngine");
+const AdminPolicy = require("../policies/adminPolicy");
+const OwnershipPolicy = require("../policies/ownershipPolicy");
+const TimeBasedPolicy = require("../policies/timeBasedPolicy");
+const DepartmentPolicy = require("../policies/departmentPolicy");
 
 const policyEngine = new PolicyEngine();
 
@@ -503,12 +511,12 @@ module.exports = policyEngine;
 
 ```javascript
 // middleware/abac.js
-const policyEngine = require('../config/authorization');
+const policyEngine = require("../config/authorization");
 
 const authorize = (action, resourceType, getResource) => {
   return async (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      return res.status(401).json({ error: "Not authenticated" });
     }
 
     try {
@@ -516,7 +524,7 @@ const authorize = (action, resourceType, getResource) => {
       const resource = await getResource(req);
 
       if (!resource) {
-        return res.status(404).json({ error: 'Resource not found' });
+        return res.status(404).json({ error: "Resource not found" });
       }
 
       // Build context
@@ -525,35 +533,35 @@ const authorize = (action, resourceType, getResource) => {
           userId: req.user.userId,
           email: req.user.email,
           role: req.user.role,
-          department: req.user.department
+          department: req.user.department,
         },
         resource: {
           id: resource.id,
           type: resourceType,
           ownerId: resource.ownerId,
           department: resource.department,
-          classification: resource.classification
+          classification: resource.classification,
         },
         action,
         environment: {
           time: new Date(),
           ipAddress: req.ip,
-          userAgent: req.get('user-agent')
-        }
+          userAgent: req.get("user-agent"),
+        },
       };
 
       // Evaluate policy
       const allowed = await policyEngine.evaluate(context);
 
       if (!allowed) {
-        return res.status(403).json({ error: 'Access denied' });
+        return res.status(403).json({ error: "Access denied" });
       }
 
       // Attach resource to request for use in handler
       req.resource = resource;
       next();
     } catch (error) {
-      res.status(500).json({ error: 'Authorization check failed' });
+      res.status(500).json({ error: "Authorization check failed" });
     }
   };
 };
@@ -565,50 +573,51 @@ module.exports = authorize;
 
 ```javascript
 // routes/documents.js
-const express = require('express');
-const authenticate = require('../middleware/authenticate');
-const authorize = require('../middleware/abac');
-const Document = require('../models/Document');
+const express = require("express");
+const authenticate = require("../middleware/authenticate");
+const authorize = require("../middleware/abac");
+const Document = require("../models/Document");
 
 const router = express.Router();
 
 // Read document
-router.get('/:id',
+router.get(
+  "/:id",
   authenticate,
-  authorize('read', 'document', async (req) => {
+  authorize("read", "document", async (req) => {
     return await Document.findById(req.params.id);
   }),
   (req, res) => {
     res.json(req.resource);
-  }
+  },
 );
 
 // Update document
-router.put('/:id',
+router.put(
+  "/:id",
   authenticate,
-  authorize('edit', 'document', async (req) => {
+  authorize("edit", "document", async (req) => {
     return await Document.findById(req.params.id);
   }),
   async (req, res) => {
-    const updated = await Document.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    const updated = await Document.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
     res.json(updated);
-  }
+  },
 );
 
 // Delete document
-router.delete('/:id',
+router.delete(
+  "/:id",
   authenticate,
-  authorize('delete', 'document', async (req) => {
+  authorize("delete", "document", async (req) => {
     return await Document.findById(req.params.id);
   }),
   async (req, res) => {
     await Document.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Document deleted' });
-  }
+    res.json({ message: "Document deleted" });
+  },
 );
 
 module.exports = router;
@@ -622,83 +631,99 @@ module.exports = router;
 
 ```javascript
 // models/ResourcePermission.js
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const resourcePermissionSchema = new mongoose.Schema({
   resourceType: {
     type: String,
     required: true,
-    enum: ['document', 'project', 'folder']
+    enum: ["document", "project", "folder"],
   },
   resourceId: {
     type: String,
-    required: true
+    required: true,
   },
   userId: {
     type: String,
-    required: true
+    required: true,
   },
   relationship: {
     type: String,
     required: true,
-    enum: ['owner', 'editor', 'viewer']
+    enum: ["owner", "editor", "viewer"],
   },
   grantedBy: String,
   grantedAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 // Compound index for fast lookups
 resourcePermissionSchema.index({ resourceType: 1, resourceId: 1, userId: 1 });
 
-module.exports = mongoose.model('ResourcePermission', resourcePermissionSchema);
+module.exports = mongoose.model("ResourcePermission", resourcePermissionSchema);
 ```
 
 ### Permission Utilities
 
 ```javascript
 // utils/permissions.js
-const ResourcePermission = require('../models/ResourcePermission');
+const ResourcePermission = require("../models/ResourcePermission");
 
 const RELATIONSHIPS = {
-  OWNER: 'owner',
-  EDITOR: 'editor',
-  VIEWER: 'viewer'
+  OWNER: "owner",
+  EDITOR: "editor",
+  VIEWER: "viewer",
 };
 
 // Check if user has relationship to resource
-const hasRelationship = async (userId, resourceType, resourceId, relationship) => {
+const hasRelationship = async (
+  userId,
+  resourceType,
+  resourceId,
+  relationship,
+) => {
   const permission = await ResourcePermission.findOne({
     userId,
     resourceType,
     resourceId,
-    relationship
+    relationship,
   });
 
   return !!permission;
 };
 
 // Check if user has any of the specified relationships
-const hasAnyRelationship = async (userId, resourceType, resourceId, relationships) => {
+const hasAnyRelationship = async (
+  userId,
+  resourceType,
+  resourceId,
+  relationships,
+) => {
   const permission = await ResourcePermission.findOne({
     userId,
     resourceType,
     resourceId,
-    relationship: { $in: relationships }
+    relationship: { $in: relationships },
   });
 
   return !!permission;
 };
 
 // Grant access to resource
-const grantAccess = async (userId, resourceType, resourceId, relationship, grantedBy) => {
+const grantAccess = async (
+  userId,
+  resourceType,
+  resourceId,
+  relationship,
+  grantedBy,
+) => {
   // Check if permission already exists
   const existing = await ResourcePermission.findOne({
     userId,
     resourceType,
-    resourceId
+    resourceId,
   });
 
   if (existing) {
@@ -715,7 +740,7 @@ const grantAccess = async (userId, resourceType, resourceId, relationship, grant
     resourceType,
     resourceId,
     relationship,
-    grantedBy
+    grantedBy,
   });
 };
 
@@ -724,7 +749,7 @@ const revokeAccess = async (userId, resourceType, resourceId) => {
   await ResourcePermission.deleteOne({
     userId,
     resourceType,
-    resourceId
+    resourceId,
   });
 };
 
@@ -732,15 +757,15 @@ const revokeAccess = async (userId, resourceType, resourceId) => {
 const getResourceCollaborators = async (resourceType, resourceId) => {
   return await ResourcePermission.find({
     resourceType,
-    resourceId
-  }).populate('userId');
+    resourceId,
+  }).populate("userId");
 };
 
 // Get all resources user has access to
 const getUserResources = async (userId, resourceType) => {
   return await ResourcePermission.find({
     userId,
-    resourceType
+    resourceType,
   });
 };
 
@@ -751,7 +776,7 @@ module.exports = {
   grantAccess,
   revokeAccess,
   getResourceCollaborators,
-  getUserResources
+  getUserResources,
 };
 ```
 
@@ -759,12 +784,12 @@ module.exports = {
 
 ```javascript
 // middleware/rebac.js
-const { hasAnyRelationship, RELATIONSHIPS } = require('../utils/permissions');
+const { hasAnyRelationship, RELATIONSHIPS } = require("../utils/permissions");
 
 const requireRelationship = (resourceType, ...allowedRelationships) => {
   return async (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      return res.status(401).json({ error: "Not authenticated" });
     }
 
     const resourceId = req.params.id;
@@ -774,16 +799,16 @@ const requireRelationship = (resourceType, ...allowedRelationships) => {
         req.user.userId,
         resourceType,
         resourceId,
-        allowedRelationships
+        allowedRelationships,
       );
 
       if (!hasAccess) {
-        return res.status(403).json({ error: 'Access denied' });
+        return res.status(403).json({ error: "Access denied" });
       }
 
       next();
     } catch (error) {
-      res.status(500).json({ error: 'Authorization check failed' });
+      res.status(500).json({ error: "Authorization check failed" });
     }
   };
 };
@@ -795,81 +820,86 @@ module.exports = { requireRelationship };
 
 ```javascript
 // routes/projects.js
-const express = require('express');
-const authenticate = require('../middleware/authenticate');
-const { requireRelationship } = require('../middleware/rebac');
-const { RELATIONSHIPS, grantAccess, revokeAccess } = require('../utils/permissions');
+const express = require("express");
+const authenticate = require("../middleware/authenticate");
+const { requireRelationship } = require("../middleware/rebac");
+const {
+  RELATIONSHIPS,
+  grantAccess,
+  revokeAccess,
+} = require("../utils/permissions");
 
 const router = express.Router();
 
 // View project (owner, editor, or viewer)
-router.get('/:id',
+router.get(
+  "/:id",
   authenticate,
-  requireRelationship('project',
+  requireRelationship(
+    "project",
     RELATIONSHIPS.OWNER,
     RELATIONSHIPS.EDITOR,
-    RELATIONSHIPS.VIEWER
+    RELATIONSHIPS.VIEWER,
   ),
   async (req, res) => {
     const project = await Project.findById(req.params.id);
     res.json(project);
-  }
+  },
 );
 
 // Edit project (owner or editor)
-router.put('/:id',
+router.put(
+  "/:id",
   authenticate,
-  requireRelationship('project',
-    RELATIONSHIPS.OWNER,
-    RELATIONSHIPS.EDITOR
-  ),
+  requireRelationship("project", RELATIONSHIPS.OWNER, RELATIONSHIPS.EDITOR),
   async (req, res) => {
-    const project = await Project.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    const project = await Project.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
     res.json(project);
-  }
+  },
 );
 
 // Delete project (owner only)
-router.delete('/:id',
+router.delete(
+  "/:id",
   authenticate,
-  requireRelationship('project', RELATIONSHIPS.OWNER),
+  requireRelationship("project", RELATIONSHIPS.OWNER),
   async (req, res) => {
     await Project.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Project deleted' });
-  }
+    res.json({ message: "Project deleted" });
+  },
 );
 
 // Share project (owner only)
-router.post('/:id/share',
+router.post(
+  "/:id/share",
   authenticate,
-  requireRelationship('project', RELATIONSHIPS.OWNER),
+  requireRelationship("project", RELATIONSHIPS.OWNER),
   async (req, res) => {
     const { userId, relationship } = req.body;
 
     await grantAccess(
       userId,
-      'project',
+      "project",
       req.params.id,
       relationship,
-      req.user.userId
+      req.user.userId,
     );
 
-    res.json({ message: 'Access granted' });
-  }
+    res.json({ message: "Access granted" });
+  },
 );
 
 // Revoke access (owner only)
-router.delete('/:id/share/:userId',
+router.delete(
+  "/:id/share/:userId",
   authenticate,
-  requireRelationship('project', RELATIONSHIPS.OWNER),
+  requireRelationship("project", RELATIONSHIPS.OWNER),
   async (req, res) => {
-    await revokeAccess(req.params.userId, 'project', req.params.id);
-    res.json({ message: 'Access revoked' });
-  }
+    await revokeAccess(req.params.userId, "project", req.params.id);
+    res.json({ message: "Access revoked" });
+  },
 );
 
 module.exports = router;
@@ -881,33 +911,33 @@ module.exports = router;
 
 ```javascript
 // tests/authorization.test.js
-const request = require('supertest');
-const app = require('../app');
-const User = require('../models/User');
-const Post = require('../models/Post');
+const request = require("supertest");
+const app = require("../app");
+const User = require("../models/User");
+const Post = require("../models/Post");
 
-describe('Authorization', () => {
+describe("Authorization", () => {
   let adminToken, userToken, moderatorToken;
   let adminUser, regularUser, moderatorUser;
 
   beforeEach(async () => {
     // Create users
     adminUser = await User.create({
-      email: 'admin@example.com',
-      passwordHash: await hashPassword('password'),
-      role: 'admin'
+      email: "admin@example.com",
+      passwordHash: await hashPassword("password"),
+      role: "admin",
     });
 
     regularUser = await User.create({
-      email: 'user@example.com',
-      passwordHash: await hashPassword('password'),
-      role: 'user'
+      email: "user@example.com",
+      passwordHash: await hashPassword("password"),
+      role: "user",
     });
 
     moderatorUser = await User.create({
-      email: 'moderator@example.com',
-      passwordHash: await hashPassword('password'),
-      role: 'moderator'
+      email: "moderator@example.com",
+      passwordHash: await hashPassword("password"),
+      role: "moderator",
     });
 
     // Generate tokens
@@ -916,41 +946,41 @@ describe('Authorization', () => {
     moderatorToken = generateAccessToken(moderatorUser);
   });
 
-  test('Admin can delete any post', async () => {
+  test("Admin can delete any post", async () => {
     const post = await Post.create({
-      title: 'Test Post',
-      authorId: regularUser.id
+      title: "Test Post",
+      authorId: regularUser.id,
     });
 
     const res = await request(app)
       .delete(`/api/posts/${post.id}`)
-      .set('Authorization', `Bearer ${adminToken}`);
+      .set("Authorization", `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
   });
 
-  test('Regular user cannot delete others posts', async () => {
+  test("Regular user cannot delete others posts", async () => {
     const post = await Post.create({
-      title: 'Test Post',
-      authorId: adminUser.id
+      title: "Test Post",
+      authorId: adminUser.id,
     });
 
     const res = await request(app)
       .delete(`/api/posts/${post.id}`)
-      .set('Authorization', `Bearer ${userToken}`);
+      .set("Authorization", `Bearer ${userToken}`);
 
     expect(res.status).toBe(403);
   });
 
-  test('Moderator can delete any post', async () => {
+  test("Moderator can delete any post", async () => {
     const post = await Post.create({
-      title: 'Test Post',
-      authorId: regularUser.id
+      title: "Test Post",
+      authorId: regularUser.id,
     });
 
     const res = await request(app)
       .delete(`/api/posts/${post.id}`)
-      .set('Authorization', `Bearer ${moderatorToken}`);
+      .set("Authorization", `Bearer ${moderatorToken}`);
 
     expect(res.status).toBe(200);
   });

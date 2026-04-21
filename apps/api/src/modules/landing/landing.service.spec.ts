@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { Test, TestingModule } from '@nestjs/testing';
-import { LandingService } from './landing.service';
-import { PrismaService } from '../../prisma/prisma.service';
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { Test, TestingModule } from "@nestjs/testing";
+import { LandingService } from "./landing.service";
+import { PrismaService } from "../../prisma/prisma.service";
 
-describe('LandingService', () => {
+describe("LandingService", () => {
   let service: LandingService;
 
   const mockPrisma = {
@@ -36,8 +36,8 @@ describe('LandingService', () => {
 
   // ── getFeatured ──────────────────────────────────
 
-  describe('getFeatured', () => {
-    it('should return featured listings when enough exist', async () => {
+  describe("getFeatured", () => {
+    it("should return featured listings when enough exist", async () => {
       const featured = Array.from({ length: 6 }, (_, i) => ({
         id: `id-${i}`,
         title: `Room ${i}`,
@@ -51,8 +51,8 @@ describe('LandingService', () => {
       expect(mockPrisma.listing.findMany).toHaveBeenCalledTimes(1);
     });
 
-    it('should fill with recent listings when not enough featured', async () => {
-      const featured = [{ id: 'featured-1', title: 'Featured Room' }];
+    it("should fill with recent listings when not enough featured", async () => {
+      const featured = [{ id: "featured-1", title: "Featured Room" }];
       const additional = Array.from({ length: 7 }, (_, i) => ({
         id: `additional-${i}`,
         title: `Room ${i}`,
@@ -67,18 +67,18 @@ describe('LandingService', () => {
       expect(mockPrisma.listing.findMany).toHaveBeenCalledTimes(2);
     });
 
-    it('should exclude already fetched featured IDs from additional query', async () => {
+    it("should exclude already fetched featured IDs from additional query", async () => {
       mockPrisma.listing.findMany
-        .mockResolvedValueOnce([{ id: 'feat-1' }])
-        .mockResolvedValueOnce([{ id: 'add-1' }]);
+        .mockResolvedValueOnce([{ id: "feat-1" }])
+        .mockResolvedValueOnce([{ id: "add-1" }]);
 
       await service.getFeatured();
 
       const secondCall = mockPrisma.listing.findMany.mock.calls[1][0];
-      expect(secondCall.where.id.notIn).toContain('feat-1');
+      expect(secondCall.where.id.notIn).toContain("feat-1");
     });
 
-    it('should return empty data if no listings exist', async () => {
+    it("should return empty data if no listings exist", async () => {
       mockPrisma.listing.findMany.mockResolvedValueOnce([]);
       mockPrisma.listing.findMany.mockResolvedValueOnce([]);
 
@@ -90,23 +90,23 @@ describe('LandingService', () => {
 
   // ── getCities ────────────────────────────────────
 
-  describe('getCities', () => {
-    it('should return grouped cities with count', async () => {
+  describe("getCities", () => {
+    it("should return grouped cities with count", async () => {
       const groups = [
-        { country: 'US', state: 'FL', city: 'Orlando', _count: { id: 15 } },
-        { country: 'US', state: 'NJ', city: 'Newark', _count: { id: 8 } },
+        { country: "US", state: "FL", city: "Orlando", _count: { id: 15 } },
+        { country: "US", state: "NJ", city: "Newark", _count: { id: 8 } },
       ];
       mockPrisma.listing.groupBy.mockResolvedValueOnce(groups);
 
       const result = await service.getCities();
 
       expect(result.data).toEqual([
-        { country: 'US', state: 'FL', city: 'Orlando', count: 15 },
-        { country: 'US', state: 'NJ', city: 'Newark', count: 8 },
+        { country: "US", state: "FL", city: "Orlando", count: 15 },
+        { country: "US", state: "NJ", city: "Newark", count: 8 },
       ]);
     });
 
-    it('should return empty array when no active listings', async () => {
+    it("should return empty array when no active listings", async () => {
       mockPrisma.listing.groupBy.mockResolvedValueOnce([]);
 
       const result = await service.getCities();
@@ -114,7 +114,7 @@ describe('LandingService', () => {
       expect(result.data).toEqual([]);
     });
 
-    it('should limit to 8 cities', async () => {
+    it("should limit to 8 cities", async () => {
       mockPrisma.listing.groupBy.mockResolvedValueOnce([]);
 
       await service.getCities();
@@ -127,11 +127,17 @@ describe('LandingService', () => {
 
   // ── getStats ─────────────────────────────────────
 
-  describe('getStats', () => {
-    it('should return platform statistics', async () => {
+  describe("getStats", () => {
+    it("should return platform statistics", async () => {
       mockPrisma.$transaction.mockResolvedValueOnce([
         42, // activeListings
-        [{ city: 'Orlando' }, { city: 'Miami' }, { city: 'Newark' }, { city: 'Boston' }, { city: 'Lisboa' }], // cityGroups
+        [
+          { city: "Orlando" },
+          { city: "Miami" },
+          { city: "Newark" },
+          { city: "Boston" },
+          { city: "Lisboa" },
+        ], // cityGroups
         120, // totalUsers
       ]);
 
@@ -145,7 +151,7 @@ describe('LandingService', () => {
       });
     });
 
-    it('should return zeros when no data', async () => {
+    it("should return zeros when no data", async () => {
       mockPrisma.$transaction.mockResolvedValueOnce([0, [], 0]);
 
       const result = await service.getStats();
@@ -159,19 +165,19 @@ describe('LandingService', () => {
 
   // ── getTestimonials ──────────────────────────────
 
-  describe('getTestimonials', () => {
-    it('should return placeholder testimonials', async () => {
+  describe("getTestimonials", () => {
+    it("should return placeholder testimonials", async () => {
       const result = await service.getTestimonials();
 
       expect(result.data).toHaveLength(3);
-      expect(result.data[0]).toHaveProperty('id');
-      expect(result.data[0]).toHaveProperty('name');
-      expect(result.data[0]).toHaveProperty('city');
-      expect(result.data[0]).toHaveProperty('text');
-      expect(result.data[0]).toHaveProperty('rating');
+      expect(result.data[0]).toHaveProperty("id");
+      expect(result.data[0]).toHaveProperty("name");
+      expect(result.data[0]).toHaveProperty("city");
+      expect(result.data[0]).toHaveProperty("text");
+      expect(result.data[0]).toHaveProperty("rating");
     });
 
-    it('should have valid ratings between 1-5', async () => {
+    it("should have valid ratings between 1-5", async () => {
       const result = await service.getTestimonials();
 
       for (const t of result.data) {
@@ -183,17 +189,17 @@ describe('LandingService', () => {
 
   // ── submitContact ────────────────────────────────
 
-  describe('submitContact', () => {
+  describe("submitContact", () => {
     const contactDto = {
-      name: 'João Silva',
-      email: 'joao@test.com',
-      subject: 'Dúvida sobre quartos',
-      message: 'Gostaria de mais informações sobre os quartos em Orlando.',
+      name: "João Silva",
+      email: "joao@test.com",
+      subject: "Dúvida sobre quartos",
+      message: "Gostaria de mais informações sobre os quartos em Orlando.",
     };
 
-    it('should create a contact message in the database', async () => {
+    it("should create a contact message in the database", async () => {
       mockPrisma.contactMessage.create.mockResolvedValueOnce({
-        id: 'uuid-1',
+        id: "uuid-1",
         ...contactDto,
         createdAt: new Date(),
       });
@@ -208,16 +214,16 @@ describe('LandingService', () => {
           message: contactDto.message,
         },
       });
-      expect(result).toEqual({ message: 'Message sent successfully' });
+      expect(result).toEqual({ message: "Message sent successfully" });
     });
 
-    it('should propagate database errors', async () => {
+    it("should propagate database errors", async () => {
       mockPrisma.contactMessage.create.mockRejectedValueOnce(
-        new Error('DB error'),
+        new Error("DB error"),
       );
 
       await expect(service.submitContact(contactDto)).rejects.toThrow(
-        'DB error',
+        "DB error",
       );
     });
   });

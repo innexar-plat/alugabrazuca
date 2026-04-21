@@ -5,6 +5,7 @@ Use this template for implementing security best practices in iOS and Android ap
 ## Mobile Security Checklist (OWASP MASVS)
 
 ### Data Storage
+
 - [ ] Sensitive data encrypted at rest
 - [ ] No sensitive data in logs
 - [ ] Secure key storage (Keychain/Keystore)
@@ -12,6 +13,7 @@ Use this template for implementing security best practices in iOS and Android ap
 - [ ] Clear clipboard after timeout
 
 ### Authentication
+
 - [ ] Multi-factor authentication support
 - [ ] Biometric authentication (Face ID/Touch ID)
 - [ ] Certificate pinning for API calls
@@ -19,6 +21,7 @@ Use this template for implementing security best practices in iOS and Android ap
 - [ ] OAuth 2.0 with PKCE
 
 ### Network Security
+
 - [ ] TLS 1.3 for all connections
 - [ ] Certificate pinning implemented
 - [ ] No sensitive data in URLs
@@ -26,6 +29,7 @@ Use this template for implementing security best practices in iOS and Android ap
 - [ ] WebView security hardening
 
 ### Code Security
+
 - [ ] Code obfuscation enabled
 - [ ] No hardcoded secrets
 - [ ] Jailbreak/root detection
@@ -33,6 +37,7 @@ Use this template for implementing security best practices in iOS and Android ap
 - [ ] Secure random number generation
 
 ### Platform Security
+
 - [ ] Latest SDK version
 - [ ] Secure intent handling (Android)
 - [ ] Secure deep link validation

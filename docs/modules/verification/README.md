@@ -1,21 +1,23 @@
 # Módulo 10 — Verificação de Identidade (`verification`)
 
 ## Visão Geral
+
 Verificação de identidade dos usuários para aumentar confiança na plataforma. Selo "Verificado" visível no perfil e anúncios.
 
 ---
 
 ## 10.1 Tipos de Verificação
 
-| Nível | O que verifica | Selo |
-|-------|---------------|------|
-| **Básico** | E-mail + telefone | 🔵 E-mail verificado |
-| **Intermediário** | + documento de identidade | 🟢 ID verificado |
-| **Completo** | + selfie com documento | ✅ Totalmente verificado |
+| Nível             | O que verifica            | Selo                     |
+| ----------------- | ------------------------- | ------------------------ |
+| **Básico**        | E-mail + telefone         | 🔵 E-mail verificado     |
+| **Intermediário** | + documento de identidade | 🟢 ID verificado         |
+| **Completo**      | + selfie com documento    | ✅ Totalmente verificado |
 
 ---
 
 ## 10.2 Verificação de E-mail
+
 - Já implementado no módulo Auth
 - Link de verificação enviado no cadastro
 - Re-enviar link disponível no perfil
@@ -24,18 +26,20 @@ Verificação de identidade dos usuários para aumentar confiança na plataforma
 
 ## 10.3 Verificação de Telefone
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| `phone` | string | Número com código do país |
-| `verificationCode` | string | Código SMS de 6 dígitos |
+| Campo              | Tipo   | Descrição                 |
+| ------------------ | ------ | ------------------------- |
+| `phone`            | string | Número com código do país |
+| `verificationCode` | string | Código SMS de 6 dígitos   |
 
 ### Fluxo
+
 1. Usuário informa número de telefone
 2. Sistema envia SMS com código de 6 dígitos (expira em 5min)
 3. Usuário insere código
 4. Telefone verificado
 
 ### Regras
+
 - Máximo 3 tentativas de código
 - Máximo 5 SMS por dia por número
 - Provider: Twilio ou AWS SNS
@@ -46,23 +50,24 @@ Verificação de identidade dos usuários para aumentar confiança na plataforma
 
 ### Documentos aceitos
 
-| País | Documentos |
-|------|-----------|
-| Brasil | CPF, RG, CNH, Passaporte |
-| EUA | Driver's License, State ID, Passport |
-| Europa | ID Card, Passport, Residence Permit |
+| País   | Documentos                           |
+| ------ | ------------------------------------ |
+| Brasil | CPF, RG, CNH, Passaporte             |
+| EUA    | Driver's License, State ID, Passport |
+| Europa | ID Card, Passport, Residence Permit  |
 
 ### Campos do upload
 
-| Campo | Tipo | Obrigatório |
-|-------|------|-------------|
-| `documentType` | enum | ✅ |
-| `documentCountry` | string | ✅ |
-| `frontPhoto` | image | ✅ |
-| `backPhoto` | image | cond. (se documento tem verso) |
-| `selfieWithDocument` | image | cond. (para verificação completa) |
+| Campo                | Tipo   | Obrigatório                       |
+| -------------------- | ------ | --------------------------------- |
+| `documentType`       | enum   | ✅                                |
+| `documentCountry`    | string | ✅                                |
+| `frontPhoto`         | image  | ✅                                |
+| `backPhoto`          | image  | cond. (se documento tem verso)    |
+| `selfieWithDocument` | image  | cond. (para verificação completa) |
 
 ### Fluxo
+
 1. Usuário seleciona tipo de documento
 2. Faz upload da frente (e verso se aplicável)
 3. Para verificação completa: selfie segurando o documento
@@ -70,6 +75,7 @@ Verificação de identidade dos usuários para aumentar confiança na plataforma
 5. Aprovado → selo de verificado adicionado
 
 ### Regras
+
 - Fotos armazenadas com criptografia (S3 + KMS)
 - Dados do documento NUNCA expostos na API pública
 - Fotos deletadas após verificação aprovada (retém apenas status)
@@ -117,21 +123,21 @@ created_at      TIMESTAMP NOT NULL DEFAULT NOW()
 
 ## 10.6 Endpoints
 
-| Método | Rota | Descrição | Auth |
-|--------|------|-----------|------|
-| POST | `/api/v1/verification/phone/send` | Enviar SMS | ✅ |
-| POST | `/api/v1/verification/phone/verify` | Verificar código | ✅ |
-| POST | `/api/v1/verification/document` | Upload documento | ✅ |
-| GET | `/api/v1/verification/status` | Status das verificações | ✅ |
-| GET | `/api/v1/admin/verifications` | Fila de verificações | ✅ admin |
-| POST | `/api/v1/admin/verifications/:id/approve` | Aprovar | ✅ admin |
-| POST | `/api/v1/admin/verifications/:id/reject` | Rejeitar | ✅ admin |
+| Método | Rota                                      | Descrição               | Auth     |
+| ------ | ----------------------------------------- | ----------------------- | -------- |
+| POST   | `/api/v1/verification/phone/send`         | Enviar SMS              | ✅       |
+| POST   | `/api/v1/verification/phone/verify`       | Verificar código        | ✅       |
+| POST   | `/api/v1/verification/document`           | Upload documento        | ✅       |
+| GET    | `/api/v1/verification/status`             | Status das verificações | ✅       |
+| GET    | `/api/v1/admin/verifications`             | Fila de verificações    | ✅ admin |
+| POST   | `/api/v1/admin/verifications/:id/approve` | Aprovar                 | ✅ admin |
+| POST   | `/api/v1/admin/verifications/:id/reject`  | Rejeitar                | ✅ admin |
 
 ---
 
 ## 10.7 Páginas Frontend
 
-| Rota | Página | Auth |
-|------|--------|------|
-| `/verification` | Centro de verificação | ✅ |
-| `/admin/verifications` | Fila de verificações | ✅ admin |
+| Rota                   | Página                | Auth     |
+| ---------------------- | --------------------- | -------- |
+| `/verification`        | Centro de verificação | ✅       |
+| `/admin/verifications` | Fila de verificações  | ✅ admin |

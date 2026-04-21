@@ -43,11 +43,13 @@ Version releases, generate changelogs, and manage deployment workflows using sem
 **Format**: `MAJOR.MINOR.PATCH-<pre-release>.<number>`
 
 **Examples**:
+
 - `1.0.0-alpha.1` - Early development
 - `1.0.0-beta.2` - Feature complete, testing
 - `1.0.0-rc.1` - Release candidate
 
 **Precedence**:
+
 ```
 1.0.0-alpha < 1.0.0-alpha.1 < 1.0.0-beta < 1.0.0-rc.1 < 1.0.0
 ```
@@ -98,26 +100,32 @@ npx standard-version
 ## [2.1.0] - 2025-11-22
 
 ### Added
+
 - New OAuth2 social login providers (Google, GitHub)
 - User profile API endpoints
 - Real-time notifications via WebSocket
 
 ### Changed
+
 - Improved database query performance (30% faster)
 - Updated UI component library to v5.2
 
 ### Fixed
+
 - SQL injection vulnerability in search endpoint
 - Race condition in user registration
 - Memory leak in background job processor
 
 ### Deprecated
+
 - Legacy `/api/v1/auth` endpoints (use `/api/v2/auth`)
 
 ### Removed
+
 - Support for Node.js 14 (EOL)
 
 ### Security
+
 - Patched CVE-2025-1234 in dependency XYZ
 ```
 
@@ -196,9 +204,7 @@ npm install --save-dev @semantic-release/github
     [
       "@semantic-release/github",
       {
-        "assets": [
-          {"path": "dist/**", "label": "Distribution"}
-        ]
+        "assets": [{ "path": "dist/**", "label": "Distribution" }]
       }
     ]
   ]
@@ -235,7 +241,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install dependencies
         run: npm ci
@@ -281,6 +287,7 @@ jobs:
 ### When to Use
 
 **Hotfix required for**:
+
 - Critical production bugs
 - Security vulnerabilities
 - Data loss prevention
@@ -382,6 +389,7 @@ git push origin v2.0.1
 ### Library/Package
 
 **Follow strict SemVer**:
+
 - Breaking changes = MAJOR bump
 - New features = MINOR bump
 - Bug fixes = PATCH bump
@@ -390,6 +398,7 @@ git push origin v2.0.1
 ### Web Application
 
 **Calendar versioning or SemVer**:
+
 - SemVer for APIs and SDKs
 - CalVer for user-facing apps (`2025.11.1`)
 - Consider date-based releases for continuous deployment
@@ -397,6 +406,7 @@ git push origin v2.0.1
 ### Mobile App
 
 **Platform-specific versioning**:
+
 - **iOS**: `CFBundleShortVersionString` (user-facing, e.g., 2.1.0)
 - **iOS**: `CFBundleVersion` (build number, incrementing, e.g., 145)
 - **Android**: `versionName` (user-facing, e.g., 2.1.0)
@@ -421,23 +431,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+
 - Feature X for users to do Y
 
 ## [2.1.0] - 2025-11-22
 
 ### Added
+
 - OAuth2 social login
 - Real-time notifications
 
 ### Fixed
+
 - SQL injection in search endpoint (#234)
 
 ## [2.0.0] - 2025-10-15
 
 ### Changed
+
 - **BREAKING**: Migrated to REST API v2
 
 ### Removed
+
 - **BREAKING**: Removed deprecated v1 endpoints
 
 [Unreleased]: https://github.com/user/repo/compare/v2.1.0...HEAD
@@ -448,6 +463,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Auto-Generated from Commits
 
 **Tools**:
+
 - `standard-version` - Generates changelog from conventional commits
 - `semantic-release` - Fully automated changelog + release
 - `conventional-changelog` - Manual trigger changelog generation
@@ -462,19 +478,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 **[LAUNCH] Version 2.1.0 Released**
 
 **What's New:**
+
 - OAuth2 social login (Google, GitHub)
 - Real-time notifications via WebSocket
 - User profile API endpoints
 
 **Improvements:**
+
 - 30% faster database queries
 - Updated UI component library
 
 **Bug Fixes:**
+
 - Fixed SQL injection vulnerability (#234)
 - Resolved race condition in user registration
 
 **Breaking Changes:**
+
 - None
 
 **Migration Guide:** https://docs.example.com/migration/v2.1.0
@@ -490,9 +510,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 **Critical security patch released**
 
 **Fixed:**
+
 - Patched SQL injection vulnerability (CVE-2025-1234)
 
 **Action Required:**
+
 - All users must upgrade immediately
 - No breaking changes
 

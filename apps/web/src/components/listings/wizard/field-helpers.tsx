@@ -31,7 +31,10 @@ export function FieldInput({
   const f = useTranslations("listing.create.fields");
   return (
     <div>
-      <label htmlFor={field} className="mb-1.5 block text-sm font-medium text-foreground">
+      <label
+        htmlFor={field}
+        className="mb-1.5 block text-sm font-medium text-foreground"
+      >
         {f(field as never)}
         {required && <span className="text-destructive ml-0.5">*</span>}
       </label>
@@ -39,7 +42,12 @@ export function FieldInput({
         id={field}
         type={type}
         value={value ?? ""}
-        onChange={(e) => onChange(field, type === "number" ? Number(e.target.value) : e.target.value)}
+        onChange={(e) =>
+          onChange(
+            field,
+            type === "number" ? Number(e.target.value) : e.target.value,
+          )
+        }
         min={min}
         max={max}
         placeholder={placeholder}
@@ -78,7 +86,10 @@ export function FieldTextarea({
   const atMin = minLength !== undefined && len >= minLength;
   return (
     <div>
-      <label htmlFor={field} className="mb-1.5 block text-sm font-medium text-foreground">
+      <label
+        htmlFor={field}
+        className="mb-1.5 block text-sm font-medium text-foreground"
+      >
         {f(field as never)}
         {required && <span className="text-destructive ml-0.5">*</span>}
       </label>
@@ -92,10 +103,18 @@ export function FieldTextarea({
       />
       <div className="mt-1 flex items-center justify-between gap-2">
         {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
-        <p className={`ml-auto text-xs tabular-nums ${
-          tooShort ? "text-destructive" : atMin ? "text-emerald-600" : "text-muted-foreground"
-        }`}>
-          {len}{maxLength ? `/${maxLength}` : ""}{minLength && !atMin ? ` / ${minLength} mín.` : ""}
+        <p
+          className={`ml-auto text-xs tabular-nums ${
+            tooShort
+              ? "text-destructive"
+              : atMin
+                ? "text-emerald-600"
+                : "text-muted-foreground"
+          }`}
+        >
+          {len}
+          {maxLength ? `/${maxLength}` : ""}
+          {minLength && !atMin ? ` / ${minLength} mín.` : ""}
         </p>
       </div>
     </div>
@@ -116,11 +135,20 @@ interface FieldSelectProps {
   required?: boolean;
 }
 
-export function FieldSelect({ field, value, onChange, options, required }: FieldSelectProps) {
+export function FieldSelect({
+  field,
+  value,
+  onChange,
+  options,
+  required,
+}: FieldSelectProps) {
   const f = useTranslations("listing.create.fields");
   return (
     <div>
-      <label htmlFor={field} className="mb-1.5 block text-sm font-medium text-foreground">
+      <label
+        htmlFor={field}
+        className="mb-1.5 block text-sm font-medium text-foreground"
+      >
         {f(field as never)}
         {required && <span className="text-destructive ml-0.5">*</span>}
       </label>
@@ -149,7 +177,12 @@ interface FieldToggleProps {
   label?: string;
 }
 
-export function FieldToggle({ field, checked, onChange, label }: FieldToggleProps) {
+export function FieldToggle({
+  field,
+  checked,
+  onChange,
+  label,
+}: FieldToggleProps) {
   const f = useTranslations("listing.create.fields");
   const displayLabel = label || f(field as never);
   return (
@@ -193,7 +226,9 @@ export function SectionHeader({ icon, title, subtitle }: SectionHeaderProps) {
       </div>
       <div>
         <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-        {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+        {subtitle && (
+          <p className="text-sm text-muted-foreground">{subtitle}</p>
+        )}
       </div>
     </div>
   );
@@ -281,7 +316,10 @@ export function ComboboxField({
   // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
         setQuery("");
       }
@@ -327,7 +365,10 @@ export function ComboboxField({
 
   return (
     <div ref={containerRef} className="relative">
-      <label htmlFor={field} className="mb-1.5 block text-sm font-medium text-foreground">
+      <label
+        htmlFor={field}
+        className="mb-1.5 block text-sm font-medium text-foreground"
+      >
         {f(field as never)}
         {required && <span className="text-destructive ml-0.5">*</span>}
       </label>
@@ -380,7 +421,9 @@ export function ComboboxField({
               }`}
             >
               <span className="flex-1">{opt.label}</span>
-              {opt.value === value && <Check className="h-4 w-4 shrink-0 text-primary" />}
+              {opt.value === value && (
+                <Check className="h-4 w-4 shrink-0 text-primary" />
+              )}
             </li>
           ))}
         </ul>

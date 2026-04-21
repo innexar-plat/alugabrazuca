@@ -1,28 +1,28 @@
-import { defineConfig } from 'vitest/config';
-import { resolve } from 'path';
-import swc from 'unplugin-swc';
+import { defineConfig } from "vitest/config";
+import { resolve } from "path";
+import swc from "unplugin-swc";
 
 export default defineConfig({
   test: {
     globals: true,
-    root: './',
-    include: ['src/**/*.spec.ts'],
-    environment: 'node',
-    setupFiles: ['./vitest.setup.ts'],
+    root: "./",
+    include: ["src/**/*.spec.ts"],
+    environment: "node",
+    setupFiles: ["./vitest.setup.ts"],
     server: {
       deps: {
-        external: ['express'],
+        external: ["express"],
       },
     },
   },
   plugins: [
     swc.vite({
-      module: { type: 'es6' },
+      module: { type: "es6" },
     }),
   ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
+      "@": resolve(__dirname, "src"),
     },
   },
 });

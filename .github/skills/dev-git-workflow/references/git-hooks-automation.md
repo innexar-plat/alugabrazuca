@@ -20,14 +20,14 @@ Setup and automation patterns for Git hooks, covering Husky, lefthook, lint-stag
 
 ## Hook Types and Use Cases
 
-| Hook | Trigger | Common Use Cases |
-|------|---------|-----------------|
-| `pre-commit` | Before commit is created | Linting, formatting, type checking, secrets scanning |
-| `prepare-commit-msg` | After default message, before editor opens | Auto-insert ticket number, template enforcement |
-| `commit-msg` | After message is written | Validate commit message format (commitlint) |
-| `pre-push` | Before push to remote | Run tests, check branch naming, prevent push to main |
-| `post-merge` | After merge completes | Auto-install dependencies, rebuild, notify |
-| `post-checkout` | After checkout completes | Install deps if lockfile changed, environment setup |
+| Hook                 | Trigger                                    | Common Use Cases                                     |
+| -------------------- | ------------------------------------------ | ---------------------------------------------------- |
+| `pre-commit`         | Before commit is created                   | Linting, formatting, type checking, secrets scanning |
+| `prepare-commit-msg` | After default message, before editor opens | Auto-insert ticket number, template enforcement      |
+| `commit-msg`         | After message is written                   | Validate commit message format (commitlint)          |
+| `pre-push`           | Before push to remote                      | Run tests, check branch naming, prevent push to main |
+| `post-merge`         | After merge completes                      | Auto-install dependencies, rebuild, notify           |
+| `post-checkout`      | After checkout completes                   | Install deps if lockfile changed, environment setup  |
 
 ---
 
@@ -114,6 +114,7 @@ pre-push:
 ```
 
 **Why choose lefthook over Husky**:
+
 - Parallel command execution by default
 - Single YAML config instead of multiple shell files
 - Built-in glob filtering (no need for lint-staged)
@@ -134,16 +135,9 @@ npm install --save-dev lint-staged
 ```json
 // package.json or .lintstagedrc.json
 {
-  "*.{js,ts,tsx}": [
-    "eslint --fix",
-    "prettier --write"
-  ],
-  "*.{json,md,yml}": [
-    "prettier --write"
-  ],
-  "*.css": [
-    "stylelint --fix"
-  ]
+  "*.{js,ts,tsx}": ["eslint --fix", "prettier --write"],
+  "*.{json,md,yml}": ["prettier --write"],
+  "*.css": ["stylelint --fix"]
 }
 ```
 
@@ -177,16 +171,28 @@ npm install --save-dev @commitlint/cli @commitlint/config-conventional
 ```javascript
 // commitlint.config.js
 module.exports = {
-  extends: ['@commitlint/config-conventional'],
+  extends: ["@commitlint/config-conventional"],
   rules: {
-    'type-enum': [2, 'always', [
-      'feat', 'fix', 'refactor', 'perf', 'test',
-      'docs', 'chore', 'ci', 'build', 'revert'
-    ]],
-    'scope-empty': [1, 'never'],       // Warn if no scope
-    'subject-max-length': [2, 'always', 72],
-    'body-max-line-length': [1, 'always', 100]
-  }
+    "type-enum": [
+      2,
+      "always",
+      [
+        "feat",
+        "fix",
+        "refactor",
+        "perf",
+        "test",
+        "docs",
+        "chore",
+        "ci",
+        "build",
+        "revert",
+      ],
+    ],
+    "scope-empty": [1, "never"], // Warn if no scope
+    "subject-max-length": [2, "always", 72],
+    "body-max-line-length": [1, "always", 100],
+  },
 };
 ```
 
@@ -376,7 +382,7 @@ echo "npm test" > .husky/pre-push
 ```javascript
 // commitlint.config.js
 module.exports = {
-  extends: ['@commitlint/config-conventional']
+  extends: ["@commitlint/config-conventional"],
 };
 ```
 
@@ -402,6 +408,7 @@ git commit --allow-empty -m "chore: verify commitlint hook"
 ## Do / Avoid
 
 **DO**:
+
 - [OK] Use lint-staged to run linters only on staged files (fast feedback)
 - [OK] Enforce commit message format with commitlint
 - [OK] Scan for secrets in pre-commit (gitleaks or similar)
@@ -410,6 +417,7 @@ git commit --allow-empty -m "chore: verify commitlint hook"
 - [OK] Run heavier checks (full test suite) in pre-push, not pre-commit
 
 **AVOID**:
+
 - [FAIL] Running the entire test suite in pre-commit (too slow, developers will bypass)
 - [FAIL] Hooks that modify files without re-staging them (causes silent partial commits)
 - [FAIL] Relying solely on hooks for enforcement (CI must also validate)

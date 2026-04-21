@@ -10,8 +10,8 @@ import {
   Max,
   IsBoolean,
   IsUUID,
-} from 'class-validator';
-import { InquiryType } from '@prisma/client';
+} from "class-validator";
+import { InquiryType } from "@prisma/client";
 
 export class CreateInquiryDto {
   @IsUUID()

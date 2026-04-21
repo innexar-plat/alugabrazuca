@@ -29,37 +29,38 @@ description: "Use when: designing REST API, creating endpoints, defining HTTP me
 
 ## 2. Métodos HTTP
 
-| Método | Uso | Idempotente |
-|--------|-----|-------------|
-| `GET` | Buscar dados (sem efeito colateral) | ✅ |
-| `POST` | Criar recurso | ❌ |
-| `PUT` | Substituir recurso completo | ✅ |
-| `PATCH` | Atualizar parcialmente | ✅ |
-| `DELETE` | Remover recurso | ✅ |
+| Método   | Uso                                 | Idempotente |
+| -------- | ----------------------------------- | ----------- |
+| `GET`    | Buscar dados (sem efeito colateral) | ✅          |
+| `POST`   | Criar recurso                       | ❌          |
+| `PUT`    | Substituir recurso completo         | ✅          |
+| `PATCH`  | Atualizar parcialmente              | ✅          |
+| `DELETE` | Remover recurso                     | ✅          |
 
 ---
 
 ## 3. Códigos HTTP Corretos
 
-| Código | Quando usar |
-|--------|-------------|
-| `200 OK` | Sucesso geral (GET, PATCH, DELETE) |
-| `201 Created` | Recurso criado com sucesso (POST) |
-| `204 No Content` | Sucesso sem corpo de resposta |
-| `400 Bad Request` | Input inválido, validação falhou |
-| `401 Unauthorized` | Não autenticado |
-| `403 Forbidden` | Autenticado mas sem permissão |
-| `404 Not Found` | Recurso não existe |
-| `409 Conflict` | Conflito (ex: email duplicado) |
-| `422 Unprocessable Entity` | Dados válidos mas inválidos semanticamente |
-| `429 Too Many Requests` | Rate limit atingido |
-| `500 Internal Server Error` | Erro inesperado no servidor |
+| Código                      | Quando usar                                |
+| --------------------------- | ------------------------------------------ |
+| `200 OK`                    | Sucesso geral (GET, PATCH, DELETE)         |
+| `201 Created`               | Recurso criado com sucesso (POST)          |
+| `204 No Content`            | Sucesso sem corpo de resposta              |
+| `400 Bad Request`           | Input inválido, validação falhou           |
+| `401 Unauthorized`          | Não autenticado                            |
+| `403 Forbidden`             | Autenticado mas sem permissão              |
+| `404 Not Found`             | Recurso não existe                         |
+| `409 Conflict`              | Conflito (ex: email duplicado)             |
+| `422 Unprocessable Entity`  | Dados válidos mas inválidos semanticamente |
+| `429 Too Many Requests`     | Rate limit atingido                        |
+| `500 Internal Server Error` | Erro inesperado no servidor                |
 
 ---
 
 ## 4. Formato de Resposta Padrão
 
 ### Sucesso — listagem
+
 ```json
 {
   "data": [...],
@@ -73,6 +74,7 @@ description: "Use when: designing REST API, creating endpoints, defining HTTP me
 ```
 
 ### Sucesso — item único
+
 ```json
 {
   "data": {
@@ -85,6 +87,7 @@ description: "Use when: designing REST API, creating endpoints, defining HTTP me
 ```
 
 ### Erro — formato padrão
+
 ```json
 {
   "statusCode": 400,
@@ -105,12 +108,12 @@ description: "Use when: designing REST API, creating endpoints, defining HTTP me
 GET /users?page=1&limit=20&sortBy=createdAt&order=desc
 ```
 
-| Parâmetro | Tipo | Padrão | Máximo |
-|-----------|------|--------|--------|
-| `page` | integer | 1 | - |
-| `limit` | integer | 20 | 100 |
-| `sortBy` | string | `createdAt` | - |
-| `order` | `asc`\|`desc` | `desc` | - |
+| Parâmetro | Tipo          | Padrão      | Máximo |
+| --------- | ------------- | ----------- | ------ |
+| `page`    | integer       | 1           | -      |
+| `limit`   | integer       | 20          | 100    |
+| `sortBy`  | string        | `createdAt` | -      |
+| `order`   | `asc`\|`desc` | `desc`      | -      |
 
 ---
 

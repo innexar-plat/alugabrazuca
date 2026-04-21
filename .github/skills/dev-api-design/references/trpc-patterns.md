@@ -8,14 +8,14 @@ TypeScript-first RPC framework for end-to-end type safety without code generatio
 
 ### Decision Matrix
 
-| Factor | Choose tRPC | Choose REST/GraphQL |
-|--------|-------------|---------------------|
-| **Stack** | TypeScript monorepo (frontend + backend) | Multi-language, polyglot teams |
-| **Audience** | Internal tools, same-team consumption | Public APIs, third-party developers |
-| **Type Safety** | End-to-end required, zero runtime errors | Schema-first is sufficient |
-| **Bundle Size** | Performance critical (~3.5x smaller than GraphQL client) | Bundle size less critical |
-| **Learning Curve** | Team knows TypeScript well | Team prefers REST conventions |
-| **Multi-source** | Single data source | Multiple services to aggregate |
+| Factor             | Choose tRPC                                              | Choose REST/GraphQL                 |
+| ------------------ | -------------------------------------------------------- | ----------------------------------- |
+| **Stack**          | TypeScript monorepo (frontend + backend)                 | Multi-language, polyglot teams      |
+| **Audience**       | Internal tools, same-team consumption                    | Public APIs, third-party developers |
+| **Type Safety**    | End-to-end required, zero runtime errors                 | Schema-first is sufficient          |
+| **Bundle Size**    | Performance critical (~3.5x smaller than GraphQL client) | Bundle size less critical           |
+| **Learning Curve** | Team knows TypeScript well                               | Team prefers REST conventions       |
+| **Multi-source**   | Single data source                                       | Multiple services to aggregate      |
 
 ### tRPC Excels For
 
@@ -40,8 +40,8 @@ TypeScript-first RPC framework for end-to-end type safety without code generatio
 
 ```typescript
 // server/trpc.ts
-import { initTRPC, TRPCError } from '@trpc/server';
-import { z } from 'zod';
+import { initTRPC, TRPCError } from "@trpc/server";
+import { z } from "zod";
 
 const t = initTRPC.context<Context>().create();
 
@@ -54,8 +54,8 @@ export const protectedProcedure = t.procedure.use(authMiddleware);
 
 ```typescript
 // server/routers/user.ts
-import { router, publicProcedure, protectedProcedure } from '../trpc';
-import { z } from 'zod';
+import { router, publicProcedure, protectedProcedure } from "../trpc";
+import { z } from "zod";
 
 export const userRouter = router({
   // Query (GET-like, idempotent)
@@ -67,10 +67,12 @@ export const userRouter = router({
 
   // Mutation (POST/PUT/DELETE-like, side effects)
   create: protectedProcedure
-    .input(z.object({
-      name: z.string().min(1).max(100),
-      email: z.string().email(),
-    }))
+    .input(
+      z.object({
+        name: z.string().min(1).max(100),
+        email: z.string().email(),
+      }),
+    )
     .mutation(async ({ input, ctx }) => {
       return ctx.db.user.create({ data: input });
     }),
@@ -118,8 +120,8 @@ list: publicProcedure
 
 ```typescript
 // server/context.ts
-import { inferAsyncReturnType } from '@trpc/server';
-import { CreateNextContextOptions } from '@trpc/server/adapters/next';
+import { inferAsyncReturnType } from "@trpc/server";
+import { CreateNextContextOptions } from "@trpc/server/adapters/next";
 
 export async function createContext({ req }: CreateNextContextOptions) {
   const session = await getSession(req);
@@ -138,13 +140,13 @@ export type Context = inferAsyncReturnType<typeof createContext>;
 
 ```typescript
 // server/middleware/auth.ts
-import { TRPCError } from '@trpc/server';
+import { TRPCError } from "@trpc/server";
 
 export const authMiddleware = t.middleware(async ({ ctx, next }) => {
   if (!ctx.user) {
     throw new TRPCError({
-      code: 'UNAUTHORIZED',
-      message: 'You must be logged in',
+      code: "UNAUTHORIZED",
+      message: "You must be logged in",
     });
   }
 
@@ -158,10 +160,10 @@ export const authMiddleware = t.middleware(async ({ ctx, next }) => {
 
 // Role-based middleware
 export const adminMiddleware = t.middleware(async ({ ctx, next }) => {
-  if (ctx.user?.role !== 'admin') {
+  if (ctx.user?.role !== "admin") {
     throw new TRPCError({
-      code: 'FORBIDDEN',
-      message: 'Admin access required',
+      code: "FORBIDDEN",
+      message: "Admin access required",
     });
   }
   return next({ ctx });
@@ -179,27 +181,27 @@ export const adminProcedure = t.procedure
 
 ### tRPC Error Codes
 
-| Code | HTTP Equivalent | Use When |
-|------|-----------------|----------|
-| `BAD_REQUEST` | 400 | Invalid input |
-| `UNAUTHORIZED` | 401 | Not authenticated |
-| `FORBIDDEN` | 403 | Authenticated but not allowed |
-| `NOT_FOUND` | 404 | Resource doesn't exist |
-| `CONFLICT` | 409 | Duplicate/conflict |
-| `PRECONDITION_FAILED` | 412 | State mismatch |
-| `TOO_MANY_REQUESTS` | 429 | Rate limited |
-| `INTERNAL_SERVER_ERROR` | 500 | Server error |
+| Code                    | HTTP Equivalent | Use When                      |
+| ----------------------- | --------------- | ----------------------------- |
+| `BAD_REQUEST`           | 400             | Invalid input                 |
+| `UNAUTHORIZED`          | 401             | Not authenticated             |
+| `FORBIDDEN`             | 403             | Authenticated but not allowed |
+| `NOT_FOUND`             | 404             | Resource doesn't exist        |
+| `CONFLICT`              | 409             | Duplicate/conflict            |
+| `PRECONDITION_FAILED`   | 412             | State mismatch                |
+| `TOO_MANY_REQUESTS`     | 429             | Rate limited                  |
+| `INTERNAL_SERVER_ERROR` | 500             | Server error                  |
 
 ### Structured Errors
 
 ```typescript
 // Throw with additional data
 throw new TRPCError({
-  code: 'BAD_REQUEST',
-  message: 'Validation failed',
+  code: "BAD_REQUEST",
+  message: "Validation failed",
   cause: {
-    field: 'email',
-    issue: 'already_exists',
+    field: "email",
+    issue: "already_exists",
   },
 });
 
@@ -208,7 +210,7 @@ const utils = trpc.useUtils();
 
 const createUser = trpc.user.create.useMutation({
   onError: (error) => {
-    if (error.data?.code === 'BAD_REQUEST') {
+    if (error.data?.code === "BAD_REQUEST") {
       const cause = error.cause as { field: string; issue: string };
       setFieldError(cause.field, cause.issue);
     }
@@ -347,25 +349,27 @@ export default async function UserPage({ params }: { params: { id: string } }) {
 
 ### Feature Comparison
 
-| Feature | tRPC | GraphQL | REST |
-|---------|------|---------|------|
-| **Type Safety** | End-to-end (TypeScript) | With codegen | Manual/OpenAPI |
-| **Bundle Size** | ~10KB | ~35KB+ | Varies |
-| **Caching** | React Query | Apollo/urql cache | HTTP caching |
-| **Code Generation** | None needed | Required for types | Optional |
-| **Multi-source** | Limited | Excellent (resolvers) | Aggregation layer |
-| **Public APIs** | Not recommended | Good | Best |
-| **Learning Curve** | Low (TS devs) | Medium | Low |
-| **Tooling** | VS Code autocomplete | Apollo DevTools, GraphiQL | Postman, OpenAPI |
+| Feature             | tRPC                    | GraphQL                   | REST              |
+| ------------------- | ----------------------- | ------------------------- | ----------------- |
+| **Type Safety**     | End-to-end (TypeScript) | With codegen              | Manual/OpenAPI    |
+| **Bundle Size**     | ~10KB                   | ~35KB+                    | Varies            |
+| **Caching**         | React Query             | Apollo/urql cache         | HTTP caching      |
+| **Code Generation** | None needed             | Required for types        | Optional          |
+| **Multi-source**    | Limited                 | Excellent (resolvers)     | Aggregation layer |
+| **Public APIs**     | Not recommended         | Good                      | Best              |
+| **Learning Curve**  | Low (TS devs)           | Medium                    | Low               |
+| **Tooling**         | VS Code autocomplete    | Apollo DevTools, GraphiQL | Postman, OpenAPI  |
 
 ### Migration Path
 
 **GraphQL to tRPC** (TypeScript monorepo):
+
 1. Keep GraphQL for mobile/external clients
 2. Add tRPC for internal web dashboard
 3. Share business logic between both
 
 **REST to tRPC**:
+
 1. Keep REST for public API
 2. Use tRPC for internal services
 3. Generate OpenAPI from tRPC if needed (experimental)
@@ -374,13 +378,13 @@ export default async function UserPage({ params }: { params: { id: string } }) {
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|--------------|---------|-----|
-| **Huge routers** | Hard to maintain | Split into domain routers |
-| **Business logic in procedures** | Untestable | Extract to services |
-| **No input validation** | Runtime errors | Always use Zod schemas |
-| **Exposing DB models** | Leaky abstraction | Return DTOs |
-| **No error boundaries** | Crashes app | Handle errors in UI |
+| Anti-Pattern                     | Problem           | Fix                       |
+| -------------------------------- | ----------------- | ------------------------- |
+| **Huge routers**                 | Hard to maintain  | Split into domain routers |
+| **Business logic in procedures** | Untestable        | Extract to services       |
+| **No input validation**          | Runtime errors    | Always use Zod schemas    |
+| **Exposing DB models**           | Leaky abstraction | Return DTOs               |
+| **No error boundaries**          | Crashes app       | Handle errors in UI       |
 
 ---
 

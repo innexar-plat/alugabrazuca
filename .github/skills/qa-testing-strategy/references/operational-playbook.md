@@ -33,6 +33,7 @@ Compact navigation hub for layered testing, CI gates, and ready-to-use templates
 ```
 
 **Rationale:**
+
 - **Unit tests**: Fast (ms), isolated, easy to debug, cheap to maintain
 - **Component tests**: Balance speed + integration, good for business logic
 - **Integration tests**: Test service interactions, catch integration issues
@@ -62,18 +63,23 @@ Compact navigation hub for layered testing, CI gates, and ready-to-use templates
 ### Templates by Testing Type
 
 **Unit Testing:**
+
 - [assets/unit/template-jest-vitest.md](../assets/unit/template-jest-vitest.md) — Jest/Vitest unit tests with AAA pattern, mocking, snapshot testing, test factories, async testing, and coverage
 
 **E2E Testing:**
+
 - [assets/e2e/template-playwright.md](../assets/e2e/template-playwright.md) — Playwright cross-browser E2E tests with Page Object Model, authentication state reuse, API mocking, mobile testing, visual regression, and parallel execution
 
 **Performance Testing:**
+
 - [assets/performance/template-k6-load-testing.md](../assets/performance/template-k6-load-testing.md) — k6 load testing with realistic scenarios, spike testing, stress testing, soak testing, custom metrics, and CI/CD integration
 
 **BDD (Behavior-Driven Development):**
+
 - [assets/bdd/template-cucumber-gherkin.md](../assets/bdd/template-cucumber-gherkin.md) — Cucumber BDD with Gherkin syntax, scenario outlines, data tables, tags, step definitions, and best practices for declarative testing
 
 **Strategy & Pipeline:**
+
 - [assets/test-strategy-template.md](../assets/test-strategy-template.md) — Test strategy one-pager with quality goals, scope by layer, data handling, and ownership
 - [assets/automation-pipeline-template.md](../assets/automation-pipeline-template.md) — CI/CD pipeline blueprint with stages, gates, parallelization, and rollback rules
 
@@ -95,17 +101,20 @@ Use this pattern to balance test types for optimal speed, coverage, and maintain
 **Structure:**
 
 **Base: Unit tests (40-60%)**
+
 - Many, fast, close to the code
 - No network, filesystem, or external services
 - AAA pattern (Arrange, Act, Assert)
 - Test business logic in isolation
 
 **Middle: Integration tests (30-40%)**
+
 - Fewer, slower, validate interactions
 - Test with real databases, queues, external services (or Docker containers)
 - Verify cross-component contracts
 
 **Top: E2E/system tests (5-10%)**
+
 - Small number, slowest, cover critical user journeys
 - Test complete workflows through UI
 - Focus on happy paths and critical edge cases
@@ -159,16 +168,19 @@ Use when tests rely on non-trivial data.
 **Strategies:**
 
 **In-memory data:**
+
 - Prefer for unit tests (fast, isolated)
 - Use factories to generate test data
 - Avoid global shared state
 
 **Database tests:**
+
 - Use transactions and rollbacks per test where possible
 - Reset state between tests to avoid cross-test coupling
 - Use Docker containers (Testcontainers) for integration tests
 
 **Large datasets:**
+
 - Use factories/builders to construct minimal required data
 - Keep golden files small and understandable
 - Regenerate intentionally, not automatically
@@ -176,7 +188,7 @@ Use when tests rely on non-trivial data.
 **Example (Factory Pattern):**
 
 ```typescript
-import { faker } from '@faker-js/faker'
+import { faker } from "@faker-js/faker";
 
 export class UserFactory {
   static create(overrides = {}) {
@@ -184,13 +196,13 @@ export class UserFactory {
       email: faker.internet.email(),
       name: faker.person.fullName(),
       age: faker.number.int({ min: 18, max: 80 }),
-      role: 'user',
-      ...overrides
-    }
+      role: "user",
+      ...overrides,
+    };
   }
 
   static createMany(count: number, overrides = {}) {
-    return Array.from({ length: count }, () => this.create(overrides))
+    return Array.from({ length: count }, () => this.create(overrides));
   }
 }
 ```
@@ -206,21 +218,25 @@ Use when wiring tests into CI/CD pipelines.
 **Stages:**
 
 **Fast linting and unit tests:**
+
 - Run on every push and PR
 - Fail fast on style or obvious logic errors
 - Target: < 5 minutes
 
 **Integration and E2E tests:**
+
 - Run on main branch and release branches
 - Gate deployments for critical services
 - Target: < 15 minutes
 
 **Performance and security tests:**
+
 - Run nightly or on release branches
 - Track trends over time
 - Target: < 30 minutes
 
 **Flaky tests:**
+
 - Track flakiness explicitly (retry count, failure rate)
 - Quarantine or stabilize them instead of ignoring failures
 - Use tags (@flaky) to separate from required gates
@@ -243,11 +259,13 @@ See [assets/automation-pipeline-template.md](../assets/automation-pipeline-templ
 ### Unit Testing
 
 **Jest** - Best for:
+
 - React applications (built-in React Testing Library support)
 - Zero-config setup preference
 - Extensive mocking capabilities
 
 **Vitest** - Best for:
+
 - Vite-based projects (instant compatibility)
 - Speed priority (native ESM, parallel execution)
 - Modern tooling (watch mode, UI mode)
@@ -257,12 +275,14 @@ See [assets/automation-pipeline-template.md](../assets/automation-pipeline-templ
 ### E2E Testing
 
 **Playwright** - Best for:
+
 - Cross-browser testing (Chromium, Firefox, WebKit)
 - Parallel execution by default
 - Network interception and API mocking
 - Mobile device emulation
 
 **Cypress** - Best for:
+
 - Real-time reloading and time-travel debugging
 - Easier learning curve
 - Excellent developer experience
@@ -272,12 +292,14 @@ See [assets/automation-pipeline-template.md](../assets/automation-pipeline-templ
 ### Performance Testing
 
 **k6** - Best for:
+
 - Developer-centric (JavaScript DSL)
 - Modern CI/CD integration
 - Grafana Cloud integration
 - Protocol Buffers/gRPC support
 
 **JMeter** - Best for:
+
 - Legacy systems
 - GUI-based test creation
 - Java ecosystem
@@ -291,17 +313,21 @@ See [data/sources.json](../data/sources.json) for complete framework references 
 ## Coverage Goals
 
 **Critical paths**: 100%
+
 - Authentication, payment processing, data persistence
 - Security-sensitive operations
 
 **Business logic**: 90%+
+
 - Service layer, domain models
 - Validation, calculations, workflows
 
 **Overall**: 80%+
+
 - Repository-wide average
 
 **UI components**: 70%+
+
 - Component rendering, user interactions
 
 **Note:** Coverage is a metric, not a goal. Quality > quantity. Test behavior, not lines.
@@ -314,54 +340,58 @@ See [data/sources.json](../data/sources.json) for complete framework references 
 
 ```typescript
 // Bad - Tests internal method
-expect(service.internalHelper()).toBe(true)
+expect(service.internalHelper()).toBe(true);
 
 // Good - Tests public behavior
-expect(service.publicMethod()).toBe(expectedResult)
+expect(service.publicMethod()).toBe(expectedResult);
 ```
 
 ### BAD: Flaky Tests (Race Conditions)
 
 ```typescript
 // Bad - Sleep (flaky)
-await sleep(1000) // Hope data loads
+await sleep(1000); // Hope data loads
 
 // Good - Explicit wait
-await expect(page.getByText('Loaded')).toBeVisible()
+await expect(page.getByText("Loaded")).toBeVisible();
 ```
 
 ### BAD: Shared Mutable State
 
 ```typescript
 // Bad - Shared across tests
-let user: User
-beforeAll(() => { user = createUser() })
+let user: User;
+beforeAll(() => {
+  user = createUser();
+});
 
 // Good - Fresh for each test
-beforeEach(() => { user = createUser() })
+beforeEach(() => {
+  user = createUser();
+});
 ```
 
 ### BAD: Excessive Mocking
 
 ```typescript
 // Bad - Mock everything
-const db = { save: jest.fn(), find: jest.fn() }
-const cache = { get: jest.fn(), set: jest.fn() }
+const db = { save: jest.fn(), find: jest.fn() };
+const cache = { get: jest.fn(), set: jest.fn() };
 
 // Good - Use real implementations for internal code
-const db = new InMemoryDatabase() // Real logic
-const emailService = mockEmailService() // Mock external
+const db = new InMemoryDatabase(); // Real logic
+const emailService = mockEmailService(); // Mock external
 ```
 
 ### BAD: Brittle Selectors
 
 ```typescript
 // Bad - Implementation-coupled
-await page.locator('.btn.btn-primary.submit-v2').click()
+await page.locator(".btn.btn-primary.submit-v2").click();
 
 // Good - Semantic
-await page.getByRole('button', { name: 'Submit' }).click()
-await page.getByTestId('submit-button').click()
+await page.getByRole("button", { name: "Submit" }).click();
+await page.getByTestId("submit-button").click();
 ```
 
 See [references/test-automation-patterns.md](test-automation-patterns.md) for complete anti-patterns guide.
@@ -420,6 +450,7 @@ See [data/sources.json](../data/sources.json) for curated references across 13 c
 ## Best Practices Checklist
 
 **Test Design:**
+
 - [ ] Use AAA pattern (Arrange, Act, Assert)
 - [ ] One assertion per test (or related group)
 - [ ] Test behavior, not implementation details
@@ -427,23 +458,27 @@ See [data/sources.json](../data/sources.json) for curated references across 13 c
 - [ ] Use descriptive test names
 
 **Test Data:**
+
 - [ ] Use factories for test data generation
 - [ ] Avoid magic values (use constants or factories)
 - [ ] Clean up after tests (beforeEach/afterEach)
 
 **Test Coverage:**
+
 - [ ] 100% coverage on critical paths
 - [ ] 90%+ coverage on business logic
 - [ ] 80%+ overall coverage
 - [ ] Track coverage trends in CI
 
 **Test Maintenance:**
+
 - [ ] Run tests in parallel
 - [ ] Fix or quarantine flaky tests immediately
 - [ ] Refactor tests alongside code
 - [ ] Review test failures in CI before merging
 
 **CI/CD Integration:**
+
 - [ ] Unit tests on every commit (< 5 min)
 - [ ] Integration tests on PR (< 15 min)
 - [ ] E2E tests on staging (< 30 min)

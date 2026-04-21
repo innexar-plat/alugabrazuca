@@ -22,6 +22,7 @@ Toda aplicação backend DEVE seguir **Clean Architecture** com **Domain-Driven 
 ```
 
 Exemplos de domínios:
+
 - `/modules/users`
 - `/modules/crm`
 - `/modules/finance`
@@ -32,30 +33,35 @@ Exemplos de domínios:
 ## 2. Princípios Obrigatórios (CORE)
 
 ### SOLID
-| Princípio | Regra prática |
-|-----------|---------------|
-| **S** — Single Responsibility | 1 classe = 1 responsabilidade |
-| **O** — Open/Closed | Extensível sem modificar a base |
-| **L** — Liskov | Subclasses substituem a base sem quebrar |
-| **I** — Interface Segregation | Interfaces pequenas e específicas |
-| **D** — Dependency Inversion | Dependências sempre injetadas (nunca instanciadas diretamente) |
+
+| Princípio                     | Regra prática                                                  |
+| ----------------------------- | -------------------------------------------------------------- |
+| **S** — Single Responsibility | 1 classe = 1 responsabilidade                                  |
+| **O** — Open/Closed           | Extensível sem modificar a base                                |
+| **L** — Liskov                | Subclasses substituem a base sem quebrar                       |
+| **I** — Interface Segregation | Interfaces pequenas e específicas                              |
+| **D** — Dependency Inversion  | Dependências sempre injetadas (nunca instanciadas diretamente) |
 
 ### DRY (Don't Repeat Yourself)
+
 - Proibido duplicar lógica
 - Reutilizar serviços e helpers existentes
 - Antes de criar algo novo, verificar se já existe
 
 ### KISS (Keep It Simple, Stupid)
+
 - Evitar overengineering
 - Solução simples > solução complexa sempre
 - Se parece complicado, está errado
 
 ### YAGNI (You Aren't Gonna Need It)
+
 - Não criar features futuras
 - Implementar apenas o necessário para a tarefa atual
 - Sem abstrações prematuras
 
 ### Separation of Concerns
+
 - `controller` ≠ `service` ≠ `repository` ≠ `database`
 - Camadas nunca misturam responsabilidades
 
@@ -70,6 +76,7 @@ Requisição → Controller → Service → Repository → Database
 ```
 
 **Proibido:**
+
 - Controller acessar banco de dados diretamente
 - Lógica de negócio no controller
 - Lógica de query no service (usar repository)
@@ -79,13 +86,15 @@ Requisição → Controller → Service → Repository → Database
 ## 4. Organização de Código
 
 ### Tamanho de arquivos
-| Tamanho | Status |
-|---------|--------|
-| 50–150 linhas | ✅ Ideal |
-| até 300 linhas | ⚠️ Aceitável |
+
+| Tamanho             | Status                        |
+| ------------------- | ----------------------------- |
+| 50–150 linhas       | ✅ Ideal                      |
+| até 300 linhas      | ⚠️ Aceitável                  |
 | acima de 300 linhas | ❌ Refatorar obrigatoriamente |
 
 ### Funções
+
 - Pequenas (máximo ~30 linhas)
 - Nome claro: **verbo + substantivo** em camelCase
   - `createUser()`, `validateLead()`, `processPayment()`, `findActiveOrders()`
@@ -105,15 +114,15 @@ Requisição → Controller → Service → Repository → Database
 
 ## 6. Naming Conventions
 
-| Elemento | Padrão | Exemplo |
-|----------|--------|---------|
-| Arquivos | kebab-case | `user.service.ts`, `auth.controller.ts` |
-| Classes | PascalCase | `UserService`, `AuthController` |
-| Funções/métodos | camelCase | `createUser()`, `findById()` |
-| Variáveis | camelCase | `userId`, `isActive` |
-| Constantes | UPPER_SNAKE_CASE | `MAX_RETRY_COUNT`, `JWT_SECRET` |
-| Interfaces | PascalCase com `I` prefix (opcional) | `IUserRepository` |
-| DTOs | PascalCase + `Dto` | `CreateUserDto`, `UpdateOrderDto` |
+| Elemento        | Padrão                               | Exemplo                                 |
+| --------------- | ------------------------------------ | --------------------------------------- |
+| Arquivos        | kebab-case                           | `user.service.ts`, `auth.controller.ts` |
+| Classes         | PascalCase                           | `UserService`, `AuthController`         |
+| Funções/métodos | camelCase                            | `createUser()`, `findById()`            |
+| Variáveis       | camelCase                            | `userId`, `isActive`                    |
+| Constantes      | UPPER_SNAKE_CASE                     | `MAX_RETRY_COUNT`, `JWT_SECRET`         |
+| Interfaces      | PascalCase com `I` prefix (opcional) | `IUserRepository`                       |
+| DTOs            | PascalCase + `Dto`                   | `CreateUserDto`, `UpdateOrderDto`       |
 
 ---
 
@@ -122,6 +131,7 @@ Requisição → Controller → Service → Repository → Database
 A IA NUNCA deve gerar código sem seguir a estrutura acima.
 
 Para cada feature, sempre gerar:
+
 1. `controller` — recebe e valida requisição
 2. `service` — implementa lógica de negócio
 3. `repository` — acessa o banco de dados
@@ -129,6 +139,7 @@ Para cada feature, sempre gerar:
 5. `entity` — representa o modelo de domínio
 
 Validar código gerado para:
+
 - Evitar código duplicado
 - Garantir que segue Clean Architecture
 - Verificar que não mistura responsabilidades

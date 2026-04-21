@@ -8,14 +8,14 @@ Patterns for building reliable webhook processing systems. Covers idempotency, r
 
 Webhooks are the source of truth for payment state. A missed or double-processed webhook means lost revenue, incorrect subscription states, or duplicate charges. Unlike API calls where the client controls retry logic, webhook delivery is controlled by the sender (Stripe, Paddle, etc.). Your handler must be resilient to every delivery scenario.
 
-| Failure Mode | Impact | Mitigation |
-|-------------|--------|-----------|
-| Handler crashes | Event lost until retry | Return 500, Stripe retries |
-| Handler succeeds but DB fails | Inconsistent state | Transactional processing |
-| Duplicate delivery | Double-counted revenue | Idempotency |
-| Out-of-order events | Wrong final state | Event timestamp comparison |
-| Handler too slow | Timeout, retry storm | Queue-based processing |
-| Signature not verified | Replay attacks, spoofing | Always verify signature |
+| Failure Mode                  | Impact                   | Mitigation                 |
+| ----------------------------- | ------------------------ | -------------------------- |
+| Handler crashes               | Event lost until retry   | Return 500, Stripe retries |
+| Handler succeeds but DB fails | Inconsistent state       | Transactional processing   |
+| Duplicate delivery            | Double-counted revenue   | Idempotency                |
+| Out-of-order events           | Wrong final state        | Event timestamp comparison |
+| Handler too slow              | Timeout, retry storm     | Queue-based processing     |
+| Signature not verified        | Replay attacks, spoofing | Always verify signature    |
 
 ---
 
@@ -29,7 +29,7 @@ Use the Stripe event ID as the idempotency key. Each event has a unique ID that 
 async function processWebhookEvent(event: Stripe.Event): Promise<boolean> {
   // Check if we've already processed this event
   const existing = await db.webhookEvents.findByStripeEventId(event.id);
-  if (existing?.status === 'processed') {
+  if (existing?.status === "processed") {
     console.log(`[webhook] Skipping duplicate event: ${event.id}`);
     return true; // Already processed — return 200
   }
@@ -38,7 +38,7 @@ async function processWebhookEvent(event: Stripe.Event): Promise<boolean> {
   await db.webhookEvents.upsert({
     stripe_event_id: event.id,
     event_type: event.type,
-    status: 'processing',
+    status: "processing",
     received_at: new Date(),
   });
 
@@ -46,15 +46,15 @@ async function processWebhookEvent(event: Stripe.Event): Promise<boolean> {
     await routeEvent(event);
 
     await db.webhookEvents.update(event.id, {
-      status: 'processed',
+      status: "processed",
       processed_at: new Date(),
     });
 
     return true;
   } catch (error) {
     await db.webhookEvents.update(event.id, {
-      status: 'failed',
-      error_message: error instanceof Error ? error.message : 'Unknown error',
+      status: "failed",
+      error_message: error instanceof Error ? error.message : "Unknown error",
       failed_at: new Date(),
     });
 
@@ -70,12 +70,12 @@ For events where the same logical change might produce different event IDs (e.g.
 ```typescript
 function computeIdempotencyKey(event: Stripe.Event): string {
   switch (event.type) {
-    case 'customer.subscription.updated': {
+    case "customer.subscription.updated": {
       const sub = event.data.object as Stripe.Subscription;
       // Same subscription + same status + same price = same logical event
-      return createHash('sha256')
+      return createHash("sha256")
         .update(`${sub.id}:${sub.status}:${sub.items.data[0]?.price?.id}`)
-        .digest('hex');
+        .digest("hex");
     }
     default:
       return event.id; // Use event ID for most events
@@ -119,13 +119,13 @@ async function cleanupProcessedEvents(): Promise<void> {
 
   // Remove old successful events
   await db.webhookEvents.deleteWhere({
-    status: 'processed',
+    status: "processed",
     processed_at: { lt: thirtyDaysAgo },
   });
 
   // Remove old failed events (keep longer for forensics)
   await db.webhookEvents.deleteWhere({
-    status: 'failed',
+    status: "failed",
     failed_at: { lt: ninetyDaysAgo },
   });
 }
@@ -137,27 +137,27 @@ async function cleanupProcessedEvents(): Promise<void> {
 
 ### Stripe Retry Schedule
 
-| Attempt | Timing | Total Elapsed |
-|---------|--------|---------------|
-| 1 | Immediate | 0 |
-| 2 | ~1 hour | 1 hour |
-| 3 | ~2 hours | 3 hours |
-| 4 | ~4 hours | 7 hours |
-| 5 | ~8 hours | 15 hours |
-| 6 | ~16 hours | 31 hours |
-| 7 | ~24 hours | 55 hours |
-| 8 | ~24 hours | 79 hours (~3 days) |
+| Attempt | Timing    | Total Elapsed      |
+| ------- | --------- | ------------------ |
+| 1       | Immediate | 0                  |
+| 2       | ~1 hour   | 1 hour             |
+| 3       | ~2 hours  | 3 hours            |
+| 4       | ~4 hours  | 7 hours            |
+| 5       | ~8 hours  | 15 hours           |
+| 6       | ~16 hours | 31 hours           |
+| 7       | ~24 hours | 55 hours           |
+| 8       | ~24 hours | 79 hours (~3 days) |
 
 After ~3 days of failures, Stripe stops retrying and marks the event as failed.
 
 ### Response Codes and Their Meaning
 
-| Code | Stripe Behaviour | When to Return |
-|------|-----------------|---------------|
-| 2xx | Event processed, no retry | Handler succeeded |
-| 4xx | Event failed, no retry | Bad request (invalid signature, malformed) |
-| 5xx | Event failed, will retry | Handler error (DB down, timeout) |
-| Timeout (>30s) | Treated as failure, will retry | Handler too slow |
+| Code           | Stripe Behaviour               | When to Return                             |
+| -------------- | ------------------------------ | ------------------------------------------ |
+| 2xx            | Event processed, no retry      | Handler succeeded                          |
+| 4xx            | Event failed, no retry         | Bad request (invalid signature, malformed) |
+| 5xx            | Event failed, will retry       | Handler error (DB down, timeout)           |
+| Timeout (>30s) | Treated as failure, will retry | Handler too slow                           |
 
 ### Handler Timeout Strategy
 
@@ -167,10 +167,10 @@ export async function POST(request: NextRequest) {
   const event = await verifyAndParseEvent(request);
 
   // This might take 10+ seconds for complex operations
-  await processSubscriptionChange(event);      // DB operations
-  await sendNotificationEmail(event);          // Email API
-  await updateAnalytics(event);               // Analytics API
-  await syncToExternalCRM(event);             // CRM API
+  await processSubscriptionChange(event); // DB operations
+  await sendNotificationEmail(event); // Email API
+  await updateAnalytics(event); // Analytics API
+  await syncToExternalCRM(event); // CRM API
 
   return NextResponse.json({ received: true }); // Might timeout
 }
@@ -183,7 +183,7 @@ export async function POST(request: NextRequest) {
   await db.webhookEvents.insert({
     stripe_event_id: event.id,
     event_type: event.type,
-    status: 'received',
+    status: "received",
     payload: event,
   });
 
@@ -204,44 +204,47 @@ A dead letter queue (DLQ) captures events that failed processing after all retri
 
 ```typescript
 // Move permanently failed events to dead letter
-async function moveToDeadLetter(eventId: string, reason: string): Promise<void> {
+async function moveToDeadLetter(
+  eventId: string,
+  reason: string,
+): Promise<void> {
   await db.webhookEvents.update(eventId, {
-    status: 'dead_letter',
+    status: "dead_letter",
     error_message: reason,
     failed_at: new Date(),
   });
 
   // Alert operations team
   await alertSlack({
-    channel: '#billing-alerts',
+    channel: "#billing-alerts",
     text: `Dead letter webhook: ${eventId} — ${reason}`,
-    severity: 'high',
+    severity: "high",
   });
 }
 
 // Manual replay from dead letter queue
 async function replayDeadLetterEvent(eventId: string): Promise<void> {
   const event = await db.webhookEvents.findById(eventId);
-  if (!event || event.status !== 'dead_letter') {
+  if (!event || event.status !== "dead_letter") {
     throw new Error(`Event ${eventId} not found in dead letter queue`);
   }
 
   // Reset status and re-process
   await db.webhookEvents.update(eventId, {
-    status: 'processing',
+    status: "processing",
     retry_count: event.retry_count + 1,
   });
 
   try {
     await routeEvent(event.payload as Stripe.Event);
     await db.webhookEvents.update(eventId, {
-      status: 'processed',
+      status: "processed",
       processed_at: new Date(),
     });
   } catch (error) {
     await db.webhookEvents.update(eventId, {
-      status: 'dead_letter',
-      error_message: error instanceof Error ? error.message : 'Unknown',
+      status: "dead_letter",
+      error_message: error instanceof Error ? error.message : "Unknown",
     });
     throw error;
   }
@@ -249,8 +252,8 @@ async function replayDeadLetterEvent(eventId: string): Promise<void> {
 
 // Admin API: list and replay dead letter events
 export async function GET() {
-  const deadLetters = await db.webhookEvents.findByStatus('dead_letter', {
-    orderBy: 'received_at',
+  const deadLetters = await db.webhookEvents.findByStatus("dead_letter", {
+    orderBy: "received_at",
     limit: 100,
   });
 
@@ -270,14 +273,14 @@ export async function POST(request: NextRequest) {
 
 ### Key Metrics
 
-| Metric | Target | Alert Threshold | How to Measure |
-|--------|--------|----------------|---------------|
-| **Delivery success rate** | > 99.5% | < 98% | 2xx responses / total received |
-| **Processing time (p95)** | < 5s | > 10s | Time from receipt to processed |
-| **Failed events (last 1h)** | 0 | > 5 | Count status=failed |
-| **Dead letter queue size** | 0 | > 0 | Count status=dead_letter |
-| **Event processing lag** | < 30s | > 5m | Time from Stripe creation to processing |
-| **Duplicate rate** | < 5% | > 10% | Duplicates detected / total |
+| Metric                      | Target  | Alert Threshold | How to Measure                          |
+| --------------------------- | ------- | --------------- | --------------------------------------- |
+| **Delivery success rate**   | > 99.5% | < 98%           | 2xx responses / total received          |
+| **Processing time (p95)**   | < 5s    | > 10s           | Time from receipt to processed          |
+| **Failed events (last 1h)** | 0       | > 5             | Count status=failed                     |
+| **Dead letter queue size**  | 0       | > 0             | Count status=dead_letter                |
+| **Event processing lag**    | < 30s   | > 5m            | Time from Stripe creation to processing |
+| **Duplicate rate**          | < 5%    | > 10%           | Duplicates detected / total             |
 
 ### Monitoring Dashboard Queries
 
@@ -363,7 +366,10 @@ async function handleSubscriptionUpdated(
   const existing = await db.subscriptions.findByUserId(userId);
 
   // Skip if we've already processed a newer event for this subscription
-  if (existing?.last_event_at && new Date(existing.last_event_at) >= new Date(eventCreated * 1000)) {
+  if (
+    existing?.last_event_at &&
+    new Date(existing.last_event_at) >= new Date(eventCreated * 1000)
+  ) {
     console.log(`[webhook] Skipping stale event for user ${userId}`);
     return;
   }
@@ -398,17 +404,19 @@ Stripe's `constructEvent` method internally uses timing-safe comparison. Always 
 ```typescript
 // CORRECT: Use Stripe's built-in verification
 const event = stripe.webhooks.constructEvent(
-  body,       // Raw request body (string, not parsed JSON)
-  signature,  // stripe-signature header
+  body, // Raw request body (string, not parsed JSON)
+  signature, // stripe-signature header
   webhookSecret,
 );
 
 // WRONG: Manual verification (timing attack vulnerable)
 const expectedSignature = crypto
-  .createHmac('sha256', webhookSecret)
+  .createHmac("sha256", webhookSecret)
   .update(body)
-  .digest('hex');
-if (signature !== expectedSignature) { /* ... */ } // Timing attack!
+  .digest("hex");
+if (signature !== expectedSignature) {
+  /* ... */
+} // Timing attack!
 ```
 
 ### Replay Prevention
@@ -442,22 +450,23 @@ The signature is computed over the raw request body. Parsing and re-serialising 
 // Next.js App Router: body is already raw
 export async function POST(request: NextRequest) {
   const body = await request.text(); // Raw body for signature verification
-  const signature = request.headers.get('stripe-signature')!;
+  const signature = request.headers.get("stripe-signature")!;
   const event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   // ...
 }
 
 // Express: must use raw body parser
-app.post('/webhook',
-  express.raw({ type: 'application/json' }), // NOT express.json()
+app.post(
+  "/webhook",
+  express.raw({ type: "application/json" }), // NOT express.json()
   (req, res) => {
     const event = stripe.webhooks.constructEvent(
       req.body,
-      req.headers['stripe-signature'],
+      req.headers["stripe-signature"],
       webhookSecret,
     );
     // ...
-  }
+  },
 );
 ```
 
@@ -483,44 +492,52 @@ app.post('/webhook',
 ### Implementation with Bull/BullMQ (Redis)
 
 ```typescript
-import { Queue, Worker } from 'bullmq';
+import { Queue, Worker } from "bullmq";
 
 // Webhook receiver: fast acknowledgement
-const webhookQueue = new Queue('stripe-webhooks', {
-  connection: { host: 'localhost', port: 6379 },
+const webhookQueue = new Queue("stripe-webhooks", {
+  connection: { host: "localhost", port: 6379 },
 });
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
-  const signature = request.headers.get('stripe-signature')!;
+  const signature = request.headers.get("stripe-signature")!;
 
   // Verify signature (fast)
   const event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
 
   // Enqueue for processing (fast)
-  await webhookQueue.add(event.type, {
-    eventId: event.id,
-    eventType: event.type,
-    payload: event,
-  }, {
-    jobId: event.id, // Idempotency via job ID
-    attempts: 3,
-    backoff: { type: 'exponential', delay: 5000 },
-  });
+  await webhookQueue.add(
+    event.type,
+    {
+      eventId: event.id,
+      eventType: event.type,
+      payload: event,
+    },
+    {
+      jobId: event.id, // Idempotency via job ID
+      attempts: 3,
+      backoff: { type: "exponential", delay: 5000 },
+    },
+  );
 
   return NextResponse.json({ received: true });
 }
 
 // Queue consumer: process at own pace
-const worker = new Worker('stripe-webhooks', async (job) => {
-  const event = job.data.payload as Stripe.Event;
-  await routeEvent(event);
-}, {
-  connection: { host: 'localhost', port: 6379 },
-  concurrency: 5,
-});
+const worker = new Worker(
+  "stripe-webhooks",
+  async (job) => {
+    const event = job.data.payload as Stripe.Event;
+    await routeEvent(event);
+  },
+  {
+    connection: { host: "localhost", port: 6379 },
+    concurrency: 5,
+  },
+);
 
-worker.on('failed', (job, err) => {
+worker.on("failed", (job, err) => {
   if (job && job.attemptsMade >= job.opts.attempts!) {
     // Move to dead letter
     moveToDeadLetter(job.data.eventId, err.message);
@@ -551,52 +568,62 @@ stripe events resend evt_1234567890
 
 ```typescript
 // Test webhook handler resilience
-describe('Webhook Reliability', () => {
-  it('handles duplicate events idempotently', async () => {
-    const event = createMockEvent('checkout.session.completed');
+describe("Webhook Reliability", () => {
+  it("handles duplicate events idempotently", async () => {
+    const event = createMockEvent("checkout.session.completed");
 
     // Process same event twice
     await processWebhookEvent(event);
     await processWebhookEvent(event);
 
     // Should only create one subscription record
-    const subs = await db.subscriptions.findByUserId(event.data.object.metadata.user_id);
+    const subs = await db.subscriptions.findByUserId(
+      event.data.object.metadata.user_id,
+    );
     expect(subs).toHaveLength(1);
   });
 
-  it('handles out-of-order events correctly', async () => {
-    const userId = 'user_123';
+  it("handles out-of-order events correctly", async () => {
+    const userId = "user_123";
 
     // Send "updated" before "created"
-    await processWebhookEvent(createMockEvent('customer.subscription.updated', {
-      status: 'active',
-      created: 1000002,
-    }));
-    await processWebhookEvent(createMockEvent('customer.subscription.created', {
-      status: 'trialing',
-      created: 1000001,
-    }));
+    await processWebhookEvent(
+      createMockEvent("customer.subscription.updated", {
+        status: "active",
+        created: 1000002,
+      }),
+    );
+    await processWebhookEvent(
+      createMockEvent("customer.subscription.created", {
+        status: "trialing",
+        created: 1000001,
+      }),
+    );
 
     // Final state should be "active" (newer event wins)
     const sub = await db.subscriptions.findByUserId(userId);
-    expect(sub.status).toBe('active');
+    expect(sub.status).toBe("active");
   });
 
-  it('recovers from DB failure', async () => {
-    const event = createMockEvent('invoice.payment_succeeded');
+  it("recovers from DB failure", async () => {
+    const event = createMockEvent("invoice.payment_succeeded");
 
     // Simulate DB failure
-    jest.spyOn(db.subscriptions, 'update').mockRejectedValueOnce(new Error('DB timeout'));
+    jest
+      .spyOn(db.subscriptions, "update")
+      .mockRejectedValueOnce(new Error("DB timeout"));
 
     // Should throw (return 500 so Stripe retries)
     await expect(processWebhookEvent(event)).rejects.toThrow();
 
     // Retry should succeed
-    jest.spyOn(db.subscriptions, 'update').mockRestore();
+    jest.spyOn(db.subscriptions, "update").mockRestore();
     await processWebhookEvent(event);
 
-    const sub = await db.subscriptions.findByUserId(event.data.object.metadata.user_id);
-    expect(sub.status).toBe('active');
+    const sub = await db.subscriptions.findByUserId(
+      event.data.object.metadata.user_id,
+    );
+    expect(sub.status).toBe("active");
   });
 });
 ```
@@ -607,11 +634,11 @@ describe('Webhook Reliability', () => {
 
 ### Environment Configuration
 
-| Environment | Webhook Endpoint | Webhook Secret | Stripe Mode |
-|-------------|-----------------|----------------|-------------|
-| Development | `localhost:3000/api/stripe/webhook` | `whsec_dev_...` | Test mode |
-| Staging | `staging.yourdomain.com/api/stripe/webhook` | `whsec_staging_...` | Test mode |
-| Production | `yourdomain.com/api/stripe/webhook` | `whsec_prod_...` | Live mode |
+| Environment | Webhook Endpoint                            | Webhook Secret      | Stripe Mode |
+| ----------- | ------------------------------------------- | ------------------- | ----------- |
+| Development | `localhost:3000/api/stripe/webhook`         | `whsec_dev_...`     | Test mode   |
+| Staging     | `staging.yourdomain.com/api/stripe/webhook` | `whsec_staging_...` | Test mode   |
+| Production  | `yourdomain.com/api/stripe/webhook`         | `whsec_prod_...`    | Live mode   |
 
 ### Stripe CLI for Development
 
@@ -650,11 +677,11 @@ function getSubscriptionIdFromInvoice(invoice: Stripe.Invoice): string | null {
   // New format (2025-11-17.clover+)
   if (invoice.parent?.subscription_details) {
     const sub = invoice.parent.subscription_details.subscription;
-    return typeof sub === 'string' ? sub : sub?.id || null;
+    return typeof sub === "string" ? sub : sub?.id || null;
   }
 
   // Legacy format (pre-2025)
-  if (typeof (invoice as any).subscription === 'string') {
+  if (typeof (invoice as any).subscription === "string") {
     return (invoice as any).subscription;
   }
 
@@ -675,17 +702,17 @@ function getSubscriptionIdFromInvoice(invoice: Stripe.Invoice): string | null {
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|-------------|---------|-----|
-| No idempotency | Double-processing on retry | Track event IDs, skip duplicates |
-| Slow webhook handler | Timeouts, retry storms | Queue-based processing, fast 200 response |
-| Returning 200 on failure | Event marked as processed, never retried | Return 500 so Stripe retries |
-| No dead letter queue | Permanently failed events are lost | Capture failed events for manual replay |
-| Manual signature verification | Timing attack vulnerability | Use `stripe.webhooks.constructEvent()` |
-| No monitoring | Silent failures go undetected | Dashboard + alerting on failure rate |
-| Parsed body for verification | Signature mismatch | Use raw body (`request.text()`) |
-| No event ordering protection | Stale events overwrite newer state | Compare event timestamps |
-| Same webhook secret across environments | Security risk | Separate secrets per environment |
+| Anti-Pattern                            | Problem                                  | Fix                                       |
+| --------------------------------------- | ---------------------------------------- | ----------------------------------------- |
+| No idempotency                          | Double-processing on retry               | Track event IDs, skip duplicates          |
+| Slow webhook handler                    | Timeouts, retry storms                   | Queue-based processing, fast 200 response |
+| Returning 200 on failure                | Event marked as processed, never retried | Return 500 so Stripe retries              |
+| No dead letter queue                    | Permanently failed events are lost       | Capture failed events for manual replay   |
+| Manual signature verification           | Timing attack vulnerability              | Use `stripe.webhooks.constructEvent()`    |
+| No monitoring                           | Silent failures go undetected            | Dashboard + alerting on failure rate      |
+| Parsed body for verification            | Signature mismatch                       | Use raw body (`request.text()`)           |
+| No event ordering protection            | Stale events overwrite newer state       | Compare event timestamps                  |
+| Same webhook secret across environments | Security risk                            | Separate secrets per environment          |
 
 ---
 

@@ -1,12 +1,13 @@
 # Backend Engineering - Go + Fiber + GORM Template
 
-*Purpose: High-performance, concurrent backend services with Go's native concurrency primitives*
+_Purpose: High-performance, concurrent backend services with Go's native concurrency primitives_
 
 ---
 
 # When to Use
 
 Use this template when building:
+
 - High-performance APIs requiring low latency (<10ms)
 - Microservices with intensive concurrent operations
 - Real-time systems (WebSocket servers, streaming APIs)
@@ -14,6 +15,7 @@ Use this template when building:
 - Systems requiring predictable memory usage and minimal GC pauses
 
 **Go Advantages:**
+
 - Native goroutines for lightweight concurrency (100k+ concurrent connections)
 - Static compilation (single binary deployment, no runtime dependencies)
 - Fast startup times (critical for serverless/containers)
@@ -27,6 +29,7 @@ Use this template when building:
 # 1. Project Overview
 
 **Tech Stack:**
+
 - [ ] Go 1.22+ (prefer latest stable)
 - [ ] Fiber v2 (Express-inspired framework, 10x faster than Express.js)
 - [ ] GORM 1.25+ (ORM with hooks, transactions, migrations)
@@ -39,6 +42,7 @@ Use this template when building:
 **Project Name:** `{{project_name}}`
 
 **Team:**
+
 - Backend: {{team_size}} developers
 - DevOps: {{devops_team}}
 
@@ -88,6 +92,7 @@ project-root/
 ```
 
 **Key Principles:**
+
 - `cmd/` for executable entry points
 - `internal/` for private application code (not importable by external packages)
 - `pkg/` for reusable utilities
@@ -99,13 +104,13 @@ project-root/
 
 > **Important**: The code patterns in this template should be extracted to shared utility packages. **Do not duplicate** these utilities across services.
 
-| Utility | Extract To | Reference |
-|---------|------------|-----------|
-| Config loading (`getEnv`, `getEnvInt`) | `internal/pkg/config/` | [config-validation.md](../../../software-clean-code-standard/utilities/config-validation.md) |
-| JWT (`JWTManager`, `Generate`, `Verify`) | `internal/pkg/auth/` | [auth-utilities.md](../../../software-clean-code-standard/utilities/auth-utilities.md) |
-| Password (`HashPassword`, `VerifyPassword`) | `internal/pkg/auth/` | [auth-utilities.md](../../../software-clean-code-standard/utilities/auth-utilities.md) |
-| Errors (`AppError`, `errorHandler`) | `internal/pkg/errors/` | [error-handling.md](../../../software-clean-code-standard/utilities/error-handling.md) |
-| Logging (zap setup) | `internal/pkg/logger/` | [logging-utilities.md](../../../software-clean-code-standard/utilities/logging-utilities.md) |
+| Utility                                     | Extract To             | Reference                                                                                    |
+| ------------------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------- |
+| Config loading (`getEnv`, `getEnvInt`)      | `internal/pkg/config/` | [config-validation.md](../../../software-clean-code-standard/utilities/config-validation.md) |
+| JWT (`JWTManager`, `Generate`, `Verify`)    | `internal/pkg/auth/`   | [auth-utilities.md](../../../software-clean-code-standard/utilities/auth-utilities.md)       |
+| Password (`HashPassword`, `VerifyPassword`) | `internal/pkg/auth/`   | [auth-utilities.md](../../../software-clean-code-standard/utilities/auth-utilities.md)       |
+| Errors (`AppError`, `errorHandler`)         | `internal/pkg/errors/` | [error-handling.md](../../../software-clean-code-standard/utilities/error-handling.md)       |
+| Logging (zap setup)                         | `internal/pkg/logger/` | [logging-utilities.md](../../../software-clean-code-standard/utilities/logging-utilities.md) |
 
 **Pattern**: Create utilities once in `internal/pkg/`, import everywhere via:
 
@@ -1274,7 +1279,7 @@ ENTRYPOINT ["/main"]
 ## docker-compose.yml
 
 ```yaml
-version: '3.9'
+version: "3.9"
 
 services:
   api:
@@ -1376,6 +1381,7 @@ air:
 # 11. Production Checklist
 
 ## Security [OK]
+
 - [ ] JWT secret is strong (min 32 chars) and stored in secret manager
 - [ ] HTTPS enforced (TLS 1.2+ only)
 - [ ] Rate limiting configured per endpoint
@@ -1388,6 +1394,7 @@ air:
 - [ ] API key rotation policy
 
 ## Performance [OK]
+
 - [ ] Database connection pooling configured
 - [ ] Redis caching for read-heavy operations
 - [ ] Cursor-based pagination for large datasets
@@ -1398,6 +1405,7 @@ air:
 - [ ] Load testing completed (k6, vegeta)
 
 ## Observability [OK]
+
 - [ ] Structured logging (JSON format)
 - [ ] Request ID tracking
 - [ ] Error tracking (Sentry, Rollbar)
@@ -1407,6 +1415,7 @@ air:
 - [ ] Distributed tracing (OpenTelemetry)
 
 ## Deployment [OK]
+
 - [ ] Multi-stage Docker build
 - [ ] Container security scanning
 - [ ] Environment variables validated
@@ -1417,6 +1426,7 @@ air:
 - [ ] CI/CD pipeline configured
 
 ## Reliability [OK]
+
 - [ ] Database backups automated
 - [ ] Redis persistence configured
 - [ ] Circuit breaker for external services
@@ -1501,6 +1511,7 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 **Congratulations!** You now have a production-grade Go backend with Fiber, GORM, and PostgreSQL.
 
 **Next Steps:**
+
 1. Run `go mod tidy` to install dependencies
 2. Copy `.env.example` to `.env` and configure
 3. Start services with `docker-compose up -d`
@@ -1509,6 +1520,7 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 6. Access Swagger docs at `http://localhost:8080/swagger/index.html`
 
 **Go-Specific Best Practices:**
+
 - Use goroutines for concurrent operations (with proper sync/error handling)
 - Leverage Go's context for timeouts and cancellation
 - Profile with pprof (`import _ "net/http/pprof"`)

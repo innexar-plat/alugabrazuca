@@ -5,6 +5,7 @@ Use this template for load and performance testing with k6, a modern developer-c
 ## Why k6 (2024-2025)
 
 **Advantages over JMeter/Gatling**:
+
 - JavaScript DSL (familiar syntax)
 - CLI-first approach (no GUI overhead)
 - Built-in Grafana Cloud integration
@@ -16,172 +17,182 @@ Use this template for load and performance testing with k6, a modern developer-c
 
 ```javascript
 // load-test.js
-import http from 'k6/http'
-import { check, sleep } from 'k6'
-import { Rate } from 'k6/metrics'
+import http from "k6/http";
+import { check, sleep } from "k6";
+import { Rate } from "k6/metrics";
 
 // Custom metrics
-const errorRate = new Rate('errors')
+const errorRate = new Rate("errors");
 
 export const options = {
   stages: [
-    { duration: '2m', target: 100 },   // Ramp up to 100 users over 2 minutes
-    { duration: '5m', target: 100 },   // Stay at 100 users for 5 minutes
-    { duration: '2m', target: 200 },   // Ramp up to 200 users
-    { duration: '5m', target: 200 },   // Stay at 200 users
-    { duration: '2m', target: 0 },     // Ramp down to 0 users
+    { duration: "2m", target: 100 }, // Ramp up to 100 users over 2 minutes
+    { duration: "5m", target: 100 }, // Stay at 100 users for 5 minutes
+    { duration: "2m", target: 200 }, // Ramp up to 200 users
+    { duration: "5m", target: 200 }, // Stay at 200 users
+    { duration: "2m", target: 0 }, // Ramp down to 0 users
   ],
   thresholds: {
-    http_req_duration: ['p(95)<500', 'p(99)<1000'],  // 95% under 500ms, 99% under 1s
-    http_req_failed: ['rate<0.01'],                   // Error rate under 1%
-    errors: ['rate<0.1'],                             // Custom error rate under 10%
-  }
-}
+    http_req_duration: ["p(95)<500", "p(99)<1000"], // 95% under 500ms, 99% under 1s
+    http_req_failed: ["rate<0.01"], // Error rate under 1%
+    errors: ["rate<0.1"], // Custom error rate under 10%
+  },
+};
 
 export default function () {
   // GET request
-  const response = http.get('https://api.example.com/products')
+  const response = http.get("https://api.example.com/products");
 
   // Validate response
   const checkResult = check(response, {
-    'status is 200': (r) => r.status === 200,
-    'response time < 500ms': (r) => r.timings.duration < 500,
-    'body contains products': (r) => r.json('products') !== undefined
-  })
+    "status is 200": (r) => r.status === 200,
+    "response time < 500ms": (r) => r.timings.duration < 500,
+    "body contains products": (r) => r.json("products") !== undefined,
+  });
 
   // Track errors
-  errorRate.add(!checkResult)
+  errorRate.add(!checkResult);
 
   // Think time (simulate user behavior)
-  sleep(1)
+  sleep(1);
 }
 ```
 
 ## API Testing with Authentication
 
 ```javascript
-import http from 'k6/http'
-import { check } from 'k6'
+import http from "k6/http";
+import { check } from "k6";
 
 export const options = {
   vus: 50, // 50 virtual users
-  duration: '5m'
-}
+  duration: "5m",
+};
 
 // Setup: Authenticate once per VU
 export function setup() {
-  const loginRes = http.post('https://api.example.com/auth/login', {
-    email: 'test@example.com',
-    password: 'password123'
-  })
+  const loginRes = http.post("https://api.example.com/auth/login", {
+    email: "test@example.com",
+    password: "password123",
+  });
 
-  const token = loginRes.json('token')
-  return { token }
+  const token = loginRes.json("token");
+  return { token };
 }
 
 export default function (data) {
   const headers = {
-    'Authorization': `Bearer ${data.token}`,
-    'Content-Type': 'application/json'
-  }
+    Authorization: `Bearer ${data.token}`,
+    "Content-Type": "application/json",
+  };
 
   // Authenticated requests
-  const productsRes = http.get('https://api.example.com/products', { headers })
+  const productsRes = http.get("https://api.example.com/products", { headers });
   check(productsRes, {
-    'products loaded': (r) => r.status === 200
-  })
+    "products loaded": (r) => r.status === 200,
+  });
 
-  const ordersRes = http.get('https://api.example.com/orders', { headers })
+  const ordersRes = http.get("https://api.example.com/orders", { headers });
   check(ordersRes, {
-    'orders loaded': (r) => r.status === 200
-  })
+    "orders loaded": (r) => r.status === 200,
+  });
 }
 ```
 
 ## User Scenarios (Realistic Workflows)
 
 ```javascript
-import http from 'k6/http'
-import { check, sleep, group } from 'k6'
-import { randomItem } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js'
+import http from "k6/http";
+import { check, sleep, group } from "k6";
+import { randomItem } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
 
 export const options = {
   scenarios: {
     // 80% of users browse products
     browsers: {
-      executor: 'ramping-vus',
+      executor: "ramping-vus",
       startVUs: 0,
       stages: [
-        { duration: '5m', target: 80 },
-        { duration: '10m', target: 80 },
-        { duration: '2m', target: 0 }
+        { duration: "5m", target: 80 },
+        { duration: "10m", target: 80 },
+        { duration: "2m", target: 0 },
       ],
-      exec: 'browseProducts'
+      exec: "browseProducts",
     },
     // 20% of users make purchases
     buyers: {
-      executor: 'ramping-vus',
+      executor: "ramping-vus",
       startVUs: 0,
       stages: [
-        { duration: '5m', target: 20 },
-        { duration: '10m', target: 20 },
-        { duration: '2m', target: 0 }
+        { duration: "5m", target: 20 },
+        { duration: "10m", target: 20 },
+        { duration: "2m", target: 0 },
       ],
-      exec: 'purchaseFlow'
-    }
+      exec: "purchaseFlow",
+    },
   },
   thresholds: {
-    'group_duration{group:::Browse Products}': ['p(95)<2000'],
-    'group_duration{group:::Purchase Flow}': ['p(95)<5000']
-  }
-}
+    "group_duration{group:::Browse Products}": ["p(95)<2000"],
+    "group_duration{group:::Purchase Flow}": ["p(95)<5000"],
+  },
+};
 
 export function browseProducts() {
-  group('Browse Products', () => {
+  group("Browse Products", () => {
     // Homepage
-    http.get('https://api.example.com/')
-    sleep(2)
+    http.get("https://api.example.com/");
+    sleep(2);
 
     // Category page
-    const categories = ['laptops', 'phones', 'tablets']
-    http.get(`https://api.example.com/products?category=${randomItem(categories)}`)
-    sleep(3)
+    const categories = ["laptops", "phones", "tablets"];
+    http.get(
+      `https://api.example.com/products?category=${randomItem(categories)}`,
+    );
+    sleep(3);
 
     // Product detail
-    const productId = Math.floor(Math.random() * 100) + 1
-    http.get(`https://api.example.com/products/${productId}`)
-    sleep(2)
-  })
+    const productId = Math.floor(Math.random() * 100) + 1;
+    http.get(`https://api.example.com/products/${productId}`);
+    sleep(2);
+  });
 }
 
 export function purchaseFlow() {
-  group('Purchase Flow', () => {
+  group("Purchase Flow", () => {
     // Login
-    const loginRes = http.post('https://api.example.com/auth/login', {
-      email: 'buyer@example.com',
-      password: 'password'
-    })
-    const token = loginRes.json('token')
-    const headers = { 'Authorization': `Bearer ${token}` }
+    const loginRes = http.post("https://api.example.com/auth/login", {
+      email: "buyer@example.com",
+      password: "password",
+    });
+    const token = loginRes.json("token");
+    const headers = { Authorization: `Bearer ${token}` };
 
-    sleep(1)
+    sleep(1);
 
     // Add to cart
-    http.post('https://api.example.com/cart', {
-      productId: 42,
-      quantity: 1
-    }, { headers })
+    http.post(
+      "https://api.example.com/cart",
+      {
+        productId: 42,
+        quantity: 1,
+      },
+      { headers },
+    );
 
-    sleep(2)
+    sleep(2);
 
     // Checkout
-    http.post('https://api.example.com/orders', {
-      cartId: '123',
-      paymentMethod: 'card'
-    }, { headers })
+    http.post(
+      "https://api.example.com/orders",
+      {
+        cartId: "123",
+        paymentMethod: "card",
+      },
+      { headers },
+    );
 
-    sleep(1)
-  })
+    sleep(1);
+  });
 }
 ```
 
@@ -190,19 +201,19 @@ export function purchaseFlow() {
 ```javascript
 export const options = {
   stages: [
-    { duration: '10s', target: 100 },   // Normal load
-    { duration: '1m', target: 100 },    // Sustain normal load
-    { duration: '10s', target: 1000 },  // SPIKE to 10x load
-    { duration: '3m', target: 1000 },   // Sustain spike
-    { duration: '10s', target: 100 },   // Drop back to normal
-    { duration: '3m', target: 100 },    // Recovery period
-    { duration: '10s', target: 0 }      // Ramp down
+    { duration: "10s", target: 100 }, // Normal load
+    { duration: "1m", target: 100 }, // Sustain normal load
+    { duration: "10s", target: 1000 }, // SPIKE to 10x load
+    { duration: "3m", target: 1000 }, // Sustain spike
+    { duration: "10s", target: 100 }, // Drop back to normal
+    { duration: "3m", target: 100 }, // Recovery period
+    { duration: "10s", target: 0 }, // Ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(99)<3000'],  // Allow higher latency during spike
-    http_req_failed: ['rate<0.05']      // Allow 5% errors during spike
-  }
-}
+    http_req_duration: ["p(99)<3000"], // Allow higher latency during spike
+    http_req_failed: ["rate<0.05"], // Allow 5% errors during spike
+  },
+};
 ```
 
 ## Stress Testing (Find Breaking Point)
@@ -210,17 +221,17 @@ export const options = {
 ```javascript
 export const options = {
   stages: [
-    { duration: '2m', target: 100 },
-    { duration: '5m', target: 100 },
-    { duration: '2m', target: 200 },
-    { duration: '5m', target: 200 },
-    { duration: '2m', target: 300 },
-    { duration: '5m', target: 300 },
-    { duration: '2m', target: 400 },  // Continue increasing until system breaks
-    { duration: '5m', target: 400 },
-    { duration: '10m', target: 0 }
-  ]
-}
+    { duration: "2m", target: 100 },
+    { duration: "5m", target: 100 },
+    { duration: "2m", target: 200 },
+    { duration: "5m", target: 200 },
+    { duration: "2m", target: 300 },
+    { duration: "5m", target: 300 },
+    { duration: "2m", target: 400 }, // Continue increasing until system breaks
+    { duration: "5m", target: 400 },
+    { duration: "10m", target: 0 },
+  ],
+};
 ```
 
 ## Soak Testing (Endurance)
@@ -228,44 +239,45 @@ export const options = {
 ```javascript
 export const options = {
   stages: [
-    { duration: '5m', target: 100 },   // Ramp up
-    { duration: '8h', target: 100 },   // Sustained load for 8 hours
-    { duration: '5m', target: 0 }      // Ramp down
+    { duration: "5m", target: 100 }, // Ramp up
+    { duration: "8h", target: 100 }, // Sustained load for 8 hours
+    { duration: "5m", target: 0 }, // Ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(99)<1000'],
-    http_req_failed: ['rate<0.001']    // Very low error rate for sustained test
-  }
-}
+    http_req_duration: ["p(99)<1000"],
+    http_req_failed: ["rate<0.001"], // Very low error rate for sustained test
+  },
+};
 ```
 
 ## Custom Metrics and Trends
 
 ```javascript
-import { Trend, Counter, Gauge } from 'k6/metrics'
+import { Trend, Counter, Gauge } from "k6/metrics";
 
 // Custom metrics
-const productLoadTime = new Trend('product_load_time')
-const cartItemsCount = new Gauge('cart_items')
-const ordersPlaced = new Counter('orders_placed')
+const productLoadTime = new Trend("product_load_time");
+const cartItemsCount = new Gauge("cart_items");
+const ordersPlaced = new Counter("orders_placed");
 
 export default function () {
-  const start = Date.now()
-  const res = http.get('https://api.example.com/products/42')
-  const duration = Date.now() - start
+  const start = Date.now();
+  const res = http.get("https://api.example.com/products/42");
+  const duration = Date.now() - start;
 
-  productLoadTime.add(duration)
+  productLoadTime.add(duration);
 
   if (res.status === 200) {
-    const product = res.json()
+    const product = res.json();
     // Track cart items
-    cartItemsCount.add(product.quantity || 0)
+    cartItemsCount.add(product.quantity || 0);
   }
 
   // Simulate order placement
-  if (Math.random() < 0.1) {  // 10% of users place order
-    http.post('https://api.example.com/orders', {})
-    ordersPlaced.add(1)
+  if (Math.random() < 0.1) {
+    // 10% of users place order
+    http.post("https://api.example.com/orders", {});
+    ordersPlaced.add(1);
   }
 }
 ```
@@ -277,48 +289,48 @@ export const options = {
   thresholds: {
     // HTTP metrics
     http_req_duration: [
-      'p(50)<200',    // 50% under 200ms
-      'p(90)<400',    // 90% under 400ms
-      'p(95)<500',    // 95% under 500ms
-      'p(99)<1000'    // 99% under 1s
+      "p(50)<200", // 50% under 200ms
+      "p(90)<400", // 90% under 400ms
+      "p(95)<500", // 95% under 500ms
+      "p(99)<1000", // 99% under 1s
     ],
-    'http_req_duration{name:ProductPage}': ['p(95)<300'],
-    'http_req_duration{name:Checkout}': ['p(95)<1000'],
+    "http_req_duration{name:ProductPage}": ["p(95)<300"],
+    "http_req_duration{name:Checkout}": ["p(95)<1000"],
 
     // Error rates
-    http_req_failed: ['rate<0.01'],  // Total error rate < 1%
-    'http_req_failed{name:Checkout}': ['rate<0.001'],  // Checkout errors < 0.1%
+    http_req_failed: ["rate<0.01"], // Total error rate < 1%
+    "http_req_failed{name:Checkout}": ["rate<0.001"], // Checkout errors < 0.1%
 
     // Custom metrics
-    'product_load_time': ['p(95)<500'],
-    'orders_placed': ['count>100']  // At least 100 orders during test
-  }
-}
+    product_load_time: ["p(95)<500"],
+    orders_placed: ["count>100"], // At least 100 orders during test
+  },
+};
 ```
 
 ## Data-Driven Testing
 
 ```javascript
-import { SharedArray } from 'k6/data'
-import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
+import { SharedArray } from "k6/data";
+import papaparse from "https://jslib.k6.io/papaparse/5.1.1/index.js";
 
 // Load test data once (shared across VUs)
-const testData = new SharedArray('users', function () {
-  return papaparse.parse(open('./test-users.csv'), { header: true }).data
-})
+const testData = new SharedArray("users", function () {
+  return papaparse.parse(open("./test-users.csv"), { header: true }).data;
+});
 
 export default function () {
   // Each VU gets a different user
-  const user = testData[__VU % testData.length]
+  const user = testData[__VU % testData.length];
 
-  const loginRes = http.post('https://api.example.com/auth/login', {
+  const loginRes = http.post("https://api.example.com/auth/login", {
     email: user.email,
-    password: user.password
-  })
+    password: user.password,
+  });
 
   check(loginRes, {
-    'login successful': (r) => r.status === 200
-  })
+    "login successful": (r) => r.status === 200,
+  });
 }
 ```
 
@@ -331,7 +343,7 @@ name: Load Tests
 
 on:
   schedule:
-    - cron: '0 2 * * *'  # Run nightly
+    - cron: "0 2 * * *" # Run nightly
   workflow_dispatch:
 
 jobs:
@@ -426,45 +438,45 @@ vus_max........................: 100     min=100 max=100
 export const options = {
   scenarios: {
     light_load: {
-      executor: 'constant-vus',
+      executor: "constant-vus",
       vus: 50,
-      duration: '10m',
-      exec: 'browsing'
+      duration: "10m",
+      exec: "browsing",
     },
     heavy_load: {
-      executor: 'ramping-arrival-rate',
+      executor: "ramping-arrival-rate",
       startRate: 10,
-      timeUnit: '1s',
+      timeUnit: "1s",
       preAllocatedVUs: 100,
       stages: [
-        { duration: '5m', target: 50 },
-        { duration: '10m', target: 50 }
+        { duration: "5m", target: 50 },
+        { duration: "10m", target: 50 },
       ],
-      exec: 'checkout'
-    }
-  }
-}
+      exec: "checkout",
+    },
+  },
+};
 
 // Pattern: Smoke test (quick validation)
 export const options = {
   vus: 1,
-  duration: '1m',
+  duration: "1m",
   thresholds: {
-    http_req_failed: ['rate<0.01']
-  }
-}
+    http_req_failed: ["rate<0.01"],
+  },
+};
 
 // Pattern: Breakpoint test (find max capacity)
 export const options = {
-  executor: 'ramping-arrival-rate',
+  executor: "ramping-arrival-rate",
   startRate: 1,
-  timeUnit: '1s',
+  timeUnit: "1s",
   preAllocatedVUs: 500,
   maxVUs: 1000,
   stages: [
-    { duration: '2h', target: 100 }  // Slowly ramp up until system breaks
-  ]
-}
+    { duration: "2h", target: 100 }, // Slowly ramp up until system breaks
+  ],
+};
 ```
 
 ## Related Resources

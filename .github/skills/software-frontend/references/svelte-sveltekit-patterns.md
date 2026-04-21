@@ -111,20 +111,24 @@ export function createCartStore() {
 
   // Computed
   let total = $derived(
-    items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    items.reduce((sum, item) => sum + item.price * item.quantity, 0),
   );
 
-  let count = $derived(
-    items.reduce((sum, item) => sum + item.quantity, 0)
-  );
+  let count = $derived(items.reduce((sum, item) => sum + item.quantity, 0));
 
   return {
-    get items() { return items; },
-    get total() { return total; },
-    get count() { return count; },
+    get items() {
+      return items;
+    },
+    get total() {
+      return total;
+    },
+    get count() {
+      return count;
+    },
 
     addItem(item: CartItem) {
-      const existing = items.find(i => i.id === item.id);
+      const existing = items.find((i) => i.id === item.id);
       if (existing) {
         existing.quantity++;
       } else {
@@ -133,12 +137,12 @@ export function createCartStore() {
     },
 
     removeItem(id: string) {
-      items = items.filter(i => i.id !== id);
+      items = items.filter((i) => i.id !== id);
     },
 
     clear() {
       items = [];
-    }
+    },
   };
 }
 
@@ -154,17 +158,17 @@ export const cart = createCartStore();
 
 ```typescript
 // +page.server.ts - Server-only
-import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import { error } from "@sveltejs/kit";
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   // Access server-side resources (database, env vars)
   const post = await db.post.findUnique({
-    where: { slug: params.slug }
+    where: { slug: params.slug },
   });
 
   if (!post) {
-    throw error(404, 'Post not found');
+    throw error(404, "Post not found");
   }
 
   return { post };
@@ -173,15 +177,17 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 ```typescript
 // +page.ts - Runs on both server and client
-import type { PageLoad } from './$types';
+import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ fetch, data }) => {
   // Use SvelteKit's fetch for SSR
-  const comments = await fetch(`/api/posts/${data.post.id}/comments`).then(r => r.json());
+  const comments = await fetch(`/api/posts/${data.post.id}/comments`).then(
+    (r) => r.json(),
+  );
 
   return {
     ...data,
-    comments
+    comments,
   };
 };
 ```
@@ -190,14 +196,14 @@ export const load: PageLoad = async ({ fetch, data }) => {
 
 ```typescript
 // +page.server.ts
-import { fail, redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
-import { z } from 'zod';
+import { fail, redirect } from "@sveltejs/kit";
+import type { Actions } from "./$types";
+import { z } from "zod";
 
 const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  name: z.string().min(2)
+  name: z.string().min(2),
 });
 
 export const actions: Actions = {
@@ -209,7 +215,7 @@ export const actions: Actions = {
     const result = registerSchema.safeParse(data);
     if (!result.success) {
       return fail(400, {
-        errors: result.error.flatten().fieldErrors
+        errors: result.error.flatten().fieldErrors,
       });
     }
 
@@ -217,16 +223,16 @@ export const actions: Actions = {
     const user = await createUser(result.data);
 
     // Set session
-    cookies.set('session', user.sessionToken, {
-      path: '/',
+    cookies.set("session", user.sessionToken, {
+      path: "/",
       httpOnly: true,
       secure: true,
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 7
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 7,
     });
 
-    throw redirect(303, '/dashboard');
-  }
+    throw redirect(303, "/dashboard");
+  },
 };
 ```
 
@@ -357,15 +363,15 @@ export const actions: Actions = {
 ### Component Test
 
 ```typescript
-import { render, screen, fireEvent } from '@testing-library/svelte';
-import { describe, it, expect } from 'vitest';
-import Counter from './Counter.svelte';
+import { render, screen, fireEvent } from "@testing-library/svelte";
+import { describe, it, expect } from "vitest";
+import Counter from "./Counter.svelte";
 
-describe('Counter', () => {
-  it('increments on button click', async () => {
+describe("Counter", () => {
+  it("increments on button click", async () => {
     render(Counter);
 
-    const button = screen.getByText('+');
+    const button = screen.getByText("+");
     await fireEvent.click(button);
 
     expect(screen.getByText(/Count: 1/)).toBeInTheDocument();
@@ -441,6 +447,7 @@ describe('Counter', () => {
 ## Migration from Svelte 4
 
 Key changes:
+
 - `let` -> `$state()`
 - `$:` reactive statements -> `$derived()`
 - `export let prop` -> `let { prop } = $props()`

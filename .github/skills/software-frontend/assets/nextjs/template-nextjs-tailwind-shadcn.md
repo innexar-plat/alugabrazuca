@@ -1,6 +1,6 @@
 # Frontend Engineering - Next.js 16 + Tailwind CSS + shadcn/ui Template
 
-*Purpose: Production-grade web applications with Next.js 16 App Router, TypeScript, Tailwind CSS, and shadcn/ui components.*
+_Purpose: Production-grade web applications with Next.js 16 App Router, TypeScript, Tailwind CSS, and shadcn/ui components._
 
 ---
 
@@ -29,6 +29,7 @@ Use this template when building:
 [Brief description]
 
 **Tech Stack:**
+
 - [ ] Next.js 16.x (App Router, Turbopack default, proxy.ts)
 - [ ] React 19.2.x
 - [ ] TypeScript 5.9.x
@@ -38,11 +39,13 @@ Use this template when building:
 - [ ] PostgreSQL (optional - if full-stack)
 
 **Team:**
+
 - Owner: [Name]
 - Frontend Lead: [Name]
 - Designer: [Name]
 
 **Timeline:**
+
 - Start: [YYYY-MM-DD]
 - MVP: [YYYY-MM-DD]
 - Launch: [YYYY-MM-DD]
@@ -170,82 +173,82 @@ my-app/
 ## 3.1 tailwind.config.ts
 
 ```ts
-import type { Config } from 'tailwindcss';
+import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: ['class'],
+  darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
   ],
   theme: {
     container: {
       center: true,
-      padding: '2rem',
+      padding: "2rem",
       screens: {
-        '2xl': '1400px',
+        "2xl": "1400px",
       },
     },
     extend: {
       colors: {
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
         },
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
-        'accordion-down': {
-          from: { height: '0' },
-          to: { height: 'var(--radix-accordion-content-height)' },
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
-        'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: '0' },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
-        'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out',
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require("tailwindcss-animate")],
 };
 
 export default config;
@@ -254,18 +257,18 @@ export default config;
 ## 3.2 next.config.ts (Next.js 16)
 
 ```ts
-import type { NextConfig } from 'next';
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
     // 'domains' is deprecated - use remotePatterns instead
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'your-domain.com',
+        protocol: "https",
+        hostname: "your-domain.com",
       },
     ],
-    formats: ['image/avif', 'image/webp'],
+    formats: ["image/avif", "image/webp"],
   },
   // Turbopack is now default - remove --turbopack flags from scripts
   turbopack: {
@@ -283,19 +286,19 @@ export default nextConfig;
 ```ts
 // proxy.ts (root of project)
 // NOTE: Runs on Node.js runtime (not Edge). Use middleware.ts if you need Edge.
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 export function proxy(request: NextRequest) {
   // Authentication check example
-  const token = request.cookies.get('token');
+  const token = request.cookies.get("token");
 
-  if (!token && request.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  if (!token && request.nextUrl.pathname.startsWith("/dashboard")) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   // Add custom headers
   const response = NextResponse.next();
-  response.headers.set('x-custom-header', 'value');
+  response.headers.set("x-custom-header", "value");
 
   return response;
 }
@@ -303,7 +306,7 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     // Match all paths except static files and api routes
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };
 ```
@@ -332,26 +335,26 @@ NEXT_PUBLIC_API_URL=http://localhost:3000/api
 ## 4.1 app/layout.tsx
 
 ```tsx
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { Providers } from '@/providers';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { Providers } from "@/providers";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: 'My App',
-    template: '%s | My App',
+    default: "My App",
+    template: "%s | My App",
   },
-  description: 'My Next.js application',
-  keywords: ['next.js', 'react', 'typescript'],
-  authors: [{ name: 'Your Name' }],
+  description: "My Next.js application",
+  keywords: ["next.js", "react", "typescript"],
+  authors: [{ name: "Your Name" }],
   openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: 'https://your-domain.com',
-    siteName: 'My App',
+    type: "website",
+    locale: "en_US",
+    url: "https://your-domain.com",
+    siteName: "My App",
   },
 };
 
@@ -363,9 +366,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <Providers>
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
@@ -375,10 +376,10 @@ export default function RootLayout({
 ## 4.2 src/providers/index.tsx
 
 ```tsx
-'use client';
+"use client";
 
-import { ThemeProvider } from './theme-provider';
-import { AuthProvider } from './auth-provider';
+import { ThemeProvider } from "./theme-provider";
+import { AuthProvider } from "./auth-provider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -388,9 +389,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      <AuthProvider>
-        {children}
-      </AuthProvider>
+      <AuthProvider>{children}</AuthProvider>
     </ThemeProvider>
   );
 }
@@ -404,7 +403,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
 ```tsx
 // components/shared/loading.tsx
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from "lucide-react";
 
 export function LoadingSpinner() {
   return (
@@ -425,7 +424,7 @@ export function LoadingSkeleton() {
 }
 
 // app/loading.tsx
-import { LoadingSpinner } from '@/components/shared/loading';
+import { LoadingSpinner } from "@/components/shared/loading";
 
 export default function Loading() {
   return (
@@ -440,10 +439,10 @@ export default function Loading() {
 
 ```tsx
 // app/error.tsx
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function Error({
   error,
@@ -470,8 +469,8 @@ export default function Error({
 
 ```tsx
 // app/not-found.tsx
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
@@ -497,14 +496,14 @@ export default function NotFound() {
 
 ```tsx
 // components/forms/login-form.tsx
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -512,12 +511,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -529,8 +528,8 @@ export function LoginForm() {
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
   });
 
@@ -538,21 +537,21 @@ export function LoginForm() {
     try {
       setError(null);
 
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Login failed');
+        throw new Error(error.message || "Login failed");
       }
 
-      router.push('/dashboard');
+      router.push("/dashboard");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     }
   }
 
@@ -566,11 +565,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input
-                  type="email"
-                  placeholder="you@example.com"
-                  {...field}
-                />
+                <Input type="email" placeholder="you@example.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -602,7 +597,7 @@ export function LoginForm() {
           className="w-full"
           disabled={form.formState.isSubmitting}
         >
-          {form.formState.isSubmitting ? 'Logging in...' : 'Login'}
+          {form.formState.isSubmitting ? "Logging in..." : "Login"}
         </Button>
       </form>
     </Form>
@@ -614,13 +609,13 @@ export function LoginForm() {
 
 ```tsx
 // app/(auth)/login/page.tsx
-import { Metadata } from 'next';
-import Link from 'next/link';
-import { LoginForm } from '@/components/forms/login-form';
+import { Metadata } from "next";
+import Link from "next/link";
+import { LoginForm } from "@/components/forms/login-form";
 
 export const metadata: Metadata = {
-  title: 'Login',
-  description: 'Login to your account',
+  title: "Login",
+  description: "Login to your account",
 };
 
 export default function LoginPage() {
@@ -639,7 +634,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-sm text-muted-foreground">
-          Don't have an account?{' '}
+          Don't have an account?{" "}
           <Link
             href="/register"
             className="font-medium text-primary hover:underline"
@@ -661,8 +656,8 @@ export default function LoginPage() {
 
 ```tsx
 // app/(dashboard)/layout.tsx
-import { Header } from '@/components/layouts/header';
-import { Sidebar } from '@/components/layouts/sidebar';
+import { Header } from "@/components/layouts/header";
+import { Sidebar } from "@/components/layouts/sidebar";
 
 export default function DashboardLayout({
   children,
@@ -685,17 +680,17 @@ export default function DashboardLayout({
 
 ```tsx
 // components/layouts/sidebar.tsx
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
-import { Home, Users, Settings } from 'lucide-react';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Home, Users, Settings } from "lucide-react";
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: Home },
-  { name: 'Users', href: '/dashboard/users', icon: Users },
-  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+  { name: "Dashboard", href: "/dashboard", icon: Home },
+  { name: "Users", href: "/dashboard/users", icon: Users },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -715,10 +710,10 @@ export function Sidebar() {
               key={item.name}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'hover:bg-accent hover:text-accent-foreground'
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-accent hover:text-accent-foreground",
               )}
             >
               <item.icon className="h-5 w-5" />
@@ -736,10 +731,10 @@ export function Sidebar() {
 
 ```tsx
 // components/layouts/header.tsx
-'use client';
+"use client";
 
-import { useAuth } from '@/lib/hooks/use-auth';
-import { Button } from '@/components/ui/button';
+import { useAuth } from "@/lib/hooks/use-auth";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -747,8 +742,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { User } from 'lucide-react';
+} from "@/components/ui/dropdown-menu";
+import { User } from "lucide-react";
 
 export function Header() {
   const { user, logout } = useAuth();
@@ -767,16 +762,12 @@ export function Header() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>
-              {user?.name || 'User'}
-            </DropdownMenuLabel>
+            <DropdownMenuLabel>{user?.name || "User"}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout}>
-              Logout
-            </DropdownMenuItem>
+            <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -793,17 +784,17 @@ export function Header() {
 
 ```tsx
 // app/(dashboard)/users/page.tsx
-import { Suspense } from 'react';
-import { LoadingSkeleton } from '@/components/shared/loading';
-import { UserCard } from '@/components/users/user-card';
+import { Suspense } from "react";
+import { LoadingSkeleton } from "@/components/shared/loading";
+import { UserCard } from "@/components/users/user-card";
 
 async function getUsers() {
-  const res = await fetch('https://api.example.com/users', {
+  const res = await fetch("https://api.example.com/users", {
     next: { revalidate: 3600 }, // Revalidate every hour
   });
 
   if (!res.ok) {
-    throw new Error('Failed to fetch users');
+    throw new Error("Failed to fetch users");
   }
 
   return res.json();
@@ -837,16 +828,16 @@ export default function UsersPage() {
 
 ```tsx
 // components/users/user-list-client.tsx
-'use client';
+"use client";
 
-import useSWR from 'swr';
-import { UserCard } from './user-card';
-import { LoadingSkeleton } from '@/components/shared/loading';
+import useSWR from "swr";
+import { UserCard } from "./user-card";
+import { LoadingSkeleton } from "@/components/shared/loading";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export function UserListClient() {
-  const { data: users, error, isLoading } = useSWR('/api/users', fetcher);
+  const { data: users, error, isLoading } = useSWR("/api/users", fetcher);
 
   if (error) {
     return <div>Failed to load users</div>;
@@ -874,8 +865,8 @@ export function UserListClient() {
 
 ```ts
 // lib/utils.ts
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -887,26 +878,29 @@ export function cn(...inputs: ClassValue[]) {
 ```ts
 // lib/api.ts
 class APIError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(
+    public status: number,
+    message: string,
+  ) {
     super(message);
   }
 }
 
 export async function fetcher<T>(
   url: string,
-  options?: RequestInit
+  options?: RequestInit,
 ): Promise<T> {
   const response = await fetch(url, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...options?.headers,
     },
   });
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new APIError(response.status, error.message || 'API Error');
+    throw new APIError(response.status, error.message || "API Error");
   }
 
   return response.json();
@@ -921,26 +915,26 @@ export async function fetcher<T>(
 
 ```tsx
 // components/ui/button.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import { Button } from './button';
+import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { Button } from "./button";
 
-describe('Button', () => {
-  it('renders children', () => {
+describe("Button", () => {
+  it("renders children", () => {
     render(<Button>Click me</Button>);
-    expect(screen.getByText('Click me')).toBeInTheDocument();
+    expect(screen.getByText("Click me")).toBeInTheDocument();
   });
 
-  it('calls onClick when clicked', () => {
+  it("calls onClick when clicked", () => {
     const onClick = vi.fn();
     render(<Button onClick={onClick}>Click</Button>);
-    fireEvent.click(screen.getByText('Click'));
+    fireEvent.click(screen.getByText("Click"));
     expect(onClick).toHaveBeenCalledOnce();
   });
 
-  it('is disabled when disabled prop is true', () => {
+  it("is disabled when disabled prop is true", () => {
     render(<Button disabled>Click</Button>);
-    expect(screen.getByText('Click')).toBeDisabled();
+    expect(screen.getByText("Click")).toBeDisabled();
   });
 });
 ```
@@ -949,17 +943,17 @@ describe('Button', () => {
 
 ```ts
 // tests/e2e/auth.spec.ts
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test('user can login', async ({ page }) => {
-  await page.goto('/login');
+test("user can login", async ({ page }) => {
+  await page.goto("/login");
 
-  await page.fill('input[name="email"]', 'user@example.com');
-  await page.fill('input[name="password"]', 'password123');
+  await page.fill('input[name="email"]', "user@example.com");
+  await page.fill('input[name="password"]', "password123");
   await page.click('button[type="submit"]');
 
-  await expect(page).toHaveURL('/dashboard');
-  await expect(page.locator('text=Welcome back')).toBeVisible();
+  await expect(page).toHaveURL("/dashboard");
+  await expect(page.locator("text=Welcome back")).toBeVisible();
 });
 ```
 
@@ -968,6 +962,7 @@ test('user can login', async ({ page }) => {
 # 11. Production Checklist
 
 ## 11.1 Performance
+
 - [ ] Image optimization (Next/Image)
 - [ ] Code splitting (dynamic imports)
 - [ ] Bundle size analysis
@@ -977,6 +972,7 @@ test('user can login', async ({ page }) => {
 - [ ] API response caching
 
 ## 11.2 SEO
+
 - [ ] Metadata for all pages
 - [ ] Open Graph tags
 - [ ] Twitter cards
@@ -985,6 +981,7 @@ test('user can login', async ({ page }) => {
 - [ ] Semantic HTML
 
 ## 11.3 Accessibility
+
 - [ ] Keyboard navigation
 - [ ] Screen reader support
 - [ ] ARIA labels
@@ -993,6 +990,7 @@ test('user can login', async ({ page }) => {
 - [ ] Alt text for images
 
 ## 11.4 Security
+
 - [ ] Environment variables secure
 - [ ] CSP headers
 - [ ] CORS configuration
@@ -1001,6 +999,7 @@ test('user can login', async ({ page }) => {
 - [ ] CSRF protection
 
 ## 11.5 Monitoring
+
 - [ ] Error tracking (Sentry)
 - [ ] Analytics (Google Analytics, Plausible)
 - [ ] Performance monitoring

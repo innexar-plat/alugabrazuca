@@ -19,6 +19,7 @@ Supply chain risk is the risk that code you did not author (dependencies, build 
 CISA released updated guidance on Software Bill of Materials (December 2025):
 
 **Required SBOM Fields:**
+
 - Supplier name
 - Component name and version
 - Unique identifier (PURL, CPE)
@@ -27,6 +28,7 @@ CISA released updated guidance on Software Bill of Materials (December 2025):
 - Timestamp
 
 **Key Changes from 2021:**
+
 - Machine-readable format required (SPDX 2.3+ or CycloneDX 1.4+)
 - Vulnerability correlation (link to VEX)
 - Continuous updates (not one-time deliverable)
@@ -34,6 +36,7 @@ CISA released updated guidance on Software Bill of Materials (December 2025):
 ### EU CRA (Cyber Resilience Act)
 
 The EU CRA became law in 2025, making SBOMs mandatory for products sold in EU:
+
 - Required for all products with digital elements
 - Must be updated throughout product lifecycle
 - Penalties for non-compliance
@@ -41,6 +44,7 @@ The EU CRA became law in 2025, making SBOMs mandatory for products sold in EU:
 ### AI-BOM (AI Bill of Materials)
 
 For AI-native systems, traditional SBOMs don't capture full risk. AI-BOM includes:
+
 - Models and model versions
 - Training datasets and data provenance
 - Embeddings and vector stores
@@ -60,6 +64,7 @@ For AI-native systems, traditional SBOMs don't capture full risk. AI-BOM include
 ## OWASP Top 10:2025 - A03: Software Supply Chain Failures
 
 **First-class category in 2025** (expanded from "Vulnerable and Outdated Components"):
+
 - Dependency confusion attacks
 - Malicious package injection
 - Compromised maintainer accounts
@@ -109,7 +114,7 @@ minReleaseAge: 1440  # 24 hours in minutes
 ```json
 {
   "dependencies": {
-    "express": "4.18.2",        // Exact version, not ^4.18.2
+    "express": "4.18.2", // Exact version, not ^4.18.2
     "lodash": "4.17.21",
     "react": "18.2.0"
   }
@@ -117,6 +122,7 @@ minReleaseAge: 1440  # 24 hours in minutes
 ```
 
 **Why pin versions:**
+
 - Prevents automatic upgrades to compromised versions
 - Allows time for community to detect malicious updates
 - Enables controlled upgrade process with security review
@@ -161,6 +167,7 @@ npm sbom --sbom-format=cyclonedx > sbom.json
 ```
 
 **SBOM Benefits:**
+
 - Complete inventory of dependencies
 - Vulnerability tracking across supply chain
 - License compliance validation
@@ -194,13 +201,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write  # Required for trusted publishing
+      id-token: write # Required for trusted publishing
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
       - run: npm ci
       - run: npm test
       - run: npm publish --provenance --access public
@@ -209,6 +216,7 @@ jobs:
 ```
 
 **Benefits:**
+
 - No long-lived tokens in secrets
 - Cryptographic proof of build origin
 - Build transparency via SLSA provenance
@@ -239,6 +247,7 @@ npm audit signatures
 ```
 
 **Best Practices:**
+
 - Use hardware security keys (YubiKey, Titan Key)
 - Enable MFA on all developer accounts
 - Avoid SMS-based 2FA (vulnerable to SIM swapping)
@@ -310,17 +319,17 @@ grype dir:.
 # Use GitHub-hosted runners (trusted build environment)
 jobs:
   build:
-    runs-on: ubuntu-latest  # Isolated, ephemeral environment
+    runs-on: ubuntu-latest # Isolated, ephemeral environment
     permissions:
-      id-token: write       # Generate provenance
+      id-token: write # Generate provenance
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci --ignore-scripts  # Prevent malicious install scripts
+      - run: npm ci --ignore-scripts # Prevent malicious install scripts
       - run: npm run build
       - uses: actions/attest-build-provenance@v1
         with:
-          subject-path: 'dist/**'
+          subject-path: "dist/**"
 ```
 
 ---
@@ -476,30 +485,35 @@ find . -name sbom.json -exec grep -l "compromised-package" {} \;
 ## Best Practices Checklist
 
 **Authentication & Access**
+
 - [ ] Phishing-resistant MFA enabled on all developer accounts
 - [ ] Hardware security keys for critical accounts
 - [ ] Organization-wide MFA policy enforced
 - [ ] Periodic access reviews and key rotation
 
 **Dependency Management**
+
 - [ ] Exact version pinning (no semver ranges)
 - [ ] pnpm minimumReleaseAge or equivalent delay
 - [ ] Automated dependency updates with security review
 - [ ] Regular `npm audit` and SCA scans
 
 **Build Security**
+
 - [ ] Trusted publishing implemented (npm, PyPI, RubyGems)
 - [ ] SLSA Level 2+ provenance generation
 - [ ] Artifact signing with Sigstore
 - [ ] Hermetic builds with locked dependencies
 
 **Monitoring & Detection**
+
 - [ ] SBOM generation and tracking
 - [ ] Continuous vulnerability scanning
 - [ ] Real-time dependency monitoring
 - [ ] Alerting on new vulnerabilities
 
 **Incident Response**
+
 - [ ] Documented supply chain incident response plan
 - [ ] SBOM-driven impact analysis process
 - [ ] Communication plan for stakeholders
@@ -509,15 +523,15 @@ find . -name sbom.json -exec grep -l "compromised-package" {} \;
 
 ## Tools Comparison
 
-| Tool | Focus | Best For |
-|------|-------|----------|
-| **Dependabot** | Automated updates | GitHub native integration |
-| **Snyk** | Vulnerability scanning | Developer-first workflows |
-| **Trivy** | Container + code scanning | Multi-artifact scanning |
-| **Grype** | Vulnerability detection | CLI-first, fast scanning |
-| **Syft** | SBOM generation | Comprehensive inventory |
-| **Sigstore** | Artifact signing | Keyless signing |
-| **SLSA** | Build provenance | End-to-end attestation |
+| Tool           | Focus                     | Best For                  |
+| -------------- | ------------------------- | ------------------------- |
+| **Dependabot** | Automated updates         | GitHub native integration |
+| **Snyk**       | Vulnerability scanning    | Developer-first workflows |
+| **Trivy**      | Container + code scanning | Multi-artifact scanning   |
+| **Grype**      | Vulnerability detection   | CLI-first, fast scanning  |
+| **Syft**       | SBOM generation           | Comprehensive inventory   |
+| **Sigstore**   | Artifact signing          | Keyless signing           |
+| **SLSA**       | Build provenance          | End-to-end attestation    |
 
 ---
 

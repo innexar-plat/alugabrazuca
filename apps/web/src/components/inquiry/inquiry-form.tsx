@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
 
 interface InquiryFormProps {
   listingId: string;
@@ -12,43 +12,48 @@ interface InquiryFormProps {
   onClose: () => void;
 }
 
-const INQUIRY_TYPES = ['visit', 'info', 'apply'] as const;
+const INQUIRY_TYPES = ["visit", "info", "apply"] as const;
 
-export function InquiryForm({ listingId, listingTitle, locale, onClose }: InquiryFormProps) {
-  const t = useTranslations('inquiry');
+export function InquiryForm({
+  listingId,
+  listingTitle,
+  locale,
+  onClose,
+}: InquiryFormProps) {
+  const t = useTranslations("inquiry");
   const router = useRouter();
 
-  const [type, setType] = useState<'visit' | 'info' | 'apply'>('info');
-  const [message, setMessage] = useState('');
-  const [moveInDate, setMoveInDate] = useState('');
-  const [stayDuration, setStayDuration] = useState('');
-  const [occupants, setOccupants] = useState('1');
+  const [type, setType] = useState<"visit" | "info" | "apply">("info");
+  const [message, setMessage] = useState("");
+  const [moveInDate, setMoveInDate] = useState("");
+  const [stayDuration, setStayDuration] = useState("");
+  const [occupants, setOccupants] = useState("1");
   const [hasPets, setHasPets] = useState(false);
-  const [petDetails, setPetDetails] = useState('');
-  const [occupation, setOccupation] = useState('');
-  const [aboutMe, setAboutMe] = useState('');
+  const [petDetails, setPetDetails] = useState("");
+  const [occupation, setOccupation] = useState("");
+  const [aboutMe, setAboutMe] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!message.trim() || message.length < 20) {
-      setError('Message must be at least 20 characters.');
+      setError("Message must be at least 20 characters.");
       return;
     }
 
-    const isAuthenticated = !!localStorage.getItem('accessToken');
+    const isAuthenticated = !!localStorage.getItem("accessToken");
     if (!isAuthenticated) {
       router.push(`/${locale}/login`);
       return;
     }
 
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      await api.post('/inquiries', {
+      await api.post("/inquiries", {
         listingId,
         type,
         message: message.trim(),
@@ -62,7 +67,7 @@ export function InquiryForm({ listingId, listingTitle, locale, onClose }: Inquir
       });
       setSuccess(true);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to send inquiry.');
+      setError(err instanceof Error ? err.message : "Failed to send inquiry.");
     } finally {
       setLoading(false);
     }
@@ -83,13 +88,19 @@ export function InquiryForm({ listingId, listingTitle, locale, onClose }: Inquir
           ✕
         </button>
 
-        <h2 className="mb-1 text-lg font-bold text-[hsl(var(--foreground))]">{t('sendInquiry')}</h2>
-        <p className="mb-5 text-sm text-[hsl(var(--muted-foreground))] truncate">{listingTitle}</p>
+        <h2 className="mb-1 text-lg font-bold text-[hsl(var(--foreground))]">
+          {t("sendInquiry")}
+        </h2>
+        <p className="mb-5 text-sm text-[hsl(var(--muted-foreground))] truncate">
+          {listingTitle}
+        </p>
 
         {success ? (
           <div className="py-8 text-center">
             <div className="text-4xl mb-3">✅</div>
-            <p className="font-semibold text-[hsl(var(--foreground))]">{t('success')}</p>
+            <p className="font-semibold text-[hsl(var(--foreground))]">
+              {t("success")}
+            </p>
             <p className="mt-2 text-sm text-[hsl(var(--muted-foreground))]">
               The host will respond within 7 days.
             </p>
@@ -97,7 +108,7 @@ export function InquiryForm({ listingId, listingTitle, locale, onClose }: Inquir
               onClick={() => router.push(`/${locale}/my-inquiries`)}
               className="mt-5 rounded-lg bg-[hsl(var(--primary))] px-6 py-2 text-sm font-semibold text-[hsl(var(--primary-foreground))] hover:opacity-90"
             >
-              {t('sentTitle')}
+              {t("sentTitle")}
             </button>
           </div>
         ) : (
@@ -111,7 +122,7 @@ export function InquiryForm({ listingId, listingTitle, locale, onClose }: Inquir
             {/* Type */}
             <div>
               <label className="mb-1.5 block text-sm font-medium text-[hsl(var(--foreground))]">
-                {t('form.type')}
+                {t("form.type")}
               </label>
               <div className="flex gap-2">
                 {INQUIRY_TYPES.map((t_) => (
@@ -121,8 +132,8 @@ export function InquiryForm({ listingId, listingTitle, locale, onClose }: Inquir
                     onClick={() => setType(t_)}
                     className={`flex-1 rounded-lg border py-2 text-sm font-medium transition-colors ${
                       type === t_
-                        ? 'border-[hsl(var(--primary))] bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]'
-                        : 'border-[hsl(var(--border))] hover:bg-[hsl(var(--muted))]'
+                        ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]"
+                        : "border-[hsl(var(--border))] hover:bg-[hsl(var(--muted))]"
                     }`}
                   >
                     {t(`type.${t_}`)}
@@ -134,25 +145,27 @@ export function InquiryForm({ listingId, listingTitle, locale, onClose }: Inquir
             {/* Message */}
             <div>
               <label className="mb-1.5 block text-sm font-medium text-[hsl(var(--foreground))]">
-                {t('form.message')} <span className="text-red-500">*</span>
+                {t("form.message")} <span className="text-red-500">*</span>
               </label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder={t('form.messagePlaceholder')}
+                placeholder={t("form.messagePlaceholder")}
                 rows={4}
                 minLength={20}
                 maxLength={1000}
                 className="w-full rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]"
               />
-              <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">{message.length}/1000</p>
+              <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
+                {message.length}/1000
+              </p>
             </div>
 
             {/* Move-in date & stay duration */}
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-[hsl(var(--foreground))]">
-                  {t('form.moveInDate')}
+                  {t("form.moveInDate")}
                 </label>
                 <input
                   type="date"
@@ -163,7 +176,7 @@ export function InquiryForm({ listingId, listingTitle, locale, onClose }: Inquir
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-[hsl(var(--foreground))]">
-                  {t('form.stayDuration')}
+                  {t("form.stayDuration")}
                 </label>
                 <input
                   type="number"
@@ -180,7 +193,7 @@ export function InquiryForm({ listingId, listingTitle, locale, onClose }: Inquir
             {/* Occupants */}
             <div>
               <label className="mb-1.5 block text-sm font-medium text-[hsl(var(--foreground))]">
-                {t('form.occupants')}
+                {t("form.occupants")}
               </label>
               <input
                 type="number"
@@ -201,8 +214,11 @@ export function InquiryForm({ listingId, listingTitle, locale, onClose }: Inquir
                 onChange={(e) => setHasPets(e.target.checked)}
                 className="h-4 w-4 rounded border-[hsl(var(--border))] accent-[hsl(var(--primary))]"
               />
-              <label htmlFor="hasPets" className="text-sm text-[hsl(var(--foreground))]">
-                {t('form.hasPets')}
+              <label
+                htmlFor="hasPets"
+                className="text-sm text-[hsl(var(--foreground))]"
+              >
+                {t("form.hasPets")}
               </label>
             </div>
             {hasPets && (
@@ -210,7 +226,7 @@ export function InquiryForm({ listingId, listingTitle, locale, onClose }: Inquir
                 type="text"
                 value={petDetails}
                 onChange={(e) => setPetDetails(e.target.value)}
-                placeholder={t('form.petDetails')}
+                placeholder={t("form.petDetails")}
                 maxLength={255}
                 className="w-full rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]"
               />
@@ -219,7 +235,7 @@ export function InquiryForm({ listingId, listingTitle, locale, onClose }: Inquir
             {/* Occupation */}
             <div>
               <label className="mb-1.5 block text-sm font-medium text-[hsl(var(--foreground))]">
-                {t('form.occupation')}
+                {t("form.occupation")}
               </label>
               <input
                 type="text"
@@ -233,7 +249,7 @@ export function InquiryForm({ listingId, listingTitle, locale, onClose }: Inquir
             {/* About me */}
             <div>
               <label className="mb-1.5 block text-sm font-medium text-[hsl(var(--foreground))]">
-                {t('form.aboutMe')}
+                {t("form.aboutMe")}
               </label>
               <textarea
                 value={aboutMe}
@@ -249,7 +265,7 @@ export function InquiryForm({ listingId, listingTitle, locale, onClose }: Inquir
               disabled={loading}
               className="w-full rounded-lg bg-[hsl(var(--primary))] py-3 text-sm font-semibold text-[hsl(var(--primary-foreground))] hover:opacity-90 disabled:opacity-50 transition-opacity"
             >
-              {loading ? t('sending') : t('sendInquiry')}
+              {loading ? t("sending") : t("sendInquiry")}
             </button>
           </form>
         )}

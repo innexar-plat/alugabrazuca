@@ -67,11 +67,13 @@ npx vitest run src/scoring/__tests__/accuracy.test.ts  # single test
 - MCP server workspace: `packages/mcp-server/`
 
 <!-- caliber:managed:pre-commit -->
+
 ## Before Committing
 
 **IMPORTANT:** Before every git commit, you MUST ensure Caliber syncs agent configs with the latest code changes.
 
 First, check if the pre-commit hook is already installed:
+
 ```bash
 grep -q "caliber" .git/hooks/pre-commit 2>/dev/null && echo "hook-active" || echo "no-hook"
 ```
@@ -83,19 +85,24 @@ grep -q "caliber" .git/hooks/pre-commit 2>/dev/null && echo "hook-active" || ech
   3. After it completes, briefly tell the user what Caliber updated. Then proceed with the commit.
 
 If `caliber` is not found, tell the user: "This project uses Caliber for agent config sync. Run /setup-caliber to get set up."
+
 <!-- /caliber:managed:pre-commit -->
 
 <!-- caliber:managed:learnings -->
+
 ## Session Learnings
 
 Read `CALIBER_LEARNINGS.md` for patterns and anti-patterns learned from previous sessions.
 These are auto-extracted from real tool usage — treat them as project-specific rules.
+
 <!-- /caliber:managed:learnings -->
 
 <!-- caliber:managed:sync -->
+
 ## Context Sync
 
 This project uses [Caliber](https://github.com/caliber-ai-org/ai-setup) to keep AI agent configs in sync across Claude Code, Cursor, Copilot, and Codex.
 Configs update automatically before each commit via `caliber refresh`.
 If the pre-commit hook is not set up, run `/setup-caliber` to configure everything automatically.
+
 <!-- /caliber:managed:sync -->

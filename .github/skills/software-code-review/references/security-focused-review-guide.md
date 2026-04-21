@@ -57,26 +57,26 @@ Security review should happen first in multi-pass review. Focus on:
 
 ### Red Flags to Catch
 
-| Pattern | Risk | What to Look For |
-|---------|------|-------------------|
-| No validation on request body | Injection, type confusion | Raw `req.body` used without schema validation |
-| String concatenation with user input | Injection (SQL, XSS, command) | Template literals or `+` with untrusted data |
-| Missing length limits | DoS, buffer issues | No `maxLength` on string inputs, no array size limits |
-| Type coercion reliance | Type confusion | Using `==` instead of `===`, trusting `typeof` |
-| Missing content-type validation | MIME confusion | File uploads without type checking |
-| Direct use of URL parameters | Path traversal, SSRF | `req.params.id` used in file paths or URLs |
+| Pattern                              | Risk                          | What to Look For                                      |
+| ------------------------------------ | ----------------------------- | ----------------------------------------------------- |
+| No validation on request body        | Injection, type confusion     | Raw `req.body` used without schema validation         |
+| String concatenation with user input | Injection (SQL, XSS, command) | Template literals or `+` with untrusted data          |
+| Missing length limits                | DoS, buffer issues            | No `maxLength` on string inputs, no array size limits |
+| Type coercion reliance               | Type confusion                | Using `==` instead of `===`, trusting `typeof`        |
+| Missing content-type validation      | MIME confusion                | File uploads without type checking                    |
+| Direct use of URL parameters         | Path traversal, SSRF          | `req.params.id` used in file paths or URLs            |
 
 ### What Good Validation Looks Like
 
 ```typescript
 // GOOD: Schema validation at the boundary
-import { z } from 'zod';
+import { z } from "zod";
 
 const createUserSchema = z.object({
   email: z.string().email().max(255),
   name: z.string().min(1).max(100).trim(),
   age: z.number().int().min(13).max(150),
-  role: z.enum(['user', 'admin']),  // Allowlist, not blocklist
+  role: z.enum(["user", "admin"]), // Allowlist, not blocklist
 });
 
 export async function POST(request: NextRequest) {
@@ -106,13 +106,13 @@ Review checklist for file uploads:
 
 ```typescript
 // RED FLAG: Trusting file extension
-const ext = file.name.split('.').pop();  // Attacker controls this
+const ext = file.name.split(".").pop(); // Attacker controls this
 
 // BETTER: Validate MIME type and magic bytes
-import { fileTypeFromBuffer } from 'file-type';
+import { fileTypeFromBuffer } from "file-type";
 const type = await fileTypeFromBuffer(buffer);
 if (!ALLOWED_TYPES.includes(type?.mime)) {
-  throw new Error('Invalid file type');
+  throw new Error("Invalid file type");
 }
 ```
 
@@ -122,32 +122,32 @@ if (!ALLOWED_TYPES.includes(type?.mime)) {
 
 ### Authentication Patterns to Verify
 
-| Check | What to Look For |
-|-------|-------------------|
-| Token validation | Is the JWT signature verified? Is expiration checked? |
+| Check              | What to Look For                                                               |
+| ------------------ | ------------------------------------------------------------------------------ |
+| Token validation   | Is the JWT signature verified? Is expiration checked?                          |
 | Session management | Are sessions invalidated on logout? Is session ID rotated on privilege change? |
-| Password handling | Is bcrypt/argon2 used? Is there a minimum cost factor? |
-| MFA bypass | Can MFA be skipped via API? Is the MFA check enforced server-side? |
-| Token storage | Is the token stored securely (httpOnly cookie vs localStorage)? |
-| Rate limiting | Are login attempts rate-limited? Is there account lockout? |
+| Password handling  | Is bcrypt/argon2 used? Is there a minimum cost factor?                         |
+| MFA bypass         | Can MFA be skipped via API? Is the MFA check enforced server-side?             |
+| Token storage      | Is the token stored securely (httpOnly cookie vs localStorage)?                |
+| Rate limiting      | Are login attempts rate-limited? Is there account lockout?                     |
 
 ### Authorization Patterns to Verify
 
 ```typescript
 // RED FLAG: Missing authorization check
-app.delete('/api/posts/:id', async (req, res) => {
+app.delete("/api/posts/:id", async (req, res) => {
   await db.post.delete({ where: { id: req.params.id } });
   // Anyone can delete any post!
 });
 
 // CORRECT: Verify ownership/permission
-app.delete('/api/posts/:id', authenticate, async (req, res) => {
+app.delete("/api/posts/:id", authenticate, async (req, res) => {
   const post = await db.post.findUnique({
-    where: { id: req.params.id }
+    where: { id: req.params.id },
   });
-  if (!post) return res.status(404).json({ error: 'Not found' });
-  if (post.authorId !== req.user.id && req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Forbidden' });
+  if (!post) return res.status(404).json({ error: "Not found" });
+  if (post.authorId !== req.user.id && req.user.role !== "admin") {
+    return res.status(403).json({ error: "Forbidden" });
   }
   await db.post.delete({ where: { id: req.params.id } });
 });
@@ -174,7 +174,7 @@ RED FLAG: Sequential IDs enabling enumeration
 ```typescript
 // RED FLAG: Role set from client input via mass assignment
 const user = await db.user.create({
-  data: { ...req.body }
+  data: { ...req.body },
   // If req.body contains { role: 'admin' }, privilege escalation
 });
 
@@ -183,8 +183,8 @@ const user = await db.user.create({
   data: {
     email: validated.email,
     name: validated.name,
-    role: 'user',  // Default; admin set through separate workflow
-  }
+    role: "user", // Default; admin set through separate workflow
+  },
 });
 ```
 
@@ -199,10 +199,7 @@ const user = await db.user.create({
 const query = `SELECT * FROM users WHERE email = '${email}'`;
 
 // CORRECT: Parameterized queries
-const user = await db.query(
-  'SELECT * FROM users WHERE email = $1',
-  [email]
-);
+const user = await db.query("SELECT * FROM users WHERE email = $1", [email]);
 // Or use an ORM that parameterizes automatically
 const user = await prisma.user.findUnique({ where: { email } });
 ```
@@ -213,13 +210,13 @@ const user = await prisma.user.findUnique({ where: { email } });
 
 Patterns to flag during review:
 
-| Pattern | Risk Level | Safer Alternative |
-|---------|------------|-------------------|
-| Setting innerHTML from user data | Critical | Use `textContent` or sanitize with DOMPurify |
-| React `dangerouslySetInnerHTML` with user content | Critical | Sanitize input before rendering |
-| User data in `href`/`src` attributes | High | Validate URL scheme (http/https only) |
-| Template string injection in HTML | High | Use framework's auto-escaping |
-| `document.write` with dynamic content | High | Use DOM APIs instead |
+| Pattern                                           | Risk Level | Safer Alternative                            |
+| ------------------------------------------------- | ---------- | -------------------------------------------- |
+| Setting innerHTML from user data                  | Critical   | Use `textContent` or sanitize with DOMPurify |
+| React `dangerouslySetInnerHTML` with user content | Critical   | Sanitize input before rendering              |
+| User data in `href`/`src` attributes              | High       | Validate URL scheme (http/https only)        |
+| Template string injection in HTML                 | High       | Use framework's auto-escaping                |
+| `document.write` with dynamic content             | High       | Use DOM APIs instead                         |
 
 **URL validation example:**
 
@@ -227,7 +224,7 @@ Patterns to flag during review:
 const isValidUrl = (url: string) => {
   try {
     const parsed = new URL(url);
-    return ['http:', 'https:'].includes(parsed.protocol);
+    return ["http:", "https:"].includes(parsed.protocol);
   } catch {
     return false;
   }
@@ -255,22 +252,22 @@ Correct patterns:
 // Any use of shell execution with variable arguments
 
 // CORRECT: Use execFile with argument array (no shell interpolation)
-import { execFile } from 'child_process';
-execFile('convert', [userFilename, 'output.png']);
+import { execFile } from "child_process";
+execFile("convert", [userFilename, "output.png"]);
 ```
 
 ### Path Traversal
 
 ```typescript
 // RED FLAG: User input in file paths
-const filePath = path.join('/uploads', req.params.filename);
+const filePath = path.join("/uploads", req.params.filename);
 // Attacker payload: ../../etc/passwd
 
 // CORRECT: Validate resolved path stays within allowed directory
-const basePath = path.resolve('/uploads');
+const basePath = path.resolve("/uploads");
 const filePath = path.resolve(basePath, req.params.filename);
 if (!filePath.startsWith(basePath)) {
-  return res.status(400).json({ error: 'Invalid path' });
+  return res.status(400).json({ error: "Invalid path" });
 }
 ```
 
@@ -280,15 +277,15 @@ if (!filePath.startsWith(basePath)) {
 
 ### Hardcoded Secrets to Watch For
 
-| Secret Type | Pattern to Search | Example |
-|-------------|-------------------|---------|
-| API keys | `key`, `apikey`, `api_key` | `const API_KEY = "sk-..."` |
-| Passwords | `password`, `passwd`, `secret` | `DB_PASSWORD = "prod123"` |
-| Tokens | `token`, `bearer`, `jwt` | `const TOKEN = "eyJ..."` |
-| Connection strings | `mongodb://`, `postgres://` | Full URLs with credentials |
-| Private keys | `-----BEGIN`, `PRIVATE KEY` | RSA/SSH keys in code |
-| AWS credentials | `AKIA`, `aws_secret` | AWS access key IDs start with AKIA |
-| Webhook secrets | `webhook_secret`, `signing_secret` | Hardcoded webhook validation keys |
+| Secret Type        | Pattern to Search                  | Example                            |
+| ------------------ | ---------------------------------- | ---------------------------------- |
+| API keys           | `key`, `apikey`, `api_key`         | `const API_KEY = "sk-..."`         |
+| Passwords          | `password`, `passwd`, `secret`     | `DB_PASSWORD = "prod123"`          |
+| Tokens             | `token`, `bearer`, `jwt`           | `const TOKEN = "eyJ..."`           |
+| Connection strings | `mongodb://`, `postgres://`        | Full URLs with credentials         |
+| Private keys       | `-----BEGIN`, `PRIVATE KEY`        | RSA/SSH keys in code               |
+| AWS credentials    | `AKIA`, `aws_secret`               | AWS access key IDs start with AKIA |
+| Webhook secrets    | `webhook_secret`, `signing_secret` | Hardcoded webhook validation keys  |
 
 ### What to Look For in Diffs
 
@@ -307,7 +304,7 @@ if (!filePath.startsWith(basePath)) {
   rev: v1.4.0
   hooks:
     - id: detect-secrets
-      args: ['--baseline', '.secrets.baseline']
+      args: ["--baseline", ".secrets.baseline"]
 ```
 
 ### Logging Secrets
@@ -326,14 +323,14 @@ Red flags in logging code:
 
 ### What to Check on New Dependencies
 
-| Check | Why It Matters |
-|-------|----------------|
-| Package popularity | Low-download packages have less community scrutiny |
-| Maintenance status | Unmaintained packages accumulate vulnerabilities |
-| Permission scope | Does it need filesystem/network access? |
-| Dependency tree depth | Transitive dependencies expand attack surface |
-| Known vulnerabilities | Check npm audit / Snyk / GitHub advisories |
-| License compatibility | Some licenses have viral clauses |
+| Check                 | Why It Matters                                     |
+| --------------------- | -------------------------------------------------- |
+| Package popularity    | Low-download packages have less community scrutiny |
+| Maintenance status    | Unmaintained packages accumulate vulnerabilities   |
+| Permission scope      | Does it need filesystem/network access?            |
+| Dependency tree depth | Transitive dependencies expand attack surface      |
+| Known vulnerabilities | Check npm audit / Snyk / GitHub advisories         |
+| License compatibility | Some licenses have viral clauses                   |
 
 ### Review Process for Dependency Changes
 
@@ -351,11 +348,11 @@ Version bumped?
 
 ### Supply Chain Attacks to Watch For
 
-| Attack Vector | Indicator |
-|---------------|-----------|
-| Typosquatting | Package name similar to popular package |
-| Dependency confusion | Private package name exists on public registry |
-| Post-install scripts | Suspicious scripts in dependency's package.json |
+| Attack Vector         | Indicator                                           |
+| --------------------- | --------------------------------------------------- |
+| Typosquatting         | Package name similar to popular package             |
+| Dependency confusion  | Private package name exists on public registry      |
+| Post-install scripts  | Suspicious scripts in dependency's package.json     |
 | Maintainer compromise | Sudden new version from previously inactive package |
 
 ---
@@ -366,42 +363,44 @@ Version bumped?
 
 Check that these security headers are set in response middleware:
 
-| Header | Recommended Value |
-|--------|-------------------|
-| X-Content-Type-Options | `nosniff` |
-| X-Frame-Options | `DENY` |
-| Referrer-Policy | `strict-origin-when-cross-origin` |
-| Permissions-Policy | `camera=(), microphone=(), geolocation=()` |
-| Content-Security-Policy | `default-src 'self'; script-src 'self'` |
+| Header                    | Recommended Value                              |
+| ------------------------- | ---------------------------------------------- |
+| X-Content-Type-Options    | `nosniff`                                      |
+| X-Frame-Options           | `DENY`                                         |
+| Referrer-Policy           | `strict-origin-when-cross-origin`              |
+| Permissions-Policy        | `camera=(), microphone=(), geolocation=()`     |
+| Content-Security-Policy   | `default-src 'self'; script-src 'self'`        |
 | Strict-Transport-Security | `max-age=63072000; includeSubDomains; preload` |
 
 ### CORS Configuration Red Flags
 
-| Pattern | Risk |
-|---------|------|
-| `origin: '*'` (wildcard) | Any site can make requests |
-| Reflecting the request Origin header | Equivalent to wildcard |
-| Wildcard + credentials | Browsers block but intent is wrong |
-| No origin validation on state-changing endpoints | CSRF-like attacks |
+| Pattern                                          | Risk                               |
+| ------------------------------------------------ | ---------------------------------- |
+| `origin: '*'` (wildcard)                         | Any site can make requests         |
+| Reflecting the request Origin header             | Equivalent to wildcard             |
+| Wildcard + credentials                           | Browsers block but intent is wrong |
+| No origin validation on state-changing endpoints | CSRF-like attacks                  |
 
 **Correct pattern**: Explicit allowlist of trusted origins, validated on each request.
 
 ```typescript
 const ALLOWED_ORIGINS = [
-  'https://app.example.com',
-  'https://admin.example.com',
+  "https://app.example.com",
+  "https://admin.example.com",
 ];
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  }),
+);
 ```
 
 ---
@@ -410,43 +409,43 @@ app.use(cors({
 
 ### JavaScript/TypeScript
 
-| Mistake | Risk | Fix |
-|---------|------|-----|
-| Setting `innerHTML` from user data | XSS | Use `textContent` or sanitize |
-| Prototype pollution via object spread | RCE/DoS | Validate keys, freeze prototypes |
-| Regex DoS (ReDoS) | DoS | Use safe regex patterns, set timeout |
-| Insecure randomness (`Math.random()`) | Predictable tokens | Use `crypto.randomUUID()` |
-| Unvalidated redirects | Phishing | Validate against URL allowlist |
+| Mistake                               | Risk               | Fix                                  |
+| ------------------------------------- | ------------------ | ------------------------------------ |
+| Setting `innerHTML` from user data    | XSS                | Use `textContent` or sanitize        |
+| Prototype pollution via object spread | RCE/DoS            | Validate keys, freeze prototypes     |
+| Regex DoS (ReDoS)                     | DoS                | Use safe regex patterns, set timeout |
+| Insecure randomness (`Math.random()`) | Predictable tokens | Use `crypto.randomUUID()`            |
+| Unvalidated redirects                 | Phishing           | Validate against URL allowlist       |
 
 ### Python
 
-| Mistake | Risk | Fix |
-|---------|------|-----|
-| `pickle.loads()` on untrusted data | RCE | Use JSON or validated formats |
-| `yaml.load()` without safe loader | RCE | Use `yaml.safe_load()` |
-| Shell commands with user input | Command injection | Use `subprocess.run()` with list args |
-| Mass assignment via `**kwargs` | Privilege escalation | Explicit field assignment |
-| Template injection | RCE | Use `render_template()` with files, not strings |
+| Mistake                            | Risk                 | Fix                                             |
+| ---------------------------------- | -------------------- | ----------------------------------------------- |
+| `pickle.loads()` on untrusted data | RCE                  | Use JSON or validated formats                   |
+| `yaml.load()` without safe loader  | RCE                  | Use `yaml.safe_load()`                          |
+| Shell commands with user input     | Command injection    | Use `subprocess.run()` with list args           |
+| Mass assignment via `**kwargs`     | Privilege escalation | Explicit field assignment                       |
+| Template injection                 | RCE                  | Use `render_template()` with files, not strings |
 
 ### Go
 
-| Mistake | Risk | Fix |
-|---------|------|-----|
-| Ignoring error returns | Logic bypass | Always check errors |
-| Using `text/template` for HTML | XSS | Use `html/template` |
-| `InsecureSkipVerify: true` | MITM | Verify TLS certificates |
+| Mistake                         | Risk            | Fix                          |
+| ------------------------------- | --------------- | ---------------------------- |
+| Ignoring error returns          | Logic bypass    | Always check errors          |
+| Using `text/template` for HTML  | XSS             | Use `html/template`          |
+| `InsecureSkipVerify: true`      | MITM            | Verify TLS certificates      |
 | Race conditions on shared state | Data corruption | Use `sync.Mutex` or channels |
-| Unchecked type assertions | Panics | Use two-value assertion form |
+| Unchecked type assertions       | Panics          | Use two-value assertion form |
 
 ### Java/Kotlin
 
-| Mistake | Risk | Fix |
-|---------|------|-----|
-| Default XML parser config | XXE | Disable external entities |
-| `ObjectInputStream.readObject()` | RCE | Use JSON, validate types |
-| String concatenation in JPQL | SQL injection | Use parameterized queries |
-| Unparameterized logging | Log injection | Use parameterized log format |
-| Weak cipher defaults | Broken encryption | Specify full transform (e.g., AES/GCM/NoPadding) |
+| Mistake                          | Risk              | Fix                                              |
+| -------------------------------- | ----------------- | ------------------------------------------------ |
+| Default XML parser config        | XXE               | Disable external entities                        |
+| `ObjectInputStream.readObject()` | RCE               | Use JSON, validate types                         |
+| String concatenation in JPQL     | SQL injection     | Use parameterized queries                        |
+| Unparameterized logging          | Log injection     | Use parameterized log format                     |
+| Weak cipher defaults             | Broken encryption | Specify full transform (e.g., AES/GCM/NoPadding) |
 
 ---
 

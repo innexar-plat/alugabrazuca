@@ -15,12 +15,12 @@ Contract testing validates API compatibility between services before integration
 
 ## Approaches Comparison
 
-| Approach | Tool | When to Use |
-| -------- | ---- | ----------- |
-| **Consumer-Driven (CDC)** | Pact | Consumer knows what it needs |
-| **Contract-Driven (CDD)** | Specmatic | OpenAPI as single source of truth |
-| **Bi-Directional (BDCT)** | Pactflow | Both sides define expectations |
-| **Unified API Testing** | Karate | API, contract, and performance in one |
+| Approach                  | Tool      | When to Use                           |
+| ------------------------- | --------- | ------------------------------------- |
+| **Consumer-Driven (CDC)** | Pact      | Consumer knows what it needs          |
+| **Contract-Driven (CDD)** | Specmatic | OpenAPI as single source of truth     |
+| **Bi-Directional (BDCT)** | Pactflow  | Both sides define expectations        |
+| **Unified API Testing**   | Karate    | API, contract, and performance in one |
 
 ## Specmatic (Contract-Driven)
 
@@ -59,8 +59,8 @@ Consumer defines expectations, provider verifies.
 ```typescript
 // Consumer test (generates contract)
 const provider = new PactV4({
-  consumer: 'OrderService',
-  provider: 'InventoryService',
+  consumer: "OrderService",
+  provider: "InventoryService",
 });
 
 await provider.executeTest(async (mockServer) => {
@@ -72,8 +72,8 @@ await provider.executeTest(async (mockServer) => {
 ```typescript
 // Provider verification
 const verifier = new Verifier({
-  providerBaseUrl: 'http://localhost:3000',
-  pactUrls: ['./pacts/orderservice-inventoryservice.json'],
+  providerBaseUrl: "http://localhost:3000",
+  pactUrls: ["./pacts/orderservice-inventoryservice.json"],
 });
 
 await verifier.verifyProvider();
@@ -152,7 +152,7 @@ Pactflow enables both consumer and provider to contribute to contract definition
 # Recommended pipeline stages
 stages:
   - unit-tests
-  - contract-tests  # Before integration
+  - contract-tests # Before integration
   - integration-tests
   - e2e-tests
 
@@ -171,10 +171,10 @@ contract-tests:
 
 ## Common Pitfalls
 
-| Pitfall | Solution |
-| ------- | -------- |
+| Pitfall                        | Solution                                      |
+| ------------------------------ | --------------------------------------------- |
 | Testing implementation details | Test behavior (inputs/outputs), not internals |
-| Overly specific contracts | Use loose matchers (`#string`, `#number`) |
-| Ignoring breaking changes | Use can-i-deploy check before release |
-| Missing edge cases | Include error responses in contracts |
-| Stale contracts | Automate contract generation in CI |
+| Overly specific contracts      | Use loose matchers (`#string`, `#number`)     |
+| Ignoring breaking changes      | Use can-i-deploy check before release         |
+| Missing edge cases             | Include error responses in contracts          |
+| Stale contracts                | Automate contract generation in CI            |

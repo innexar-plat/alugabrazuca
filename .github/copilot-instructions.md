@@ -6,10 +6,10 @@
 Follow this repository guidance in order:
 
 1. .github/instructions/project-context.instructions.md ← **ler primeiro (identidade, arquitetura, regras)**
-2. .github/instructions/*.instructions.md (demais instruções técnicas)
-3. .github/agents/*.agent.md for specialized execution modes
-4. .github/skills/*/SKILL.md for domain playbooks
-5. .github/rules/* as supplemental operational frameworks
+2. .github/instructions/\*.instructions.md (demais instruções técnicas)
+3. .github/agents/\*.agent.md for specialized execution modes
+4. .github/skills/\*/SKILL.md for domain playbooks
+5. .github/rules/\* as supplemental operational frameworks
 
 ## Repository-Specific Directives
 
@@ -26,18 +26,18 @@ Follow this repository guidance in order:
 ## Mandatory Modular Workflow
 
 - Before starting any product module work, always read these files in this order:
-	1. docs/01-foundation/construction-method.md
-	2. docs/01-foundation/module-delivery-checklist.md
-	3. docs/01-foundation/module-handoff-template.md
-	4. docs/modules/<current-module>/README.md
-	5. docs/handoffs/<previous-module-handoff>.md, when it exists
+  1.  docs/01-foundation/construction-method.md
+  2.  docs/01-foundation/module-delivery-checklist.md
+  3.  docs/01-foundation/module-handoff-template.md
+  4.  docs/modules/<current-module>/README.md
+  5.  docs/handoffs/<previous-module-handoff>.md, when it exists
 - Before acting on any generic prompt such as `continue`, `continue module`, `avance`, or similar, the AI must recompute the next module from source files, not from chat memory or summaries.
 - The next module must be determined by this checkpoint, in order:
-	1. read `docs/01-foundation/construction-method.md`
-	2. list files in `docs/handoffs/`
-	3. compare the official module order against existing handoffs
-	4. pick the first module in the official order that does not yet have a completed handoff
-	5. only then open that module README and start work
+  1.  read `docs/01-foundation/construction-method.md`
+  2.  list files in `docs/handoffs/`
+  3.  compare the official module order against existing handoffs
+  4.  pick the first module in the official order that does not yet have a completed handoff
+  5.  only then open that module README and start work
 - Never infer the next module only from the latest conversational summary, an open editor tab, or the last module mentioned in chat.
 - If the official order and the existing handoffs diverge, the AI must stop following the accidental sequence and resume from the first missing module in the official order.
 - Work one module at a time. Do not open or partially implement multiple modules in parallel.

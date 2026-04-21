@@ -23,6 +23,7 @@ Comprehensive guide for building ultra-high-performance, memory-safe backend ser
 ### Core Ownership Rules
 
 **Rule 1: Each value has exactly one owner**
+
 ```rust
 let s1 = String::from("hello");
 let s2 = s1; // s1 is moved to s2, s1 is no longer valid
@@ -32,6 +33,7 @@ println!("{}", s2); // OK
 ```
 
 **Rule 2: Borrowing doesn't transfer ownership**
+
 ```rust
 fn calculate_length(s: &String) -> usize {
     s.len()
@@ -43,6 +45,7 @@ println!("Length of '{}' is {}", s1, len); // s1 still valid
 ```
 
 **Rule 3: Mutable references are exclusive**
+
 ```rust
 let mut s = String::from("hello");
 
@@ -56,6 +59,7 @@ println!("{}", r1);
 ### Common Borrowing Patterns
 
 **Split Borrows**
+
 ```rust
 struct Data {
     field1: Vec<i32>,
@@ -80,6 +84,7 @@ impl Data {
 ```
 
 **Interior Mutability**
+
 ```rust
 use std::cell::RefCell;
 use std::rc::Rc;

@@ -3,12 +3,12 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import { InquiryStatus, ListingStatus } from '@prisma/client';
-import { PrismaService } from '../../prisma/prisma.service';
-import { CreateInquiryDto } from './dto/create-inquiry.dto';
-import { RejectInquiryDto } from './dto/reject-inquiry.dto';
-import { ReplyInquiryDto } from './dto/reply-inquiry.dto';
+} from "@nestjs/common";
+import { InquiryStatus, ListingStatus } from "@prisma/client";
+import { PrismaService } from "../../prisma/prisma.service";
+import { CreateInquiryDto } from "./dto/create-inquiry.dto";
+import { RejectInquiryDto } from "./dto/reject-inquiry.dto";
+import { ReplyInquiryDto } from "./dto/reply-inquiry.dto";
 
 const MAX_PENDING_INQUIRIES = 10;
 const EXPIRY_DAYS = 7;
@@ -26,12 +26,14 @@ export class InquiryService {
       select: { id: true, hostId: true, status: true, title: true },
     });
 
-    if (!listing) throw new NotFoundException('Listing not found');
+    if (!listing) throw new NotFoundException("Listing not found");
     if (listing.status !== ListingStatus.active) {
-      throw new BadRequestException('Listing is not available for inquiries');
+      throw new BadRequestException("Listing is not available for inquiries");
     }
     if (listing.hostId === tenantId) {
-      throw new BadRequestException('You cannot send an inquiry to your own listing');
+      throw new BadRequestException(
+        "You cannot send an inquiry to your own listing",
+      );
     }
 
     // 2. Check tenant does not already have inquiry for this listing
@@ -39,7 +41,9 @@ export class InquiryService {
       where: { listingId_tenantId: { listingId: dto.listingId, tenantId } },
     });
     if (existing) {
-      throw new BadRequestException('You already have an inquiry for this listing');
+      throw new BadRequestException(
+        "You already have an inquiry for this listing",
+      );
     }
 
     // 3. Check max pending inquiries
@@ -74,8 +78,22 @@ export class InquiryService {
       },
       include: {
         listing: { select: { id: true, title: true, city: true, state: true } },
-        tenant: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
-        host: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
+        tenant: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+          },
+        },
+        host: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+          },
+        },
       },
     });
 
@@ -97,7 +115,7 @@ export class InquiryService {
         where: { tenantId },
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         include: {
           listing: {
             select: {
@@ -111,7 +129,14 @@ export class InquiryService {
               photos: { take: 1, select: { thumbnailUrl: true } },
             },
           },
-          host: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
+          host: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              avatarUrl: true,
+            },
+          },
         },
       }),
       this.prisma.inquiry.count({ where: { tenantId } }),
@@ -132,7 +157,7 @@ export class InquiryService {
         where: { hostId },
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         include: {
           listing: {
             select: {
@@ -181,7 +206,14 @@ export class InquiryService {
             pricePerMonth: true,
             currency: true,
             photos: { take: 3, select: { url: true, thumbnailUrl: true } },
-            host: { select: { id: true, firstName: true, phone: true, whatsapp: true } },
+            host: {
+              select: {
+                id: true,
+                firstName: true,
+                phone: true,
+                whatsapp: true,
+              },
+            },
           },
         },
         tenant: {
@@ -195,13 +227,20 @@ export class InquiryService {
             whatsapp: true,
           },
         },
-        host: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
+        host: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+          },
+        },
       },
     });
 
-    if (!inquiry) throw new NotFoundException('Inquiry not found');
+    if (!inquiry) throw new NotFoundException("Inquiry not found");
     if (inquiry.tenantId !== userId && inquiry.hostId !== userId) {
-      throw new ForbiddenException('You do not have access to this inquiry');
+      throw new ForbiddenException("You do not have access to this inquiry");
     }
 
     // Hide sensitive address unless accepted
@@ -258,8 +297,11 @@ export class InquiryService {
 
   async reply(id: string, hostId: string, dto: ReplyInquiryDto) {
     const inquiry = await this.findInquiryForHost(id, hostId);
-    if (inquiry.status === InquiryStatus.rejected || inquiry.status === InquiryStatus.cancelled) {
-      throw new BadRequestException('Cannot reply to a closed inquiry');
+    if (
+      inquiry.status === InquiryStatus.rejected ||
+      inquiry.status === InquiryStatus.cancelled
+    ) {
+      throw new BadRequestException("Cannot reply to a closed inquiry");
     }
 
     const updated = await this.prisma.inquiry.update({
@@ -273,10 +315,10 @@ export class InquiryService {
 
   async cancel(id: string, tenantId: string) {
     const inquiry = await this.prisma.inquiry.findUnique({ where: { id } });
-    if (!inquiry) throw new NotFoundException('Inquiry not found');
+    if (!inquiry) throw new NotFoundException("Inquiry not found");
     if (inquiry.tenantId !== tenantId) throw new ForbiddenException();
     if (inquiry.status !== InquiryStatus.pending) {
-      throw new BadRequestException('Only pending inquiries can be cancelled');
+      throw new BadRequestException("Only pending inquiries can be cancelled");
     }
 
     const updated = await this.prisma.inquiry.update({
@@ -290,14 +332,14 @@ export class InquiryService {
 
   private async findInquiryForHost(id: string, hostId: string) {
     const inquiry = await this.prisma.inquiry.findUnique({ where: { id } });
-    if (!inquiry) throw new NotFoundException('Inquiry not found');
+    if (!inquiry) throw new NotFoundException("Inquiry not found");
     if (inquiry.hostId !== hostId) throw new ForbiddenException();
     return inquiry;
   }
 
   private assertPending(status: InquiryStatus) {
     if (status !== InquiryStatus.pending) {
-      throw new BadRequestException('Inquiry is no longer pending');
+      throw new BadRequestException("Inquiry is no longer pending");
     }
   }
 }

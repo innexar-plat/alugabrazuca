@@ -25,24 +25,24 @@ Compliance testing patterns for regulated environments -- automating audit evide
 
 ## Compliance Standards Overview
 
-| Standard | Scope | Key Requirements | Applies To |
-|----------|-------|-----------------|------------|
-| **SOC 2** | Service organizations | Security, availability, processing integrity, confidentiality, privacy | SaaS, cloud services |
-| **HIPAA** | Healthcare data | PHI protection, access controls, audit trails, encryption | Healthcare apps |
-| **GDPR** | EU personal data | Consent, right to erasure, data portability, breach notification | Any app with EU users |
-| **PCI-DSS** | Payment card data | Cardholder data protection, network security, access control | E-commerce, payments |
+| Standard    | Scope                 | Key Requirements                                                       | Applies To            |
+| ----------- | --------------------- | ---------------------------------------------------------------------- | --------------------- |
+| **SOC 2**   | Service organizations | Security, availability, processing integrity, confidentiality, privacy | SaaS, cloud services  |
+| **HIPAA**   | Healthcare data       | PHI protection, access controls, audit trails, encryption              | Healthcare apps       |
+| **GDPR**    | EU personal data      | Consent, right to erasure, data portability, breach notification       | Any app with EU users |
+| **PCI-DSS** | Payment card data     | Cardholder data protection, network security, access control           | E-commerce, payments  |
 
 ### Testing Obligations by Standard
 
-| Testing Type | SOC 2 | HIPAA | GDPR | PCI-DSS |
-|-------------|-------|-------|------|---------|
-| Access control testing | Required | Required | Required | Required |
-| Encryption validation | Required | Required | Required | Required |
-| Audit log testing | Required | Required | Recommended | Required |
-| Penetration testing | Recommended | Required | Recommended | Required (annual) |
-| Vulnerability scanning | Recommended | Required | Recommended | Required (quarterly) |
-| Data retention testing | Recommended | Required | Required | Required |
-| Incident response testing | Recommended | Required | Required | Required |
+| Testing Type              | SOC 2       | HIPAA    | GDPR        | PCI-DSS              |
+| ------------------------- | ----------- | -------- | ----------- | -------------------- |
+| Access control testing    | Required    | Required | Required    | Required             |
+| Encryption validation     | Required    | Required | Required    | Required             |
+| Audit log testing         | Required    | Required | Recommended | Required             |
+| Penetration testing       | Recommended | Required | Recommended | Required (annual)    |
+| Vulnerability scanning    | Recommended | Required | Recommended | Required (quarterly) |
+| Data retention testing    | Recommended | Required | Required    | Required             |
+| Incident response testing | Recommended | Required | Required    | Required             |
 
 ---
 
@@ -245,7 +245,7 @@ if __name__ == "__main__":
 name: Compliance Evidence Collection
 on:
   schedule:
-    - cron: '0 6 * * 1'  # Weekly Monday 6am UTC
+    - cron: "0 6 * * 1" # Weekly Monday 6am UTC
   workflow_dispatch:
 
 jobs:
@@ -271,7 +271,7 @@ jobs:
         with:
           name: compliance-evidence-${{ github.run_id }}
           path: evidence/
-          retention-days: 365  # Keep for audit period
+          retention-days: 365 # Keep for audit period
 ```
 
 ---
@@ -281,21 +281,23 @@ jobs:
 ### RBAC Verification
 
 ```typescript
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-const roles = ['admin', 'editor', 'viewer', 'guest'] as const;
+const roles = ["admin", "editor", "viewer", "guest"] as const;
 
 const accessMatrix = {
-  '/admin/users': { admin: 200, editor: 403, viewer: 403, guest: 401 },
-  '/admin/settings': { admin: 200, editor: 403, viewer: 403, guest: 401 },
-  '/api/posts': { admin: 200, editor: 200, viewer: 200, guest: 401 },
-  '/api/posts/create': { admin: 201, editor: 201, viewer: 403, guest: 401 },
-  '/api/posts/delete': { admin: 200, editor: 403, viewer: 403, guest: 401 },
+  "/admin/users": { admin: 200, editor: 403, viewer: 403, guest: 401 },
+  "/admin/settings": { admin: 200, editor: 403, viewer: 403, guest: 401 },
+  "/api/posts": { admin: 200, editor: 200, viewer: 200, guest: 401 },
+  "/api/posts/create": { admin: 201, editor: 201, viewer: 403, guest: 401 },
+  "/api/posts/delete": { admin: 200, editor: 403, viewer: 403, guest: 401 },
 };
 
 for (const [endpoint, expected] of Object.entries(accessMatrix)) {
   for (const role of roles) {
-    test(`${role} accessing ${endpoint} returns ${expected[role]}`, async ({ request }) => {
+    test(`${role} accessing ${endpoint} returns ${expected[role]}`, async ({
+      request,
+    }) => {
       const token = await getTokenForRole(role);
       const response = await request.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
@@ -309,20 +311,20 @@ for (const [endpoint, expected] of Object.entries(accessMatrix)) {
 ### Privilege Escalation Tests
 
 ```typescript
-test.describe('Privilege escalation prevention', () => {
-  test('viewer cannot modify own role to admin', async ({ request }) => {
-    const viewerToken = await getTokenForRole('viewer');
-    const response = await request.patch('/api/users/me', {
+test.describe("Privilege escalation prevention", () => {
+  test("viewer cannot modify own role to admin", async ({ request }) => {
+    const viewerToken = await getTokenForRole("viewer");
+    const response = await request.patch("/api/users/me", {
       headers: { Authorization: `Bearer ${viewerToken}` },
-      data: { role: 'admin' },
+      data: { role: "admin" },
     });
     // Should either reject or ignore the role field
     expect(response.status()).toBe(403);
   });
 
-  test('user cannot access another user private data', async ({ request }) => {
-    const userAToken = await getTokenForRole('user', 'user-a@example.com');
-    const response = await request.get('/api/users/user-b-id/private', {
+  test("user cannot access another user private data", async ({ request }) => {
+    const userAToken = await getTokenForRole("user", "user-a@example.com");
+    const response = await request.get("/api/users/user-b-id/private", {
       headers: { Authorization: `Bearer ${userAToken}` },
     });
     expect(response.status()).toBe(403);
@@ -335,22 +337,25 @@ test.describe('Privilege escalation prevention', () => {
 ## Data Residency Verification
 
 ```typescript
-test.describe('Data residency compliance', () => {
-  test('EU user data stored in EU region', async ({ request }) => {
+test.describe("Data residency compliance", () => {
+  test("EU user data stored in EU region", async ({ request }) => {
     // Create EU user
-    const createResponse = await request.post('/api/users', {
+    const createResponse = await request.post("/api/users", {
       data: {
-        email: 'eu-user@example.de',
-        country: 'DE',
-        name: 'Test EU User',
+        email: "eu-user@example.de",
+        country: "DE",
+        name: "Test EU User",
       },
     });
     const userId = (await createResponse.json()).id;
 
     // Verify storage region via admin API
-    const regionResponse = await request.get(`/api/admin/data-location/${userId}`, {
-      headers: { Authorization: `Bearer ${adminToken}` },
-    });
+    const regionResponse = await request.get(
+      `/api/admin/data-location/${userId}`,
+      {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      },
+    );
     const location = await regionResponse.json();
     expect(location.region).toMatch(/^eu-/);
     expect(location.database).toMatch(/eu-/);
@@ -405,33 +410,33 @@ end
 ### In-Transit Encryption
 
 ```typescript
-import { test, expect } from '@playwright/test';
-import https from 'https';
-import tls from 'tls';
+import { test, expect } from "@playwright/test";
+import https from "https";
+import tls from "tls";
 
-test('API endpoint enforces TLS 1.2+', async () => {
-  const host = 'api.example.com';
+test("API endpoint enforces TLS 1.2+", async () => {
+  const host = "api.example.com";
 
   const result = await new Promise<tls.TLSSocket>((resolve, reject) => {
     const socket = tls.connect({ host, port: 443, servername: host }, () => {
       resolve(socket);
     });
-    socket.on('error', reject);
+    socket.on("error", reject);
   });
 
   const protocol = result.getProtocol();
-  expect(['TLSv1.2', 'TLSv1.3']).toContain(protocol);
+  expect(["TLSv1.2", "TLSv1.3"]).toContain(protocol);
 
   result.destroy();
 });
 
-test('HTTP redirects to HTTPS', async ({ request }) => {
+test("HTTP redirects to HTTPS", async ({ request }) => {
   // This test verifies HTTP to HTTPS redirect
-  const response = await request.get('http://api.example.com/', {
+  const response = await request.get("http://api.example.com/", {
     maxRedirects: 0,
   });
   expect(response.status()).toBe(301);
-  expect(response.headers()['location']).toMatch(/^https:/);
+  expect(response.headers()["location"]).toMatch(/^https:/);
 });
 ```
 
@@ -440,43 +445,53 @@ test('HTTP redirects to HTTPS', async ({ request }) => {
 ## PII Handling Tests
 
 ```typescript
-test.describe('PII protection', () => {
-  test('PII not exposed in API responses to unauthorized roles', async ({ request }) => {
-    const viewerToken = await getTokenForRole('viewer');
-    const response = await request.get('/api/users', {
+test.describe("PII protection", () => {
+  test("PII not exposed in API responses to unauthorized roles", async ({
+    request,
+  }) => {
+    const viewerToken = await getTokenForRole("viewer");
+    const response = await request.get("/api/users", {
       headers: { Authorization: `Bearer ${viewerToken}` },
     });
     const users = await response.json();
 
     for (const user of users.data) {
-      expect(user).not.toHaveProperty('ssn');
-      expect(user).not.toHaveProperty('date_of_birth');
+      expect(user).not.toHaveProperty("ssn");
+      expect(user).not.toHaveProperty("date_of_birth");
       expect(user.email).toMatch(/^[\w]{1,3}\*+@/); // Masked email
-      expect(user.phone).toMatch(/^\*+\d{4}$/);      // Last 4 digits only
+      expect(user.phone).toMatch(/^\*+\d{4}$/); // Last 4 digits only
     }
   });
 
-  test('PII not logged in application logs', async ({ request }) => {
+  test("PII not logged in application logs", async ({ request }) => {
     // Trigger an operation that processes PII
-    await request.post('/api/users', {
-      data: { email: 'pii-test@example.com', ssn: '123-45-6789', name: 'PII Test' },
+    await request.post("/api/users", {
+      data: {
+        email: "pii-test@example.com",
+        ssn: "123-45-6789",
+        name: "PII Test",
+      },
     });
 
     // Check recent logs via admin API
-    const logsResponse = await request.get('/api/admin/logs?last=100', {
+    const logsResponse = await request.get("/api/admin/logs?last=100", {
       headers: { Authorization: `Bearer ${adminToken}` },
     });
     const logs = await logsResponse.json();
     const logText = JSON.stringify(logs);
 
-    expect(logText).not.toContain('123-45-6789');
-    expect(logText).not.toContain('pii-test@example.com');
+    expect(logText).not.toContain("123-45-6789");
+    expect(logText).not.toContain("pii-test@example.com");
   });
 
-  test('GDPR right to erasure works completely', async ({ request }) => {
+  test("GDPR right to erasure works completely", async ({ request }) => {
     // Create user with PII
-    const createResp = await request.post('/api/users', {
-      data: { email: 'delete-me@example.com', name: 'Delete Me', phone: '+1234567890' },
+    const createResp = await request.post("/api/users", {
+      data: {
+        email: "delete-me@example.com",
+        name: "Delete Me",
+        phone: "+1234567890",
+      },
     });
     const userId = (await createResp.json()).id;
 
@@ -503,9 +518,9 @@ test.describe('PII protection', () => {
 ## Data Retention Policy Enforcement
 
 ```typescript
-test.describe('Data retention policies', () => {
-  test('expired data is purged according to policy', async ({ request }) => {
-    const policyResponse = await request.get('/api/admin/retention-policies', {
+test.describe("Data retention policies", () => {
+  test("expired data is purged according to policy", async ({ request }) => {
+    const policyResponse = await request.get("/api/admin/retention-policies", {
       headers: { Authorization: `Bearer ${adminToken}` },
     });
     const policies = await policyResponse.json();
@@ -518,7 +533,9 @@ test.describe('Data retention policies', () => {
       );
       const audit = await auditResp.json();
 
-      expect(audit.oldest_record_age_days).toBeLessThanOrEqual(policy.retention_days);
+      expect(audit.oldest_record_age_days).toBeLessThanOrEqual(
+        policy.retention_days,
+      );
       expect(audit.expired_records_count).toBe(0);
     }
   });
@@ -527,33 +544,39 @@ test.describe('Data retention policies', () => {
 
 ### Retention Policy Matrix
 
-| Data Type | SOC 2 | HIPAA | GDPR | PCI-DSS |
-|-----------|-------|-------|------|---------|
-| Audit logs | 1 year | 6 years | Per purpose | 1 year |
-| User accounts | Per policy | 6 years after last interaction | Until consent withdrawn | Per policy |
-| Payment data | 7 years (financial) | N/A | Minimal necessary | Until no longer needed |
-| Session logs | 90 days | 6 years | 30 days | 90 days |
-| Backup data | 90 days | 6 years | Same as source | 90 days |
+| Data Type     | SOC 2               | HIPAA                          | GDPR                    | PCI-DSS                |
+| ------------- | ------------------- | ------------------------------ | ----------------------- | ---------------------- |
+| Audit logs    | 1 year              | 6 years                        | Per purpose             | 1 year                 |
+| User accounts | Per policy          | 6 years after last interaction | Until consent withdrawn | Per policy             |
+| Payment data  | 7 years (financial) | N/A                            | Minimal necessary       | Until no longer needed |
+| Session logs  | 90 days             | 6 years                        | 30 days                 | 90 days                |
+| Backup data   | 90 days             | 6 years                        | Same as source          | 90 days                |
 
 ---
 
 ## Audit Log Completeness Testing
 
 ```typescript
-test.describe('Audit log completeness', () => {
+test.describe("Audit log completeness", () => {
   const auditableActions = [
-    { action: 'user.login', trigger: () => login('test@example.com') },
-    { action: 'user.logout', trigger: () => logout() },
-    { action: 'user.create', trigger: () => createUser({ email: 'new@example.com' }) },
-    { action: 'user.delete', trigger: () => deleteUser('test-user-id') },
-    { action: 'data.export', trigger: () => exportData('users') },
-    { action: 'settings.change', trigger: () => updateSettings({ mfa: true }) },
-    { action: 'permission.grant', trigger: () => grantPermission('user-id', 'admin') },
+    { action: "user.login", trigger: () => login("test@example.com") },
+    { action: "user.logout", trigger: () => logout() },
+    {
+      action: "user.create",
+      trigger: () => createUser({ email: "new@example.com" }),
+    },
+    { action: "user.delete", trigger: () => deleteUser("test-user-id") },
+    { action: "data.export", trigger: () => exportData("users") },
+    { action: "settings.change", trigger: () => updateSettings({ mfa: true }) },
+    {
+      action: "permission.grant",
+      trigger: () => grantPermission("user-id", "admin"),
+    },
   ];
 
   for (const { action, trigger } of auditableActions) {
     test(`${action} is recorded in audit log`, async ({ request }) => {
-      const beforeResp = await request.get('/api/admin/audit-logs?limit=1', {
+      const beforeResp = await request.get("/api/admin/audit-logs?limit=1", {
         headers: { Authorization: `Bearer ${adminToken}` },
       });
       const before = await beforeResp.json();
@@ -563,9 +586,12 @@ test.describe('Audit log completeness', () => {
       await trigger();
 
       // Verify audit log entry
-      const afterResp = await request.get(`/api/admin/audit-logs?after=${lastId}`, {
-        headers: { Authorization: `Bearer ${adminToken}` },
-      });
+      const afterResp = await request.get(
+        `/api/admin/audit-logs?after=${lastId}`,
+        {
+          headers: { Authorization: `Bearer ${adminToken}` },
+        },
+      );
       const after = await afterResp.json();
 
       const entry = after.data.find((e: any) => e.action === action);
@@ -577,23 +603,29 @@ test.describe('Audit log completeness', () => {
     });
   }
 
-  test('audit logs are immutable', async ({ request }) => {
-    const logsResp = await request.get('/api/admin/audit-logs?limit=1', {
+  test("audit logs are immutable", async ({ request }) => {
+    const logsResp = await request.get("/api/admin/audit-logs?limit=1", {
       headers: { Authorization: `Bearer ${adminToken}` },
     });
     const logEntry = (await logsResp.json()).data[0];
 
     // Attempt to modify audit log (should fail)
-    const modifyResp = await request.patch(`/api/admin/audit-logs/${logEntry.id}`, {
-      headers: { Authorization: `Bearer ${adminToken}` },
-      data: { action: 'tampered' },
-    });
+    const modifyResp = await request.patch(
+      `/api/admin/audit-logs/${logEntry.id}`,
+      {
+        headers: { Authorization: `Bearer ${adminToken}` },
+        data: { action: "tampered" },
+      },
+    );
     expect([403, 404, 405]).toContain(modifyResp.status());
 
     // Attempt to delete audit log (should fail)
-    const deleteResp = await request.delete(`/api/admin/audit-logs/${logEntry.id}`, {
-      headers: { Authorization: `Bearer ${adminToken}` },
-    });
+    const deleteResp = await request.delete(
+      `/api/admin/audit-logs/${logEntry.id}`,
+      {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      },
+    );
     expect([403, 404, 405]).toContain(deleteResp.status());
   });
 });
@@ -603,12 +635,12 @@ test.describe('Audit log completeness', () => {
 
 ## Penetration Testing Requirements
 
-| Standard | Frequency | Scope | Required By |
-|----------|-----------|-------|-------------|
-| SOC 2 | Annual (recommended) | External + internal | Trust services criteria |
-| HIPAA | Annual (recommended) | All ePHI systems | Security rule |
-| GDPR | Risk-based | Data processing systems | Art. 32 |
-| PCI-DSS | Annual (external), quarterly (internal) | Cardholder data environment | Req. 11.3 |
+| Standard | Frequency                               | Scope                       | Required By             |
+| -------- | --------------------------------------- | --------------------------- | ----------------------- |
+| SOC 2    | Annual (recommended)                    | External + internal         | Trust services criteria |
+| HIPAA    | Annual (recommended)                    | All ePHI systems            | Security rule           |
+| GDPR     | Risk-based                              | Data processing systems     | Art. 32                 |
+| PCI-DSS  | Annual (external), quarterly (internal) | Cardholder data environment | Req. 11.3               |
 
 ### Pen Test Automation (Supplemental)
 
@@ -633,13 +665,13 @@ nuclei -u https://staging.example.com \
 
 ## Vulnerability Scanning Cadence
 
-| Scan Type | Frequency | Tool Examples | CI Integration |
-|-----------|-----------|---------------|----------------|
-| Dependency scan | Every commit | Snyk, Dependabot, npm audit | PR gate |
-| Container scan | Every build | Trivy, Grype, Snyk Container | Build gate |
-| SAST (static) | Every commit | Semgrep, CodeQL, SonarQube | PR gate |
-| DAST (dynamic) | Weekly / pre-release | OWASP ZAP, Nuclei | Scheduled CI |
-| Infrastructure | Weekly | ScoutSuite, Prowler | Scheduled CI |
+| Scan Type       | Frequency            | Tool Examples                | CI Integration |
+| --------------- | -------------------- | ---------------------------- | -------------- |
+| Dependency scan | Every commit         | Snyk, Dependabot, npm audit  | PR gate        |
+| Container scan  | Every build          | Trivy, Grype, Snyk Container | Build gate     |
+| SAST (static)   | Every commit         | Semgrep, CodeQL, SonarQube   | PR gate        |
+| DAST (dynamic)  | Weekly / pre-release | OWASP ZAP, Nuclei            | Scheduled CI   |
+| Infrastructure  | Weekly               | ScoutSuite, Prowler          | Scheduled CI   |
 
 ```yaml
 # GitHub Actions: vulnerability scanning pipeline
@@ -649,7 +681,7 @@ on:
     branches: [main]
   pull_request:
   schedule:
-    - cron: '0 4 * * 1'  # Weekly Monday 4am
+    - cron: "0 4 * * 1" # Weekly Monday 4am
 
 jobs:
   dependency-scan:
@@ -687,24 +719,24 @@ jobs:
 
 ### SOC 2 Test Matrix (Excerpt)
 
-| Control | Test | Automation | Frequency |
-|---------|------|------------|-----------|
-| CC6.1 - Encryption at rest | InSpec `ENCRYPT-AT-REST-001` | Fully automated | Weekly |
-| CC6.7 - Encryption in transit | TLS version check | Fully automated | Daily |
-| CC6.1 - Access control | RBAC matrix test | Fully automated | Every PR |
-| CC7.2 - Security monitoring | Audit log completeness | Fully automated | Daily |
-| CC8.1 - Change management | PR approval requirement | GitHub branch protection | Every PR |
+| Control                       | Test                         | Automation               | Frequency |
+| ----------------------------- | ---------------------------- | ------------------------ | --------- |
+| CC6.1 - Encryption at rest    | InSpec `ENCRYPT-AT-REST-001` | Fully automated          | Weekly    |
+| CC6.7 - Encryption in transit | TLS version check            | Fully automated          | Daily     |
+| CC6.1 - Access control        | RBAC matrix test             | Fully automated          | Every PR  |
+| CC7.2 - Security monitoring   | Audit log completeness       | Fully automated          | Daily     |
+| CC8.1 - Change management     | PR approval requirement      | GitHub branch protection | Every PR  |
 
 ### HIPAA Test Matrix (Excerpt)
 
-| Safeguard | Test | Automation | Frequency |
-|-----------|------|------------|-----------|
-| 164.312(a)(1) - Access control | User auth + RBAC tests | Fully automated | Every PR |
-| 164.312(a)(2)(iv) - Encryption | At-rest + in-transit checks | Fully automated | Weekly |
-| 164.312(b) - Audit controls | Audit log completeness | Fully automated | Daily |
-| 164.312(c)(1) - Integrity | Data checksums, immutable logs | Fully automated | Daily |
-| 164.312(d) - Authentication | MFA enforcement test | Fully automated | Every PR |
-| 164.312(e)(1) - Transmission security | TLS enforcement | Fully automated | Daily |
+| Safeguard                             | Test                           | Automation      | Frequency |
+| ------------------------------------- | ------------------------------ | --------------- | --------- |
+| 164.312(a)(1) - Access control        | User auth + RBAC tests         | Fully automated | Every PR  |
+| 164.312(a)(2)(iv) - Encryption        | At-rest + in-transit checks    | Fully automated | Weekly    |
+| 164.312(b) - Audit controls           | Audit log completeness         | Fully automated | Daily     |
+| 164.312(c)(1) - Integrity             | Data checksums, immutable logs | Fully automated | Daily     |
+| 164.312(d) - Authentication           | MFA enforcement test           | Fully automated | Every PR  |
+| 164.312(e)(1) - Transmission security | TLS enforcement                | Fully automated | Daily     |
 
 ---
 

@@ -5,6 +5,7 @@ Use this template for behavior-driven development (BDD) with Cucumber and Gherki
 ## Why BDD (2024 Best Practices)
 
 **Benefits**:
+
 - Living documentation (scenarios are always up-to-date)
 - Collaboration between technical and non-technical stakeholders
 - Clear acceptance criteria before development
@@ -54,75 +55,83 @@ Feature: User Login
 
 ```typescript
 // step-definitions/login.steps.ts
-import { Given, When, Then, Before, After } from '@cucumber/cucumber'
-import { expect } from '@playwright/test'
-import { LoginPage } from '../pages/login.page'
+import { Given, When, Then, Before, After } from "@cucumber/cucumber";
+import { expect } from "@playwright/test";
+import { LoginPage } from "../pages/login.page";
 
-let page: Page
-let loginPage: LoginPage
+let page: Page;
+let loginPage: LoginPage;
 
 Before(async function () {
-  page = await this.browser.newPage()
-  loginPage = new LoginPage(page)
-})
+  page = await this.browser.newPage();
+  loginPage = new LoginPage(page);
+});
 
 After(async function () {
-  await page.close()
-})
+  await page.close();
+});
 
-Given('the application is running', async function () {
+Given("the application is running", async function () {
   // Verify app health endpoint
-  const response = await page.request.get('https://api.example.com/health')
-  expect(response.status()).toBe(200)
-})
+  const response = await page.request.get("https://api.example.com/health");
+  expect(response.status()).toBe(200);
+});
 
-Given('I am on the login page', async function () {
-  await page.goto('/login')
-  await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible()
-})
+Given("I am on the login page", async function () {
+  await page.goto("/login");
+  await expect(page.getByRole("heading", { name: "Login" })).toBeVisible();
+});
 
-When('I enter email {string}', async function (email: string) {
-  await page.getByLabel('Email').fill(email)
-})
+When("I enter email {string}", async function (email: string) {
+  await page.getByLabel("Email").fill(email);
+});
 
-When('I enter password {string}', async function (password: string) {
-  await page.getByLabel('Password').fill(password)
-})
+When("I enter password {string}", async function (password: string) {
+  await page.getByLabel("Password").fill(password);
+});
 
-When('I click the {string} button', async function (buttonText: string) {
-  await page.getByRole('button', { name: buttonText }).click()
-})
+When("I click the {string} button", async function (buttonText: string) {
+  await page.getByRole("button", { name: buttonText }).click();
+});
 
-When('I click the {string} button {int} times', async function (buttonText: string, times: number) {
-  for (let i = 0; i < times; i++) {
-    await page.getByRole('button', { name: buttonText }).click()
-    await page.waitForTimeout(1000)
-  }
-})
+When(
+  "I click the {string} button {int} times",
+  async function (buttonText: string, times: number) {
+    for (let i = 0; i < times; i++) {
+      await page.getByRole("button", { name: buttonText }).click();
+      await page.waitForTimeout(1000);
+    }
+  },
+);
 
-Then('I should see my dashboard', async function () {
-  await expect(page).toHaveURL('/dashboard')
-  await expect(page.getByTestId('dashboard')).toBeVisible()
-})
+Then("I should see my dashboard", async function () {
+  await expect(page).toHaveURL("/dashboard");
+  await expect(page.getByTestId("dashboard")).toBeVisible();
+});
 
-Then('I should see {string}', async function (text: string) {
-  await expect(page.getByText(text)).toBeVisible()
-})
+Then("I should see {string}", async function (text: string) {
+  await expect(page.getByText(text)).toBeVisible();
+});
 
-Then('I should see an error {string}', async function (errorMessage: string) {
-  await expect(page.getByRole('alert')).toContainText(errorMessage)
-})
+Then("I should see an error {string}", async function (errorMessage: string) {
+  await expect(page.getByRole("alert")).toContainText(errorMessage);
+});
 
-Then('I should remain on the login page', async function () {
-  await expect(page).toHaveURL('/login')
-})
+Then("I should remain on the login page", async function () {
+  await expect(page).toHaveURL("/login");
+});
 
-Then('I should not be able to log in for {int} minutes', async function (minutes: number) {
-  // Store context for future validation
-  this.lockoutDuration = minutes
-  const lockoutMessage = await page.getByTestId('lockout-message').textContent()
-  expect(lockoutMessage).toContain(`${minutes} minutes`)
-})
+Then(
+  "I should not be able to log in for {int} minutes",
+  async function (minutes: number) {
+    // Store context for future validation
+    this.lockoutDuration = minutes;
+    const lockoutMessage = await page
+      .getByTestId("lockout-message")
+      .textContent();
+    expect(lockoutMessage).toContain(`${minutes} minutes`);
+  },
+);
 ```
 
 ## Scenario Outlines (Data-Driven Tests)
@@ -270,109 +279,109 @@ Scenario: Bulk create users
 
 ```typescript
 // Step definition for data tables
-When('I create a user with the following details:', async function (dataTable) {
-  const userData = dataTable.rowsHash()
-  await this.api.post('/users', userData)
-})
+When("I create a user with the following details:", async function (dataTable) {
+  const userData = dataTable.rowsHash();
+  await this.api.post("/users", userData);
+});
 
-When('I create the following users:', async function (dataTable) {
-  const users = dataTable.hashes()
+When("I create the following users:", async function (dataTable) {
+  const users = dataTable.hashes();
   for (const user of users) {
-    await this.api.post('/users', user)
+    await this.api.post("/users", user);
   }
-})
+});
 ```
 
 ## Hooks for Setup/Teardown
 
 ```typescript
 // support/hooks.ts
-import { Before, After, BeforeAll, AfterAll, Status } from '@cucumber/cucumber'
+import { Before, After, BeforeAll, AfterAll, Status } from "@cucumber/cucumber";
 
 BeforeAll(async function () {
   // Global setup (runs once before all scenarios)
-  console.log('Starting test suite')
-})
+  console.log("Starting test suite");
+});
 
 AfterAll(async function () {
   // Global teardown (runs once after all scenarios)
-  console.log('Test suite completed')
-})
+  console.log("Test suite completed");
+});
 
 Before(async function () {
   // Setup before each scenario
-  this.startTime = Date.now()
-})
+  this.startTime = Date.now();
+});
 
 After(async function (scenario) {
   // Teardown after each scenario
-  const duration = Date.now() - this.startTime
-  console.log(`Scenario "${scenario.pickle.name}" took ${duration}ms`)
+  const duration = Date.now() - this.startTime;
+  console.log(`Scenario "${scenario.pickle.name}" took ${duration}ms`);
 
   // Take screenshot on failure
   if (scenario.result?.status === Status.FAILED) {
-    const screenshot = await this.page.screenshot()
-    this.attach(screenshot, 'image/png')
+    const screenshot = await this.page.screenshot();
+    this.attach(screenshot, "image/png");
   }
-})
+});
 
 // Tagged hooks
-Before({ tags: '@database' }, async function () {
-  await this.db.clear()
-})
+Before({ tags: "@database" }, async function () {
+  await this.db.clear();
+});
 
-After({ tags: '@database' }, async function () {
-  await this.db.close()
-})
+After({ tags: "@database" }, async function () {
+  await this.db.close();
+});
 ```
 
 ## Custom World (Shared Context)
 
 ```typescript
 // support/world.ts
-import { setWorldConstructor, World, IWorldOptions } from '@cucumber/cucumber'
-import { chromium, Browser, Page } from '@playwright/test'
+import { setWorldConstructor, World, IWorldOptions } from "@cucumber/cucumber";
+import { chromium, Browser, Page } from "@playwright/test";
 
 export class CustomWorld extends World {
-  browser?: Browser
-  page?: Page
-  apiResponse?: any
-  testData: Map<string, any>
+  browser?: Browser;
+  page?: Page;
+  apiResponse?: any;
+  testData: Map<string, any>;
 
   constructor(options: IWorldOptions) {
-    super(options)
-    this.testData = new Map()
+    super(options);
+    this.testData = new Map();
   }
 
   async init() {
-    this.browser = await chromium.launch()
-    const context = await this.browser.newContext()
-    this.page = await context.newPage()
+    this.browser = await chromium.launch();
+    const context = await this.browser.newContext();
+    this.page = await context.newPage();
   }
 
   async cleanup() {
-    await this.page?.close()
-    await this.browser?.close()
+    await this.page?.close();
+    await this.browser?.close();
   }
 
   // Helper methods
   async login(email: string, password: string) {
-    await this.page!.goto('/login')
-    await this.page!.getByLabel('Email').fill(email)
-    await this.page!.getByLabel('Password').fill(password)
-    await this.page!.getByRole('button', { name: 'Login' }).click()
+    await this.page!.goto("/login");
+    await this.page!.getByLabel("Email").fill(email);
+    await this.page!.getByLabel("Password").fill(password);
+    await this.page!.getByRole("button", { name: "Login" }).click();
   }
 
   storeData(key: string, value: any) {
-    this.testData.set(key, value)
+    this.testData.set(key, value);
   }
 
   getData(key: string) {
-    return this.testData.get(key)
+    return this.testData.get(key);
   }
 }
 
-setWorldConstructor(CustomWorld)
+setWorldConstructor(CustomWorld);
 ```
 
 ## Configuration
@@ -380,21 +389,21 @@ setWorldConstructor(CustomWorld)
 ```typescript
 // cucumber.config.ts
 export default {
-  require: ['step-definitions/**/*.ts'],
-  requireModule: ['ts-node/register'],
+  require: ["step-definitions/**/*.ts"],
+  requireModule: ["ts-node/register"],
   format: [
-    'progress-bar',
-    'html:test-results/cucumber-report.html',
-    'json:test-results/cucumber-report.json',
-    'junit:test-results/cucumber-report.xml'
+    "progress-bar",
+    "html:test-results/cucumber-report.html",
+    "json:test-results/cucumber-report.json",
+    "junit:test-results/cucumber-report.xml",
   ],
   formatOptions: {
-    snippetInterface: 'async-await'
+    snippetInterface: "async-await",
   },
   parallel: 2,
   retry: 1,
-  retryTagFilter: '@flaky'
-}
+  retryTagFilter: "@flaky",
+};
 ```
 
 ## Integration with CI/CD
@@ -412,7 +421,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install dependencies
         run: npm ci
@@ -450,6 +459,7 @@ jobs:
 ## Anti-Patterns to Avoid
 
 [FAIL] **Overly specific scenarios**:
+
 ```gherkin
 # Too detailed
 When I click the button with id "submit-btn-123"
@@ -458,6 +468,7 @@ Then I should see element with class "success-message"
 ```
 
 [OK] **User-focused scenarios**:
+
 ```gherkin
 # Better
 When I submit the form
@@ -465,6 +476,7 @@ Then I should see a success message
 ```
 
 [FAIL] **Reusing steps inappropriately**:
+
 ```gherkin
 # Confusing reuse
 Given I am on the login page
@@ -472,6 +484,7 @@ And I am on the products page  # Which page am I on?
 ```
 
 [FAIL] **Testing too much in one scenario**:
+
 ```gherkin
 # Too much in one scenario (split into 3 scenarios)
 Scenario: Complete user journey

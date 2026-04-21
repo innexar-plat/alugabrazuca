@@ -8,11 +8,11 @@
 
 ## Coverage Table
 
-| Feature/Backlog ID | Feature Name | Criticality | Coverage Status | Direct Evidence (path + test id) | Waiver (if any) | Owner | Due Date |
-|---|---|---|---|---|---|---|---|
-|  |  | High/Med/Low | direct/indirect/none |  |  |  |  |
-|  |  |  |  |  |  |  |  |
-|  |  |  |  |  |  |  |  |
+| Feature/Backlog ID | Feature Name | Criticality  | Coverage Status      | Direct Evidence (path + test id) | Waiver (if any) | Owner | Due Date |
+| ------------------ | ------------ | ------------ | -------------------- | -------------------------------- | --------------- | ----- | -------- |
+|                    |              | High/Med/Low | direct/indirect/none |                                  |                 |       |          |
+|                    |              |              |                      |                                  |                 |       |          |
+|                    |              |              |                      |                                  |                 |       |          |
 
 ## Summary
 

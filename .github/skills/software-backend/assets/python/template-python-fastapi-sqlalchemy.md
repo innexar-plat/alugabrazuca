@@ -1,12 +1,13 @@
 # Backend Engineering - Python + FastAPI + SQLAlchemy Template
 
-*Purpose: High-performance Python APIs with async support, ideal for ML/DS backends and data-intensive applications*
+_Purpose: High-performance Python APIs with async support, ideal for ML/DS backends and data-intensive applications_
 
 ---
 
 # When to Use
 
 Use this template when building:
+
 - Machine learning model serving APIs
 - Data science backends with pandas/NumPy integration
 - APIs requiring Python ecosystem libraries (scikit-learn, TensorFlow, PyTorch)
@@ -14,6 +15,7 @@ Use this template when building:
 - Services integrating with Jupyter notebooks or data pipelines
 
 **Python/FastAPI Advantages:**
+
 - **Async/await support**: High-performance async I/O (comparable to Node.js)
 - **Automatic API docs**: OpenAPI/Swagger UI generated from type hints
 - **Pydantic validation**: Runtime type checking with Python type hints
@@ -28,6 +30,7 @@ Use this template when building:
 # 1. Project Overview
 
 **Tech Stack:**
+
 - [ ] Python 3.12+ (prefer latest stable; type hints + strict linting)
 - [ ] FastAPI (current stable, async web framework)
 - [ ] SQLAlchemy 2.0+ (async ORM)
@@ -41,6 +44,7 @@ Use this template when building:
 **Project Name:** `{{project_name}}`
 
 **Team:**
+
 - Backend: {{team_size}} Python developers
 - ML/DS: {{ml_team_size}} data scientists
 
@@ -106,6 +110,7 @@ project-root/
 ```
 
 **Key Principles:**
+
 - Async-first architecture (async/await everywhere)
 - Type hints on all functions (enable MyPy strict mode)
 - Pydantic schemas for validation
@@ -118,13 +123,13 @@ project-root/
 
 > **Important**: The code patterns in this template should be extracted to `app/core/`. **Do not duplicate** these utilities across modules.
 
-| Utility | Extract To | Reference |
-|---------|------------|-----------|
-| Config (`Settings`, Pydantic) | `app/core/config.py` | [config-validation.md](../../../software-clean-code-standard/utilities/config-validation.md) |
-| JWT (`create_access_token`, `decode_token`) | `app/core/security.py` | [auth-utilities.md](../../../software-clean-code-standard/utilities/auth-utilities.md) |
-| Password (`hash_password`, `verify_password`) | `app/core/security.py` | [auth-utilities.md](../../../software-clean-code-standard/utilities/auth-utilities.md) |
-| Errors (`AppError`, exception handlers) | `app/core/errors.py` | [error-handling.md](../../../software-clean-code-standard/utilities/error-handling.md) |
-| Logging (structlog setup) | `app/core/logging.py` | [logging-utilities.md](../../../software-clean-code-standard/utilities/logging-utilities.md) |
+| Utility                                       | Extract To             | Reference                                                                                    |
+| --------------------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------- |
+| Config (`Settings`, Pydantic)                 | `app/core/config.py`   | [config-validation.md](../../../software-clean-code-standard/utilities/config-validation.md) |
+| JWT (`create_access_token`, `decode_token`)   | `app/core/security.py` | [auth-utilities.md](../../../software-clean-code-standard/utilities/auth-utilities.md)       |
+| Password (`hash_password`, `verify_password`) | `app/core/security.py` | [auth-utilities.md](../../../software-clean-code-standard/utilities/auth-utilities.md)       |
+| Errors (`AppError`, exception handlers)       | `app/core/errors.py`   | [error-handling.md](../../../software-clean-code-standard/utilities/error-handling.md)       |
+| Logging (structlog setup)                     | `app/core/logging.py`  | [logging-utilities.md](../../../software-clean-code-standard/utilities/logging-utilities.md) |
 
 **Pattern**: Create utilities once in `app/core/`, import everywhere via:
 
@@ -1054,7 +1059,7 @@ CMD alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000
 ## docker-compose.yml
 
 ```yaml
-version: '3.9'
+version: "3.9"
 
 services:
   api:
@@ -1157,6 +1162,7 @@ docker-logs:
 # 11. Production Checklist
 
 ## Security [OK]
+
 - [ ] JWT secret is strong (min 32 chars) and stored securely
 - [ ] HTTPS enforced with TLS 1.2+
 - [ ] Rate limiting per endpoint
@@ -1169,6 +1175,7 @@ docker-logs:
 - [ ] Environment variables validated at startup
 
 ## Performance [OK]
+
 - [ ] Database connection pooling configured
 - [ ] Redis caching for read-heavy operations
 - [ ] Async/await for all I/O operations
@@ -1179,6 +1186,7 @@ docker-logs:
 - [ ] Query optimization with explain analyze
 
 ## Observability [OK]
+
 - [ ] Structured logging (JSON format)
 - [ ] Request ID tracking
 - [ ] Error tracking (Sentry integration)
@@ -1188,6 +1196,7 @@ docker-logs:
 - [ ] OpenTelemetry tracing
 
 ## Deployment [OK]
+
 - [ ] Multi-stage Docker build
 - [ ] Container security scanning
 - [ ] Database migrations automated
@@ -1197,6 +1206,7 @@ docker-logs:
 - [ ] Blue-green or canary deployment
 
 ## Reliability [OK]
+
 - [ ] Database backups automated
 - [ ] Redis persistence configured
 - [ ] Retry logic with tenacity
@@ -1210,6 +1220,7 @@ docker-logs:
 # 12. API Documentation
 
 FastAPI automatically generates OpenAPI docs. Access at:
+
 - Swagger UI: `http://localhost:8000/docs`
 - ReDoc: `http://localhost:8000/redoc`
 - OpenAPI JSON: `http://localhost:8000/openapi.json`
@@ -1235,6 +1246,7 @@ app = FastAPI(
 **Congratulations!** You now have a production-grade Python backend with FastAPI, SQLAlchemy, and PostgreSQL.
 
 **Next Steps:**
+
 1. Install dependencies with `poetry install` or `pip install -r requirements/base.txt`
 2. Copy `.env.example` to `.env` and configure
 3. Start services with `docker-compose up -d`
@@ -1243,6 +1255,7 @@ app = FastAPI(
 6. Access API docs at `http://localhost:8000/docs`
 
 **Python/FastAPI Best Practices:**
+
 - **Type hints everywhere**: Enable MyPy strict mode for compile-time type checking
 - **Async/await**: Use async for all I/O operations (database, Redis, HTTP)
 - **Pydantic validation**: Runtime validation with automatic OpenAPI schema generation

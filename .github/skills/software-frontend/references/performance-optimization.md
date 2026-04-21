@@ -22,12 +22,12 @@ Actionable patterns for optimizing Core Web Vitals (LCP, INP, CLS), bundle size,
 
 ### Targets
 
-| Metric | Good | Needs Improvement | Poor |
-|--------|------|-------------------|------|
-| LCP (Largest Contentful Paint) | <= 2.5s | 2.5-4.0s | > 4.0s |
-| INP (Interaction to Next Paint) | <= 200ms | 200-500ms | > 500ms |
-| CLS (Cumulative Layout Shift) | <= 0.1 | 0.1-0.25 | > 0.25 |
-| TTFB (Time to First Byte) | < 600ms | 600-1000ms | > 1000ms |
+| Metric                          | Good     | Needs Improvement | Poor     |
+| ------------------------------- | -------- | ----------------- | -------- |
+| LCP (Largest Contentful Paint)  | <= 2.5s  | 2.5-4.0s          | > 4.0s   |
+| INP (Interaction to Next Paint) | <= 200ms | 200-500ms         | > 500ms  |
+| CLS (Cumulative Layout Shift)   | <= 0.1   | 0.1-0.25          | > 0.25   |
+| TTFB (Time to First Byte)       | < 600ms  | 600-1000ms        | > 1000ms |
 
 ### LCP Optimization
 
@@ -68,8 +68,13 @@ export default function HeroSection() {
   <link rel="preload" as="image" href="/hero.webp" fetchpriority="high" />
 
   <!-- Preload critical font -->
-  <link rel="preload" as="font" type="font/woff2"
-        href="/fonts/Inter-var.woff2" crossorigin />
+  <link
+    rel="preload"
+    as="font"
+    type="font/woff2"
+    href="/fonts/Inter-var.woff2"
+    crossorigin
+  />
 
   <!-- Preconnect to external origins -->
   <link rel="preconnect" href="https://cdn.example.com" />
@@ -109,14 +114,14 @@ self.onmessage = (event) => {
 };
 
 // component.tsx
-const worker = new Worker(new URL('./worker.ts', import.meta.url));
+const worker = new Worker(new URL("./worker.ts", import.meta.url));
 function handleClick() {
   worker.postMessage(largeDataset);
   worker.onmessage = (event) => setResult(event.data);
 }
 
 // FIX 3: Use startTransition for non-urgent updates
-import { startTransition } from 'react';
+import { startTransition } from "react";
 
 function handleInput(value: string) {
   // Urgent: update the input field immediately
@@ -124,7 +129,7 @@ function handleInput(value: string) {
 
   // Non-urgent: update the filtered list (can be interrupted)
   startTransition(() => {
-    setFilteredItems(items.filter(item => item.name.includes(value)));
+    setFilteredItems(items.filter((item) => item.name.includes(value)));
   });
 }
 ```
@@ -147,13 +152,13 @@ CLS measures visual stability -- elements shifting unexpectedly during page load
 
 Common CLS causes and fixes:
 
-| Cause | Fix |
-|-------|-----|
-| Images without dimensions | Set `width` and `height` or `aspect-ratio` |
-| Ads/embeds without reserved space | Use placeholder with fixed dimensions |
-| Web fonts causing FOIT/FOUT | Use `font-display: swap` + `size-adjust` |
+| Cause                                   | Fix                                               |
+| --------------------------------------- | ------------------------------------------------- |
+| Images without dimensions               | Set `width` and `height` or `aspect-ratio`        |
+| Ads/embeds without reserved space       | Use placeholder with fixed dimensions             |
+| Web fonts causing FOIT/FOUT             | Use `font-display: swap` + `size-adjust`          |
 | Dynamic content inserted above viewport | Insert below the fold or use transform animations |
-| Late-loading CSS changing layout | Inline critical CSS, defer non-critical |
+| Late-loading CSS changing layout        | Inline critical CSS, defer non-critical           |
 
 ---
 
@@ -171,10 +176,10 @@ ANALYZE=true npm run build
 
 ```typescript
 // next.config.ts
-import withBundleAnalyzer from '@next/bundle-analyzer';
+import withBundleAnalyzer from "@next/bundle-analyzer";
 
 const config = withBundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
+  enabled: process.env.ANALYZE === "true",
 })({
   // ... next config
 });
@@ -207,17 +212,17 @@ const DatePicker = dynamic(
 
 ```typescript
 // WRONG: Import at the top level (included in main bundle)
-import { format, parseISO, differenceInDays } from 'date-fns';
+import { format, parseISO, differenceInDays } from "date-fns";
 
 // RIGHT: Dynamic import when needed
 async function formatDate(date: string) {
-  const { format, parseISO } = await import('date-fns');
-  return format(parseISO(date), 'MMM d, yyyy');
+  const { format, parseISO } = await import("date-fns");
+  return format(parseISO(date), "MMM d, yyyy");
 }
 
 // RIGHT: Conditional dynamic import
 async function processCSV(file: File) {
-  const Papa = (await import('papaparse')).default;
+  const Papa = (await import("papaparse")).default;
   return Papa.parse(file, { header: true });
 }
 ```
@@ -226,27 +231,27 @@ async function processCSV(file: File) {
 
 ```typescript
 // BAD: Import entire library
-import _ from 'lodash';
-const sorted = _.sortBy(items, 'name');
+import _ from "lodash";
+const sorted = _.sortBy(items, "name");
 // Includes ALL of lodash in bundle (~70KB)
 
 // GOOD: Import specific function
-import sortBy from 'lodash/sortBy';
-const sorted = sortBy(items, 'name');
+import sortBy from "lodash/sortBy";
+const sorted = sortBy(items, "name");
 // Only includes sortBy (~2KB)
 
 // BETTER: Use native methods or lodash-es
-import { sortBy } from 'lodash-es';  // ES modules, tree-shakeable
+import { sortBy } from "lodash-es"; // ES modules, tree-shakeable
 ```
 
 ### Bundle Size Budgets
 
-| Category | Budget | Check |
-|----------|--------|-------|
+| Category               | Budget          | Check               |
+| ---------------------- | --------------- | ------------------- |
 | First Load JS (shared) | < 100KB gzipped | `next build` output |
-| Per-page JS | < 50KB gzipped | `next build` output |
-| Total page weight | < 500KB | Lighthouse |
-| Largest dependency | < 50KB gzipped | Bundle analyzer |
+| Per-page JS            | < 50KB gzipped  | `next build` output |
+| Total page weight      | < 500KB         | Lighthouse          |
+| Largest dependency     | < 50KB gzipped  | Bundle analyzer     |
 
 ---
 
@@ -282,20 +287,20 @@ import Image from 'next/image';
 
 ### Format Selection
 
-| Format | Use Case | Browser Support | Size vs JPEG |
-|--------|----------|-----------------|-------------|
-| AVIF | Best compression, photos | Chrome, Firefox, Safari 16+ | 50-70% smaller |
-| WebP | Good compression, wide support | All modern browsers | 25-35% smaller |
-| JPEG | Fallback for old browsers | Universal | Baseline |
-| PNG | Transparency needed | Universal | Larger for photos |
-| SVG | Icons, logos, illustrations | Universal | Scalable, tiny for simple graphics |
+| Format | Use Case                       | Browser Support             | Size vs JPEG                       |
+| ------ | ------------------------------ | --------------------------- | ---------------------------------- |
+| AVIF   | Best compression, photos       | Chrome, Firefox, Safari 16+ | 50-70% smaller                     |
+| WebP   | Good compression, wide support | All modern browsers         | 25-35% smaller                     |
+| JPEG   | Fallback for old browsers      | Universal                   | Baseline                           |
+| PNG    | Transparency needed            | Universal                   | Larger for photos                  |
+| SVG    | Icons, logos, illustrations    | Universal                   | Scalable, tiny for simple graphics |
 
 ```typescript
 // Next.js automatically serves AVIF/WebP with fallback
 // Configure in next.config.ts:
 const nextConfig = {
   images: {
-    formats: ['image/avif', 'image/webp'],
+    formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
   },
@@ -360,21 +365,21 @@ export default function RootLayout({ children }) {
 
 ### Font Loading Strategy
 
-| Strategy | `font-display` | Behavior | Best For |
-|----------|---------------|----------|----------|
-| Swap | `swap` | Show fallback, swap when loaded | Body text |
-| Optional | `optional` | Show fallback, use font only if cached | Non-critical text |
-| Fallback | `fallback` | Brief blank, then fallback, then swap | Headings |
-| Block | `block` | Invisible text until font loads | Icon fonts (avoid these) |
+| Strategy | `font-display` | Behavior                               | Best For                 |
+| -------- | -------------- | -------------------------------------- | ------------------------ |
+| Swap     | `swap`         | Show fallback, swap when loaded        | Body text                |
+| Optional | `optional`     | Show fallback, use font only if cached | Non-critical text        |
+| Fallback | `fallback`     | Brief blank, then fallback, then swap  | Headings                 |
+| Block    | `block`        | Invisible text until font loads        | Icon fonts (avoid these) |
 
 ### Variable Fonts
 
 ```css
 /* Variable fonts: one file, all weights */
 @font-face {
-  font-family: 'Inter';
-  src: url('/fonts/Inter-var.woff2') format('woff2');
-  font-weight: 100 900;  /* Full weight range */
+  font-family: "Inter";
+  src: url("/fonts/Inter-var.woff2") format("woff2");
+  font-weight: 100 900; /* Full weight range */
   font-display: swap;
   font-style: normal;
 }
@@ -625,12 +630,12 @@ Push "use client" as deep as possible in the component tree.
 
 ### Loading Strategies
 
-| Strategy | When to Use | Impact |
-|----------|-------------|--------|
-| `afterInteractive` (default) | Analytics, chat widgets | Loads after hydration |
-| `lazyOnload` | Non-essential scripts | Loads during idle time |
-| `beforeInteractive` | Critical polyfills | Blocks hydration (use sparingly) |
-| `worker` (Partytown) | Analytics, ads | Runs in Web Worker |
+| Strategy                     | When to Use             | Impact                           |
+| ---------------------------- | ----------------------- | -------------------------------- |
+| `afterInteractive` (default) | Analytics, chat widgets | Loads after hydration            |
+| `lazyOnload`                 | Non-essential scripts   | Loads during idle time           |
+| `beforeInteractive`          | Critical polyfills      | Blocks hydration (use sparingly) |
+| `worker` (Partytown)         | Analytics, ads          | Runs in Web Worker               |
 
 ```typescript
 // Next.js Script component
@@ -674,13 +679,13 @@ const nextConfig = {
 
 ### Third-Party Script Audit
 
-| Question | Red Flag | Action |
-|----------|----------|--------|
-| Does it block rendering? | Synchronous `<script>` in `<head>` | Move to `afterInteractive` or `lazyOnload` |
-| How large is it? | > 50KB | Evaluate alternatives or defer loading |
-| Does it load more scripts? | Chain-loads multiple resources | Consider removing or using Partytown |
-| Is it on the critical path? | Blocks LCP or INP | Defer or load in Web Worker |
-| Can it be self-hosted? | External CDN with variable latency | Self-host and cache |
+| Question                    | Red Flag                           | Action                                     |
+| --------------------------- | ---------------------------------- | ------------------------------------------ |
+| Does it block rendering?    | Synchronous `<script>` in `<head>` | Move to `afterInteractive` or `lazyOnload` |
+| How large is it?            | > 50KB                             | Evaluate alternatives or defer loading     |
+| Does it load more scripts?  | Chain-loads multiple resources     | Consider removing or using Partytown       |
+| Is it on the critical path? | Blocks LCP or INP                  | Defer or load in Web Worker                |
+| Can it be self-hosted?      | External CDN with variable latency | Self-host and cache                        |
 
 ---
 
@@ -709,9 +714,7 @@ npx lighthouse https://example.com \
       { "resourceType": "image", "budget": 300 },
       { "resourceType": "total", "budget": 500 }
     ],
-    "resourceCounts": [
-      { "resourceType": "third-party", "budget": 5 }
-    ]
+    "resourceCounts": [{ "resourceType": "third-party", "budget": 5 }]
   }
 ]
 ```
@@ -720,9 +723,9 @@ npx lighthouse https://example.com \
 
 ```typescript
 // app/components/WebVitals.tsx
-'use client';
+"use client";
 
-import { useReportWebVitals } from 'next/web-vitals';
+import { useReportWebVitals } from "next/web-vitals";
 
 export function WebVitals() {
   useReportWebVitals((metric) => {
@@ -730,10 +733,10 @@ export function WebVitals() {
     console.log(metric.name, metric.value);
 
     // Or send to an endpoint
-    fetch('/api/vitals', {
-      method: 'POST',
+    fetch("/api/vitals", {
+      method: "POST",
       body: JSON.stringify({
-        name: metric.name,     // CLS, FCP, INP, LCP, TTFB
+        name: metric.name, // CLS, FCP, INP, LCP, TTFB
         value: metric.value,
         rating: metric.rating, // good, needs-improvement, poor
         id: metric.id,

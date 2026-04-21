@@ -7,6 +7,7 @@ Production-ready template for building full-stack web applications with Nuxt 4, 
 ## Overview
 
 This template provides a modern Nuxt 4 setup with:
+
 - **Nuxt 4** - Progressive Vue.js framework with Nitro server engine
 - **Vue 3** - Composition API with `<script setup>`
 - **TypeScript** - Full type safety
@@ -115,10 +116,10 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   modules: [
-    '@nuxtjs/tailwindcss',
-    '@nuxt/ui',           // or 'shadcn-nuxt'
-    '@pinia/nuxt',
-    '@vueuse/nuxt',
+    "@nuxtjs/tailwindcss",
+    "@nuxt/ui", // or 'shadcn-nuxt'
+    "@pinia/nuxt",
+    "@vueuse/nuxt",
   ],
 
   typescript: {
@@ -128,15 +129,13 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: 'My Nuxt App',
+      title: "My Nuxt App",
       meta: [
-        { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'My awesome Nuxt 4 app' },
+        { charset: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        { name: "description", content: "My awesome Nuxt 4 app" },
       ],
-      link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      ],
+      link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
     },
   },
 
@@ -147,51 +146,51 @@ export default defineNuxtConfig({
 
     // Public keys (exposed to client)
     public: {
-      apiBase: process.env.API_BASE_URL || 'http://localhost:3000',
+      apiBase: process.env.API_BASE_URL || "http://localhost:3000",
     },
   },
 
   // Nitro server configuration
   nitro: {
-    preset: 'node-server',  // or 'vercel', 'netlify', etc.
+    preset: "node-server", // or 'vercel', 'netlify', etc.
   },
-})
+});
 ```
 
 ### tailwind.config.ts
 
 ```typescript
 // tailwind.config.ts
-import type { Config } from 'tailwindcss'
+import type { Config } from "tailwindcss";
 
 export default <Partial<Config>>{
   content: [
-    './components/**/*.{js,vue,ts}',
-    './layouts/**/*.vue',
-    './pages/**/*.vue',
-    './plugins/**/*.{js,ts}',
-    './app.vue',
+    "./components/**/*.{js,vue,ts}",
+    "./layouts/**/*.vue",
+    "./pages/**/*.vue",
+    "./plugins/**/*.{js,ts}",
+    "./app.vue",
   ],
   theme: {
     extend: {
       colors: {
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
+          50: "#eff6ff",
+          100: "#dbeafe",
+          200: "#bfdbfe",
+          300: "#93c5fd",
+          400: "#60a5fa",
+          500: "#3b82f6",
+          600: "#2563eb",
+          700: "#1d4ed8",
+          800: "#1e40af",
+          900: "#1e3a8a",
         },
       },
     },
   },
   plugins: [],
-}
+};
 ```
 
 ---
@@ -204,21 +203,20 @@ export default <Partial<Config>>{
 <!-- pages/blog/[slug].vue -->
 <script setup lang="ts">
 // Route params are auto-typed
-const route = useRoute()
-const slug = route.params.slug
+const route = useRoute();
+const slug = route.params.slug;
 
 // useAsyncData for data fetching (SSR-friendly)
-const { data: post, error } = await useAsyncData(
-  `post-${slug}`,
-  () => $fetch(`/api/posts/${slug}`)
-)
+const { data: post, error } = await useAsyncData(`post-${slug}`, () =>
+  $fetch(`/api/posts/${slug}`),
+);
 
 // Handle not found
 if (!post.value) {
   throw createError({
     statusCode: 404,
-    message: 'Post not found',
-  })
+    message: "Post not found",
+  });
 }
 
 // SEO metadata
@@ -226,7 +224,7 @@ useSeoMeta({
   title: post.value.title,
   description: post.value.excerpt,
   ogImage: post.value.image,
-})
+});
 </script>
 
 <template>
@@ -246,40 +244,37 @@ useSeoMeta({
 <!-- components/UserProfile.vue -->
 <script setup lang="ts">
 // Auto-imported composables
-const { user, isAuthenticated, logout } = useAuth()
-const { formatDate } = useFormatters()
+const { user, isAuthenticated, logout } = useAuth();
+const { formatDate } = useFormatters();
 
 // Component props
 interface Props {
-  showEmail?: boolean
+  showEmail?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
   showEmail: false,
-})
+});
 
 // Local state
-const isEditing = ref(false)
+const isEditing = ref(false);
 
 // Computed
 const displayName = computed(() =>
-  user.value ? `${user.value.firstName} ${user.value.lastName}` : 'Guest'
-)
+  user.value ? `${user.value.firstName} ${user.value.lastName}` : "Guest",
+);
 
 // Methods
 const handleLogout = async () => {
-  await logout()
-  navigateTo('/login')
-}
+  await logout();
+  navigateTo("/login");
+};
 </script>
 
 <template>
   <div class="bg-white rounded-lg shadow p-6">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-2xl font-bold">{{ displayName }}</h2>
-      <button
-        @click="handleLogout"
-        class="text-red-600 hover:text-red-800"
-      >
+      <button @click="handleLogout" class="text-red-600 hover:text-red-800">
         Logout
       </button>
     </div>
@@ -299,36 +294,36 @@ const handleLogout = async () => {
 ```typescript
 // composables/useAuth.ts
 export const useAuth = () => {
-  const user = useState<User | null>('user', () => null)
-  const token = useCookie('auth_token')
+  const user = useState<User | null>("user", () => null);
+  const token = useCookie("auth_token");
 
-  const isAuthenticated = computed(() => !!user.value)
+  const isAuthenticated = computed(() => !!user.value);
 
   const login = async (credentials: LoginCredentials) => {
-    const data = await $fetch('/api/auth/login', {
-      method: 'POST',
+    const data = await $fetch("/api/auth/login", {
+      method: "POST",
       body: credentials,
-    })
+    });
 
-    user.value = data.user
-    token.value = data.token
-  }
+    user.value = data.user;
+    token.value = data.token;
+  };
 
   const logout = async () => {
-    await $fetch('/api/auth/logout', { method: 'POST' })
-    user.value = null
-    token.value = null
-  }
+    await $fetch("/api/auth/logout", { method: "POST" });
+    user.value = null;
+    token.value = null;
+  };
 
   const fetchUser = async () => {
-    if (!token.value) return
+    if (!token.value) return;
 
     try {
-      user.value = await $fetch('/api/auth/me')
+      user.value = await $fetch("/api/auth/me");
     } catch (error) {
-      token.value = null
+      token.value = null;
     }
-  }
+  };
 
   return {
     user: readonly(user),
@@ -336,8 +331,8 @@ export const useAuth = () => {
     login,
     logout,
     fetchUser,
-  }
-}
+  };
+};
 ```
 
 ### API Route (Server)
@@ -346,18 +341,18 @@ export const useAuth = () => {
 // server/api/posts/index.get.ts
 export default defineEventHandler(async (event) => {
   // Query parameters
-  const query = getQuery(event)
-  const page = Number(query.page) || 1
-  const limit = Number(query.limit) || 10
+  const query = getQuery(event);
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
 
   // Database query (example with Prisma)
   const posts = await prisma.post.findMany({
     skip: (page - 1) * limit,
     take: limit,
-    orderBy: { createdAt: 'desc' },
-  })
+    orderBy: { createdAt: "desc" },
+  });
 
-  const total = await prisma.post.count()
+  const total = await prisma.post.count();
 
   return {
     data: posts,
@@ -367,74 +362,74 @@ export default defineEventHandler(async (event) => {
       total,
       totalPages: Math.ceil(total / limit),
     },
-  }
-})
+  };
+});
 ```
 
 ### API Route with Validation
 
 ```typescript
 // server/api/posts/index.post.ts
-import { z } from 'zod'
+import { z } from "zod";
 
 const postSchema = z.object({
   title: z.string().min(1).max(200),
   content: z.string().min(10),
   published: z.boolean().default(false),
-})
+});
 
 export default defineEventHandler(async (event) => {
   // Parse and validate body
-  const body = await readBody(event)
-  const result = postSchema.safeParse(body)
+  const body = await readBody(event);
+  const result = postSchema.safeParse(body);
 
   if (!result.success) {
     throw createError({
       statusCode: 400,
-      message: 'Validation failed',
+      message: "Validation failed",
       data: result.error.flatten(),
-    })
+    });
   }
 
   // Create post
   const post = await prisma.post.create({
     data: result.data,
-  })
+  });
 
-  return post
-})
+  return post;
+});
 ```
 
 ### Pinia Store
 
 ```typescript
 // stores/auth.ts
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
-export const useAuthStore = defineStore('auth', () => {
+export const useAuthStore = defineStore("auth", () => {
   // State
-  const user = ref<User | null>(null)
-  const token = useCookie('auth_token')
+  const user = ref<User | null>(null);
+  const token = useCookie("auth_token");
 
   // Getters
-  const isAuthenticated = computed(() => !!user.value)
-  const userName = computed(() => user.value?.name || 'Guest')
+  const isAuthenticated = computed(() => !!user.value);
+  const userName = computed(() => user.value?.name || "Guest");
 
   // Actions
   const login = async (credentials: LoginCredentials) => {
-    const data = await $fetch('/api/auth/login', {
-      method: 'POST',
+    const data = await $fetch("/api/auth/login", {
+      method: "POST",
       body: credentials,
-    })
+    });
 
-    user.value = data.user
-    token.value = data.token
-  }
+    user.value = data.user;
+    token.value = data.token;
+  };
 
   const logout = () => {
-    user.value = null
-    token.value = null
-  }
+    user.value = null;
+    token.value = null;
+  };
 
   return {
     user,
@@ -443,8 +438,8 @@ export const useAuthStore = defineStore('auth', () => {
     userName,
     login,
     logout,
-  }
-})
+  };
+});
 ```
 
 ### Layout
@@ -452,7 +447,7 @@ export const useAuthStore = defineStore('auth', () => {
 ```vue
 <!-- layouts/default.vue -->
 <script setup lang="ts">
-const { user } = useAuth()
+const { user } = useAuth();
 </script>
 
 <template>
@@ -460,9 +455,7 @@ const { user } = useAuth()
     <header class="bg-white shadow">
       <nav class="container mx-auto px-4 py-4">
         <div class="flex items-center justify-between">
-          <NuxtLink to="/" class="text-xl font-bold">
-            My App
-          </NuxtLink>
+          <NuxtLink to="/" class="text-xl font-bold"> My App </NuxtLink>
 
           <div class="flex items-center gap-4">
             <NuxtLink to="/about">About</NuxtLink>
@@ -500,52 +493,52 @@ const { user } = useAuth()
 
 ```typescript
 // tests/unit/composables/useAuth.test.ts
-import { describe, it, expect, beforeEach } from 'vitest'
-import { useAuth } from '~/composables/useAuth'
+import { describe, it, expect, beforeEach } from "vitest";
+import { useAuth } from "~/composables/useAuth";
 
-describe('useAuth', () => {
+describe("useAuth", () => {
   beforeEach(() => {
     // Reset state
-  })
+  });
 
-  it('should initialize with no user', () => {
-    const { user, isAuthenticated } = useAuth()
-    expect(user.value).toBeNull()
-    expect(isAuthenticated.value).toBe(false)
-  })
+  it("should initialize with no user", () => {
+    const { user, isAuthenticated } = useAuth();
+    expect(user.value).toBeNull();
+    expect(isAuthenticated.value).toBe(false);
+  });
 
-  it('should login successfully', async () => {
-    const { login, user, isAuthenticated } = useAuth()
+  it("should login successfully", async () => {
+    const { login, user, isAuthenticated } = useAuth();
 
-    await login({ email: 'test@example.com', password: 'password' })
+    await login({ email: "test@example.com", password: "password" });
 
-    expect(user.value).toBeTruthy()
-    expect(isAuthenticated.value).toBe(true)
-  })
-})
+    expect(user.value).toBeTruthy();
+    expect(isAuthenticated.value).toBe(true);
+  });
+});
 ```
 
 ### E2E Test (Playwright)
 
 ```typescript
 // tests/e2e/auth.test.ts
-import { test, expect } from '@playwright/test'
+import { test, expect } from "@playwright/test";
 
-test('user can login', async ({ page }) => {
-  await page.goto('/')
+test("user can login", async ({ page }) => {
+  await page.goto("/");
 
   // Click login link
-  await page.click('text=Login')
+  await page.click("text=Login");
 
   // Fill form
-  await page.fill('input[name="email"]', 'test@example.com')
-  await page.fill('input[name="password"]', 'password')
-  await page.click('button[type="submit"]')
+  await page.fill('input[name="email"]', "test@example.com");
+  await page.fill('input[name="password"]', "password");
+  await page.click('button[type="submit"]');
 
   // Verify redirect
-  await expect(page).toHaveURL('/dashboard')
-  await expect(page.locator('text=Dashboard')).toBeVisible()
-})
+  await expect(page).toHaveURL("/dashboard");
+  await expect(page.locator("text=Dashboard")).toBeVisible();
+});
 ```
 
 ---
@@ -553,6 +546,7 @@ test('user can login', async ({ page }) => {
 ## Production Checklist
 
 ### Performance
+
 - [ ] Enable image optimization with `<NuxtImg>` component
 - [ ] Use `lazy` loading for below-fold content
 - [ ] Implement route-level code splitting (automatic)
@@ -560,6 +554,7 @@ test('user can login', async ({ page }) => {
 - [ ] Use `<ClientOnly>` for client-only components
 
 ### SEO
+
 - [ ] Configure `useSeoMeta()` for all pages
 - [ ] Add `robots.txt` in `/public`
 - [ ] Add `sitemap.xml` (use `@nuxtjs/sitemap` module)
@@ -567,6 +562,7 @@ test('user can login', async ({ page }) => {
 - [ ] Enable server-side rendering (default)
 
 ### Security
+
 - [ ] Use runtime config for sensitive data
 - [ ] Implement CSRF protection for API routes
 - [ ] Add rate limiting to API routes
@@ -574,6 +570,7 @@ test('user can login', async ({ page }) => {
 - [ ] Use `httpOnly` cookies for auth tokens
 
 ### Deployment
+
 - [ ] Set `NODE_ENV=production`
 - [ ] Configure environment variables
 - [ ] Run `npm run build` and test `.output/`

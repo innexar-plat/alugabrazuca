@@ -7,6 +7,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 ## Experiment Configuration
 
 ### Metadata Tracking
+
 - [ ] Experiment name descriptive and consistent
 - [ ] Run names unique and informative
 - [ ] Tags used for categorization
@@ -15,6 +16,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Timestamp recorded
 
 ### Hyperparameters
+
 - [ ] All hyperparameters logged
 - [ ] Hyperparameter names consistent across runs
 - [ ] Nested hyperparameters structured properly
@@ -22,6 +24,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Hyperparameter search space tracked
 
 ### Environment Information
+
 - [ ] Python/package versions logged
 - [ ] Hardware specs recorded (CPU, GPU, memory)
 - [ ] Operating system logged
@@ -33,6 +36,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 ## Data Versioning
 
 ### Dataset Tracking
+
 - [ ] Training data version/snapshot ID logged
 - [ ] Validation data version logged
 - [ ] Test data version logged
@@ -41,6 +45,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Data hash/checksum recorded
 
 ### Feature Tracking
+
 - [ ] Feature set version tracked
 - [ ] Feature list documented
 - [ ] Feature transformations logged
@@ -48,6 +53,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Feature store integration (if applicable)
 
 ### Data Quality
+
 - [ ] Data quality metrics logged
 - [ ] Missing value statistics recorded
 - [ ] Distribution statistics logged
@@ -59,6 +65,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 ## Model Tracking
 
 ### Model Artifacts
+
 - [ ] Trained model saved
 - [ ] Model format standardized
 - [ ] Model size tracked
@@ -67,6 +74,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Model versioning consistent
 
 ### Model Metadata
+
 - [ ] Model type/family documented
 - [ ] Number of parameters logged
 - [ ] Training duration recorded
@@ -74,6 +82,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Model registry entry created
 
 ### Model Dependencies
+
 - [ ] Framework versions logged (PyTorch, TensorFlow, scikit-learn)
 - [ ] Custom code/modules tracked
 - [ ] External dependencies documented
@@ -84,6 +93,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 ## Metrics & Performance
 
 ### Training Metrics
+
 - [ ] Loss curves logged (train and validation)
 - [ ] Metrics logged at appropriate intervals
 - [ ] Learning rate schedule logged
@@ -91,6 +101,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Training convergence monitored
 
 ### Evaluation Metrics
+
 - [ ] Primary metric logged
 - [ ] Guardrail metrics logged
 - [ ] Metrics calculated on held-out test set
@@ -98,6 +109,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Metric definitions standardized
 
 ### Slice Analysis
+
 - [ ] Performance by slice tracked
 - [ ] Fairness metrics logged
 - [ ] Error analysis results documented
@@ -108,6 +120,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 ## Artifacts & Visualizations
 
 ### Plots & Charts
+
 - [ ] Loss curves saved
 - [ ] Confusion matrices logged
 - [ ] ROC/PR curves saved
@@ -116,6 +129,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Calibration plots logged (if applicable)
 
 ### Reports & Documents
+
 - [ ] Model evaluation report attached
 - [ ] Model card created/linked
 - [ ] Experiment notes documented
@@ -123,6 +137,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Next steps/recommendations logged
 
 ### Code Artifacts
+
 - [ ] Training script saved
 - [ ] Configuration files saved
 - [ ] Preprocessing code saved
@@ -133,6 +148,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 ## Experiment Organization
 
 ### Naming Conventions
+
 - [ ] Experiment names follow convention
 - [ ] Run names informative and consistent
 - [ ] Tags used systematically
@@ -140,6 +156,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Naming conflicts avoided
 
 ### Grouping & Filtering
+
 - [ ] Related experiments grouped
 - [ ] Hyperparameter sweeps organized
 - [ ] Ablation studies clearly marked
@@ -147,6 +164,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Parent-child run relationships tracked
 
 ### Search & Discovery
+
 - [ ] Experiments searchable by hyperparameters
 - [ ] Experiments filterable by metrics
 - [ ] Experiments sortable by performance
@@ -158,6 +176,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 ## Reproducibility
 
 ### Code Versioning
+
 - [ ] Git commit tracked
 - [ ] Code snapshot saved (if no git)
 - [ ] Branch name logged
@@ -165,12 +184,14 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Code diff tracked for important changes
 
 ### Environment Reproducibility
+
 - [ ] Requirements.txt/environment.yml saved
 - [ ] Docker image tag logged (if applicable)
 - [ ] Conda environment exported
 - [ ] System dependencies documented
 
 ### Data Reproducibility
+
 - [ ] Data version pinned
 - [ ] Data preprocessing steps tracked
 - [ ] Random seeds set and logged
@@ -178,6 +199,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Non-deterministic operations flagged
 
 ### Re-run Capability
+
 - [ ] Experiment can be re-run from logs
 - [ ] Results reproducible within noise
 - [ ] Instructions clear for reproduction
@@ -188,6 +210,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 ## Comparison & Analysis
 
 ### Run Comparison
+
 - [ ] Comparison views easy to create
 - [ ] Hyperparameter differences highlighted
 - [ ] Metric differences visualized
@@ -195,6 +218,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Best run selection criteria clear
 
 ### Hyperparameter Optimization
+
 - [ ] Optimization strategy logged (grid, random, Bayesian)
 - [ ] Search space documented
 - [ ] Optimization progress tracked
@@ -202,6 +226,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Convergence of optimization monitored
 
 ### Ablation Studies
+
 - [ ] Ablation experiments clearly marked
 - [ ] Component removal tracked
 - [ ] Impact on performance quantified
@@ -212,6 +237,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 ## Integration & Automation
 
 ### CI/CD Integration
+
 - [ ] Experiments logged in automated pipelines
 - [ ] Training metrics published to CI system
 - [ ] Model registration automated
@@ -219,6 +245,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Experiment dashboard linked from CI
 
 ### Model Registry Integration
+
 - [ ] Models registered automatically
 - [ ] Model stage transitions logged (staging, production)
 - [ ] Model lineage tracked (experiment → registry)
@@ -226,6 +253,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Deployment metadata linked
 
 ### Orchestration Integration
+
 - [ ] Experiments logged from orchestrator (Airflow, etc.)
 - [ ] Task parameters logged
 - [ ] Execution context captured
@@ -236,6 +264,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 ## Monitoring & Alerting
 
 ### Experiment Monitoring
+
 - [ ] Long-running experiments monitored
 - [ ] Stalled experiments detected
 - [ ] Resource utilization tracked
@@ -243,12 +272,14 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Training anomalies detected
 
 ### Performance Tracking
+
 - [ ] Performance trends visualized
 - [ ] Performance degradation detected
 - [ ] Comparison to baseline automated
 - [ ] Alerts configured for key metrics
 
 ### Collaborative Features
+
 - [ ] Experiment notes/comments enabled
 - [ ] Team members tagged where relevant
 - [ ] Shared dashboards created
@@ -259,18 +290,21 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 ## Security & Privacy
 
 ### Access Control
+
 - [ ] Experiments visible to appropriate teams
 - [ ] Sensitive experiments access-controlled
 - [ ] API keys/tokens managed securely
 - [ ] Audit logs enabled
 
 ### Data Privacy
+
 - [ ] No PII logged in experiments
 - [ ] Sensitive metrics redacted
 - [ ] Data samples anonymized
 - [ ] Compliance requirements met
 
 ### Secrets Management
+
 - [ ] No credentials in logged config
 - [ ] Environment variables used for secrets
 - [ ] API keys rotated regularly
@@ -285,12 +319,14 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - Common `CC-*` IDs for experiment tracking: `CC-OBS-01`, `CC-OBS-02`, `CC-OBS-03`, `CC-ERR-01`, `CC-ERR-03`, `CC-ERR-04`, `CC-PERF-01`, `CC-PERF-02`, `CC-FUN-05`, `CC-TST-01`, `CC-DOC-01`
 
 ### Testing
+
 - [ ] Unit tests for logging functions
 - [ ] Integration tests with experiment tracker
 - [ ] Mock logging in unit tests
 - [ ] Logging failures don't crash training
 
 ### Performance
+
 - [ ] Logging async where possible
 - [ ] Batch logging used for high-frequency metrics
 - [ ] Network retries configured
@@ -301,6 +337,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 ## Documentation
 
 ### Experiment Documentation
+
 - [ ] Purpose of experiment clear
 - [ ] Hypotheses documented
 - [ ] Methodology explained
@@ -308,6 +345,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Lessons learned captured
 
 ### Team Documentation
+
 - [ ] Team conventions documented
 - [ ] Naming standards defined
 - [ ] Tagging guidelines provided
@@ -315,6 +353,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Onboarding guide for new team members
 
 ### External Documentation
+
 - [ ] Experiment tracker setup documented
 - [ ] Authentication setup instructions clear
 - [ ] API usage examples provided
@@ -325,6 +364,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 ## MLflow Specific (if applicable)
 
 ### Tracking Setup
+
 - [ ] Tracking URI configured correctly
 - [ ] Backend store configured (database, file)
 - [ ] Artifact store configured (S3, Azure, etc.)
@@ -332,6 +372,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Multi-user setup if needed
 
 ### Model Registry
+
 - [ ] Models registered with meaningful names
 - [ ] Model versions tracked
 - [ ] Model stages used appropriately
@@ -339,6 +380,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] Model lineage clear
 
 ### Projects & Models
+
 - [ ] MLflow Projects used for reproducibility
 - [ ] MLproject file complete
 - [ ] Environment specification included
@@ -350,6 +392,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 ## Weights & Biases Specific (if applicable)
 
 ### Logging Features
+
 - [ ] wandb.init() called appropriately
 - [ ] wandb.config for hyperparameters
 - [ ] wandb.log() for metrics
@@ -357,12 +400,14 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 - [ ] wandb.finish() called on completion
 
 ### Visualizations
+
 - [ ] wandb.Image() for image logging
 - [ ] wandb.Table() for data logging
 - [ ] Custom charts configured
 - [ ] Reports created for key experiments
 
 ### Collaboration
+
 - [ ] Team/project structure appropriate
 - [ ] Artifacts shared with team
 - [ ] Report links in documentation
@@ -373,6 +418,7 @@ Specialized checklist for reviewing ML experiment tracking implementations (MLfl
 ## Final Checklist
 
 Before approving experiment tracking code:
+
 - [ ] All experiments reproducible
 - [ ] Metrics and hyperparameters logged completely
 - [ ] Model artifacts saved correctly

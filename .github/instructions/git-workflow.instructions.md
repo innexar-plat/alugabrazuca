@@ -18,6 +18,7 @@ chore/*       ← tarefas técnicas (deps, config, refactor)
 ```
 
 ### Exemplos de nomes de branch
+
 ```
 feature/user-authentication
 feature/payment-gateway
@@ -32,6 +33,7 @@ release/v2.1.0
 ## 2. Conventional Commits (Padrão obrigatório)
 
 ### Formato
+
 ```
 <tipo>(<escopo>): <descrição curta em imperativo>
 
@@ -42,20 +44,21 @@ release/v2.1.0
 
 ### Tipos de commit
 
-| Tipo | Quando usar |
-|------|-------------|
-| `feat` | Nova funcionalidade |
-| `fix` | Correção de bug |
-| `docs` | Apenas documentação |
-| `style` | Formatação (sem mudança de lógica) |
+| Tipo       | Quando usar                         |
+| ---------- | ----------------------------------- |
+| `feat`     | Nova funcionalidade                 |
+| `fix`      | Correção de bug                     |
+| `docs`     | Apenas documentação                 |
+| `style`    | Formatação (sem mudança de lógica)  |
 | `refactor` | Refatoração sem nova feature ou bug |
-| `test` | Adicionar ou corrigir testes |
-| `chore` | Manutenção, dependências, build |
-| `perf` | Melhoria de performance |
-| `ci` | Mudanças em CI/CD |
-| `revert` | Reverter commit anterior |
+| `test`     | Adicionar ou corrigir testes        |
+| `chore`    | Manutenção, dependências, build     |
+| `perf`     | Melhoria de performance             |
+| `ci`       | Mudanças em CI/CD                   |
+| `revert`   | Reverter commit anterior            |
 
 ### Exemplos corretos
+
 ```
 feat(auth): add JWT refresh token support
 
@@ -69,6 +72,7 @@ chore(deps): update TypeScript to 5.4
 ```
 
 ### Regras
+
 - Descrição em **inglês**, imperativo, minúsculo, sem ponto final
 - Máximo 72 caracteres na primeira linha
 - Escopos entre parênteses são opcionais, mas recomendados

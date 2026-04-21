@@ -117,4 +117,3 @@ Anti-patterns:
 
 - Using a vector store as the source of truth for business data
 - Shipping agents without termination conditions and without audit logs
-

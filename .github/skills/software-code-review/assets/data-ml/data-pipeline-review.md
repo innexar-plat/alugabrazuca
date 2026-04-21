@@ -7,6 +7,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 ## Pipeline Architecture
 
 ### Design Principles
+
 - [ ] Pipeline purpose and scope clearly defined
 - [ ] Data flow diagram documented
 - [ ] Input/output contracts specified
@@ -15,6 +16,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Incremental processing strategy defined
 
 ### Orchestration
+
 - [ ] Orchestration tool appropriate (Airflow, Prefect, Dagster, etc.)
 - [ ] DAG structure clear and logical
 - [ ] Dependencies explicitly defined
@@ -23,6 +25,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Critical path optimized
 
 ### Scalability
+
 - [ ] Data volume growth considered
 - [ ] Processing strategy scales (batch vs streaming)
 - [ ] Resource requirements documented
@@ -34,6 +37,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 ## Data Ingestion
 
 ### Source Integration
+
 - [ ] Data sources documented (APIs, databases, files)
 - [ ] Authentication/authorization handled securely
 - [ ] Rate limiting respected
@@ -42,6 +46,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Timeout settings appropriate
 
 ### Data Extraction
+
 - [ ] Incremental loading strategy defined
 - [ ] Full refresh vs incremental logic clear
 - [ ] Watermarks/checkpoints tracked
@@ -50,6 +55,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Schema evolution handled
 
 ### Error Handling
+
 - [ ] Transient failures retried appropriately
 - [ ] Permanent failures logged and alerted
 - [ ] Partial failures don't block entire pipeline
@@ -61,6 +67,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 ## Data Validation
 
 ### Schema Validation
+
 - [ ] Input schema validated on ingestion
 - [ ] Column types enforced
 - [ ] Required fields checked
@@ -69,6 +76,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Breaking changes prevented
 
 ### Data Quality Checks
+
 - [ ] Null/missing value checks
 - [ ] Range/bound checks on numeric fields
 - [ ] Format validation on strings/dates
@@ -77,6 +85,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Anomaly detection for data distribution
 
 ### Business Logic Validation
+
 - [ ] Domain-specific rules validated
 - [ ] Cross-field consistency checked
 - [ ] Business constraints enforced
@@ -88,11 +97,13 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 ## Data Transformation
 
 ### Transformation Logic
+
 - Baseline `CC-*` to apply (cite IDs if violated): `CC-DOC-01`, `CC-FUN-01`, `CC-FUN-04`, `CC-TYP-04`, `CC-NAM-03`
 - [ ] Timezone handling explicit
 - [ ] Date/time arithmetic correct
 
 ### Feature Engineering
+
 - [ ] Feature transformations reproducible
 - [ ] No train/serve skew in features
 - [ ] Feature statistics computed from training data only
@@ -101,6 +112,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] No data leakage in feature creation
 
 ### Performance Optimization
+
 - [ ] Efficient SQL queries (proper joins, filters, indexes)
 - [ ] Data shuffles minimized
 - [ ] Unnecessary computations eliminated
@@ -113,6 +125,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 ## Data Storage
 
 ### Storage Strategy
+
 - [ ] Storage format appropriate (Parquet, Delta, Iceberg, etc.)
 - [ ] Partitioning scheme efficient
 - [ ] Compression enabled
@@ -121,6 +134,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Retention periods documented
 
 ### Data Organization
+
 - [ ] Staging/intermediate/marts layers clear
 - [ ] Naming is consistent and intention-revealing (cite `CC-NAM-01`, `CC-NAM-02`, `CC-NAM-03`)
 - [ ] Directory structure logical
@@ -128,6 +142,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Access controls configured
 
 ### Data Versioning
+
 - [ ] Data versions tracked
 - [ ] Snapshots available for reproducibility
 - [ ] Rollback strategy defined
@@ -138,6 +153,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 ## Monitoring & Observability
 
 ### Pipeline Monitoring
+
 - [ ] Pipeline execution metrics tracked
 - [ ] Processing duration monitored
 - [ ] Record counts logged
@@ -145,6 +161,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Resource utilization monitored (CPU, memory, I/O)
 
 ### Data Monitoring
+
 - [ ] Data volume trends tracked
 - [ ] Data quality metrics computed
 - [ ] Schema changes detected
@@ -152,6 +169,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Missing data alerts configured
 
 ### Alerting
+
 - [ ] Critical failures trigger alerts
 - [ ] Data quality violations trigger alerts
 - [ ] SLA breaches trigger alerts
@@ -163,6 +181,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 ## Testing
 
 ### Unit Tests
+
 - [ ] Transformation functions unit tested
 - [ ] Edge cases covered
 - [ ] Null handling tested
@@ -170,6 +189,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Business logic validated
 
 ### Integration Tests
+
 - [ ] End-to-end pipeline tested on sample data
 - [ ] Source connections tested
 - [ ] Destination writes tested
@@ -177,6 +197,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Rollback tested
 
 ### Data Tests
+
 - [ ] Expected schema tests
 - [ ] Row count tests
 - [ ] Uniqueness tests
@@ -189,6 +210,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 ## Error Handling & Recovery
 
 ### Failure Modes
+
 - [ ] Transient vs permanent failures distinguished
 - [ ] Retry logic with exponential backoff
 - [ ] Max retry limits defined
@@ -196,6 +218,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Graceful degradation where possible
 
 ### Recovery Mechanisms
+
 - [ ] Checkpoint/resume capability
 - [ ] Idempotent operations (safe to re-run)
 - [ ] Rollback procedures documented
@@ -203,6 +226,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Data reconciliation after failures
 
 ### Logging
+
 - [ ] Structured logging used
 - [ ] Log levels appropriate (DEBUG, INFO, WARN, ERROR)
 - [ ] Sensitive data not logged
@@ -214,6 +238,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 ## Security & Privacy
 
 ### Data Security
+
 - [ ] Data encrypted in transit (TLS)
 - [ ] Data encrypted at rest (where required)
 - [ ] Access controls enforced (IAM, RBAC)
@@ -222,6 +247,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Audit logs enabled
 
 ### Privacy Compliance
+
 - [ ] PII identified and classified
 - [ ] Data anonymization/pseudonymization applied
 - [ ] Data retention policies followed
@@ -230,6 +256,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Data lineage tracked for audits
 
 ### Data Governance
+
 - [ ] Data ownership documented
 - [ ] Data classification applied
 - [ ] Access requests logged
@@ -259,6 +286,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 ## Performance & Efficiency
 
 ### Resource Utilization
+
 - [ ] Memory usage optimized (lazy loading, chunking)
 - [ ] CPU utilization efficient
 - [ ] Network I/O minimized
@@ -266,6 +294,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Parallelization used where beneficial
 
 ### Cost Optimization
+
 - [ ] Compute resources right-sized
 - [ ] Storage costs optimized (compression, lifecycle)
 - [ ] Spot/preemptible instances used where appropriate
@@ -273,6 +302,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Cost budget alerts configured
 
 ### Latency Optimization
+
 - [ ] Pipeline duration meets SLA
 - [ ] Critical path optimized
 - [ ] Unnecessary dependencies eliminated
@@ -284,6 +314,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 ## Production Readiness
 
 ### Deployment
+
 - [ ] CI/CD pipeline configured
 - [ ] Automated testing in CI
 - [ ] Deployment strategy defined (blue/green, canary)
@@ -291,6 +322,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Environment parity (dev/staging/prod)
 
 ### Maintenance
+
 - [ ] Monitoring dashboards created
 - [ ] Alert rules configured
 - [ ] Runbook complete
@@ -298,6 +330,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Incident response process documented
 
 ### Documentation
+
 - [ ] Architecture diagram available
 - [ ] Data dictionary maintained
 - [ ] SLA/SLO documented
@@ -309,6 +342,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 ## SQLMesh Specific (if applicable)
 
 ### Model Configuration
+
 - [ ] Model types appropriate (FULL, INCREMENTAL_BY_TIME_RANGE, etc.)
 - [ ] Incremental strategy correct
 - [ ] Partitioning aligned with incremental key
@@ -316,12 +350,14 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 - [ ] Model descriptions provided
 
 ### Testing & Validation
+
 - [ ] Unit tests for model logic
 - [ ] Audits for data quality
 - [ ] CI/CD integration configured
 - [ ] Test data fixtures provided
 
 ### Best Practices
+
 - [ ] Staging/intermediate/marts layers clear
 - [ ] Incremental models for large tables
 - [ ] Backfill strategy defined
@@ -332,6 +368,7 @@ Specialized checklist for reviewing data processing pipelines, ETL/ELT workflows
 ## Final Checklist
 
 Before approving data pipeline code:
+
 - [ ] Pipeline runs successfully end-to-end
 - [ ] Data quality checks passing
 - [ ] Tests passing

@@ -8,6 +8,7 @@
 ## O que foi entregue
 
 ### Banco de Dados
+
 - **2 tabelas** criadas via Prisma migration `20260419215338_m2_listing_tables`:
   - `listings` — ~80 campos cobrindo: localização, detalhes do quarto, banheiro, cozinha, lavanderia, sala/estacionamento, área externa, amenidades, preço, regras da casa, preferências de inquilino, informações do imóvel, mídia, contadores de engajamento, boost/destaque, campos administrativos, timestamps + soft delete
   - `listing_photos` — id, listingId, url, thumbnailUrl, caption, sortOrder, createdAt
@@ -16,6 +17,7 @@
 - **Relação** `User.listings → Listing[]` configurada
 
 ### Backend (NestJS)
+
 - **ListingModule** registrado no AppModule
 - **ListingService** — lógica completa:
   - `create()` — cria listing como draft vinculado ao hostId
@@ -49,6 +51,7 @@
 - Compilação limpa (0 erros TypeScript)
 
 ### Frontend (Next.js)
+
 - **4 páginas novas:**
   - `/my-listings` — dashboard de listagens do host com status badges coloridos, thumbnails, ações (editar, publicar, pausar, reativar, marcar alugado, deletar com confirmação), estado vazio com link para criar
   - `/listings/new` — wizard de 9 passos: localização, quarto, banheiro, áreas comuns, preço, regras, imóvel, fotos (placeholder), revisão. Indicador de passos clicável, salvar como rascunho ou publicar
@@ -62,6 +65,7 @@
 - Build produção: **30 páginas** geradas com sucesso (6 novas de listing)
 
 ### Infraestrutura
+
 - Migration aplicada no banco com sucesso
 - Backend rodando com ListingModule carregado (12 rotas mapeadas)
 - Frontend compilado sem erros
@@ -70,20 +74,20 @@
 
 ## Endpoints disponíveis
 
-| Método | Rota | Auth | Descrição |
-|--------|------|------|-----------|
-| POST | `/api/v1/listings` | ✅ | Criar listing (draft) |
-| GET | `/api/v1/listings/my` | ✅ | Minhas listagens (paginado) |
-| GET | `/api/v1/listings/:id` | ❌ | Ver listing público |
-| PATCH | `/api/v1/listings/:id` | ✅ | Atualizar listing |
-| DELETE | `/api/v1/listings/:id` | ✅ | Soft delete |
-| POST | `/api/v1/listings/:id/publish` | ✅ | Publicar (requer 3+ fotos) |
-| POST | `/api/v1/listings/:id/pause` | ✅ | Pausar listing |
-| POST | `/api/v1/listings/:id/resume` | ✅ | Reativar listing |
-| POST | `/api/v1/listings/:id/mark-rented` | ✅ | Marcar como alugado |
-| POST | `/api/v1/listings/:id/photos` | ✅ | Adicionar foto |
-| DELETE | `/api/v1/listings/:id/photos/:photoId` | ✅ | Remover foto |
-| PATCH | `/api/v1/listings/:id/photos/reorder` | ✅ | Reordenar fotos |
+| Método | Rota                                   | Auth | Descrição                   |
+| ------ | -------------------------------------- | ---- | --------------------------- |
+| POST   | `/api/v1/listings`                     | ✅   | Criar listing (draft)       |
+| GET    | `/api/v1/listings/my`                  | ✅   | Minhas listagens (paginado) |
+| GET    | `/api/v1/listings/:id`                 | ❌   | Ver listing público         |
+| PATCH  | `/api/v1/listings/:id`                 | ✅   | Atualizar listing           |
+| DELETE | `/api/v1/listings/:id`                 | ✅   | Soft delete                 |
+| POST   | `/api/v1/listings/:id/publish`         | ✅   | Publicar (requer 3+ fotos)  |
+| POST   | `/api/v1/listings/:id/pause`           | ✅   | Pausar listing              |
+| POST   | `/api/v1/listings/:id/resume`          | ✅   | Reativar listing            |
+| POST   | `/api/v1/listings/:id/mark-rented`     | ✅   | Marcar como alugado         |
+| POST   | `/api/v1/listings/:id/photos`          | ✅   | Adicionar foto              |
+| DELETE | `/api/v1/listings/:id/photos/:photoId` | ✅   | Remover foto                |
+| PATCH  | `/api/v1/listings/:id/photos/reorder`  | ✅   | Reordenar fotos             |
 
 ---
 

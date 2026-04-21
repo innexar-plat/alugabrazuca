@@ -11,6 +11,7 @@ Foundational security principles for building secure systems from the ground up.
 **Concept**: Layer multiple security controls so failure of one doesn't compromise the system.
 
 **Implementation:**
+
 ```javascript
 // Layer 1: Input validation
 const validateInput = (data) => {
@@ -20,14 +21,14 @@ const validateInput = (data) => {
 
 // Layer 2: Authentication
 const authenticate = (req, res, next) => {
-  if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
   next();
 };
 
 // Layer 3: Authorization
 const authorize = (req, res, next) => {
   if (!hasPermission(req.user, req.resource)) {
-    return res.status(403).json({ error: 'Forbidden' });
+    return res.status(403).json({ error: "Forbidden" });
   }
   next();
 };
@@ -41,16 +42,17 @@ const logSecurityEvent = (event) => {
 };
 
 // Apply all layers
-app.post('/api/sensitive-action',
+app.post(
+  "/api/sensitive-action",
   rateLimit,
   authenticate,
   authorize,
   validateRequest,
   async (req, res) => {
-    logSecurityEvent({ action: 'sensitive-action', user: req.user.id });
+    logSecurityEvent({ action: "sensitive-action", user: req.user.id });
     const result = await performAction(validateInput(req.body));
     res.json(result);
-  }
+  },
 );
 ```
 
@@ -61,18 +63,19 @@ app.post('/api/sensitive-action',
 **Concept**: Grant minimum permissions necessary for a task.
 
 **Implementation:**
+
 ```javascript
 // Bad: Single admin role with all permissions
 const ROLES = {
-  ADMIN: ['users:*', 'posts:*', 'settings:*', 'billing:*']
+  ADMIN: ["users:*", "posts:*", "settings:*", "billing:*"],
 };
 
 // Good: Granular roles with specific permissions
 const ROLES = {
-  USER_ADMIN: ['users:read', 'users:write'],
-  CONTENT_MODERATOR: ['posts:read', 'posts:delete'],
-  BILLING_ADMIN: ['billing:read', 'billing:write'],
-  SYSTEM_ADMIN: ['settings:read', 'settings:write']
+  USER_ADMIN: ["users:read", "users:write"],
+  CONTENT_MODERATOR: ["posts:read", "posts:delete"],
+  BILLING_ADMIN: ["billing:read", "billing:write"],
+  SYSTEM_ADMIN: ["settings:read", "settings:write"],
 };
 
 // Database access with least privilege
@@ -101,9 +104,10 @@ const createDatabaseUser = async () => {
 **Concept**: System should fail in a secure state, not expose sensitive data or bypass security.
 
 **Implementation:**
+
 ```javascript
 // Bad: Error exposes sensitive information
-app.get('/api/users/:id', async (req, res) => {
+app.get("/api/users/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     res.json(user);
@@ -113,21 +117,21 @@ app.get('/api/users/:id', async (req, res) => {
 });
 
 // Good: Fail securely with generic error
-app.get('/api/users/:id', async (req, res) => {
+app.get("/api/users/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
 
     res.json(user);
   } catch (error) {
     // Log detailed error server-side
-    logger.error('Failed to retrieve user', { error, userId: req.params.id });
+    logger.error("Failed to retrieve user", { error, userId: req.params.id });
 
     // Return generic error to client
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -145,7 +149,7 @@ const checkPermission = (user, resource) => {
   try {
     return policyEngine.evaluate(user, resource);
   } catch (error) {
-    logger.error('Permission check failed', { error, user, resource });
+    logger.error("Permission check failed", { error, user, resource });
     return false; // GOOD: Secure: denies access on error
   }
 };
@@ -158,6 +162,7 @@ const checkPermission = (user, resource) => {
 **Concept**: Check authorization on every access attempt, never cache authorization decisions.
 
 **Implementation:**
+
 ```javascript
 // Bad: Cache authorization decision
 const userPermissions = {};
@@ -173,7 +178,7 @@ const authorize = async (req, res, next) => {
   if (userPermissions[userId].includes(req.permission)) {
     next();
   } else {
-    res.status(403).json({ error: 'Forbidden' });
+    res.status(403).json({ error: "Forbidden" });
   }
 };
 
@@ -185,17 +190,17 @@ const authorize = async (req, res, next) => {
   if (permissions.includes(req.permission)) {
     next();
   } else {
-    res.status(403).json({ error: 'Forbidden' });
+    res.status(403).json({ error: "Forbidden" });
   }
 };
 
 // Good: Verify ownership on every access
-app.put('/api/posts/:id', authenticate, async (req, res) => {
+app.put("/api/posts/:id", authenticate, async (req, res) => {
   const post = await Post.findById(req.params.id);
 
   // GOOD: Verify ownership every time
-  if (post.authorId !== req.user.id && req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Forbidden' });
+  if (post.authorId !== req.user.id && req.user.role !== "admin") {
+    return res.status(403).json({ error: "Forbidden" });
   }
 
   await post.update(req.body);
@@ -210,6 +215,7 @@ app.put('/api/posts/:id', authenticate, async (req, res) => {
 **Concept**: Critical operations require multiple parties or approvals.
 
 **Implementation:**
+
 ```javascript
 // Example: Financial transaction approval
 const initiateTransfer = async (userId, amount, recipient) => {
@@ -218,8 +224,8 @@ const initiateTransfer = async (userId, amount, recipient) => {
     initiatedBy: userId,
     amount,
     recipient,
-    status: 'pending',
-    createdAt: new Date()
+    status: "pending",
+    createdAt: new Date(),
   });
 
   // Notify approvers
@@ -233,17 +239,17 @@ const approveTransfer = async (transferId, approverId) => {
 
   // Cannot approve own transfer
   if (transfer.initiatedBy === approverId) {
-    throw new SecurityError('Cannot approve own transfer');
+    throw new SecurityError("Cannot approve own transfer");
   }
 
   // Require admin role for approval
   const approver = await User.findById(approverId);
-  if (approver.role !== 'admin') {
-    throw new AuthorizationError('Insufficient permissions');
+  if (approver.role !== "admin") {
+    throw new AuthorizationError("Insufficient permissions");
   }
 
   // Execute transfer
-  transfer.status = 'approved';
+  transfer.status = "approved";
   transfer.approvedBy = approverId;
   transfer.approvedAt = new Date();
 
@@ -261,16 +267,17 @@ const approveTransfer = async (transferId, approverId) => {
 **Concept**: Security should not rely on secrecy of design, only on keys/credentials.
 
 **Implementation:**
+
 ```javascript
 // Bad: Custom "encryption" algorithm
 const obfuscate = (data) => {
-  return data.split('').reverse().join(''); // BAD: Weak, obscure
+  return data.split("").reverse().join(""); // BAD: Weak, obscure
 };
 
 // Good: Standard encryption with secret key
 const encrypt = (data, key) => {
   const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
   // ... standard encryption
 };
 
@@ -278,7 +285,7 @@ const encrypt = (data, key) => {
 // /api/v1/secret_admin_panel_xyz123
 
 // Good: Use authentication/authorization
-app.get('/api/v1/admin', authenticate, requireRole('admin'), adminHandler);
+app.get("/api/v1/admin", authenticate, requireRole("admin"), adminHandler);
 ```
 
 ---
@@ -288,6 +295,7 @@ app.get('/api/v1/admin', authenticate, requireRole('admin'), adminHandler);
 **Concept**: Most secure configuration should be the default.
 
 **Implementation:**
+
 ```javascript
 // Good: Secure defaults
 const createUser = async (userData) => {
@@ -297,36 +305,43 @@ const createUser = async (userData) => {
     emailVerified: false,
     mfaEnabled: false,
     accountLocked: false,
-    role: 'user', // Not admin
+    role: "user", // Not admin
     permissions: [], // No permissions by default
-    createdAt: new Date()
+    createdAt: new Date(),
   });
 };
 
 // Good: Secure cookie defaults
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  cookie: {
-    secure: true,        // GOOD: HTTPS only
-    httpOnly: true,      // GOOD: No JavaScript access
-    sameSite: 'strict',  // GOOD: CSRF protection
-    maxAge: 30 * 60 * 1000
-  }
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    cookie: {
+      secure: true, // GOOD: HTTPS only
+      httpOnly: true, // GOOD: No JavaScript access
+      sameSite: "strict", // GOOD: CSRF protection
+      maxAge: 30 * 60 * 1000,
+    },
+  }),
+);
 
 // Good: Secure CORS defaults
-const cors = require('cors');
+const cors = require("cors");
 
-app.use(cors({
-  origin: false, // GOOD: Deny all by default
-  credentials: true,
-  optionsSuccessStatus: 200
-}));
+app.use(
+  cors({
+    origin: false, // GOOD: Deny all by default
+    credentials: true,
+    optionsSuccessStatus: 200,
+  }),
+);
 
 // Explicitly allow specific origins
-app.use('/api/public', cors({
-  origin: ['https://app.example.com']
-}));
+app.use(
+  "/api/public",
+  cors({
+    origin: ["https://app.example.com"],
+  }),
+);
 ```
 
 ---
@@ -336,17 +351,18 @@ app.use('/api/public', cors({
 **Concept**: Simpler systems are easier to secure and audit.
 
 **Implementation:**
+
 ```javascript
 // Bad: Overly complex authorization logic
 const checkAccess = (user, resource) => {
-  if (user.role === 'admin') return true;
-  if (user.role === 'moderator' && resource.type === 'post') {
-    if (resource.reportCount > 5 || resource.flags.includes('spam')) {
+  if (user.role === "admin") return true;
+  if (user.role === "moderator" && resource.type === "post") {
+    if (resource.reportCount > 5 || resource.flags.includes("spam")) {
       return true;
     }
   }
   if (user.id === resource.ownerId) {
-    if (resource.status !== 'locked' || user.hasPremium) {
+    if (resource.status !== "locked" || user.hasPremium) {
       return true;
     }
   }
@@ -356,16 +372,16 @@ const checkAccess = (user, resource) => {
 
 // Good: Clear, simple policy-based authorization
 const policies = [
-  new AdminPolicy(),              // Admins can do anything
-  new OwnershipPolicy(),          // Owners can edit their resources
-  new ModeratorPolicy()           // Moderators can moderate flagged content
+  new AdminPolicy(), // Admins can do anything
+  new OwnershipPolicy(), // Owners can edit their resources
+  new ModeratorPolicy(), // Moderators can moderate flagged content
 ];
 
 const checkAccess = async (user, resource, action) => {
   for (const policy of policies) {
     const result = await policy.evaluate(user, resource, action);
-    if (result === 'allow') return true;
-    if (result === 'deny') return false;
+    if (result === "allow") return true;
+    if (result === "deny") return false;
   }
   return false; // Deny by default
 };
@@ -378,6 +394,7 @@ const checkAccess = async (user, resource, action) => {
 ### Pattern 1: Threat Modeling (STRIDE)
 
 **STRIDE Framework:**
+
 - **S**poofing: Identity verification
 - **T**ampering: Data integrity
 - **R**epudiation: Audit logging
@@ -386,6 +403,7 @@ const checkAccess = async (user, resource, action) => {
 - **E**levation of Privilege: Authorization
 
 **Example Threat Model:**
+
 ```
 Component: User Authentication API
 
@@ -422,6 +440,7 @@ Threats:
 **Concept**: Never trust, always verify - verify every request regardless of source.
 
 **Implementation:**
+
 ```javascript
 // Every request must be authenticated and authorized
 const zeroTrustMiddleware = [
@@ -441,22 +460,22 @@ const zeroTrustMiddleware = [
   evaluateRiskScore,
 
   // 6. Log access
-  logAccess
+  logAccess,
 ];
 
-app.use('/api/*', zeroTrustMiddleware);
+app.use("/api/*", zeroTrustMiddleware);
 
 // No implicit trust for internal services
 const callInternalAPI = async (endpoint, data) => {
   const token = await getServiceToken();
 
   return await fetch(`https://internal-api/${endpoint}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Authorization': `Bearer ${token}`,
-      'X-Service-ID': process.env.SERVICE_ID
+      Authorization: `Bearer ${token}`,
+      "X-Service-ID": process.env.SERVICE_ID,
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
 };
 ```
@@ -466,28 +485,30 @@ const callInternalAPI = async (endpoint, data) => {
 ### Pattern 3: Secure Session Management
 
 ```javascript
-const session = require('express-session');
-const RedisStore = require('connect-redis').default;
+const session = require("express-session");
+const RedisStore = require("connect-redis").default;
 
-app.use(session({
-  store: new RedisStore({ client: redisClient }),
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: true,
-    httpOnly: true,
-    sameSite: 'strict',
-    maxAge: 30 * 60 * 1000
-  },
-  // Regenerate session ID periodically
-  rolling: true,
+app.use(
+  session({
+    store: new RedisStore({ client: redisClient }),
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: true,
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: 30 * 60 * 1000,
+    },
+    // Regenerate session ID periodically
+    rolling: true,
 
-  // Session versioning
-  genid: (req) => {
-    return crypto.randomUUID();
-  }
-}));
+    // Session versioning
+    genid: (req) => {
+      return crypto.randomUUID();
+    },
+  }),
+);
 
 // Regenerate session on privilege change
 const elevatePrivileges = (req, res, next) => {
@@ -498,13 +519,13 @@ const elevatePrivileges = (req, res, next) => {
 
     // Copy session data
     req.session.userId = req.user.id;
-    req.session.role = 'admin';
+    req.session.role = "admin";
 
     // Log session change
-    logger.info('Session elevated', {
+    logger.info("Session elevated", {
       oldSessionId,
       newSessionId: req.sessionID,
-      userId: req.user.id
+      userId: req.user.id,
     });
 
     next();
@@ -512,18 +533,18 @@ const elevatePrivileges = (req, res, next) => {
 };
 
 // Destroy session on logout
-app.post('/auth/logout', (req, res) => {
+app.post("/auth/logout", (req, res) => {
   const sessionId = req.sessionID;
 
   req.session.destroy((err) => {
     if (err) {
-      logger.error('Session destruction failed', { err, sessionId });
-      return res.status(500).json({ error: 'Logout failed' });
+      logger.error("Session destruction failed", { err, sessionId });
+      return res.status(500).json({ error: "Logout failed" });
     }
 
-    res.clearCookie('connect.sid');
-    logger.info('User logged out', { sessionId });
-    res.json({ message: 'Logged out' });
+    res.clearCookie("connect.sid");
+    logger.info("User logged out", { sessionId });
+    res.json({ message: "Logged out" });
   });
 });
 ```
@@ -538,29 +559,29 @@ app.post('/auth/logout', (req, res) => {
 // Trust boundary: External API → Application
 const externalAPIBoundary = async (req, res, next) => {
   // 1. Authenticate API client
-  const apiKey = req.headers['x-api-key'];
-  if (!await verifyAPIKey(apiKey)) {
-    return res.status(401).json({ error: 'Invalid API key' });
+  const apiKey = req.headers["x-api-key"];
+  if (!(await verifyAPIKey(apiKey))) {
+    return res.status(401).json({ error: "Invalid API key" });
   }
 
   // 2. Validate input schema
   try {
     req.validatedData = validateAPISchema(req.body);
   } catch (error) {
-    return res.status(400).json({ error: 'Invalid request format' });
+    return res.status(400).json({ error: "Invalid request format" });
   }
 
   // 3. Rate limit
   const allowed = await checkRateLimit(apiKey);
   if (!allowed) {
-    return res.status(429).json({ error: 'Rate limit exceeded' });
+    return res.status(429).json({ error: "Rate limit exceeded" });
   }
 
   // 4. Log crossing of trust boundary
-  logger.info('External API request', {
+  logger.info("External API request", {
     apiKey,
     endpoint: req.path,
-    ip: req.ip
+    ip: req.ip,
   });
 
   next();
@@ -571,17 +592,17 @@ const databaseBoundary = {
   query: async (sql, params) => {
     // 1. Validate SQL (parameterized queries only)
     if (!Array.isArray(params)) {
-      throw new SecurityError('Parameterized queries required');
+      throw new SecurityError("Parameterized queries required");
     }
 
     // 2. Log query
-    logger.debug('Database query', { sql, params });
+    logger.debug("Database query", { sql, params });
 
     // 3. Execute with timeout
     const result = await db.execute(sql, params, { timeout: 5000 });
 
     return result;
-  }
+  },
 };
 ```
 
@@ -590,6 +611,7 @@ const databaseBoundary = {
 ## Security Checklist
 
 ### Design Phase
+
 - [ ] Conduct threat modeling (STRIDE)
 - [ ] Define security requirements
 - [ ] Identify trust boundaries
@@ -599,6 +621,7 @@ const databaseBoundary = {
 - [ ] Review architecture with security team
 
 ### Implementation Phase
+
 - [ ] Follow secure coding standards
 - [ ] Implement defense in depth
 - [ ] Apply principle of least privilege
@@ -608,6 +631,7 @@ const databaseBoundary = {
 - [ ] Implement proper error handling
 
 ### Testing Phase
+
 - [ ] Penetration testing
 - [ ] Security code review
 - [ ] Dependency vulnerability scanning
@@ -617,6 +641,7 @@ const databaseBoundary = {
 - [ ] Test error handling
 
 ### Deployment Phase
+
 - [ ] Secure configuration management
 - [ ] Environment separation
 - [ ] Secrets management

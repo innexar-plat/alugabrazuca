@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
-import Link from 'next/link';
-import { useRouter, useParams } from 'next/navigation';
-import { api, resolveMediaUrl } from '@/lib/api';
+import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useRouter, useParams } from "next/navigation";
+import { api, resolveMediaUrl } from "@/lib/api";
 
 interface InquiryReceived {
   id: string;
@@ -35,16 +35,16 @@ interface InquiriesResponse {
 }
 
 const statusColor: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  accepted: 'bg-green-100 text-green-800',
-  rejected: 'bg-red-100 text-red-800',
-  expired: 'bg-gray-100 text-gray-500',
-  cancelled: 'bg-gray-100 text-gray-500',
-  completed: 'bg-blue-100 text-blue-800',
+  pending: "bg-yellow-100 text-yellow-800",
+  accepted: "bg-green-100 text-green-800",
+  rejected: "bg-red-100 text-red-800",
+  expired: "bg-gray-100 text-gray-500",
+  cancelled: "bg-gray-100 text-gray-500",
+  completed: "bg-blue-100 text-blue-800",
 };
 
 export default function HostInquiriesPage() {
-  const t = useTranslations('inquiry');
+  const t = useTranslations("inquiry");
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string;
@@ -52,7 +52,7 @@ export default function HostInquiriesPage() {
   const [inquiries, setInquiries] = useState<InquiryReceived[]>([]);
   const [loading, setLoading] = useState(true);
   const [meta, setMeta] = useState({ total: 0, page: 1, totalPages: 1 });
-  const [filter, setFilter] = useState<string>('all');
+  const [filter, setFilter] = useState<string>("all");
 
   useEffect(() => {
     loadInquiries();
@@ -62,13 +62,19 @@ export default function HostInquiriesPage() {
   async function loadInquiries(page = 1) {
     try {
       setLoading(true);
-      const res = await api.get<InquiriesResponse>(`/inquiries/received?page=${page}&limit=20`);
+      const res = await api.get<InquiriesResponse>(
+        `/inquiries/received?page=${page}&limit=20`,
+      );
       if (page === 1) {
         setInquiries(res.data);
       } else {
         setInquiries((prev) => [...prev, ...res.data]);
       }
-      setMeta({ total: res.meta.total, page: res.meta.page, totalPages: res.meta.totalPages });
+      setMeta({
+        total: res.meta.total,
+        page: res.meta.page,
+        totalPages: res.meta.totalPages,
+      });
     } catch {
       router.push(`/${locale}/login`);
     } finally {
@@ -76,7 +82,8 @@ export default function HostInquiriesPage() {
     }
   }
 
-  const filtered = filter === 'all' ? inquiries : inquiries.filter((i) => i.status === filter);
+  const filtered =
+    filter === "all" ? inquiries : inquiries.filter((i) => i.status === filter);
 
   if (loading && inquiries.length === 0) {
     return (
@@ -91,32 +98,36 @@ export default function HostInquiriesPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">{t('receivedTitle')}</h1>
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
+          {t("receivedTitle")}
+        </h1>
         <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-          {meta.total} {t('title').toLowerCase()}
+          {meta.total} {t("title").toLowerCase()}
         </p>
       </div>
 
       {/* Filter tabs */}
       <div className="mb-6 flex gap-2 overflow-x-auto">
-        {['all', 'pending', 'accepted', 'rejected'].map((status) => (
+        {["all", "pending", "accepted", "rejected"].map((status) => (
           <button
             key={status}
             onClick={() => setFilter(status)}
             className={`flex-shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
               filter === status
-                ? 'bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]'
-                : 'border border-[hsl(var(--border))] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))]'
+                ? "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]"
+                : "border border-[hsl(var(--border))] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))]"
             }`}
           >
-            {status === 'all' ? 'All' : t(`status.${status}`)}
+            {status === "all" ? "All" : t(`status.${status}`)}
           </button>
         ))}
       </div>
 
       {filtered.length === 0 ? (
         <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-12 text-center">
-          <p className="text-[hsl(var(--muted-foreground))]">{t('emptyReceived')}</p>
+          <p className="text-[hsl(var(--muted-foreground))]">
+            {t("emptyReceived")}
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -147,28 +158,32 @@ export default function HostInquiriesPage() {
                         {inquiry.tenant.firstName} {inquiry.tenant.lastName}
                       </span>
                       <p className="text-xs text-[hsl(var(--muted-foreground))] truncate">
-                        {inquiry.listing.title} · {inquiry.listing.city}, {inquiry.listing.state}
+                        {inquiry.listing.title} · {inquiry.listing.city},{" "}
+                        {inquiry.listing.state}
                       </p>
                     </div>
                     <span
-                      className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${statusColor[inquiry.status] || 'bg-gray-100 text-gray-700'}`}
+                      className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${statusColor[inquiry.status] || "bg-gray-100 text-gray-700"}`}
                     >
                       {t(`status.${inquiry.status}`)}
                     </span>
                   </div>
 
-                  <p className="line-clamp-2 text-sm text-[hsl(var(--muted-foreground))]">{inquiry.message}</p>
+                  <p className="line-clamp-2 text-sm text-[hsl(var(--muted-foreground))]">
+                    {inquiry.message}
+                  </p>
 
                   <div className="flex items-center justify-between mt-1">
                     <span className="text-xs text-[hsl(var(--muted-foreground))]">
-                      {t('type.' + inquiry.type)} · {new Date(inquiry.createdAt).toLocaleDateString()}
-                      {inquiry.hasPets && ' · 🐾 pets'}
+                      {t("type." + inquiry.type)} ·{" "}
+                      {new Date(inquiry.createdAt).toLocaleDateString()}
+                      {inquiry.hasPets && " · 🐾 pets"}
                     </span>
                     <Link
                       href={`/${locale}/inquiries/${inquiry.id}`}
                       className="text-xs font-medium text-[hsl(var(--primary))] hover:underline"
                     >
-                      {t('viewDetail')} →
+                      {t("viewDetail")} →
                     </Link>
                   </div>
                 </div>
@@ -183,7 +198,7 @@ export default function HostInquiriesPage() {
                 disabled={loading}
                 className="rounded-lg border border-[hsl(var(--border))] px-6 py-2 text-sm font-medium hover:bg-[hsl(var(--muted))] transition-colors disabled:opacity-50"
               >
-                {loading ? '...' : t('loadMore')}
+                {loading ? "..." : t("loadMore")}
               </button>
             </div>
           )}

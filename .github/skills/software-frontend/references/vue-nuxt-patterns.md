@@ -30,30 +30,30 @@ Operational patterns for building production-ready Vue and Nuxt applications.
 ```vue
 <script setup lang="ts">
 // Auto-imported in Nuxt — no need for explicit imports
-const count = ref(0)
-const doubled = computed(() => count.value * 2)
+const count = ref(0);
+const doubled = computed(() => count.value * 2);
 
-const increment = () => count.value++
+const increment = () => count.value++;
 
 // Props
 interface Props {
-  title: string
-  count?: number
+  title: string;
+  count?: number;
 }
 const props = withDefaults(defineProps<Props>(), {
-  count: 0
-})
+  count: 0,
+});
 
 // Emits
 const emit = defineEmits<{
-  update: [value: number]
-  delete: [id: string]
-}>()
+  update: [value: number];
+  delete: [id: string];
+}>();
 
 // Lifecycle
 onMounted(() => {
-  console.log('Component mounted')
-})
+  console.log("Component mounted");
+});
 </script>
 ```
 
@@ -62,21 +62,23 @@ onMounted(() => {
 ```typescript
 // composables/useCounter.ts
 export const useCounter = (initialValue = 0) => {
-  const count = ref(initialValue)
-  const doubled = computed(() => count.value * 2)
+  const count = ref(initialValue);
+  const doubled = computed(() => count.value * 2);
 
-  const increment = () => count.value++
-  const decrement = () => count.value--
-  const reset = () => { count.value = initialValue }
+  const increment = () => count.value++;
+  const decrement = () => count.value--;
+  const reset = () => {
+    count.value = initialValue;
+  };
 
   return {
     count: readonly(count),
     doubled,
     increment,
     decrement,
-    reset
-  }
-}
+    reset,
+  };
+};
 ```
 
 Keep composables focused on a single concern. Prefix with `use`. Nuxt auto-imports anything exported from `composables/` with a `use` prefix.
@@ -88,6 +90,7 @@ Keep composables focused on a single concern. Prefix with `use`. Nuxt auto-impor
 ### Auto-imports
 
 Nuxt auto-imports:
+
 - Components from `components/`
 - Composables from `composables/`
 - Utils from `utils/`
@@ -98,33 +101,33 @@ Nuxt auto-imports:
 
 #### useAsyncData vs useFetch vs $fetch
 
-| Method | Use When | SSR Hydrated |
-|--------|----------|-------------|
-| `useFetch` | Fetching from API routes, simplest option | Yes |
-| `useAsyncData` | Custom fetching logic, more control over caching keys | Yes |
-| `$fetch` | User-triggered actions (form submits, button clicks), server routes calling external APIs | No |
+| Method         | Use When                                                                                  | SSR Hydrated |
+| -------------- | ----------------------------------------------------------------------------------------- | ------------ |
+| `useFetch`     | Fetching from API routes, simplest option                                                 | Yes          |
+| `useAsyncData` | Custom fetching logic, more control over caching keys                                     | Yes          |
+| `$fetch`       | User-triggered actions (form submits, button clicks), server routes calling external APIs | No           |
 
 ```typescript
 // useFetch — convenient wrapper, SSR-safe
-const { data, status, error, refresh } = await useFetch('/api/posts', {
+const { data, status, error, refresh } = await useFetch("/api/posts", {
   query: { page: 1 },
-  headers: { 'Authorization': `Bearer ${token}` }
-})
+  headers: { Authorization: `Bearer ${token}` },
+});
 
 // useAsyncData — more control, custom fetching
 const { data, pending, error, refresh } = await useAsyncData(
-  'posts',                        // unique cache key
-  () => $fetch('/api/posts'),
-  { watch: [page] }               // re-fetch when page changes
-)
+  "posts", // unique cache key
+  () => $fetch("/api/posts"),
+  { watch: [page] }, // re-fetch when page changes
+);
 
 // $fetch — for mutations and user-triggered actions (NOT SSR-hydrated)
 async function createPost(body: CreatePostInput) {
-  await $fetch('/api/posts', {
-    method: 'POST',
-    body
-  })
-  await refreshNuxtData('posts')  // invalidate the cached data
+  await $fetch("/api/posts", {
+    method: "POST",
+    body,
+  });
+  await refreshNuxtData("posts"); // invalidate the cached data
 }
 ```
 
@@ -134,7 +137,7 @@ Always handle errors from data fetching — `useFetch` and `useAsyncData` don't 
 
 ```vue
 <script setup lang="ts">
-const { data: posts, error, status } = await useFetch('/api/posts')
+const { data: posts, error, status } = await useFetch("/api/posts");
 </script>
 
 <template>
@@ -160,52 +163,52 @@ Nuxt 4 uses Nitro as its server engine. Server routes live in `server/` and run 
 ```typescript
 // server/api/posts/index.get.ts — handles GET /api/posts
 export default defineEventHandler(async (event) => {
-  const query = getQuery(event)
-  const page = Number(query.page) || 1
-  const limit = Number(query.limit) || 20
+  const query = getQuery(event);
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 20;
 
   const posts = await prisma.post.findMany({
     skip: (page - 1) * limit,
     take: limit,
-    orderBy: { createdAt: 'desc' }
-  })
+    orderBy: { createdAt: "desc" },
+  });
 
-  return posts
-})
+  return posts;
+});
 
 // server/api/posts/index.post.ts — handles POST /api/posts
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
+  const body = await readBody(event);
 
   // Validate with Zod
-  const parsed = createPostSchema.safeParse(body)
+  const parsed = createPostSchema.safeParse(body);
   if (!parsed.success) {
     throw createError({
       statusCode: 400,
-      message: 'Validation failed',
-      data: parsed.error.flatten()
-    })
+      message: "Validation failed",
+      data: parsed.error.flatten(),
+    });
   }
 
   const post = await prisma.post.create({
-    data: parsed.data
-  })
+    data: parsed.data,
+  });
 
-  setResponseStatus(event, 201)
-  return post
-})
+  setResponseStatus(event, 201);
+  return post;
+});
 
 // server/api/posts/[id].get.ts — handles GET /api/posts/:id
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
+  const id = getRouterParam(event, "id");
 
-  const post = await prisma.post.findUnique({ where: { id } })
+  const post = await prisma.post.findUnique({ where: { id } });
   if (!post) {
-    throw createError({ statusCode: 404, message: 'Post not found' })
+    throw createError({ statusCode: 404, message: "Post not found" });
   }
 
-  return post
-})
+  return post;
+});
 ```
 
 File naming convention: `[method].ts` suffix determines the HTTP method. `index.get.ts` handles GET, `index.post.ts` handles POST, etc.
@@ -218,24 +221,24 @@ Server middleware runs on every request before route handlers. Use for auth veri
 // server/middleware/auth.ts
 export default defineEventHandler(async (event) => {
   // Skip auth for public routes
-  const publicPaths = ['/api/auth/login', '/api/auth/register']
-  if (publicPaths.some(p => event.path?.startsWith(p))) return
+  const publicPaths = ["/api/auth/login", "/api/auth/register"];
+  if (publicPaths.some((p) => event.path?.startsWith(p))) return;
 
   // Only protect /api/ routes
-  if (!event.path?.startsWith('/api/')) return
+  if (!event.path?.startsWith("/api/")) return;
 
-  const token = getHeader(event, 'authorization')?.replace('Bearer ', '')
+  const token = getHeader(event, "authorization")?.replace("Bearer ", "");
   if (!token) {
-    throw createError({ statusCode: 401, message: 'Unauthorized' })
+    throw createError({ statusCode: 401, message: "Unauthorized" });
   }
 
   try {
-    const user = verifyJwt(token)
-    event.context.auth = user
+    const user = verifyJwt(token);
+    event.context.auth = user;
   } catch {
-    throw createError({ statusCode: 401, message: 'Invalid token' })
+    throw createError({ statusCode: 401, message: "Invalid token" });
   }
-})
+});
 ```
 
 Access auth context in route handlers via `event.context.auth`.
@@ -246,15 +249,15 @@ Shared utilities in `server/utils/` are auto-imported in server routes.
 
 ```typescript
 // server/utils/db.ts
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
 
-let prisma: PrismaClient
+let prisma: PrismaClient;
 
 export function usePrisma() {
   if (!prisma) {
-    prisma = new PrismaClient()
+    prisma = new PrismaClient();
   }
-  return prisma
+  return prisma;
 }
 ```
 
@@ -265,22 +268,22 @@ Route middleware runs on the client (and server during SSR) before navigating to
 ```typescript
 // middleware/auth.global.ts — runs on every route
 export default defineNuxtRouteMiddleware((to) => {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated } = useAuth();
 
-  const publicPages = ['/', '/login', '/register']
+  const publicPages = ["/", "/login", "/register"];
   if (!publicPages.includes(to.path) && !isAuthenticated.value) {
-    return navigateTo('/login')
+    return navigateTo("/login");
   }
-})
+});
 
 // middleware/guest.ts — named middleware, opt-in per page
 export default defineNuxtRouteMiddleware(() => {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated } = useAuth();
 
   if (isAuthenticated.value) {
-    return navigateTo('/dashboard')
+    return navigateTo("/dashboard");
   }
-})
+});
 ```
 
 Apply named middleware on a page:
@@ -289,9 +292,9 @@ Apply named middleware on a page:
 <!-- pages/login.vue -->
 <script setup lang="ts">
 definePageMeta({
-  middleware: 'guest',
-  layout: 'auth'
-})
+  middleware: "guest",
+  layout: "auth",
+});
 </script>
 ```
 
@@ -302,27 +305,27 @@ Plugins run once when the app initializes. Use for registering global utilities,
 ```typescript
 // plugins/api.ts
 export default defineNuxtPlugin(() => {
-  const config = useRuntimeConfig()
+  const config = useRuntimeConfig();
 
   const api = $fetch.create({
     baseURL: config.public.apiBase,
     onRequest({ options }) {
-      const token = useCookie('auth-token')
+      const token = useCookie("auth-token");
       if (token.value) {
-        options.headers.set('Authorization', `Bearer ${token.value}`)
+        options.headers.set("Authorization", `Bearer ${token.value}`);
       }
     },
     onResponseError({ response }) {
       if (response.status === 401) {
-        navigateTo('/login')
+        navigateTo("/login");
       }
-    }
-  })
+    },
+  });
 
   return {
-    provide: { api }
-  }
-})
+    provide: { api },
+  };
+});
 ```
 
 Access via `const { $api } = useNuxtApp()` in components and composables.
@@ -341,22 +344,22 @@ export default defineNuxtConfig({
 
     // Client-exposed (prefixed with public)
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || '/api',
-      appName: 'My App'
-    }
-  }
-})
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || "/api",
+      appName: "My App",
+    },
+  },
+});
 ```
 
 ```typescript
 // In server routes — full config available
-const config = useRuntimeConfig()
-console.log(config.jwtSecret)       // server-only value
-console.log(config.public.apiBase)  // public value
+const config = useRuntimeConfig();
+console.log(config.jwtSecret); // server-only value
+console.log(config.public.apiBase); // public value
 
 // In components — only public config
-const config = useRuntimeConfig()
-console.log(config.public.apiBase)  // works
+const config = useRuntimeConfig();
+console.log(config.public.apiBase); // works
 // config.jwtSecret — undefined on client
 ```
 
@@ -370,40 +373,40 @@ Use the Composition API syntax for stores — it's consistent with composables a
 
 ```typescript
 // stores/auth.ts
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
-export const useAuthStore = defineStore('auth', () => {
-  const user = ref<User | null>(null)
-  const token = useCookie('auth-token')  // SSR-safe via useCookie
+export const useAuthStore = defineStore("auth", () => {
+  const user = ref<User | null>(null);
+  const token = useCookie("auth-token"); // SSR-safe via useCookie
 
-  const isAuthenticated = computed(() => !!token.value && !!user.value)
+  const isAuthenticated = computed(() => !!token.value && !!user.value);
 
   async function login(credentials: LoginInput) {
-    const response = await $fetch<AuthResponse>('/api/auth/login', {
-      method: 'POST',
-      body: credentials
-    })
-    user.value = response.user
-    token.value = response.token
+    const response = await $fetch<AuthResponse>("/api/auth/login", {
+      method: "POST",
+      body: credentials,
+    });
+    user.value = response.user;
+    token.value = response.token;
   }
 
   function logout() {
-    user.value = null
-    token.value = null
-    navigateTo('/login')
+    user.value = null;
+    token.value = null;
+    navigateTo("/login");
   }
 
   async function fetchUser() {
-    if (!token.value) return
+    if (!token.value) return;
     try {
-      user.value = await $fetch<User>('/api/users/me')
+      user.value = await $fetch<User>("/api/users/me");
     } catch {
-      logout()
+      logout();
     }
   }
 
-  return { user, token, isAuthenticated, login, logout, fetchUser }
-})
+  return { user, token, isAuthenticated, login, logout, fetchUser };
+});
 ```
 
 ### SSR Hydration
@@ -411,6 +414,7 @@ export const useAuthStore = defineStore('auth', () => {
 `@pinia/nuxt` handles Pinia SSR hydration automatically — state created during server rendering is serialized and hydrated on the client. No manual setup needed.
 
 Key rules:
+
 - Use `useCookie()` (not `localStorage`) for values that must survive SSR (tokens, preferences). `useCookie` is SSR-safe; `localStorage` is not.
 - Use `useState()` for simple cross-component state that should hydrate but doesn't need a full store.
 - Don't call `$fetch` in store initialization — use `callOnce()` or trigger fetching from a plugin/page.
@@ -418,9 +422,9 @@ Key rules:
 ```typescript
 // plugins/auth.server.ts — fetch user on server during SSR
 export default defineNuxtPlugin(async () => {
-  const auth = useAuthStore()
-  await auth.fetchUser()
-})
+  const auth = useAuthStore();
+  await auth.fetchUser();
+});
 ```
 
 ---
@@ -456,12 +460,11 @@ export default defineNuxtPlugin(async () => {
 
 ```vue
 <script setup lang="ts">
-import { useVirtualList } from '@vueuse/core'
+import { useVirtualList } from "@vueuse/core";
 
-const { list, containerProps, wrapperProps } = useVirtualList(
-  largeArray,
-  { itemHeight: 50 }
-)
+const { list, containerProps, wrapperProps } = useVirtualList(largeArray, {
+  itemHeight: 50,
+});
 </script>
 
 <template>
@@ -497,9 +500,9 @@ The island component must be in `components/islands/` or have a `.server.vue` su
 // nuxt.config.ts
 export default defineNuxtConfig({
   experimental: {
-    payloadExtraction: true  // extract shared payloads for prerendered pages
-  }
-})
+    payloadExtraction: true, // extract shared payloads for prerendered pages
+  },
+});
 ```
 
 ---
@@ -512,7 +515,7 @@ export default defineNuxtConfig({
 
 ```vue
 <script setup lang="ts">
-const { data: post } = await useFetch(`/api/posts/${route.params.slug}`)
+const { data: post } = await useFetch(`/api/posts/${route.params.slug}`);
 
 useSeoMeta({
   title: () => post.value?.title,
@@ -520,8 +523,8 @@ useSeoMeta({
   ogTitle: () => post.value?.title,
   ogDescription: () => post.value?.excerpt,
   ogImage: () => post.value?.image,
-  twitterCard: 'summary_large_image'
-})
+  twitterCard: "summary_large_image",
+});
 </script>
 ```
 
@@ -534,12 +537,12 @@ Use `useHead` when you need link tags, scripts, or non-meta head elements.
 useHead({
   title: post.value?.title,
   link: [
-    { rel: 'canonical', href: `https://example.com/blog/${route.params.slug}` }
+    { rel: "canonical", href: `https://example.com/blog/${route.params.slug}` },
   ],
   script: [
-    { type: 'application/ld+json', innerHTML: JSON.stringify(structuredData) }
-  ]
-})
+    { type: "application/ld+json", innerHTML: JSON.stringify(structuredData) },
+  ],
+});
 </script>
 ```
 
@@ -552,11 +555,11 @@ npx nuxi module add @nuxtjs/sitemap
 ```typescript
 // nuxt.config.ts
 export default defineNuxtConfig({
-  site: { url: 'https://example.com' },
+  site: { url: "https://example.com" },
   sitemap: {
-    sources: ['/api/__sitemap__/urls']  // dynamic routes
-  }
-})
+    sources: ["/api/__sitemap__/urls"], // dynamic routes
+  },
+});
 ```
 
 ---
@@ -566,110 +569,110 @@ export default defineNuxtConfig({
 ### Component Test
 
 ```typescript
-import { mountSuspended } from '@nuxt/test-utils/runtime'
-import { describe, it, expect } from 'vitest'
-import Counter from '~/components/Counter.vue'
+import { mountSuspended } from "@nuxt/test-utils/runtime";
+import { describe, it, expect } from "vitest";
+import Counter from "~/components/Counter.vue";
 
-describe('Counter', () => {
-  it('increments count on button click', async () => {
-    const wrapper = await mountSuspended(Counter)
+describe("Counter", () => {
+  it("increments count on button click", async () => {
+    const wrapper = await mountSuspended(Counter);
 
-    await wrapper.find('button').trigger('click')
+    await wrapper.find("button").trigger("click");
 
-    expect(wrapper.text()).toContain('Count: 1')
-  })
+    expect(wrapper.text()).toContain("Count: 1");
+  });
 
-  it('renders with default props', async () => {
+  it("renders with default props", async () => {
     const wrapper = await mountSuspended(Counter, {
-      props: { initialCount: 5 }
-    })
+      props: { initialCount: 5 },
+    });
 
-    expect(wrapper.text()).toContain('Count: 5')
-  })
-})
+    expect(wrapper.text()).toContain("Count: 5");
+  });
+});
 ```
 
 ### Composable Test
 
 ```typescript
-import { describe, it, expect } from 'vitest'
-import { useCounter } from '~/composables/useCounter'
+import { describe, it, expect } from "vitest";
+import { useCounter } from "~/composables/useCounter";
 
-describe('useCounter', () => {
-  it('starts with initial value', () => {
-    const { count } = useCounter(10)
-    expect(count.value).toBe(10)
-  })
+describe("useCounter", () => {
+  it("starts with initial value", () => {
+    const { count } = useCounter(10);
+    expect(count.value).toBe(10);
+  });
 
-  it('increments and decrements', () => {
-    const { count, increment, decrement } = useCounter(0)
-    increment()
-    expect(count.value).toBe(1)
-    decrement()
-    expect(count.value).toBe(0)
-  })
-})
+  it("increments and decrements", () => {
+    const { count, increment, decrement } = useCounter(0);
+    increment();
+    expect(count.value).toBe(1);
+    decrement();
+    expect(count.value).toBe(0);
+  });
+});
 ```
 
 ### Server Route Test
 
 ```typescript
-import { describe, it, expect } from 'vitest'
-import { $fetch, setup } from '@nuxt/test-utils'
+import { describe, it, expect } from "vitest";
+import { $fetch, setup } from "@nuxt/test-utils";
 
-describe('POST /api/posts', async () => {
-  await setup({ server: true })
+describe("POST /api/posts", async () => {
+  await setup({ server: true });
 
-  it('creates a post with valid data', async () => {
-    const post = await $fetch('/api/posts', {
-      method: 'POST',
-      body: { title: 'Test', content: 'Hello world' }
-    })
+  it("creates a post with valid data", async () => {
+    const post = await $fetch("/api/posts", {
+      method: "POST",
+      body: { title: "Test", content: "Hello world" },
+    });
 
-    expect(post.id).toBeDefined()
-    expect(post.title).toBe('Test')
-  })
+    expect(post.id).toBeDefined();
+    expect(post.title).toBe("Test");
+  });
 
-  it('returns 400 for invalid data', async () => {
-    const error = await $fetch('/api/posts', {
-      method: 'POST',
-      body: {}
-    }).catch(e => e)
+  it("returns 400 for invalid data", async () => {
+    const error = await $fetch("/api/posts", {
+      method: "POST",
+      body: {},
+    }).catch((e) => e);
 
-    expect(error.statusCode).toBe(400)
-  })
-})
+    expect(error.statusCode).toBe(400);
+  });
+});
 ```
 
 ### Pinia Store Test
 
 ```typescript
-import { describe, it, expect, beforeEach } from 'vitest'
-import { setActivePinia, createPinia } from 'pinia'
-import { useCartStore } from '~/stores/cart'
+import { describe, it, expect, beforeEach } from "vitest";
+import { setActivePinia, createPinia } from "pinia";
+import { useCartStore } from "~/stores/cart";
 
-describe('useCartStore', () => {
+describe("useCartStore", () => {
   beforeEach(() => {
-    setActivePinia(createPinia())
-  })
+    setActivePinia(createPinia());
+  });
 
-  it('adds items to cart', () => {
-    const cart = useCartStore()
-    cart.addItem({ id: '1', name: 'Widget', price: 10, quantity: 1 })
+  it("adds items to cart", () => {
+    const cart = useCartStore();
+    cart.addItem({ id: "1", name: "Widget", price: 10, quantity: 1 });
 
-    expect(cart.itemCount).toBe(1)
-    expect(cart.total).toBe(10)
-  })
+    expect(cart.itemCount).toBe(1);
+    expect(cart.total).toBe(10);
+  });
 
-  it('increments quantity for duplicate items', () => {
-    const cart = useCartStore()
-    cart.addItem({ id: '1', name: 'Widget', price: 10, quantity: 1 })
-    cart.addItem({ id: '1', name: 'Widget', price: 10, quantity: 1 })
+  it("increments quantity for duplicate items", () => {
+    const cart = useCartStore();
+    cart.addItem({ id: "1", name: "Widget", price: 10, quantity: 1 });
+    cart.addItem({ id: "1", name: "Widget", price: 10, quantity: 1 });
 
-    expect(cart.itemCount).toBe(2)
-    expect(cart.items).toHaveLength(1)
-  })
-})
+    expect(cart.itemCount).toBe(2);
+    expect(cart.items).toHaveLength(1);
+  });
+});
 ```
 
 ---
@@ -677,66 +680,72 @@ describe('useCartStore', () => {
 ## Common Mistakes to Avoid
 
 **Don't destructure reactive objects — you lose reactivity:**
+
 ```typescript
 // Bad — count is now a plain number
-const { count } = reactive({ count: 0 })
+const { count } = reactive({ count: 0 });
 
 // Good — use ref or keep the reactive object intact
-const count = ref(0)
-const state = reactive({ count: 0 })
+const count = ref(0);
+const state = reactive({ count: 0 });
 ```
 
 **Don't use reactive() for primitives:**
+
 ```typescript
 // Bad — reactive only works with objects
-const count = reactive(0)
+const count = reactive(0);
 
 // Good
-const count = ref(0)
+const count = ref(0);
 ```
 
 **Don't call $fetch directly in setup without useFetch/useAsyncData — it fires twice (server + client):**
+
 ```typescript
 // Bad — runs on server during SSR, then again on client hydration
-const data = await $fetch('/api/posts')
+const data = await $fetch("/api/posts");
 
 // Good — SSR-hydrated, runs once
-const { data } = await useFetch('/api/posts')
+const { data } = await useFetch("/api/posts");
 ```
 
 **Don't use localStorage in setup — it breaks SSR:**
+
 ```typescript
 // Bad — localStorage doesn't exist on server
-const theme = ref(localStorage.getItem('theme'))
+const theme = ref(localStorage.getItem("theme"));
 
 // Good — useCookie is SSR-safe
-const theme = useCookie('theme', { default: () => 'light' })
+const theme = useCookie("theme", { default: () => "light" });
 
 // Also good — guard with process.client
-const theme = ref('light')
+const theme = ref("light");
 if (import.meta.client) {
-  theme.value = localStorage.getItem('theme') || 'light'
+  theme.value = localStorage.getItem("theme") || "light";
 }
 ```
 
 **Don't forget unique keys for useAsyncData:**
+
 ```typescript
 // Bad — colliding keys cause stale data
-const { data: a } = await useAsyncData('data', () => $fetch('/api/a'))
-const { data: b } = await useAsyncData('data', () => $fetch('/api/b'))
+const { data: a } = await useAsyncData("data", () => $fetch("/api/a"));
+const { data: b } = await useAsyncData("data", () => $fetch("/api/b"));
 
 // Good — unique keys per data source
-const { data: a } = await useAsyncData('users', () => $fetch('/api/a'))
-const { data: b } = await useAsyncData('posts', () => $fetch('/api/b'))
+const { data: a } = await useAsyncData("users", () => $fetch("/api/a"));
+const { data: b } = await useAsyncData("posts", () => $fetch("/api/b"));
 ```
 
 **Don't mutate props directly:**
+
 ```typescript
 // Bad
-props.count++
+props.count++;
 
 // Good — emit an event for the parent to handle
-emit('update:count', props.count + 1)
+emit("update:count", props.count + 1);
 ```
 
 ---

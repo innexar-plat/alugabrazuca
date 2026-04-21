@@ -7,13 +7,13 @@ description: "Use ALWAYS: project identity, architecture overview, module order,
 
 ## 1. Identidade
 
-| Campo | Valor |
-|-------|-------|
-| **Nome do projeto** | Definido em `APP_NAME` no `.env` (padrão: `BrasilQuartos`) |
-| **Descrição** | Plataforma de aluguel de quartos nos EUA e Europa para brasileiros |
-| **Público** | Brasileiros morando ou se mudando para o exterior |
-| **Idiomas** | PT (padrão), EN, ES — trilíngue, detecção automática do navegador |
-| **Deploy** | Servidor próprio (VPS) + Docker Compose + Nginx + Let's Encrypt |
+| Campo               | Valor                                                              |
+| ------------------- | ------------------------------------------------------------------ |
+| **Nome do projeto** | Definido em `APP_NAME` no `.env` (padrão: `BrasilQuartos`)         |
+| **Descrição**       | Plataforma de aluguel de quartos nos EUA e Europa para brasileiros |
+| **Público**         | Brasileiros morando ou se mudando para o exterior                  |
+| **Idiomas**         | PT (padrão), EN, ES — trilíngue, detecção automática do navegador  |
+| **Deploy**          | Servidor próprio (VPS) + Docker Compose + Nginx + Let's Encrypt    |
 
 > O nome da plataforma ainda pode mudar. **Nunca hardcode o nome** — usar sempre `process.env.APP_NAME` no backend e a variável de ambiente no frontend. Toda referência ao nome no código deve vir do `.env`.
 
@@ -43,14 +43,14 @@ Monorepo (Turborepo)
 └── packages/shared-types → Tipos compartilhados
 ```
 
-| Serviço | Porta | Tecnologia |
-|---------|-------|-----------|
-| Frontend | 3000 | Next.js 16 (App Router) |
-| Backend | 3001 | NestJS (Modular Monolith) |
-| PostgreSQL | 5432 | PostgreSQL 16 |
-| Redis | 6379 | Redis 7 |
-| MinIO | 9000 | MinIO (storage S3) |
-| Nginx | 80/443 | Reverse proxy + SSL |
+| Serviço    | Porta  | Tecnologia                |
+| ---------- | ------ | ------------------------- |
+| Frontend   | 3000   | Next.js 16 (App Router)   |
+| Backend    | 3001   | NestJS (Modular Monolith) |
+| PostgreSQL | 5432   | PostgreSQL 16             |
+| Redis      | 6379   | Redis 7                   |
+| MinIO      | 9000   | MinIO (storage S3)        |
+| Nginx      | 80/443 | Reverse proxy + SSL       |
 
 ---
 
@@ -68,18 +68,18 @@ Nunca pular módulo. Nunca iniciar o próximo sem handoff completo do anterior.
 
 ## 5. Regras de Naming (código)
 
-| Elemento | Padrão | Exemplo |
-|----------|--------|---------|
-| Nome do app | Via `APP_NAME` env var | `process.env.APP_NAME` |
-| Nome do DB | Via `DATABASE_URL` env var | Nunca hardcoded |
-| Arquivos | kebab-case | `user.service.ts` |
-| Classes | PascalCase | `UserService` |
-| Funções | camelCase | `createUser()` |
-| Variáveis | camelCase | `userId` |
-| Constantes | UPPER_SNAKE | `MAX_RETRY_COUNT` |
-| Tabelas SQL | snake_case plural | `users`, `order_items` |
-| Colunas SQL | snake_case | `created_at`, `user_id` |
-| Env vars | UPPER_SNAKE | `APP_NAME`, `JWT_SECRET` |
+| Elemento    | Padrão                     | Exemplo                  |
+| ----------- | -------------------------- | ------------------------ |
+| Nome do app | Via `APP_NAME` env var     | `process.env.APP_NAME`   |
+| Nome do DB  | Via `DATABASE_URL` env var | Nunca hardcoded          |
+| Arquivos    | kebab-case                 | `user.service.ts`        |
+| Classes     | PascalCase                 | `UserService`            |
+| Funções     | camelCase                  | `createUser()`           |
+| Variáveis   | camelCase                  | `userId`                 |
+| Constantes  | UPPER_SNAKE                | `MAX_RETRY_COUNT`        |
+| Tabelas SQL | snake_case plural          | `users`, `order_items`   |
+| Colunas SQL | snake_case                 | `created_at`, `user_id`  |
+| Env vars    | UPPER_SNAKE                | `APP_NAME`, `JWT_SECRET` |
 
 ---
 
@@ -90,6 +90,7 @@ O template com todos os campos está em `.env.example`.
 **Nunca commitar `.env` no git** — apenas `.env.example` com valores de exemplo.
 
 Variáveis obrigatórias de identidade:
+
 ```
 APP_NAME=BrasilQuartos
 APP_URL=http://localhost:3000

@@ -8,13 +8,13 @@
 
 ## Quick Decision: Webhook vs Polling vs Streaming
 
-| Factor | Webhooks | Polling | SSE / Streaming |
-|---|---|---|---|
-| Latency | Near real-time (seconds) | Interval-dependent (minutes) | True real-time (ms) |
-| Consumer complexity | Medium — must host endpoint | Low — simple GET requests | High — persistent connection |
-| Provider complexity | High — delivery, retry, DLQ | Low — stateless | High — connection management |
-| Firewall friendliness | Requires inbound port | Fully outbound | Fully outbound |
-| Use when | Event-driven integrations, third-party notifications | Simple status checks, low-frequency updates | Dashboards, live feeds, chat |
+| Factor                | Webhooks                                             | Polling                                     | SSE / Streaming              |
+| --------------------- | ---------------------------------------------------- | ------------------------------------------- | ---------------------------- |
+| Latency               | Near real-time (seconds)                             | Interval-dependent (minutes)                | True real-time (ms)          |
+| Consumer complexity   | Medium — must host endpoint                          | Low — simple GET requests                   | High — persistent connection |
+| Provider complexity   | High — delivery, retry, DLQ                          | Low — stateless                             | High — connection management |
+| Firewall friendliness | Requires inbound port                                | Fully outbound                              | Fully outbound               |
+| Use when              | Event-driven integrations, third-party notifications | Simple status checks, low-frequency updates | Dashboards, live feeds, chat |
 
 ---
 
@@ -65,10 +65,10 @@ Is this a breaking change to event payload?
 
 ### Event Type Naming Convention
 
-| Pattern | Example | Use when |
-|---|---|---|
-| `resource.action` | `customer.created` | Standard CRUD events |
-| `resource.sub.action` | `invoice.payment.failed` | Nested resource events |
+| Pattern                     | Example                            | Use when                 |
+| --------------------------- | ---------------------------------- | ------------------------ |
+| `resource.action`           | `customer.created`                 | Standard CRUD events     |
+| `resource.sub.action`       | `invoice.payment.failed`           | Nested resource events   |
 | `resource.action.qualifier` | `subscription.updated.plan_change` | Distinguishing sub-types |
 
 ---
@@ -104,13 +104,13 @@ Attempt 7: 24 hours (final)
 
 ### Dead Letter Queue (DLQ) Setup
 
-| Component | Requirement |
-|---|---|
-| Storage | Durable message store (SQS, Redis Streams, Postgres) |
-| Retention | Minimum 30 days |
-| Replay | API endpoint to retry individual or batch events |
-| Alerting | Notify provider ops when DLQ depth exceeds threshold |
-| Consumer visibility | Dashboard or API showing failed deliveries |
+| Component           | Requirement                                          |
+| ------------------- | ---------------------------------------------------- |
+| Storage             | Durable message store (SQS, Redis Streams, Postgres) |
+| Retention           | Minimum 30 days                                      |
+| Replay              | API endpoint to retry individual or batch events     |
+| Alerting            | Notify provider ops when DLQ depth exceeds threshold |
+| Consumer visibility | Dashboard or API showing failed deliveries           |
 
 ---
 
@@ -191,11 +191,11 @@ Receive webhook event
 
 ### Idempotency Store Options
 
-| Store | TTL support | Performance | Use when |
-|---|---|---|---|
-| Redis SET with EX | Native | Fast | High-volume, ephemeral ok |
-| Postgres unique constraint | Manual cleanup | Medium | Need audit trail |
-| DynamoDB with TTL | Native | Fast | AWS-native, serverless |
+| Store                      | TTL support    | Performance | Use when                  |
+| -------------------------- | -------------- | ----------- | ------------------------- |
+| Redis SET with EX          | Native         | Fast        | High-volume, ephemeral ok |
+| Postgres unique constraint | Manual cleanup | Medium      | Need audit trail          |
+| DynamoDB with TTL          | Native         | Fast        | AWS-native, serverless    |
 
 ### Idempotency Key Rules
 
@@ -210,12 +210,12 @@ Receive webhook event
 
 ### Local Development Testing
 
-| Tool | Purpose | Command |
-|---|---|---|
-| ngrok | Tunnel to localhost | `ngrok http 3000` |
-| Stripe CLI | Forward Stripe events | `stripe listen --forward-to localhost:3000/webhooks` |
-| GitHub CLI | Redeliver events | `gh api /repos/{owner}/{repo}/hooks/{id}/deliveries` |
-| smee.io | Proxy for GitHub webhooks | `smee -u https://smee.io/xyz --target http://localhost:3000` |
+| Tool       | Purpose                   | Command                                                      |
+| ---------- | ------------------------- | ------------------------------------------------------------ |
+| ngrok      | Tunnel to localhost       | `ngrok http 3000`                                            |
+| Stripe CLI | Forward Stripe events     | `stripe listen --forward-to localhost:3000/webhooks`         |
+| GitHub CLI | Redeliver events          | `gh api /repos/{owner}/{repo}/hooks/{id}/deliveries`         |
+| smee.io    | Proxy for GitHub webhooks | `smee -u https://smee.io/xyz --target http://localhost:3000` |
 
 ### Automated Testing Checklist
 
@@ -249,12 +249,12 @@ tests/
 
 ### Response Time Requirements
 
-| Provider | Timeout | Recommendation |
-|---|---|---|
-| Stripe | 20 seconds | Respond in <5s, process async |
-| GitHub | 10 seconds | Respond in <3s, process async |
-| Shopify | 5 seconds | Respond immediately, queue processing |
-| General | Varies | Always return 200 before heavy processing |
+| Provider | Timeout    | Recommendation                            |
+| -------- | ---------- | ----------------------------------------- |
+| Stripe   | 20 seconds | Respond in <5s, process async             |
+| GitHub   | 10 seconds | Respond in <3s, process async             |
+| Shopify  | 5 seconds  | Respond immediately, queue processing     |
+| General  | Varies     | Always return 200 before heavy processing |
 
 ### Async Processing Pattern
 
@@ -284,18 +284,18 @@ tests/
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|---|---|---|
-| Synchronous heavy processing | Timeouts, lost events | Enqueue and process async |
-| Relying on event ordering | Events arrive out of order | Use timestamps and state checks |
-| No idempotency handling | Duplicate processing on retries | Implement idempotency store |
-| Parsing body before signature check | Security vulnerability | Verify signature against raw body first |
-| Hardcoded webhook secret | Cannot rotate without downtime | Support multiple active secrets |
-| Returning 200 on processing failure | Provider thinks delivery succeeded | Return 500 to trigger retry |
-| No DLQ or failure visibility | Silent data loss | Implement DLQ with alerting |
-| Webhook secret in query params | Leaks in logs and referrer headers | Use header-based HMAC signatures |
-| Not validating timestamp | Replay attack vulnerability | Check timestamp within tolerance window |
-| Filtering events client-side only | Unnecessary traffic and processing | Configure event types at subscription level |
+| Anti-Pattern                        | Problem                            | Fix                                         |
+| ----------------------------------- | ---------------------------------- | ------------------------------------------- |
+| Synchronous heavy processing        | Timeouts, lost events              | Enqueue and process async                   |
+| Relying on event ordering           | Events arrive out of order         | Use timestamps and state checks             |
+| No idempotency handling             | Duplicate processing on retries    | Implement idempotency store                 |
+| Parsing body before signature check | Security vulnerability             | Verify signature against raw body first     |
+| Hardcoded webhook secret            | Cannot rotate without downtime     | Support multiple active secrets             |
+| Returning 200 on processing failure | Provider thinks delivery succeeded | Return 500 to trigger retry                 |
+| No DLQ or failure visibility        | Silent data loss                   | Implement DLQ with alerting                 |
+| Webhook secret in query params      | Leaks in logs and referrer headers | Use header-based HMAC signatures            |
+| Not validating timestamp            | Replay attack vulnerability        | Check timestamp within tolerance window     |
+| Filtering events client-side only   | Unnecessary traffic and processing | Configure event types at subscription level |
 
 ---
 

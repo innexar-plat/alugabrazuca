@@ -12,23 +12,27 @@ Comprehensive code review checklist for blockchain smart contracts (Solidity, Ru
 ## Critical Security Issues (P0)
 
 ### Reentrancy
+
 - [ ] All state changes before external calls (Checks-Effects-Interactions)
 - [ ] ReentrancyGuard modifier on state-changing functions
 - [ ] No external calls in loops
 - [ ] ETH transfers use `.call{value:}` with success check
 
 ### Access Control
+
 - [ ] All privileged functions have access modifiers (`onlyOwner`, `onlyRole`)
 - [ ] Zero address validation on admin transfers
 - [ ] Multi-signature or timelock for critical operations
 - [ ] Role revocation properly implemented
 
 ### Integer Overflow/Underflow
+
 - [ ] Solidity 0.8+ or SafeMath for older versions
 - [ ] `unchecked` blocks only where mathematically safe
 - [ ] No arithmetic with user input in unchecked blocks
 
 ### Oracle Manipulation
+
 - [ ] Price data validated (not zero, not stale)
 - [ ] TWAP (Time-Weighted Average Price) for critical operations
 - [ ] Multiple oracle sources for redundancy
@@ -40,23 +44,27 @@ Comprehensive code review checklist for blockchain smart contracts (Solidity, Ru
 ## High Severity Issues (P1)
 
 ### Frontrunning/MEV
+
 - [ ] Commit-reveal schemes for sensitive operations
 - [ ] Flashbots integration for MEV-sensitive transactions
 - [ ] Slippage protection on swaps
 - [ ] Deadline parameters on time-sensitive calls
 
 ### Delegatecall Safety
+
 - [ ] No delegatecall to untrusted addresses
 - [ ] Proxy implementation whitelisting
 - [ ] Storage collision checks in upgradeable contracts
 
 ### External Call Safety
+
 - [ ] Return values checked for all external calls
 - [ ] Gas stipends appropriate (avoid `.transfer()` and `.send()`)
 - [ ] Reentrancy protection where needed
 - [ ] Proper error handling with try/catch
 
 ### Flash Loan Protection
+
 - [ ] State changes within single transaction validated
 - [ ] Balance checks at transaction end
 - [ ] No reliance on `balanceOf` for critical logic
@@ -67,6 +75,7 @@ Comprehensive code review checklist for blockchain smart contracts (Solidity, Ru
 ## Medium Severity Issues (P2)
 
 ### Gas Optimization
+
 - [ ] Storage variables packed into 32-byte slots
 - [ ] `calldata` used for external function arrays
 - [ ] Storage reads cached in memory/stack
@@ -75,18 +84,21 @@ Comprehensive code review checklist for blockchain smart contracts (Solidity, Ru
 - [ ] `unchecked` for safe arithmetic (loop counters)
 
 ### Input Validation
+
 - [ ] All user inputs validated (bounds, zero checks, array lengths)
 - [ ] Address parameters checked for zero address
 - [ ] Array length limits to prevent DoS
 - [ ] Percentage/ratio parameters validated
 
 ### Event Emission
+
 - [ ] Events emitted for all state changes
 - [ ] Indexed parameters for important values
 - [ ] Events emitted before external calls
 - [ ] Consistent event naming convention
 
 ### Timestamp Manipulation
+
 - [ ] No reliance on `block.timestamp` for short periods (<15 minutes)
 - [ ] Use `block.number` for short time periods
 - [ ] Document acceptable timestamp drift
@@ -96,6 +108,7 @@ Comprehensive code review checklist for blockchain smart contracts (Solidity, Ru
 ## Upgradeable Contract Review
 
 ### Proxy Pattern Checks
+
 - [ ] Storage gaps in base contracts (`uint256[50] private __gap`)
 - [ ] Initializer functions protected (`initializer` modifier)
 - [ ] Constructor disables initializers (`_disableInitializers()`)
@@ -103,6 +116,7 @@ Comprehensive code review checklist for blockchain smart contracts (Solidity, Ru
 - [ ] `_authorizeUpgrade` properly protected
 
 ### Storage Layout
+
 - [ ] No storage variable reordering
 - [ ] Namespaced storage for new variables
 - [ ] Diamond storage pattern for complex upgrades
@@ -113,6 +127,7 @@ Comprehensive code review checklist for blockchain smart contracts (Solidity, Ru
 ## DeFi-Specific Checks
 
 ### AMM/DEX
+
 - [ ] Constant product formula correct (`x * y = k`)
 - [ ] Slippage calculation accurate
 - [ ] Fee collection doesn't break invariants
@@ -121,6 +136,7 @@ Comprehensive code review checklist for blockchain smart contracts (Solidity, Ru
 - [ ] No rounding errors favoring attackers
 
 ### Lending/Borrowing
+
 - [ ] Collateral ratio enforced
 - [ ] Liquidation threshold correct
 - [ ] Health factor calculation accurate
@@ -129,6 +145,7 @@ Comprehensive code review checklist for blockchain smart contracts (Solidity, Ru
 - [ ] Flash loan protection
 
 ### Staking/Yield Farming
+
 - [ ] Reward calculation correct
 - [ ] No reward manipulation via deposits/withdrawals
 - [ ] Compound interest math accurate
@@ -140,6 +157,7 @@ Comprehensive code review checklist for blockchain smart contracts (Solidity, Ru
 ## Token-Specific Checks
 
 ### ERC20
+
 - [ ] Total supply tracking correct
 - [ ] Transfer returns boolean
 - [ ] Approve/TransferFrom race condition mitigated
@@ -147,6 +165,7 @@ Comprehensive code review checklist for blockchain smart contracts (Solidity, Ru
 - [ ] Burn/mint properly updates totalSupply
 
 ### ERC721/ERC1155
+
 - [ ] Token ID uniqueness enforced
 - [ ] Metadata URI properly implemented
 - [ ] Safe transfer callbacks implemented
@@ -197,17 +216,20 @@ Comprehensive code review checklist for blockchain smart contracts (Solidity, Ru
 ## Solana-Specific Checks (Rust/Anchor)
 
 ### Account Validation
+
 - [ ] All accounts validated (ownership, signer, mutability)
 - [ ] PDA (Program Derived Address) seeds validated
 - [ ] Account discriminators checked
 - [ ] Account size constraints enforced
 
 ### Signer Checks
+
 - [ ] Required signers properly enforced
 - [ ] No missing `is_signer` constraints
 - [ ] Authority validation on privileged operations
 
 ### CPI (Cross-Program Invocation)
+
 - [ ] CPI signer seeds validated
 - [ ] Program ID validation
 - [ ] Account ownership validated post-CPI
@@ -217,12 +239,14 @@ Comprehensive code review checklist for blockchain smart contracts (Solidity, Ru
 ## TON-Specific Checks (FunC/Tact)
 
 ### Message Handling
+
 - [ ] Bounce flag properly set
 - [ ] Message value validation
 - [ ] Excess gas refunded
 - [ ] Internal message handling correct
 
 ### State Management
+
 - [ ] Persistent data properly saved
 - [ ] Cell references valid
 - [ ] Gas limits appropriate

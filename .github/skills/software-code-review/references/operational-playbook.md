@@ -27,12 +27,12 @@ Mark P0/P1 as **REQUIRED** fixes. Mark P2/P3 as **SUGGESTION** or **OPTIONAL**.
 
 Track these metrics to measure review effectiveness:
 
-| Metric | What It Measures | Target |
-|--------|------------------|--------|
-| Deployment Frequency | How often code deploys | Daily to weekly |
-| Lead Time for Changes | Commit to production | <1 day |
-| Change Failure Rate | Deployments causing issues | <15% |
-| Time to Restore | Recovery from failures | <1 hour |
+| Metric                 | What It Measures           | Target                |
+| ---------------------- | -------------------------- | --------------------- |
+| Deployment Frequency   | How often code deploys     | Daily to weekly       |
+| Lead Time for Changes  | Commit to production       | <1 day                |
+| Change Failure Rate    | Deployments causing issues | <15%                  |
+| Time to Restore        | Recovery from failures     | <1 hour               |
 | **Rework Rate (2025)** | Unplanned production fixes | Track trend, minimize |
 
 ### AI Impact on Reviews (2025-2026)
@@ -197,6 +197,7 @@ Use this when a change is large or risky.
   - Tests check boundaries (empty lists, large values, invalid inputs).
 
 If tests are missing:
+
 - Call out missing coverage as REQUIRED when bugs would be likely or high impact.
 - Suggest concrete test cases and where to put them.
 

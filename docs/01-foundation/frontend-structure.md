@@ -64,6 +64,7 @@ Para visitantes e páginas abertas.
 ```
 
 **Header público:**
+
 - Logo (link para home)
 - Busca rápida (input com autocomplete)
 - Link "Anunciar meu quarto"
@@ -72,6 +73,7 @@ Para visitantes e páginas abertas.
 - Mobile: hamburger menu
 
 **Páginas neste layout:**
+
 - `/` — Landing page
 - `/rooms` — Busca de quartos
 - `/rooms/:city` — Busca por cidade
@@ -121,6 +123,7 @@ Para usuários logados (inquilino e anfitrião).
 ```
 
 **Header autenticado:**
+
 - Logo
 - Busca rápida
 - Botão "+ Anunciar" (CTA accent)
@@ -130,27 +133,29 @@ Para usuários logados (inquilino e anfitrião).
 
 **Sidebar — Itens (ícones + texto):**
 
-| Ícone | Label | Rota | Roles |
-|-------|-------|------|-------|
-| 📊 | Dashboard | `/dashboard` | todos |
-| 🏠 | Meus Quartos | `/my-listings` | host |
-| ❤️ | Favoritos | `/favorites` | todos |
-| 💬 | Mensagens | `/messages` | todos |
-| 📩 | Solicitações | `/inquiries` | todos |
-| ⭐ | Avaliações | `/reviews` | todos |
-| 👤 | Meu Perfil | `/profile` | todos |
-| ✅ | Verificação | `/verification` | todos |
-| 💳 | Assinatura | `/subscription` | host |
-| 📊 | Faturamento | `/billing` | host |
-| ⚙️ | Configurações | `/settings` | todos |
-| 🚪 | Sair | — | todos |
+| Ícone | Label         | Rota            | Roles |
+| ----- | ------------- | --------------- | ----- |
+| 📊    | Dashboard     | `/dashboard`    | todos |
+| 🏠    | Meus Quartos  | `/my-listings`  | host  |
+| ❤️    | Favoritos     | `/favorites`    | todos |
+| 💬    | Mensagens     | `/messages`     | todos |
+| 📩    | Solicitações  | `/inquiries`    | todos |
+| ⭐    | Avaliações    | `/reviews`      | todos |
+| 👤    | Meu Perfil    | `/profile`      | todos |
+| ✅    | Verificação   | `/verification` | todos |
+| 💳    | Assinatura    | `/subscription` | host  |
+| 📊    | Faturamento   | `/billing`      | host  |
+| ⚙️    | Configurações | `/settings`     | todos |
+| 🚪    | Sair          | —               | todos |
 
 **Comportamento da Sidebar:**
+
 - Desktop (≥1024px): sidebar fixa, 260px largura, collapsível para 72px (ícones)
 - Tablet (768-1023px): sidebar oculta, abre com botão hamburger (overlay)
 - Mobile (<768px): bottom navigation com 5 itens principais + hamburger para restante
 
 **Páginas neste layout:**
+
 - `/dashboard` — Painel do usuário
 - `/my-listings` — Meus anúncios
 - `/listings/new` — Criar anúncio (wizard)
@@ -197,17 +202,18 @@ Para administradores da plataforma.
 
 **Sidebar Admin — Itens:**
 
-| Ícone | Label | Rota |
-|-------|-------|------|
-| 📊 | Dashboard | `/admin` |
-| 🏠 | Anúncios | `/admin/listings` |
-| 👥 | Usuários | `/admin/users` |
-| ✅ | Verificações | `/admin/verifications` |
-| 🚨 | Denúncias | `/admin/reports` |
-| 💰 | Financeiro | `/admin/finance` |
-| ⚙️ | Configurações | `/admin/settings` |
+| Ícone | Label         | Rota                   |
+| ----- | ------------- | ---------------------- |
+| 📊    | Dashboard     | `/admin`               |
+| 🏠    | Anúncios      | `/admin/listings`      |
+| 👥    | Usuários      | `/admin/users`         |
+| ✅    | Verificações  | `/admin/verifications` |
+| 🚨    | Denúncias     | `/admin/reports`       |
+| 💰    | Financeiro    | `/admin/finance`       |
+| ⚙️    | Configurações | `/admin/settings`      |
 
 **Páginas neste layout:**
+
 - `/admin` — Dashboard com métricas
 - `/admin/listings` — Fila de moderação
 - `/admin/users` — Lista de usuários
@@ -225,88 +231,88 @@ Para administradores da plataforma.
 
 Componentes base do shadcn/ui, customizados com tokens de cor.
 
-| Componente | Variantes | Descrição |
-|-----------|-----------|-----------|
-| `Button` | primary, secondary, accent, danger, ghost, outline, link | Botão com loading state |
-| `Input` | default, error | Campo de texto |
-| `Textarea` | default, error | Campo de texto multilinha |
-| `Select` | default, multi | Seletor dropdown |
-| `Checkbox` | default | Checkbox |
-| `Radio` | default | Radio button |
-| `Switch` | default | Toggle on/off |
-| `Badge` | success, warning, error, info, neutral, premium | Tag/label |
-| `Avatar` | sm, md, lg, xl | Foto de perfil circular |
-| `Skeleton` | text, circle, card | Loading placeholder |
-| `Spinner` | sm, md, lg | Loading spinner |
-| `Tooltip` | default | Tooltip on hover |
-| `Popover` | default | Popup com conteúdo |
-| `Dialog` | default, destructive | Modal |
-| `Sheet` | left, right, top, bottom | Painel lateral deslizante |
-| `Dropdown` | default | Menu dropdown |
-| `Tabs` | default, pills | Navegação por abas |
-| `Accordion` | default | Seções colapsáveis |
-| `Toast` | success, error, warning, info | Notificação temporária |
-| `Separator` | horizontal, vertical | Linha divisória |
-| `Label` | default | Label de form |
-| `Card` | default, hover, interactive | Container com sombra |
-| `Table` | default, striped | Tabela de dados |
-| `Pagination` | default | Navegação de páginas |
-| `Breadcrumb` | default | Trilha de navegação |
-| `Slider` | default, range | Slider numérico |
-| `Calendar` | default | Seletor de data |
-| `DatePicker` | default | Input de data com calendar |
-| `Command` | default | Paleta de comandos (busca) |
-| `Progress` | default, circle | Barra de progresso |
-| `ScrollArea` | default | Área com scroll customizado |
+| Componente   | Variantes                                                | Descrição                   |
+| ------------ | -------------------------------------------------------- | --------------------------- |
+| `Button`     | primary, secondary, accent, danger, ghost, outline, link | Botão com loading state     |
+| `Input`      | default, error                                           | Campo de texto              |
+| `Textarea`   | default, error                                           | Campo de texto multilinha   |
+| `Select`     | default, multi                                           | Seletor dropdown            |
+| `Checkbox`   | default                                                  | Checkbox                    |
+| `Radio`      | default                                                  | Radio button                |
+| `Switch`     | default                                                  | Toggle on/off               |
+| `Badge`      | success, warning, error, info, neutral, premium          | Tag/label                   |
+| `Avatar`     | sm, md, lg, xl                                           | Foto de perfil circular     |
+| `Skeleton`   | text, circle, card                                       | Loading placeholder         |
+| `Spinner`    | sm, md, lg                                               | Loading spinner             |
+| `Tooltip`    | default                                                  | Tooltip on hover            |
+| `Popover`    | default                                                  | Popup com conteúdo          |
+| `Dialog`     | default, destructive                                     | Modal                       |
+| `Sheet`      | left, right, top, bottom                                 | Painel lateral deslizante   |
+| `Dropdown`   | default                                                  | Menu dropdown               |
+| `Tabs`       | default, pills                                           | Navegação por abas          |
+| `Accordion`  | default                                                  | Seções colapsáveis          |
+| `Toast`      | success, error, warning, info                            | Notificação temporária      |
+| `Separator`  | horizontal, vertical                                     | Linha divisória             |
+| `Label`      | default                                                  | Label de form               |
+| `Card`       | default, hover, interactive                              | Container com sombra        |
+| `Table`      | default, striped                                         | Tabela de dados             |
+| `Pagination` | default                                                  | Navegação de páginas        |
+| `Breadcrumb` | default                                                  | Trilha de navegação         |
+| `Slider`     | default, range                                           | Slider numérico             |
+| `Calendar`   | default                                                  | Seletor de data             |
+| `DatePicker` | default                                                  | Input de data com calendar  |
+| `Command`    | default                                                  | Paleta de comandos (busca)  |
+| `Progress`   | default, circle                                          | Barra de progresso          |
+| `ScrollArea` | default                                                  | Área com scroll customizado |
 
 ### 3.2 Shared Molecules (`components/shared/`)
 
 Composições reutilizáveis em múltiplos módulos.
 
-| Componente | Props principais | Onde usa |
-|-----------|-----------------|---------|
-| `SearchInput` | placeholder, onSearch, suggestions | Header, busca |
-| `PriceTag` | amount, currency, period | Cards, listagens |
-| `RatingStars` | rating, count, size | Reviews, cards |
-| `StatusBadge` | status (active, pending, etc.) | Anúncios, solicitações |
-| `UserMiniCard` | user, showVerified, showRating | Perfis, reviews |
-| `PhotoGallery` | photos, showCount | Anúncios |
-| `PhotoUploader` | maxPhotos, onUpload, onRemove | Criar/editar anúncio |
-| `EmptyState` | icon, title, description, action | Listas vazias |
-| `LoadingState` | type (skeleton, spinner) | Carregamento |
-| `ErrorState` | message, onRetry | Erros |
-| `ConfirmDialog` | title, message, onConfirm | Ações destrutivas |
-| `StepWizard` | steps, currentStep, onNext, onBack | Wizard de anúncio |
-| `FilterPanel` | filters, onApply, onReset | Busca |
-| `SortSelect` | options, current, onChange | Busca |
-| `LanguageSelector` | currentLocale, locales | Header |
-| `ThemeToggle` | — | Header (light/dark) |
-| `NotificationBell` | count, onClick | Header auth |
-| `MessageBadge` | count, onClick | Header auth |
-| `AmenityIcon` | amenity, size | Detalhe anúncio |
-| `AmenityList` | amenities, maxShow | Cards, detalhe |
-| `MapPin` | listing, onClick | Mapa |
-| `MapCluster` | count, onClick | Mapa |
-| `StatCard` | label, value, change, icon | Dashboard |
-| `InfoRow` | icon, label, value | Detalhe anúncio |
-| `FileUploader` | accept, maxSize, onUpload | Verificação |
-| `CurrencyInput` | currency, value, onChange | Preço |
-| `PhoneInput` | countryCode, value, onChange | Perfil |
+| Componente         | Props principais                   | Onde usa               |
+| ------------------ | ---------------------------------- | ---------------------- |
+| `SearchInput`      | placeholder, onSearch, suggestions | Header, busca          |
+| `PriceTag`         | amount, currency, period           | Cards, listagens       |
+| `RatingStars`      | rating, count, size                | Reviews, cards         |
+| `StatusBadge`      | status (active, pending, etc.)     | Anúncios, solicitações |
+| `UserMiniCard`     | user, showVerified, showRating     | Perfis, reviews        |
+| `PhotoGallery`     | photos, showCount                  | Anúncios               |
+| `PhotoUploader`    | maxPhotos, onUpload, onRemove      | Criar/editar anúncio   |
+| `EmptyState`       | icon, title, description, action   | Listas vazias          |
+| `LoadingState`     | type (skeleton, spinner)           | Carregamento           |
+| `ErrorState`       | message, onRetry                   | Erros                  |
+| `ConfirmDialog`    | title, message, onConfirm          | Ações destrutivas      |
+| `StepWizard`       | steps, currentStep, onNext, onBack | Wizard de anúncio      |
+| `FilterPanel`      | filters, onApply, onReset          | Busca                  |
+| `SortSelect`       | options, current, onChange         | Busca                  |
+| `LanguageSelector` | currentLocale, locales             | Header                 |
+| `ThemeToggle`      | —                                  | Header (light/dark)    |
+| `NotificationBell` | count, onClick                     | Header auth            |
+| `MessageBadge`     | count, onClick                     | Header auth            |
+| `AmenityIcon`      | amenity, size                      | Detalhe anúncio        |
+| `AmenityList`      | amenities, maxShow                 | Cards, detalhe         |
+| `MapPin`           | listing, onClick                   | Mapa                   |
+| `MapCluster`       | count, onClick                     | Mapa                   |
+| `StatCard`         | label, value, change, icon         | Dashboard              |
+| `InfoRow`          | icon, label, value                 | Detalhe anúncio        |
+| `FileUploader`     | accept, maxSize, onUpload          | Verificação            |
+| `CurrencyInput`    | currency, value, onChange          | Preço                  |
+| `PhoneInput`       | countryCode, value, onChange       | Perfil                 |
 
 ### 3.3 Layout Organisms (`components/layout/`)
 
-| Componente | Descrição |
-|-----------|-----------|
-| `PublicHeader` | Header das páginas públicas |
-| `AuthHeader` | Header das páginas autenticadas |
-| `AdminTopbar` | Topbar do painel admin |
-| `PublicFooter` | Footer completo |
-| `AuthFooter` | Footer simplificado |
-| `Sidebar` | Sidebar colapsível com itens por role |
-| `AdminSidebar` | Sidebar do admin (dark theme) |
-| `MobileBottomNav` | Navegação inferior mobile (5 itens) |
-| `BreadcrumbNav` | Breadcrumb automático por rota |
-| `PageHeader` | Título + descrição + ações da página |
+| Componente        | Descrição                             |
+| ----------------- | ------------------------------------- |
+| `PublicHeader`    | Header das páginas públicas           |
+| `AuthHeader`      | Header das páginas autenticadas       |
+| `AdminTopbar`     | Topbar do painel admin                |
+| `PublicFooter`    | Footer completo                       |
+| `AuthFooter`      | Footer simplificado                   |
+| `Sidebar`         | Sidebar colapsível com itens por role |
+| `AdminSidebar`    | Sidebar do admin (dark theme)         |
+| `MobileBottomNav` | Navegação inferior mobile (5 itens)   |
+| `BreadcrumbNav`   | Breadcrumb automático por rota        |
+| `PageHeader`      | Título + descrição + ações da página  |
 
 ---
 
@@ -436,9 +442,9 @@ Troca em 1 arquivo = troca em toda a plataforma
 /* styles/tokens.css — ÚNICO ARQUIVO para mudar cores */
 :root {
   /* Mudar ESTAS variáveis muda TUDO */
-  --primary: 160 84% 39%;       /* verde esmeralda */
+  --primary: 160 84% 39%; /* verde esmeralda */
   --primary-foreground: 0 0% 100%;
-  --accent: 43 96% 56%;         /* dourado */
+  --accent: 43 96% 56%; /* dourado */
   --accent-foreground: 0 0% 0%;
   --background: 0 0% 98%;
   --foreground: 0 0% 10%;
@@ -471,18 +477,18 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
         // ... mapeamento completo
       },
     },
   },
-}
+};
 ```
 
 ```tsx
@@ -499,13 +505,13 @@ export default {
 
 ## 7. Responsividade — Padrão Mobile-First
 
-| Viewport | Layout | Sidebar | Header |
-|----------|--------|---------|--------|
-| < 640px | 1 coluna, full width | Bottom nav (5 itens) | Hamburger + logo |
-| 640-767px | 1 coluna com padding | Bottom nav | Logo + ações |
-| 768-1023px | 2 colunas (grid) | Overlay (hamburger) | Completo |
-| 1024-1279px | Sidebar + conteúdo | Colapsada (72px) | Completo |
-| ≥ 1280px | Sidebar + conteúdo | Expandida (260px) | Completo |
+| Viewport    | Layout               | Sidebar              | Header           |
+| ----------- | -------------------- | -------------------- | ---------------- |
+| < 640px     | 1 coluna, full width | Bottom nav (5 itens) | Hamburger + logo |
+| 640-767px   | 1 coluna com padding | Bottom nav           | Logo + ações     |
+| 768-1023px  | 2 colunas (grid)     | Overlay (hamburger)  | Completo         |
+| 1024-1279px | Sidebar + conteúdo   | Colapsada (72px)     | Completo         |
+| ≥ 1280px    | Sidebar + conteúdo   | Expandida (260px)    | Completo         |
 
 ### Mobile Bottom Navigation (5 itens)
 
@@ -522,12 +528,12 @@ export default {
 
 Cada página/listagem DEVE implementar 4 estados:
 
-| Estado | Componente | Descrição |
-|--------|-----------|-----------|
-| **Loading** | `<LoadingState />` | Skeleton ou spinner |
-| **Empty** | `<EmptyState />` | Ícone + texto + CTA |
-| **Error** | `<ErrorState />` | Mensagem + botão retry |
-| **Success** | Conteúdo real | Dados renderizados |
+| Estado      | Componente         | Descrição              |
+| ----------- | ------------------ | ---------------------- |
+| **Loading** | `<LoadingState />` | Skeleton ou spinner    |
+| **Empty**   | `<EmptyState />`   | Ícone + texto + CTA    |
+| **Error**   | `<ErrorState />`   | Mensagem + botão retry |
+| **Success** | Conteúdo real      | Dados renderizados     |
 
 ```tsx
 // Padrão obrigatório em toda listagem
@@ -536,14 +542,15 @@ function MyListingsPage() {
 
   if (isLoading) return <LoadingState type="skeleton" count={3} />;
   if (error) return <ErrorState message={error.message} onRetry={refetch} />;
-  if (listings.length === 0) return (
-    <EmptyState
-      icon={Home}
-      title="Nenhum anúncio ainda"
-      description="Crie seu primeiro anúncio e comece a receber solicitações"
-      action={{ label: "Criar anúncio", href: "/listings/new" }}
-    />
-  );
+  if (listings.length === 0)
+    return (
+      <EmptyState
+        icon={Home}
+        title="Nenhum anúncio ainda"
+        description="Crie seu primeiro anúncio e comece a receber solicitações"
+        action={{ label: "Criar anúncio", href: "/listings/new" }}
+      />
+    );
 
   return <MyListingsTable listings={listings} />;
 }

@@ -1,12 +1,13 @@
 # Backend Engineering - C# + ASP.NET Core + Entity Framework Core Template
 
-*Purpose: Enterprise-grade .NET 10 (LTS) APIs with C# 14, strong typing, DI, and mature tooling, ideal for large teams and Azure ecosystems*
+_Purpose: Enterprise-grade .NET 10 (LTS) APIs with C# 14, strong typing, DI, and mature tooling, ideal for large teams and Azure ecosystems_
 
 ---
 
 # When to Use
 
 Use this template when building:
+
 - Enterprise APIs with complex business logic and domain modeling
 - Services targeting Azure or Windows Server ecosystems
 - Systems requiring strong type safety and compile-time guarantees
@@ -15,6 +16,7 @@ Use this template when building:
 - Microservices with mature DevOps pipelines (CI/CD, health checks, observability)
 
 **C#/ASP.NET Core Advantages:**
+
 - **Built-in DI**: First-class dependency injection container
 - **Performance**: Kestrel is among the fastest web servers; AOT compilation available
 - **Strong typing**: Compile-time safety with nullable reference types
@@ -29,6 +31,7 @@ Use this template when building:
 # 1. Project Overview
 
 **Tech Stack:**
+
 - [ ] .NET 10 LTS (C# 14; released Nov 2025, supported through Nov 2028)
 - [ ] ASP.NET Core 10 (Minimal API or Controller-based, built-in validation, OpenAPI 3.1)
 - [ ] Entity Framework Core 10 (LeftJoin, named query filters, simplified ExecuteUpdate)
@@ -42,6 +45,7 @@ Use this template when building:
 **Project Name:** `{{project_name}}`
 
 **Team:**
+
 - Backend: {{team_size}} .NET developers
 - DevOps: {{devops_team_size}} engineers
 
@@ -116,6 +120,7 @@ project-root/
 ```
 
 **Key Principles:**
+
 - Clean Architecture (Domain -> Application -> Infrastructure -> API)
 - Dependency Inversion: inner layers define interfaces, outer layers implement
 - Entity Framework Core with code-first migrations
@@ -128,13 +133,13 @@ project-root/
 
 > **Important**: Shared patterns go in the Application/Infrastructure layers. **Do not duplicate** across projects.
 
-| Utility | Extract To | Reference |
-|---------|------------|-----------|
-| Config (Options pattern) | `Api/` service registration | [config-validation.md](../../../software-clean-code-standard/utilities/config-validation.md) |
-| JWT (token generation/validation) | `Infrastructure/Services/` | [auth-utilities.md](../../../software-clean-code-standard/utilities/auth-utilities.md) |
-| Password hashing (BCrypt) | `Infrastructure/Services/` | [auth-utilities.md](../../../software-clean-code-standard/utilities/auth-utilities.md) |
-| Errors (ProblemDetails, middleware) | `Api/Middleware/` | [error-handling.md](../../../software-clean-code-standard/utilities/error-handling.md) |
-| Logging (Serilog setup) | `Api/Program.cs` | [logging-utilities.md](../../../software-clean-code-standard/utilities/logging-utilities.md) |
+| Utility                             | Extract To                  | Reference                                                                                    |
+| ----------------------------------- | --------------------------- | -------------------------------------------------------------------------------------------- |
+| Config (Options pattern)            | `Api/` service registration | [config-validation.md](../../../software-clean-code-standard/utilities/config-validation.md) |
+| JWT (token generation/validation)   | `Infrastructure/Services/`  | [auth-utilities.md](../../../software-clean-code-standard/utilities/auth-utilities.md)       |
+| Password hashing (BCrypt)           | `Infrastructure/Services/`  | [auth-utilities.md](../../../software-clean-code-standard/utilities/auth-utilities.md)       |
+| Errors (ProblemDetails, middleware) | `Api/Middleware/`           | [error-handling.md](../../../software-clean-code-standard/utilities/error-handling.md)       |
+| Logging (Serilog setup)             | `Api/Program.cs`            | [logging-utilities.md](../../../software-clean-code-standard/utilities/logging-utilities.md) |
 
 ---
 
@@ -830,6 +835,7 @@ docker-logs:
 # 10. Production Checklist
 
 ## Security
+
 - [ ] JWT secret is strong (min 32 chars) and stored in secret manager
 - [ ] Passkey / WebAuthn support via ASP.NET Core Identity (.NET 10)
 - [ ] HTTPS enforced via Kestrel or reverse proxy
@@ -843,6 +849,7 @@ docker-logs:
 - [ ] Configuration validated at startup (Options pattern + ValidateOnStart)
 
 ## Performance
+
 - [ ] DbContext pooling (`AddDbContextPool`)
 - [ ] HybridCache for read-heavy operations (L1 in-memory + L2 Redis, stampede protection)
 - [ ] Async/await for all I/O operations with CancellationToken propagation
@@ -854,6 +861,7 @@ docker-logs:
 - [ ] EF Core 10 LeftJoin instead of GroupJoin+SelectMany+DefaultIfEmpty
 
 ## Observability
+
 - [ ] Structured logging with Serilog (JSON format)
 - [ ] Correlation ID tracking (X-Correlation-Id header)
 - [ ] Error tracking (Sentry or Application Insights)
@@ -863,6 +871,7 @@ docker-logs:
 - [ ] OpenTelemetry tracing
 
 ## Deployment
+
 - [ ] Multi-stage Docker build with non-root user
 - [ ] Container security scanning
 - [ ] EF Core migrations automated (or idempotent SQL scripts)
@@ -872,6 +881,7 @@ docker-logs:
 - [ ] Blue-green or canary deployment
 
 ## Reliability
+
 - [ ] Database backups automated
 - [ ] Redis persistence configured
 - [ ] Retry logic with Microsoft.Extensions.Resilience + Polly v8 (`AddStandardResilienceHandler`)
@@ -888,6 +898,7 @@ docker-logs:
 **Congratulations!** You now have a production-grade C# 14 / .NET 10 backend with ASP.NET Core 10, Entity Framework Core 10, and PostgreSQL.
 
 **Next Steps:**
+
 1. Create solution: `dotnet new sln -n MyApp`
 2. Create projects and add to solution
 3. Copy `appsettings.json` and configure connection strings
@@ -897,6 +908,7 @@ docker-logs:
 7. Access OpenAPI docs at `https://localhost:5001/openapi/v1.json`
 
 **C# 14 / .NET 10 Best Practices:**
+
 - **Extension members (C# 14)**: Use `extension` blocks for extension properties and methods
 - **`field` keyword (C# 14)**: Semi-auto properties — custom accessor logic without backing field boilerplate
 - **Null-conditional assignment (C# 14)**: `obj?.Prop = value;` — cleaner null-safe code

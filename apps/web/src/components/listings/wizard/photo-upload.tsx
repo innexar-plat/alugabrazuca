@@ -3,7 +3,14 @@
 import { useState, useCallback, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { api } from "@/lib/api";
-import { Upload, X, Star, GripVertical, ImagePlus, AlertCircle } from "lucide-react";
+import {
+  Upload,
+  X,
+  Star,
+  GripVertical,
+  ImagePlus,
+  AlertCircle,
+} from "lucide-react";
 
 export interface UploadedPhoto {
   id: string;
@@ -19,7 +26,9 @@ export interface UploadedPhoto {
 interface PhotoUploadProps {
   photos: UploadedPhoto[];
   coverIndex: number;
-  onChange: (photos: UploadedPhoto[] | ((prev: UploadedPhoto[]) => UploadedPhoto[])) => void;
+  onChange: (
+    photos: UploadedPhoto[] | ((prev: UploadedPhoto[]) => UploadedPhoto[]),
+  ) => void;
   onCoverChange: (index: number) => void;
   maxPhotos?: number;
   minPhotos?: number;
@@ -68,10 +77,11 @@ export function PhotoUpload({
       formData.append("file", file);
 
       try {
-        const data = await api.upload<{ url: string; thumbnailUrl: string; filename: string }>(
-          "/listings/upload",
-          formData,
-        );
+        const data = await api.upload<{
+          url: string;
+          thumbnailUrl: string;
+          filename: string;
+        }>("/listings/upload", formData);
 
         return {
           id: crypto.randomUUID(),
@@ -122,7 +132,9 @@ export function PhotoUpload({
         const newPhotos = [...prev];
         results.forEach((result, i) => {
           if (!result) return;
-          const placeholderIndex = prev.findIndex((p) => p.id === placeholders[i].id);
+          const placeholderIndex = prev.findIndex(
+            (p) => p.id === placeholders[i].id,
+          );
           if (placeholderIndex !== -1) {
             newPhotos[placeholderIndex] = result;
           }
@@ -187,7 +199,8 @@ export function PhotoUpload({
     setDragIndex(null);
   };
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
+  const apiUrl =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
   const baseUrl = apiUrl.replace("/api/v1", "");
 
   return (
@@ -210,7 +223,9 @@ export function PhotoUpload({
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 mb-3">
           <Upload className="h-6 w-6 text-primary" />
         </div>
-        <p className="text-sm font-medium text-foreground mb-1">{t("dragDrop")}</p>
+        <p className="text-sm font-medium text-foreground mb-1">
+          {t("dragDrop")}
+        </p>
         <p className="text-xs text-muted-foreground">{t("formats")}</p>
         <input
           ref={fileInputRef}
@@ -265,7 +280,9 @@ export function PhotoUpload({
               ) : photo.error ? (
                 <div className="flex h-full flex-col items-center justify-center bg-destructive/5 p-2 text-center">
                   <AlertCircle className="h-5 w-5 text-destructive mb-1" />
-                  <p className="text-[10px] text-destructive leading-tight">{photo.error}</p>
+                  <p className="text-[10px] text-destructive leading-tight">
+                    {photo.error}
+                  </p>
                   <p className="text-[10px] text-muted-foreground mt-0.5 truncate w-full">
                     {photo.filename}
                   </p>

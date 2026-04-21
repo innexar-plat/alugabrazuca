@@ -5,24 +5,28 @@ Use this template for catching unintended visual changes in UI components, pages
 ## Framework Selection
 
 **Playwright Visual Comparisons** - Best for:
+
 - Full-page screenshots across browsers
 - Component screenshot testing
 - Built-in pixel-diff comparison
 - CI/CD integration out of the box
 
 **Chromatic (Storybook)** - Best for:
+
 - Design system visual testing
 - Component library regression
 - Automated visual review workflow
 - Cloud-based baseline management
 
 **Percy (BrowserStack)** - Best for:
+
 - Cross-browser visual testing
 - Responsive design validation
 - Integration with existing E2E tests
 - Advanced diff algorithms
 
 **BackstopJS** - Best for:
+
 - Lightweight visual regression
 - JSON configuration
 - Headless browser testing
@@ -34,147 +38,156 @@ Use this template for catching unintended visual changes in UI components, pages
 
 ```typescript
 // components/Button.visual.test.ts
-import { test, expect } from '@playwright/test'
+import { test, expect } from "@playwright/test";
 
-test.describe('Button Visual Tests', () => {
-  test('default button renders correctly', async ({ page }) => {
-    await page.goto('/components/button')
+test.describe("Button Visual Tests", () => {
+  test("default button renders correctly", async ({ page }) => {
+    await page.goto("/components/button");
 
     // Take screenshot of specific element
-    const button = page.locator('[data-testid="default-button"]')
-    await expect(button).toHaveScreenshot('button-default.png')
-  })
+    const button = page.locator('[data-testid="default-button"]');
+    await expect(button).toHaveScreenshot("button-default.png");
+  });
 
-  test('button states', async ({ page }) => {
-    await page.goto('/components/button')
+  test("button states", async ({ page }) => {
+    await page.goto("/components/button");
 
     // Hover state
-    const button = page.locator('[data-testid="default-button"]')
-    await button.hover()
-    await expect(button).toHaveScreenshot('button-hover.png')
+    const button = page.locator('[data-testid="default-button"]');
+    await button.hover();
+    await expect(button).toHaveScreenshot("button-hover.png");
 
     // Focus state
-    await button.focus()
-    await expect(button).toHaveScreenshot('button-focus.png')
+    await button.focus();
+    await expect(button).toHaveScreenshot("button-focus.png");
 
     // Disabled state
-    const disabledButton = page.locator('[data-testid="disabled-button"]')
-    await expect(disabledButton).toHaveScreenshot('button-disabled.png')
-  })
+    const disabledButton = page.locator('[data-testid="disabled-button"]');
+    await expect(disabledButton).toHaveScreenshot("button-disabled.png");
+  });
 
-  test('button variants', async ({ page }) => {
-    await page.goto('/components/button')
+  test("button variants", async ({ page }) => {
+    await page.goto("/components/button");
 
-    const variants = ['primary', 'secondary', 'outline', 'ghost', 'destructive']
+    const variants = [
+      "primary",
+      "secondary",
+      "outline",
+      "ghost",
+      "destructive",
+    ];
 
     for (const variant of variants) {
-      const button = page.locator(`[data-testid="button-${variant}"]`)
-      await expect(button).toHaveScreenshot(`button-${variant}.png`)
+      const button = page.locator(`[data-testid="button-${variant}"]`);
+      await expect(button).toHaveScreenshot(`button-${variant}.png`);
     }
-  })
+  });
 
-  test('button sizes', async ({ page }) => {
-    await page.goto('/components/button')
+  test("button sizes", async ({ page }) => {
+    await page.goto("/components/button");
 
-    const sizes = ['sm', 'md', 'lg']
+    const sizes = ["sm", "md", "lg"];
 
     for (const size of sizes) {
-      const button = page.locator(`[data-testid="button-${size}"]`)
-      await expect(button).toHaveScreenshot(`button-size-${size}.png`)
+      const button = page.locator(`[data-testid="button-${size}"]`);
+      await expect(button).toHaveScreenshot(`button-size-${size}.png`);
     }
-  })
-})
+  });
+});
 ```
 
 ### Full Page Screenshots
 
 ```typescript
 // pages/Dashboard.visual.test.ts
-import { test, expect } from '@playwright/test'
+import { test, expect } from "@playwright/test";
 
-test.describe('Dashboard Visual Tests', () => {
+test.describe("Dashboard Visual Tests", () => {
   test.beforeEach(async ({ page }) => {
     // Setup: Login and navigate
-    await page.goto('/login')
-    await page.fill('[name="email"]', 'test@example.com')
-    await page.fill('[name="password"]', 'password')
-    await page.click('button[type="submit"]')
-    await page.waitForURL('/dashboard')
-  })
+    await page.goto("/login");
+    await page.fill('[name="email"]', "test@example.com");
+    await page.fill('[name="password"]', "password");
+    await page.click('button[type="submit"]');
+    await page.waitForURL("/dashboard");
+  });
 
-  test('dashboard initial state', async ({ page }) => {
+  test("dashboard initial state", async ({ page }) => {
     // Wait for dynamic content to load
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState("networkidle");
 
     // Take full page screenshot
-    await expect(page).toHaveScreenshot('dashboard-initial.png', {
+    await expect(page).toHaveScreenshot("dashboard-initial.png", {
       fullPage: true,
-      animations: 'disabled' // Disable animations for consistent screenshots
-    })
-  })
+      animations: "disabled", // Disable animations for consistent screenshots
+    });
+  });
 
-  test('dashboard with filters applied', async ({ page }) => {
+  test("dashboard with filters applied", async ({ page }) => {
     // Apply filters
-    await page.click('[data-testid="filter-button"]')
-    await page.click('[data-testid="filter-last-30-days"]')
-    await page.click('[data-testid="apply-filters"]')
+    await page.click('[data-testid="filter-button"]');
+    await page.click('[data-testid="filter-last-30-days"]');
+    await page.click('[data-testid="apply-filters"]');
 
     // Wait for filtered data
-    await page.waitForResponse(resp => resp.url().includes('/api/analytics'))
-    await page.waitForLoadState('networkidle')
+    await page.waitForResponse((resp) => resp.url().includes("/api/analytics"));
+    await page.waitForLoadState("networkidle");
 
-    await expect(page).toHaveScreenshot('dashboard-filtered.png', {
-      fullPage: true
-    })
-  })
+    await expect(page).toHaveScreenshot("dashboard-filtered.png", {
+      fullPage: true,
+    });
+  });
 
-  test('dashboard responsive layouts', async ({ page }) => {
+  test("dashboard responsive layouts", async ({ page }) => {
     const viewports = [
-      { name: 'mobile', width: 375, height: 667 },
-      { name: 'tablet', width: 768, height: 1024 },
-      { name: 'desktop', width: 1920, height: 1080 }
-    ]
+      { name: "mobile", width: 375, height: 667 },
+      { name: "tablet", width: 768, height: 1024 },
+      { name: "desktop", width: 1920, height: 1080 },
+    ];
 
     for (const viewport of viewports) {
-      await page.setViewportSize({ width: viewport.width, height: viewport.height })
-      await page.waitForLoadState('networkidle')
+      await page.setViewportSize({
+        width: viewport.width,
+        height: viewport.height,
+      });
+      await page.waitForLoadState("networkidle");
 
       await expect(page).toHaveScreenshot(`dashboard-${viewport.name}.png`, {
-        fullPage: true
-      })
+        fullPage: true,
+      });
     }
-  })
-})
+  });
+});
 ```
 
 ### Cross-Browser Visual Testing
 
 ```typescript
 // playwright.config.ts
-import { defineConfig, devices } from '@playwright/test'
+import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] }
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
     },
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] }
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"] },
     },
     {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] }
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
     },
     {
-      name: 'mobile-chrome',
-      use: { ...devices['Pixel 5'] }
+      name: "mobile-chrome",
+      use: { ...devices["Pixel 5"] },
     },
     {
-      name: 'mobile-safari',
-      use: { ...devices['iPhone 13'] }
-    }
+      name: "mobile-safari",
+      use: { ...devices["iPhone 13"] },
+    },
   ],
 
   // Visual comparison settings
@@ -182,66 +195,70 @@ export default defineConfig({
     toHaveScreenshot: {
       maxDiffPixels: 100, // Allow up to 100 pixels difference
       threshold: 0.2, // 20% threshold for pixel color difference
-      animations: 'disabled'
-    }
-  }
-})
+      animations: "disabled",
+    },
+  },
+});
 ```
 
 ### Advanced Visual Testing Techniques
 
 ```typescript
 // components/Chart.visual.test.ts
-import { test, expect } from '@playwright/test'
+import { test, expect } from "@playwright/test";
 
-test.describe('Chart Visual Tests', () => {
-  test('chart with stable mock data', async ({ page }) => {
+test.describe("Chart Visual Tests", () => {
+  test("chart with stable mock data", async ({ page }) => {
     // Mock API to return consistent data
-    await page.route('**/api/chart-data', route => {
+    await page.route("**/api/chart-data", (route) => {
       route.fulfill({
         status: 200,
         body: JSON.stringify({
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-          data: [10, 20, 15, 25, 30]
-        })
-      })
-    })
+          labels: ["Jan", "Feb", "Mar", "Apr", "May"],
+          data: [10, 20, 15, 25, 30],
+        }),
+      });
+    });
 
-    await page.goto('/dashboard/charts')
+    await page.goto("/dashboard/charts");
 
     // Wait for chart to render
-    await page.waitForSelector('canvas.chart-canvas')
+    await page.waitForSelector("canvas.chart-canvas");
 
     // Take screenshot with mask for dynamic elements
-    await expect(page).toHaveScreenshot('chart-stable.png', {
-      mask: [page.locator('[data-testid="timestamp"]')] // Hide timestamp
-    })
-  })
+    await expect(page).toHaveScreenshot("chart-stable.png", {
+      mask: [page.locator('[data-testid="timestamp"]')], // Hide timestamp
+    });
+  });
 
-  test('chart with animations complete', async ({ page }) => {
-    await page.goto('/dashboard/charts')
+  test("chart with animations complete", async ({ page }) => {
+    await page.goto("/dashboard/charts");
 
     // Wait for animations to complete
-    await page.waitForTimeout(1000) // Wait for chart animation
+    await page.waitForTimeout(1000); // Wait for chart animation
 
-    await expect(page.locator('.chart-container')).toHaveScreenshot('chart-animated.png')
-  })
+    await expect(page.locator(".chart-container")).toHaveScreenshot(
+      "chart-animated.png",
+    );
+  });
 
-  test('chart theme variations', async ({ page }) => {
-    const themes = ['light', 'dark', 'high-contrast']
+  test("chart theme variations", async ({ page }) => {
+    const themes = ["light", "dark", "high-contrast"];
 
     for (const theme of themes) {
-      await page.goto('/dashboard/charts')
+      await page.goto("/dashboard/charts");
       await page.evaluate((t) => {
-        document.documentElement.setAttribute('data-theme', t)
-      }, theme)
+        document.documentElement.setAttribute("data-theme", t);
+      }, theme);
 
-      await page.waitForTimeout(500) // Wait for theme transition
+      await page.waitForTimeout(500); // Wait for theme transition
 
-      await expect(page.locator('.chart-container')).toHaveScreenshot(`chart-${theme}.png`)
+      await expect(page.locator(".chart-container")).toHaveScreenshot(
+        `chart-${theme}.png`,
+      );
     }
-  })
-})
+  });
+});
 ```
 
 ## Chromatic Visual Testing (Storybook)
@@ -321,16 +338,13 @@ export const DarkMode: Story = {
 ```javascript
 // .storybook/main.js
 module.exports = {
-  stories: ['../src/**/*.stories.@(ts|tsx)'],
-  addons: [
-    '@storybook/addon-essentials',
-    '@storybook/addon-interactions'
-  ],
+  stories: ["../src/**/*.stories.@(ts|tsx)"],
+  addons: ["@storybook/addon-essentials", "@storybook/addon-interactions"],
   framework: {
-    name: '@storybook/react-vite',
-    options: {}
-  }
-}
+    name: "@storybook/react-vite",
+    options: {},
+  },
+};
 ```
 
 ```javascript
@@ -352,53 +366,55 @@ module.exports = {
 
 ```typescript
 // tests/visual/HomePage.percy.test.ts
-import { test } from '@playwright/test'
-import percySnapshot from '@percy/playwright'
+import { test } from "@playwright/test";
+import percySnapshot from "@percy/playwright";
 
-test.describe('Home Page Visual Tests', () => {
-  test('homepage renders correctly', async ({ page }) => {
-    await page.goto('/')
-    await page.waitForLoadState('networkidle')
+test.describe("Home Page Visual Tests", () => {
+  test("homepage renders correctly", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
 
     // Take Percy snapshot
-    await percySnapshot(page, 'Homepage - Desktop')
-  })
+    await percySnapshot(page, "Homepage - Desktop");
+  });
 
-  test('homepage responsive', async ({ page }) => {
-    await page.goto('/')
-    await page.waitForLoadState('networkidle')
+  test("homepage responsive", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
 
     // Percy automatically tests configured breakpoints
-    await percySnapshot(page, 'Homepage - Responsive', {
-      widths: [375, 768, 1280, 1920]
-    })
-  })
+    await percySnapshot(page, "Homepage - Responsive", {
+      widths: [375, 768, 1280, 1920],
+    });
+  });
 
-  test('homepage with user logged in', async ({ page, context }) => {
+  test("homepage with user logged in", async ({ page, context }) => {
     // Set auth cookie
-    await context.addCookies([{
-      name: 'session',
-      value: 'test-session-token',
-      domain: 'localhost',
-      path: '/'
-    }])
+    await context.addCookies([
+      {
+        name: "session",
+        value: "test-session-token",
+        domain: "localhost",
+        path: "/",
+      },
+    ]);
 
-    await page.goto('/')
-    await page.waitForLoadState('networkidle')
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
 
-    await percySnapshot(page, 'Homepage - Logged In')
-  })
+    await percySnapshot(page, "Homepage - Logged In");
+  });
 
-  test('homepage dark mode', async ({ page }) => {
-    await page.goto('/')
+  test("homepage dark mode", async ({ page }) => {
+    await page.goto("/");
     await page.evaluate(() => {
-      document.documentElement.setAttribute('data-theme', 'dark')
-    })
-    await page.waitForTimeout(300) // Theme transition
+      document.documentElement.setAttribute("data-theme", "dark");
+    });
+    await page.waitForTimeout(300); // Theme transition
 
-    await percySnapshot(page, 'Homepage - Dark Mode')
-  })
-})
+    await percySnapshot(page, "Homepage - Dark Mode");
+  });
+});
 ```
 
 ### Percy Configuration
@@ -408,13 +424,13 @@ test.describe('Home Page Visual Tests', () => {
 version: 2
 static:
   cleanUrls: true
-  include: '**/*.{html,htm}'
-  exclude: '**/node_modules/**'
+  include: "**/*.{html,htm}"
+  exclude: "**/node_modules/**"
 
 snapshot:
   widths:
-    - 375  # Mobile
-    - 768  # Tablet
+    - 375 # Mobile
+    - 768 # Tablet
     - 1280 # Desktop
     - 1920 # Large Desktop
 
@@ -436,7 +452,7 @@ snapshot:
 discovery:
   allowed-hostnames:
     - localhost
-    - '*.yourdomain.com'
+    - "*.yourdomain.com"
 
   network-idle-timeout: 750
 ```
@@ -448,80 +464,80 @@ discovery:
 ```javascript
 // backstop.config.js
 module.exports = {
-  id: 'visual_regression_test',
+  id: "visual_regression_test",
   viewports: [
     {
-      label: 'phone',
+      label: "phone",
       width: 375,
-      height: 667
+      height: 667,
     },
     {
-      label: 'tablet',
+      label: "tablet",
       width: 768,
-      height: 1024
+      height: 1024,
     },
     {
-      label: 'desktop',
+      label: "desktop",
       width: 1920,
-      height: 1080
-    }
+      height: 1080,
+    },
   ],
 
   scenarios: [
     {
-      label: 'Homepage',
-      url: 'http://localhost:3000',
+      label: "Homepage",
+      url: "http://localhost:3000",
       delay: 1000,
       misMatchThreshold: 0.1,
-      requireSameDimensions: true
+      requireSameDimensions: true,
     },
     {
-      label: 'Button Component',
-      url: 'http://localhost:3000/components/button',
+      label: "Button Component",
+      url: "http://localhost:3000/components/button",
       selectors: ['[data-testid="button-showcase"]'],
       delay: 500,
       hoverSelector: '[data-testid="button-primary"]',
-      clickSelector: '[data-testid="button-toggle"]'
+      clickSelector: '[data-testid="button-toggle"]',
     },
     {
-      label: 'Dashboard - Logged In',
-      url: 'http://localhost:3000/dashboard',
-      cookiePath: 'backstop_data/cookies.json',
+      label: "Dashboard - Logged In",
+      url: "http://localhost:3000/dashboard",
+      cookiePath: "backstop_data/cookies.json",
       delay: 2000,
       removeSelectors: [
         '[data-testid="timestamp"]', // Hide dynamic timestamp
-        '[data-testid="live-data"]'   // Hide live updating data
-      ]
+        '[data-testid="live-data"]', // Hide live updating data
+      ],
     },
     {
-      label: 'Form Validation',
-      url: 'http://localhost:3000/contact',
-      onBeforeScript: 'puppet/onBefore.js',
-      onReadyScript: 'puppet/fillForm.js',
-      delay: 500
-    }
+      label: "Form Validation",
+      url: "http://localhost:3000/contact",
+      onBeforeScript: "puppet/onBefore.js",
+      onReadyScript: "puppet/fillForm.js",
+      delay: 500,
+    },
   ],
 
   paths: {
-    bitmaps_reference: 'backstop_data/bitmaps_reference',
-    bitmaps_test: 'backstop_data/bitmaps_test',
-    engine_scripts: 'backstop_data/engine_scripts',
-    html_report: 'backstop_data/html_report',
-    ci_report: 'backstop_data/ci_report'
+    bitmaps_reference: "backstop_data/bitmaps_reference",
+    bitmaps_test: "backstop_data/bitmaps_test",
+    engine_scripts: "backstop_data/engine_scripts",
+    html_report: "backstop_data/html_report",
+    ci_report: "backstop_data/ci_report",
   },
 
-  report: ['browser', 'CI'],
-  engine: 'puppeteer',
+  report: ["browser", "CI"],
+  engine: "puppeteer",
   engineOptions: {
-    args: ['--no-sandbox']
+    args: ["--no-sandbox"],
   },
 
   asyncCaptureLimit: 5,
   asyncCompareLimit: 50,
 
   debug: false,
-  debugWindow: false
-}
+  debugWindow: false,
+};
 ```
 
 ### BackstopJS Custom Scripts
@@ -529,37 +545,37 @@ module.exports = {
 ```javascript
 // backstop_data/engine_scripts/puppet/fillForm.js
 module.exports = async (page, scenario, viewport) => {
-  console.log('Filling form for scenario:', scenario.label)
+  console.log("Filling form for scenario:", scenario.label);
 
   // Fill form fields
-  await page.type('[name="email"]', 'test@example.com')
-  await page.type('[name="name"]', 'Test User')
-  await page.type('[name="message"]', 'This is a test message')
+  await page.type('[name="email"]', "test@example.com");
+  await page.type('[name="name"]', "Test User");
+  await page.type('[name="message"]', "This is a test message");
 
   // Trigger validation by clicking submit
-  await page.click('button[type="submit"]')
+  await page.click('button[type="submit"]');
 
   // Wait for validation messages
-  await page.waitForSelector('.validation-message', { timeout: 1000 })
-}
+  await page.waitForSelector(".validation-message", { timeout: 1000 });
+};
 ```
 
 ```javascript
 // backstop_data/engine_scripts/puppet/onBefore.js
 module.exports = async (page, scenario, viewport) => {
-  console.log('Running onBefore for:', scenario.label)
+  console.log("Running onBefore for:", scenario.label);
 
   // Set cookies for authenticated scenarios
   if (scenario.cookiePath) {
-    const cookies = require(scenario.cookiePath)
-    await page.setCookie(...cookies)
+    const cookies = require(scenario.cookiePath);
+    await page.setCookie(...cookies);
   }
 
   // Hide dynamic elements
   await page.evaluateOnNewDocument(() => {
-    window.localStorage.setItem('disable-animations', 'true')
-  })
-}
+    window.localStorage.setItem("disable-animations", "true");
+  });
+};
 ```
 
 ## CI/CD Integration
@@ -585,7 +601,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -641,7 +657,7 @@ jobs:
         uses: chromaui/action@v1
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-          buildScriptName: 'build-storybook'
+          buildScriptName: "build-storybook"
           exitZeroOnChanges: true
           onlyChanged: true # Only test changed stories
 ```
@@ -665,71 +681,79 @@ jobs:
 ## Common Pitfalls
 
 [FAIL] **Not waiting for content to load**:
+
 ```typescript
 // Bad - Screenshot taken before content loads
-await page.goto('/dashboard')
-await expect(page).toHaveScreenshot()
+await page.goto("/dashboard");
+await expect(page).toHaveScreenshot();
 
 // Good - Wait for network idle
-await page.goto('/dashboard')
-await page.waitForLoadState('networkidle')
-await expect(page).toHaveScreenshot()
+await page.goto("/dashboard");
+await page.waitForLoadState("networkidle");
+await expect(page).toHaveScreenshot();
 ```
 
 [FAIL] **Testing with animations enabled**:
+
 ```typescript
 // Bad - Animations cause flaky tests
-await expect(page).toHaveScreenshot()
+await expect(page).toHaveScreenshot();
 
 // Good - Disable animations
 await expect(page).toHaveScreenshot({
-  animations: 'disabled'
-})
+  animations: "disabled",
+});
 ```
 
 [FAIL] **Not handling dynamic content**:
+
 ```typescript
 // Bad - Timestamp causes every test to fail
-await expect(page).toHaveScreenshot('dashboard.png')
+await expect(page).toHaveScreenshot("dashboard.png");
 
 // Good - Mask dynamic elements
-await expect(page).toHaveScreenshot('dashboard.png', {
-  mask: [page.locator('[data-testid="timestamp"]')]
-})
+await expect(page).toHaveScreenshot("dashboard.png", {
+  mask: [page.locator('[data-testid="timestamp"]')],
+});
 ```
 
 [FAIL] **Overly strict thresholds**:
+
 ```typescript
 // Bad - Fails on minor anti-aliasing differences
 await expect(page).toHaveScreenshot({
-  maxDiffPixels: 0
-})
+  maxDiffPixels: 0,
+});
 
 // Good - Allow minor pixel differences
 await expect(page).toHaveScreenshot({
   maxDiffPixels: 100,
-  threshold: 0.2
-})
+  threshold: 0.2,
+});
 ```
 
 ## Testing Workflow
 
 1. **Initial baseline**: Run tests and accept all screenshots as baseline
+
 ```bash
 npm run test:visual -- --update-snapshots
 ```
 
 2. **Development**: Make UI changes and run tests
+
 ```bash
 npm run test:visual
 ```
 
 3. **Review diffs**: Check diff images for unintended changes
+
 ```bash
 open test-results/*-diff.png
 ```
 
 4. **Update baselines**: Accept intentional changes
+
 ```bash
 npm run test:visual -- --update-snapshots
 ```

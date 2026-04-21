@@ -27,6 +27,7 @@ Execution-ready patterns and checklists for common backend concerns.
 **Use when:** Building production-grade backend services.
 
 **Structure:**
+
 ```
 src/
 |-- api/
@@ -43,6 +44,7 @@ src/
 ```
 
 **Checklist:**
+
 - [ ] Separation of concerns (routes/controllers/services/repos)
 - [ ] Middleware for cross-cutting concerns
 - [ ] Environment-based configuration
@@ -57,6 +59,7 @@ src/
 **Use when:** Designing resource-based APIs.
 
 **Principles:**
+
 - Use HTTP methods correctly (GET, POST, PUT, PATCH, DELETE)
 - Resource-based URLs: `/users/:id` not `/getUser?id=1`
 - Use proper status codes (200, 201, 400, 401, 404, 500)
@@ -65,6 +68,7 @@ src/
 - Versioning strategy (URL, header, or accept header)
 
 **Example:**
+
 ```
 GET /api/v1/users # List users
 POST /api/v1/users # Create user
@@ -77,6 +81,7 @@ GET /api/v1/users/:id/orders # Nested resources
 ```
 
 **Checklist:**
+
 - [ ] Consistent naming (plural nouns)
 - [ ] Idempotent operations
 - [ ] Proper HTTP methods
@@ -91,6 +96,7 @@ GET /api/v1/users/:id/orders # Nested resources
 **Use when:** Clients need flexible data fetching, avoiding over-fetching/under-fetching.
 
 **Why GraphQL in 2025:**
+
 - Single endpoint for all queries/mutations
 - Strongly typed schema with automatic documentation
 - Client-driven data requirements (request exactly what you need)
@@ -98,6 +104,7 @@ GET /api/v1/users/:id/orders # Nested resources
 - Built-in introspection and tooling support
 
 **Quick Example - GraphQL Schema:**
+
 ```graphql
 type User {
   id: ID!
@@ -126,6 +133,7 @@ type Mutation {
 ```
 
 **Quick Example - GraphQL Resolver (Node.js + Apollo Server):**
+
 ```typescript
 const resolvers = {
   Query: {
@@ -150,6 +158,7 @@ const resolvers = {
 ```
 
 **GraphQL Best Practices (2025):**
+
 - Use **persisted queries** for caching and security
 - Implement **DataLoader** to prevent N+1 query problems
 - Apply **depth limiting** to prevent malicious deeply nested queries
@@ -158,6 +167,7 @@ const resolvers = {
 - Enable **field-level authorization** for fine-grained access control
 
 **Checklist:**
+
 - [ ] Schema-first or code-first approach chosen
 - [ ] Resolvers handle errors gracefully
 - [ ] DataLoader for batching and caching
@@ -178,30 +188,32 @@ For comprehensive authentication patterns including JWT, OAuth2, sessions, RBAC,
 **Reference:** `references/backend-best-practices.md` (Authentication section)
 
 **Quick Example - JWT Authentication:**
+
 ```typescript
 // Generate token
 const token = jwt.sign(
- { userId: user.id, role: user.role },
- process.env.JWT_SECRET,
- { expiresIn: '7d' }
+  { userId: user.id, role: user.role },
+  process.env.JWT_SECRET,
+  { expiresIn: "7d" },
 );
 
 // Verify middleware
 const authenticate = async (req, res, next) => {
- const token = req.headers.authorization?.replace('Bearer ', '');
- if (!token) return next(new AppError(401, 'Unauthorized'));
+  const token = req.headers.authorization?.replace("Bearer ", "");
+  if (!token) return next(new AppError(401, "Unauthorized"));
 
- try {
- const payload = jwt.verify(token, process.env.JWT_SECRET);
- req.user = await userService.findById(payload.userId);
- next();
- } catch (error) {
- next(new AppError(401, 'Invalid token'));
- }
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await userService.findById(payload.userId);
+    next();
+  } catch (error) {
+    next(new AppError(401, "Invalid token"));
+  }
 };
 ```
 
 **Checklist:**
+
 - [ ] Secure password hashing (bcrypt, argon2)
 - [ ] Token expiration and refresh mechanism
 - [ ] Role-based access control (RBAC)
@@ -219,46 +231,49 @@ For comprehensive error handling patterns including custom error classes, global
 **Reference:** `references/backend-best-practices.md` (Error Handling section)
 
 **Quick Example - Custom Error Class:**
+
 ```typescript
 class AppError extends Error {
- constructor(
- public statusCode: number,
- public message: string,
- public isOperational = true
- ) {
- super(message);
- Error.captureStackTrace(this, this.constructor);
- }
+  constructor(
+    public statusCode: number,
+    public message: string,
+    public isOperational = true,
+  ) {
+    super(message);
+    Error.captureStackTrace(this, this.constructor);
+  }
 }
 
 // Usage
-throw new AppError(404, 'User not found');
-throw new AppError(400, 'Invalid email format');
+throw new AppError(404, "User not found");
+throw new AppError(400, "Invalid email format");
 ```
 
 **Quick Example - Request Validation (Zod):**
+
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 const createUserSchema = z.object({
- email: z.string().email(),
- password: z.string().min(8),
- name: z.string().min(2).max(50),
- role: z.enum(['user', 'admin']).optional(),
+  email: z.string().email(),
+  password: z.string().min(8),
+  name: z.string().min(2).max(50),
+  role: z.enum(["user", "admin"]).optional(),
 });
 
 // Middleware
 const validate = (schema) => (req, res, next) => {
- try {
- req.body = schema.parse(req.body);
- next();
- } catch (error) {
- next(new AppError(400, error.message));
- }
+  try {
+    req.body = schema.parse(req.body);
+    next();
+  } catch (error) {
+    next(new AppError(400, error.message));
+  }
 };
 ```
 
 **Checklist:**
+
 - [ ] Custom error classes
 - [ ] Global error handler
 - [ ] Validate at API boundary
@@ -276,6 +291,7 @@ For comprehensive database patterns including repository pattern, schema design,
 **Reference:** `references/backend-best-practices.md` (Database Patterns section)
 
 **Prisma Best Practices:**
+
 - **Prisma Accelerate** for serverless/edge deployments (HTTP-based connection pooling, global caching, eliminates cold start penalties)
 - **Singleton pattern with globalThis** in Next.js to prevent connection pool exhaustion from hot reloading
 - **Schema-first approach** (define models in `schema.prisma`, auto-generate type-safe client)
@@ -283,29 +299,31 @@ For comprehensive database patterns including repository pattern, schema design,
 - **Production migrations**: Always use `prisma migrate deploy` in production, never `prisma migrate dev`
 
 **Quick Example - Repository Pattern:**
+
 ```typescript
 interface UserRepository {
- findById(id: string): Promise<User | null>;
- findByEmail(email: string): Promise<User | null>;
- create(data: CreateUserInput): Promise<User>;
- update(id: string, data: UpdateUserInput): Promise<User>;
- delete(id: string): Promise<void>;
+  findById(id: string): Promise<User | null>;
+  findByEmail(email: string): Promise<User | null>;
+  create(data: CreateUserInput): Promise<User>;
+  update(id: string, data: UpdateUserInput): Promise<User>;
+  delete(id: string): Promise<void>;
 }
 
 class PrismaUserRepository implements UserRepository {
- constructor(private prisma: PrismaClient) {}
+  constructor(private prisma: PrismaClient) {}
 
- async findById(id: string) {
- return this.prisma.user.findUnique({ where: { id } });
- }
+  async findById(id: string) {
+    return this.prisma.user.findUnique({ where: { id } });
+  }
 
- async create(data: CreateUserInput) {
- return this.prisma.user.create({ data });
- }
+  async create(data: CreateUserInput) {
+    return this.prisma.user.create({ data });
+  }
 }
 ```
 
 **Checklist:**
+
 - [ ] Repository pattern for data access
 - [ ] Transaction support
 - [ ] Query optimization (select only needed fields)
@@ -322,8 +340,9 @@ class PrismaUserRepository implements UserRepository {
 Prevents cascading failures by stopping requests to a failing service after a threshold is reached.
 
 **Quick Example - Circuit Breaker (Node.js):**
+
 ```typescript
-import CircuitBreaker from 'opossum';
+import CircuitBreaker from "opossum";
 
 // Wrap external service call
 const options = {
@@ -337,25 +356,26 @@ const breaker = new CircuitBreaker(async (userId: string) => {
 }, options);
 
 // Circuit states: CLOSED (normal) -> OPEN (failing) -> HALF_OPEN (testing)
-breaker.on('open', () => logger.warn('Circuit breaker opened'));
-breaker.on('halfOpen', () => logger.info('Circuit breaker half-open, testing'));
-breaker.on('close', () => logger.info('Circuit breaker closed'));
+breaker.on("open", () => logger.warn("Circuit breaker opened"));
+breaker.on("halfOpen", () => logger.info("Circuit breaker half-open, testing"));
+breaker.on("close", () => logger.info("Circuit breaker closed"));
 
 // Use the breaker
 try {
   const user = await breaker.fire(userId);
 } catch (error) {
   // Fallback: return cached data or default response
-  return getCachedUser(userId) || { id: userId, name: 'Unknown' };
+  return getCachedUser(userId) || { id: userId, name: "Unknown" };
 }
 ```
 
 **Retry with Exponential Backoff:**
+
 ```typescript
 async function retryWithBackoff<T>(
   fn: () => Promise<T>,
   maxRetries = 3,
-  baseDelay = 1000
+  baseDelay = 1000,
 ): Promise<T> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -364,14 +384,15 @@ async function retryWithBackoff<T>(
       if (attempt === maxRetries) throw error;
 
       const delay = baseDelay * Math.pow(2, attempt); // Exponential backoff
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
-  throw new Error('Max retries exceeded');
+  throw new Error("Max retries exceeded");
 }
 ```
 
 **Microservices Best Practices (2025):**
+
 - Use **service mesh** (Istio, Linkerd) for traffic management and observability
 - Implement **health checks** (`/health`, `/ready`) for each service
 - Apply **distributed tracing** (OpenTelemetry, Jaeger) to debug cross-service issues
@@ -380,6 +401,7 @@ async function retryWithBackoff<T>(
 - Enable **graceful degradation** with circuit breakers and fallbacks
 
 **Checklist:**
+
 - [ ] Circuit breakers for external service calls
 - [ ] Retry logic with exponential backoff
 - [ ] Health check endpoints implemented
@@ -400,50 +422,53 @@ For comprehensive performance patterns including caching strategies (Redis, in-m
 **Reference:** `references/backend-best-practices.md` (Performance Patterns section)
 
 **Quick Example - Redis Caching:**
+
 ```typescript
 class CacheService {
- constructor(
- private redis: Redis,
- private defaultTTL = 300 // 5 minutes
- ) {}
+  constructor(
+    private redis: Redis,
+    private defaultTTL = 300, // 5 minutes
+  ) {}
 
- async get<T>(key: string): Promise<T | null> {
- const cached = await this.redis.get(key);
- return cached ? JSON.parse(cached) : null;
- }
+  async get<T>(key: string): Promise<T | null> {
+    const cached = await this.redis.get(key);
+    return cached ? JSON.parse(cached) : null;
+  }
 
- async set(key: string, value: any, ttl = this.defaultTTL) {
- await this.redis.setex(key, ttl, JSON.stringify(value));
- }
+  async set(key: string, value: any, ttl = this.defaultTTL) {
+    await this.redis.setex(key, ttl, JSON.stringify(value));
+  }
 
- async invalidate(pattern: string) {
- const keys = await this.redis.keys(pattern);
- if (keys.length) await this.redis.del(...keys);
- }
+  async invalidate(pattern: string) {
+    const keys = await this.redis.keys(pattern);
+    if (keys.length) await this.redis.del(...keys);
+  }
 }
 ```
 
 **Quick Example - Cursor-based Pagination:**
+
 ```typescript
 async function listUsers({ cursor, limit = 20 }: PaginationParams) {
- const users = await prisma.user.findMany({
- take: limit + 1,
- ...(cursor && { skip: 1, cursor: { id: cursor } }),
- orderBy: { createdAt: 'desc' },
- });
+  const users = await prisma.user.findMany({
+    take: limit + 1,
+    ...(cursor && { skip: 1, cursor: { id: cursor } }),
+    orderBy: { createdAt: "desc" },
+  });
 
- const hasMore = users.length > limit;
- const items = hasMore ? users.slice(0, -1) : users;
+  const hasMore = users.length > limit;
+  const items = hasMore ? users.slice(0, -1) : users;
 
- return {
- items,
- nextCursor: hasMore ? items[items.length - 1].id : null,
- hasMore,
- };
+  return {
+    items,
+    nextCursor: hasMore ? items[items.length - 1].id : null,
+    hasMore,
+  };
 }
 ```
 
 **Checklist:**
+
 - [ ] Cache invalidation strategy
 - [ ] TTL for all cached data
 - [ ] Cursor-based pagination for infinite scroll
@@ -461,6 +486,7 @@ For comprehensive testing patterns including unit testing, integration testing, 
 **Reference:** `references/backend-best-practices.md` (Testing section)
 
 **Test Pyramid:**
+
 ```
  E2E Tests (5%)
  ----------------
@@ -471,34 +497,36 @@ For comprehensive testing patterns including unit testing, integration testing, 
 ```
 
 **Quick Example - Unit Test:**
+
 ```typescript
-describe('UserService', () => {
- let userService: UserService;
- let mockRepo: jest.Mocked<UserRepository>;
+describe("UserService", () => {
+  let userService: UserService;
+  let mockRepo: jest.Mocked<UserRepository>;
 
- beforeEach(() => {
- mockRepo = {
- findById: jest.fn(),
- create: jest.fn(),
- };
- userService = new UserService(mockRepo);
- });
+  beforeEach(() => {
+    mockRepo = {
+      findById: jest.fn(),
+      create: jest.fn(),
+    };
+    userService = new UserService(mockRepo);
+  });
 
- it('should create user with hashed password', async () => {
- const input = { email: 'test@example.com', password: 'password123' };
- mockRepo.create.mockResolvedValue({ id: '1', ...input });
+  it("should create user with hashed password", async () => {
+    const input = { email: "test@example.com", password: "password123" };
+    mockRepo.create.mockResolvedValue({ id: "1", ...input });
 
- const result = await userService.createUser(input);
+    const result = await userService.createUser(input);
 
- expect(mockRepo.create).toHaveBeenCalledWith({
- email: input.email,
- password: expect.not.stringContaining('password123'),
- });
- });
+    expect(mockRepo.create).toHaveBeenCalledWith({
+      email: input.email,
+      password: expect.not.stringContaining("password123"),
+    });
+  });
 });
 ```
 
 **Checklist:**
+
 - [ ] 80%+ code coverage
 - [ ] Test happy paths and error cases
 - [ ] Mock external dependencies
@@ -516,22 +544,24 @@ For comprehensive observability patterns including structured logging (Pino/Wins
 **Reference:** `references/backend-best-practices.md` (Observability section)
 
 **Quick Example - Structured Logging:**
+
 ```typescript
-import pino from 'pino';
+import pino from "pino";
 
 const logger = pino({
- level: process.env.LOG_LEVEL || 'info',
- formatters: {
- level: (label) => ({ level: label }),
- },
+  level: process.env.LOG_LEVEL || "info",
+  formatters: {
+    level: (label) => ({ level: label }),
+  },
 });
 
 // Usage
-logger.info({ userId: user.id, action: 'login' }, 'User logged in');
-logger.error({ err, requestId }, 'Database query failed');
+logger.info({ userId: user.id, action: "login" }, "User logged in");
+logger.error({ err, requestId }, "Database query failed");
 ```
 
 **Checklist:**
+
 - [ ] Structured JSON logs
 - [ ] Correlation IDs for request tracing
 - [ ] Log levels: error, warn, info, debug
@@ -545,6 +575,7 @@ logger.error({ err, requestId }, 'Database query failed');
 **Use when:** Writing type-safe backend code.
 
 **Critical TypeScript Patterns:**
+
 - **Enable strict mode** in `tsconfig.json` (catches subtle bugs)
 - **Use `unknown` instead of `any`** for safer type handling
 - **Template literal types** for dynamic string-based types
@@ -554,32 +585,35 @@ logger.error({ err, requestId }, 'Database query failed');
 - **Composition over inheritance** for type definitions
 
 **Quick Example - Discriminated Unions:**
+
 ```typescript
 type ApiResponse<T> =
- | { status: 'success'; data: T }
- | { status: 'error'; error: string };
+  | { status: "success"; data: T }
+  | { status: "error"; error: string };
 
 function handleResponse(response: ApiResponse<User>) {
- if (response.status === 'success') {
- return response.data; // TypeScript knows data exists
- } else {
- throw new Error(response.error); // TypeScript knows error exists
- }
+  if (response.status === "success") {
+    return response.data; // TypeScript knows data exists
+  } else {
+    throw new Error(response.error); // TypeScript knows error exists
+  }
 }
 ```
 
 **Quick Example - satisfies Operator:**
+
 ```typescript
 const config = {
- database: 'postgres',
- port: 5432,
- ssl: true
+  database: "postgres",
+  port: 5432,
+  ssl: true,
 } satisfies Record<string, string | number | boolean>;
 
 // config.port is inferred as number, not string | number | boolean
 ```
 
 **Checklist:**
+
 - [ ] `strict: true` in tsconfig.json
 - [ ] Avoid `any`, prefer `unknown` or proper types
 - [ ] Use generics with extends constraints
@@ -594,6 +628,7 @@ const config = {
 **Use when:** Securing backend APIs with modern best practices.
 
 **IMPORTANT:** For comprehensive security patterns, see the **software-security-patterns** skill which covers:
+
 - OWASP Top 10 vulnerabilities and prevention
 - Authentication & Authorization (JWT, OAuth, MFA, RBAC, ABAC)
 - Input validation & sanitization (SQL injection, XSS, CSRF)
@@ -603,6 +638,7 @@ const config = {
 **Backend-Specific Security:** See `references/backend-best-practices.md` (Security section) for Node.js/Express-specific implementations.
 
 **Modern Security Enhancements:**
+
 - **Secret Managers**: Use AWS Secrets Manager, HashiCorp Vault, or Azure Key Vault instead of `.env` files in production
 - **Helmet.js**: Add secure HTTP headers to protect against XSS, clickjacking, MIME sniffing
 - **Rate Limiting**: Implement per-endpoint and per-user rate limits with Redis-backed stores
@@ -610,28 +646,32 @@ const config = {
 - **Dependency Scanning**: Automate with Snyk, npm audit, or GitHub Dependabot
 
 **Quick Example - Helmet.js:**
+
 ```typescript
-import helmet from 'helmet';
-import express from 'express';
+import helmet from "helmet";
+import express from "express";
 
 const app = express();
 
-app.use(helmet({
- contentSecurityPolicy: {
- directives: {
- defaultSrc: ["'self'"],
- styleSrc: ["'self'", "'unsafe-inline'"]
- }
- },
- hsts: {
- maxAge: 31536000,
- includeSubDomains: true,
- preload: true
- }
-}));
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+      },
+    },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+  }),
+);
 ```
 
 **Security Checklist:**
+
 - [ ] HTTPS only (enforce with HSTS headers)
 - [ ] Rate limiting (express-rate-limit with Redis backend)
 - [ ] CORS configuration (specific origins, no wildcards in production)
@@ -650,38 +690,38 @@ app.use(helmet({
 
 ## Database Relationship Matrix
 
-| Relationship | Prisma Syntax | Example |
-|--------------|---------------|---------|
-| One-to-One | `@relation` with `@unique` | User <-> Profile |
-| One-to-Many | `@relation` | User -> Posts |
-| Many-to-Many | Implicit or explicit join table | Posts <-> Tags |
+| Relationship | Prisma Syntax                   | Example          |
+| ------------ | ------------------------------- | ---------------- |
+| One-to-One   | `@relation` with `@unique`      | User <-> Profile |
+| One-to-Many  | `@relation`                     | User -> Posts    |
+| Many-to-Many | Implicit or explicit join table | Posts <-> Tags   |
 
 ---
 
 ## HTTP Status Codes
 
-| Code | Meaning | Use Case |
-|------|---------|----------|
-| 200 | OK | Successful GET, PUT, PATCH |
-| 201 | Created | Successful POST |
-| 204 | No Content | Successful DELETE |
-| 400 | Bad Request | Validation error |
-| 401 | Unauthorized | Missing/invalid auth |
-| 403 | Forbidden | Insufficient permissions |
-| 404 | Not Found | Resource not found |
-| 409 | Conflict | Duplicate resource |
-| 500 | Internal Server Error | Server error |
+| Code | Meaning               | Use Case                   |
+| ---- | --------------------- | -------------------------- |
+| 200  | OK                    | Successful GET, PUT, PATCH |
+| 201  | Created               | Successful POST            |
+| 204  | No Content            | Successful DELETE          |
+| 400  | Bad Request           | Validation error           |
+| 401  | Unauthorized          | Missing/invalid auth       |
+| 403  | Forbidden             | Insufficient permissions   |
+| 404  | Not Found             | Resource not found         |
+| 409  | Conflict              | Duplicate resource         |
+| 500  | Internal Server Error | Server error               |
 
 ---
 
 ## State Management Selection
 
-| Scope | Solution |
-|-------|----------|
-| Request-scoped | req object |
-| Application-wide | Singleton/DI container |
-| User session | Redis/database session store |
-| Background jobs | Queue (BullMQ, Agenda) |
+| Scope            | Solution                     |
+| ---------------- | ---------------------------- |
+| Request-scoped   | req object                   |
+| Application-wide | Singleton/DI container       |
+| User session     | Redis/database session store |
+| Background jobs  | Queue (BullMQ, Agenda)       |
 
 ---
 
@@ -712,24 +752,24 @@ The `.single()` method throws an error if no rows or multiple rows are returned.
 
 ```typescript
 // BAD: BAD - No error handling, crashes on missing data
-const { data } = await supabase.from('users').select().eq('id', id).single();
+const { data } = await supabase.from("users").select().eq("id", id).single();
 
 // GOOD: GOOD - Explicit error + null check
 const { data: user, error } = await supabase
-  .from('users')
-  .select('*')
-  .eq('id', id)
+  .from("users")
+  .select("*")
+  .eq("id", id)
   .single();
 
 if (error || !user) {
-  return NextResponse.json({ error: 'User not found' }, { status: 404 });
+  return NextResponse.json({ error: "User not found" }, { status: 404 });
 }
 
 // GOOD: ALTERNATIVE - Use .maybeSingle() for optional data
 const { data: profile } = await supabase
-  .from('profiles')
-  .select('*')
-  .eq('user_id', userId)
+  .from("profiles")
+  .select("*")
+  .eq("user_id", userId)
   .maybeSingle(); // Returns null instead of throwing if not found
 
 if (!profile) {
@@ -744,24 +784,24 @@ if (!profile) {
 const tier = subscription.tier;
 
 // GOOD: GOOD - Always provide defaults
-const tier = (subscription?.tier as SubscriptionTier) || 'free';
+const tier = (subscription?.tier as SubscriptionTier) || "free";
 
 // GOOD: BETTER - Validate type before casting
 const rawTier = subscription?.tier;
-const tier: SubscriptionTier = isValidTier(rawTier) ? rawTier : 'free';
+const tier: SubscriptionTier = isValidTier(rawTier) ? rawTier : "free";
 ```
 
 ### Error Destructuring Pattern
 
 ```typescript
 // BAD: BAD - Ignoring error
-const { data } = await supabase.from('users').select();
+const { data } = await supabase.from("users").select();
 
 // GOOD: GOOD - Always destructure error
-const { data, error } = await supabase.from('users').select();
+const { data, error } = await supabase.from("users").select();
 if (error) {
-  logger.error({ error, context: 'users.list' }, 'Database query failed');
-  throw new DatabaseError('Failed to fetch users');
+  logger.error({ error, context: "users.list" }, "Database query failed");
+  throw new DatabaseError("Failed to fetch users");
 }
 ```
 
@@ -769,20 +809,21 @@ if (error) {
 
 ```typescript
 // BAD: BAD - Querying without considering RLS
-const { data } = await supabase.from('private_data').select();
+const { data } = await supabase.from("private_data").select();
 
 // GOOD: GOOD - Use service role only when needed
 const supabaseAdmin = createClient(url, serviceRoleKey, {
-  auth: { autoRefreshToken: false, persistSession: false }
+  auth: { autoRefreshToken: false, persistSession: false },
 });
 
 // For user-scoped queries, use the user's JWT
 const supabaseUser = createClient(url, anonKey, {
-  global: { headers: { Authorization: `Bearer ${userToken}` } }
+  global: { headers: { Authorization: `Bearer ${userToken}` } },
 });
 ```
 
 **Checklist:**
+
 - [ ] Always destructure `{ data, error }` from queries
 - [ ] Use `.maybeSingle()` for optional relationships
 - [ ] Validate data exists before accessing properties
@@ -811,18 +852,15 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json(
-      { error: 'Invalid JSON body' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
   // Then validate with Zod
   const result = requestSchema.safeParse(body);
   if (!result.success) {
     return NextResponse.json(
-      { error: 'Validation failed', details: result.error.flatten() },
-      { status: 400 }
+      { error: "Validation failed", details: result.error.flatten() },
+      { status: 400 },
     );
   }
 
@@ -835,20 +873,22 @@ export async function POST(request: Request) {
 
 ```typescript
 // src/lib/api/validate.ts
-import { z } from 'zod';
-import { NextResponse } from 'next/server';
+import { z } from "zod";
+import { NextResponse } from "next/server";
 
 export async function parseRequestBody<T extends z.ZodSchema>(
   request: Request,
-  schema: T
-): Promise<{ data: z.infer<T>; error?: never } | { data?: never; error: NextResponse }> {
+  schema: T,
+): Promise<
+  { data: z.infer<T>; error?: never } | { data?: never; error: NextResponse }
+> {
   let body: unknown;
 
   try {
     body = await request.json();
   } catch {
     return {
-      error: NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+      error: NextResponse.json({ error: "Invalid JSON body" }, { status: 400 }),
     };
   }
 
@@ -856,9 +896,9 @@ export async function parseRequestBody<T extends z.ZodSchema>(
   if (!result.success) {
     return {
       error: NextResponse.json(
-        { error: 'Validation failed', details: result.error.flatten() },
-        { status: 400 }
-      )
+        { error: "Validation failed", details: result.error.flatten() },
+        { status: 400 },
+      ),
     };
   }
 
@@ -877,6 +917,7 @@ export async function POST(request: Request) {
 ```
 
 **Checklist:**
+
 - [ ] Wrap `request.json()` in try-catch
 - [ ] Return 400 for invalid JSON (not 500)
 - [ ] Validate body shape with Zod after parsing
@@ -894,19 +935,19 @@ export async function POST(request: Request) {
 ```typescript
 // src/lib/api/errors.ts
 interface ApiErrorResponse {
-  error: string;          // Human-readable message
-  code?: string;          // Machine-readable code (e.g., 'USER_NOT_FOUND')
-  details?: unknown;      // Additional context (validation errors, etc.)
+  error: string; // Human-readable message
+  code?: string; // Machine-readable code (e.g., 'USER_NOT_FOUND')
+  details?: unknown; // Additional context (validation errors, etc.)
 }
 
 // Error codes for client handling
 const ErrorCodes = {
-  VALIDATION_ERROR: 'VALIDATION_ERROR',
-  NOT_FOUND: 'NOT_FOUND',
-  UNAUTHORIZED: 'UNAUTHORIZED',
-  FORBIDDEN: 'FORBIDDEN',
-  RATE_LIMITED: 'RATE_LIMITED',
-  INTERNAL_ERROR: 'INTERNAL_ERROR',
+  VALIDATION_ERROR: "VALIDATION_ERROR",
+  NOT_FOUND: "NOT_FOUND",
+  UNAUTHORIZED: "UNAUTHORIZED",
+  FORBIDDEN: "FORBIDDEN",
+  RATE_LIMITED: "RATE_LIMITED",
+  INTERNAL_ERROR: "INTERNAL_ERROR",
 } as const;
 ```
 
@@ -914,54 +955,52 @@ const ErrorCodes = {
 
 ```typescript
 // src/lib/api/responses.ts
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 export function apiError(
   message: string,
   status: number,
   code?: string,
-  details?: unknown
+  details?: unknown,
 ) {
   return NextResponse.json(
     { error: message, ...(code && { code }), ...(details && { details }) },
-    { status }
+    { status },
   );
 }
 
 // Convenience methods
 export const errors = {
   badRequest: (msg: string, details?: unknown) =>
-    apiError(msg, 400, 'VALIDATION_ERROR', details),
-  unauthorized: (msg = 'Unauthorized') =>
-    apiError(msg, 401, 'UNAUTHORIZED'),
-  forbidden: (msg = 'Forbidden') =>
-    apiError(msg, 403, 'FORBIDDEN'),
+    apiError(msg, 400, "VALIDATION_ERROR", details),
+  unauthorized: (msg = "Unauthorized") => apiError(msg, 401, "UNAUTHORIZED"),
+  forbidden: (msg = "Forbidden") => apiError(msg, 403, "FORBIDDEN"),
   notFound: (resource: string) =>
-    apiError(`${resource} not found`, 404, 'NOT_FOUND'),
-  rateLimited: () =>
-    apiError('Too many requests', 429, 'RATE_LIMITED'),
-  internal: (msg = 'Internal server error') =>
-    apiError(msg, 500, 'INTERNAL_ERROR'),
+    apiError(`${resource} not found`, 404, "NOT_FOUND"),
+  rateLimited: () => apiError("Too many requests", 429, "RATE_LIMITED"),
+  internal: (msg = "Internal server error") =>
+    apiError(msg, 500, "INTERNAL_ERROR"),
 };
 
 // Usage
-return errors.notFound('User');
-return errors.badRequest('Invalid email format', { field: 'email' });
+return errors.notFound("User");
+return errors.badRequest("Invalid email format", { field: "email" });
 ```
 
 **HTTP Status Code Reference:**
 
-| Scenario | Status | Code | Example |
-|----------|--------|------|---------|
-| Invalid input | 400 | VALIDATION_ERROR | Missing required field |
-| Invalid JSON | 400 | VALIDATION_ERROR | Malformed request body |
-| Not authenticated | 401 | UNAUTHORIZED | No/invalid token |
-| Not authorized | 403 | FORBIDDEN | Can't access resource |
-| Not found | 404 | NOT_FOUND | Entity doesn't exist |
-| Rate limited | 429 | RATE_LIMITED | Too many requests |
-| Server error | 500 | INTERNAL_ERROR | Unexpected exception |
+| Scenario          | Status | Code             | Example                |
+| ----------------- | ------ | ---------------- | ---------------------- |
+| Invalid input     | 400    | VALIDATION_ERROR | Missing required field |
+| Invalid JSON      | 400    | VALIDATION_ERROR | Malformed request body |
+| Not authenticated | 401    | UNAUTHORIZED     | No/invalid token       |
+| Not authorized    | 403    | FORBIDDEN        | Can't access resource  |
+| Not found         | 404    | NOT_FOUND        | Entity doesn't exist   |
+| Rate limited      | 429    | RATE_LIMITED     | Too many requests      |
+| Server error      | 500    | INTERNAL_ERROR   | Unexpected exception   |
 
 **Checklist:**
+
 - [ ] Use consistent error response shape
 - [ ] Include error codes for client handling
 - [ ] Create helper functions for common errors
@@ -979,7 +1018,7 @@ return errors.badRequest('Invalid email format', { field: 'email' });
 ```typescript
 // Set explicit duration for slow routes (Next.js 14+)
 export const maxDuration = 30; // seconds (max 60 on Pro, 300 on Enterprise)
-export const dynamic = 'force-dynamic'; // Disable static optimization
+export const dynamic = "force-dynamic"; // Disable static optimization
 ```
 
 **Timeout Prevention Strategies:**
@@ -1049,15 +1088,16 @@ function getCached<T>(key: string, ttlMs: number, fn: () => Promise<T>): Promise
 
 **Common Timeout Causes & Solutions:**
 
-| Cause | Solution |
-|-------|----------|
-| N+1 database queries | Use joins or DataLoader pattern |
-| External API calls | Add timeouts, use circuit breakers |
-| Complex calculations | Pre-compute via cron, cache results |
-| Large data processing | Stream responses, paginate |
-| Cold starts | Use Vercel's warm function feature |
+| Cause                 | Solution                            |
+| --------------------- | ----------------------------------- |
+| N+1 database queries  | Use joins or DataLoader pattern     |
+| External API calls    | Add timeouts, use circuit breakers  |
+| Complex calculations  | Pre-compute via cron, cache results |
+| Large data processing | Stream responses, paginate          |
+| Cold starts           | Use Vercel's warm function feature  |
 
 **Checklist:**
+
 - [ ] Set `maxDuration` for known slow routes
 - [ ] Add timeout wrapper to expensive operations
 - [ ] Pre-compute expensive data via cron jobs
@@ -1070,6 +1110,7 @@ function getCached<T>(key: string, ttlMs: number, fn: () => Promise<T>): Promise
 # Resources
 
 **Best Practices Guides** (`references/`)
+
 - `backend-best-practices.md` - Node.js backend engineering patterns including:
   - Authentication & Authorization (JWT, OAuth2, sessions, RBAC)
   - Error Handling & Validation (custom errors, global handlers, Zod/Joi)
@@ -1101,7 +1142,7 @@ function getCached<T>(key: string, ttlMs: number, fn: () => Promise<T>): Promise
   - Pydantic validation and serialization
   - Pytest fixtures and async testing
   - Performance optimization and caching
- - Security (OWASP Top 10, password security, rate limiting, CORS)
+- Security (OWASP Top 10, password security, rate limiting, CORS)
 
 **External Documentation:**
 See [data/sources.json](../data/sources.json) for official documentation links and learning resources.
@@ -1109,4 +1150,7 @@ See [data/sources.json](../data/sources.json) for official documentation links a
 ---
 
 # END
+
+```
+
 ```

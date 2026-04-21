@@ -23,24 +23,26 @@ Patterns and techniques for reviewing large pull requests effectively, including
 
 ### Recommended Size Thresholds
 
-| PR Size (Lines Changed) | Category | Review Time | Defect Detection Rate |
-|--------------------------|----------|-------------|----------------------|
-| 1-50 | Small | 5-10 min | ~60-70% |
-| 51-200 | Medium | 15-30 min | ~50-60% |
-| 201-400 | Large | 30-60 min | ~30-40% |
-| 401-1000 | Very Large | 60-120 min | ~15-25% |
-| 1000+ | Unmanageable | 2+ hours | <15% |
+| PR Size (Lines Changed) | Category     | Review Time | Defect Detection Rate |
+| ----------------------- | ------------ | ----------- | --------------------- |
+| 1-50                    | Small        | 5-10 min    | ~60-70%               |
+| 51-200                  | Medium       | 15-30 min   | ~50-60%               |
+| 201-400                 | Large        | 30-60 min   | ~30-40%               |
+| 401-1000                | Very Large   | 60-120 min  | ~15-25%               |
+| 1000+                   | Unmanageable | 2+ hours    | <15%                  |
 
 **Target**: Keep PRs under 200 lines of meaningful changes (excluding generated code, lockfiles, and test fixtures).
 
 ### What Counts Toward Size
 
 Include in line count:
+
 - Application source code changes
 - Test code (but weight less heavily)
 - Configuration changes with logic implications
 
 Exclude from line count:
+
 - Auto-generated files (lockfiles, schema outputs)
 - Large test fixture data files
 - Snapshot files
@@ -75,13 +77,13 @@ Research from Google, Microsoft, and SmartBear consistently shows:
 
 ### Team Velocity Impact
 
-| Metric | Small PRs (<200 LOC) | Large PRs (>400 LOC) |
-|--------|----------------------|----------------------|
-| Time to first review | Hours | Days |
-| Review iterations | 1-2 rounds | 3-5 rounds |
-| Merge conflicts | Rare | Frequent |
-| Revert frequency | Low | High |
-| Reviewer willingness | High | Low ("I'll look later") |
+| Metric               | Small PRs (<200 LOC) | Large PRs (>400 LOC)    |
+| -------------------- | -------------------- | ----------------------- |
+| Time to first review | Hours                | Days                    |
+| Review iterations    | 1-2 rounds           | 3-5 rounds              |
+| Merge conflicts      | Rare                 | Frequent                |
+| Revert frequency     | Low                  | High                    |
+| Reviewer willingness | High                 | Low ("I'll look later") |
 
 ### The Compounding Problem
 
@@ -168,13 +170,13 @@ git town sync
 
 ### Stacking Strategy: How to Decompose
 
-| Decomposition Axis | Example | When to Use |
-|---------------------|---------|-------------|
-| By layer | Data model -> API -> UI | Standard feature work |
-| By concern | Auth -> Validation -> Business logic | Cross-cutting features |
-| By risk level | High-risk core -> Low-risk wiring | Security-sensitive features |
-| By reviewability | Schema migration -> Code changes | Database changes |
-| By dependency | Library upgrade -> Consumer updates | Dependency bumps |
+| Decomposition Axis | Example                              | When to Use                 |
+| ------------------ | ------------------------------------ | --------------------------- |
+| By layer           | Data model -> API -> UI              | Standard feature work       |
+| By concern         | Auth -> Validation -> Business logic | Cross-cutting features      |
+| By risk level      | High-risk core -> Low-risk wiring    | Security-sensitive features |
+| By reviewability   | Schema migration -> Code changes     | Database changes            |
+| By dependency      | Library upgrade -> Consumer updates  | Dependency bumps            |
 
 ### Stack Sizing
 
@@ -250,13 +252,13 @@ Set a timer. If a PR requires more than 60 minutes of focused review, stop and r
 
 ### When to Split Reviewers
 
-| Scenario | Strategy |
-|----------|----------|
-| Full-stack feature | Frontend reviewer + Backend reviewer |
+| Scenario                     | Strategy                                             |
+| ---------------------------- | ---------------------------------------------------- |
+| Full-stack feature           | Frontend reviewer + Backend reviewer                 |
 | Security-sensitive + Feature | Security reviewer (P0/P1) + Feature reviewer (P2/P3) |
-| Cross-team changes | Domain expert per team |
-| Infrastructure + Application | Platform engineer + App developer |
-| Database + Application | DBA review migration + Developer review code |
+| Cross-team changes           | Domain expert per team                               |
+| Infrastructure + Application | Platform engineer + App developer                    |
+| Database + Application       | DBA review migration + Developer review code         |
 
 ### Delegation Template
 
@@ -264,16 +266,19 @@ Set a timer. If a PR requires more than 60 minutes of focused review, stop and r
 ## Review Delegation
 
 @frontend-reviewer: Please review `src/components/` and `src/hooks/` for:
+
 - Component composition and prop design
 - Accessibility (WCAG 2.2)
 - Performance (unnecessary re-renders)
 
 @backend-reviewer: Please review `src/api/` and `src/services/` for:
+
 - Input validation and error handling
 - Database query efficiency
 - Authentication/authorization
 
 @security-reviewer: Please review for:
+
 - [ ] Input sanitization
 - [ ] Authorization checks on all endpoints
 - [ ] No secrets in code
@@ -297,11 +302,11 @@ Set a timer. If a PR requires more than 60 minutes of focused review, stop and r
 
 ### When to Use Commit-by-Commit
 
-| Approach | Best For | Worst For |
-|----------|----------|-----------|
+| Approach         | Best For                                                | Worst For                             |
+| ---------------- | ------------------------------------------------------- | ------------------------------------- |
 | Commit-by-commit | Refactors with logical steps, well-structured histories | Messy commit histories, squash merges |
-| Full diff | Small PRs, single-concern changes | Large PRs with mixed concerns |
-| Hybrid | Large PRs with clean commits | Poorly structured histories |
+| Full diff        | Small PRs, single-concern changes                       | Large PRs with mixed concerns         |
+| Hybrid           | Large PRs with clean commits                            | Poorly structured histories           |
 
 ### Commit-by-Commit Review Process
 
@@ -370,12 +375,12 @@ Review session (2 hours max per day):
 
 Avoid the single-reviewer bottleneck:
 
-| Practice | Implementation |
-|----------|----------------|
-| Round-robin assignment | Rotate primary reviewer across team |
-| Expertise-based routing | Use CODEOWNERS for domain routing |
-| Review buddies | Pair team members for shared context |
-| Load-aware assignment | Track open review count per person |
+| Practice                | Implementation                       |
+| ----------------------- | ------------------------------------ |
+| Round-robin assignment  | Rotate primary reviewer across team  |
+| Expertise-based routing | Use CODEOWNERS for domain routing    |
+| Review buddies          | Pair team members for shared context |
+| Load-aware assignment   | Track open review count per person   |
 
 ---
 
@@ -383,13 +388,13 @@ Avoid the single-reviewer bottleneck:
 
 ### GitHub Features
 
-| Feature | How It Helps |
-|---------|-------------|
-| File tree filtering | Focus on specific directories |
-| Viewed checkbox | Track which files you have reviewed |
-| Suggestion blocks | Propose specific code changes inline |
+| Feature                  | How It Helps                            |
+| ------------------------ | --------------------------------------- |
+| File tree filtering      | Focus on specific directories           |
+| Viewed checkbox          | Track which files you have reviewed     |
+| Suggestion blocks        | Propose specific code changes inline    |
 | Required reviews by path | Different reviewers for different areas |
-| PR templates | Structured descriptions with checklists |
+| PR templates             | Structured descriptions with checklists |
 
 ### IDE-Based Review
 
@@ -403,12 +408,12 @@ VS Code + GitHub Pull Requests extension:
 
 ### Third-Party Tools
 
-| Tool | Key Feature for Large PRs |
-|------|--------------------------|
-| Graphite | PR stacking, stack-aware merge queue |
-| Reviewable | Incremental review tracking, file-level disposition |
-| CodeSee | Visual diff maps, impact analysis |
-| Gitpod/Codespaces | One-click PR environments for manual testing |
+| Tool              | Key Feature for Large PRs                           |
+| ----------------- | --------------------------------------------------- |
+| Graphite          | PR stacking, stack-aware merge queue                |
+| Reviewable        | Incremental review tracking, file-level disposition |
+| CodeSee           | Visual diff maps, impact analysis                   |
+| Gitpod/Codespaces | One-click PR environments for manual testing        |
 
 ### Folding and Focus Mode
 

@@ -86,31 +86,38 @@ DoD zero trust requirements for FY2027:
 
 ```javascript
 // OAuth 2.0 + OpenID Connect flow
-const express = require('express');
-const passport = require('passport');
-const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
+const express = require("express");
+const passport = require("passport");
+const OIDCStrategy = require("passport-azure-ad").OIDCStrategy;
 
-passport.use(new OIDCStrategy({
-  identityMetadata: 'https://login.microsoftonline.com/tenant/.well-known/openid-configuration',
-  clientID: process.env.CLIENT_ID,
-  responseType: 'code id_token',
-  responseMode: 'form_post',
-  redirectUrl: 'https://app.example.com/auth/callback',
-  allowHttpForRedirectUrl: false,
-  clientSecret: process.env.CLIENT_SECRET,
-  validateIssuer: true,
-  issuer: 'https://sts.windows.net/tenant-id/',
-  passReqToCallback: false,
-  scope: ['profile', 'email', 'openid']
-}, (iss, sub, profile, accessToken, refreshToken, done) => {
-  // Verify user and create session
-  return done(null, profile);
-}));
+passport.use(
+  new OIDCStrategy(
+    {
+      identityMetadata:
+        "https://login.microsoftonline.com/tenant/.well-known/openid-configuration",
+      clientID: process.env.CLIENT_ID,
+      responseType: "code id_token",
+      responseMode: "form_post",
+      redirectUrl: "https://app.example.com/auth/callback",
+      allowHttpForRedirectUrl: false,
+      clientSecret: process.env.CLIENT_SECRET,
+      validateIssuer: true,
+      issuer: "https://sts.windows.net/tenant-id/",
+      passReqToCallback: false,
+      scope: ["profile", "email", "openid"],
+    },
+    (iss, sub, profile, accessToken, refreshToken, done) => {
+      // Verify user and create session
+      return done(null, profile);
+    },
+  ),
+);
 
-app.get('/auth/login',
-  passport.authenticate('azuread-openidconnect', {
-    failureRedirect: '/login'
-  })
+app.get(
+  "/auth/login",
+  passport.authenticate("azuread-openidconnect", {
+    failureRedirect: "/login",
+  }),
 );
 ```
 
@@ -118,14 +125,14 @@ app.get('/auth/login',
 
 ```javascript
 // Verify MFA token
-const speakeasy = require('speakeasy');
+const speakeasy = require("speakeasy");
 
 const verifyMFA = (token, secret) => {
   return speakeasy.totp.verify({
     secret: secret,
-    encoding: 'base32',
+    encoding: "base32",
     token: token,
-    window: 1  // Allow 1 time step before/after for clock drift
+    window: 1, // Allow 1 time step before/after for clock drift
   });
 };
 
@@ -133,13 +140,13 @@ const verifyMFA = (token, secret) => {
 const requireMFA = async (req, res, next) => {
   if (!req.user.mfaEnabled) {
     return res.status(403).json({
-      error: 'MFA required but not enabled'
+      error: "MFA required but not enabled",
     });
   }
 
-  const token = req.headers['x-mfa-token'];
+  const token = req.headers["x-mfa-token"];
   if (!token || !verifyMFA(token, req.user.mfaSecret)) {
-    return res.status(401).json({ error: 'Invalid MFA token' });
+    return res.status(401).json({ error: "Invalid MFA token" });
   }
 
   next();
@@ -155,12 +162,12 @@ const requireMFA = async (req, res, next) => {
 ```javascript
 // Device trust verification middleware
 const assessDeviceTrust = async (req, res, next) => {
-  const deviceId = req.headers['x-device-id'];
+  const deviceId = req.headers["x-device-id"];
   const device = await DeviceRegistry.findById(deviceId);
 
   if (!device) {
     return res.status(403).json({
-      error: 'Unknown device'
+      error: "Unknown device",
     });
   }
 
@@ -170,17 +177,18 @@ const assessDeviceTrust = async (req, res, next) => {
     antivirus: device.antivirusEnabled && device.antivirusUpdated,
     encrypted: device.diskEncrypted,
     jailbroken: !device.jailbroken,
-    lastSeen: Date.now() - device.lastSeenAt < 24 * 60 * 60 * 1000
+    lastSeen: Date.now() - device.lastSeenAt < 24 * 60 * 60 * 1000,
   };
 
-  const trustScore = Object.values(checks).filter(Boolean).length / Object.keys(checks).length;
+  const trustScore =
+    Object.values(checks).filter(Boolean).length / Object.keys(checks).length;
 
   if (trustScore < 0.8) {
     return res.status(403).json({
-      error: 'Device does not meet security requirements',
+      error: "Device does not meet security requirements",
       violations: Object.entries(checks)
         .filter(([key, value]) => !value)
-        .map(([key]) => key)
+        .map(([key]) => key),
     });
   }
 
@@ -188,7 +196,7 @@ const assessDeviceTrust = async (req, res, next) => {
   next();
 };
 
-app.use('/api', assessDeviceTrust);
+app.use("/api", assessDeviceTrust);
 ```
 
 ---
@@ -204,8 +212,7 @@ kind: AuthorizationPolicy
 metadata:
   name: deny-all
   namespace: production
-spec:
-  {}  # Empty spec = deny all
+spec: {} # Empty spec = deny all
 
 ---
 # Allow specific service-to-service communication
@@ -220,13 +227,13 @@ spec:
       app: backend
   action: ALLOW
   rules:
-  - from:
-    - source:
-        principals: ["cluster.local/ns/production/sa/frontend"]
-    to:
-    - operation:
-        methods: ["GET", "POST"]
-        paths: ["/api/*"]
+    - from:
+        - source:
+            principals: ["cluster.local/ns/production/sa/frontend"]
+      to:
+        - operation:
+            methods: ["GET", "POST"]
+            paths: ["/api/*"]
 ```
 
 **Mutual TLS (mTLS)**
@@ -240,39 +247,41 @@ metadata:
   namespace: production
 spec:
   mtls:
-    mode: STRICT  # Require mTLS for all traffic
+    mode: STRICT # Require mTLS for all traffic
 ```
 
 **Application-Level mTLS**
 
 ```javascript
 // Node.js HTTPS server with client certificate verification
-const https = require('https');
-const fs = require('fs');
+const https = require("https");
+const fs = require("fs");
 
 const options = {
-  key: fs.readFileSync('server-key.pem'),
-  cert: fs.readFileSync('server-cert.pem'),
-  ca: fs.readFileSync('ca-cert.pem'),
+  key: fs.readFileSync("server-key.pem"),
+  cert: fs.readFileSync("server-cert.pem"),
+  ca: fs.readFileSync("ca-cert.pem"),
   requestCert: true,
-  rejectUnauthorized: true
+  rejectUnauthorized: true,
 };
 
-https.createServer(options, (req, res) => {
-  const cert = req.socket.getPeerCertificate();
+https
+  .createServer(options, (req, res) => {
+    const cert = req.socket.getPeerCertificate();
 
-  if (!req.client.authorized) {
-    return res.writeHead(401).end('Unauthorized');
-  }
+    if (!req.client.authorized) {
+      return res.writeHead(401).end("Unauthorized");
+    }
 
-  // Verify certificate subject
-  if (cert.subject.CN !== 'authorized-client') {
-    return res.writeHead(403).end('Forbidden');
-  }
+    // Verify certificate subject
+    if (cert.subject.CN !== "authorized-client") {
+      return res.writeHead(403).end("Forbidden");
+    }
 
-  res.writeHead(200);
-  res.end('Authenticated via mTLS');
-}).listen(8443);
+    res.writeHead(200);
+    res.end("Authenticated via mTLS");
+  })
+  .listen(8443);
 ```
 
 ---
@@ -283,7 +292,7 @@ https.createServer(options, (req, res) => {
 
 ```javascript
 // OPA policy enforcement middleware
-const axios = require('axios');
+const axios = require("axios");
 
 const enforcePolicy = (resource, action) => {
   return async (req, res, next) => {
@@ -291,43 +300,44 @@ const enforcePolicy = (resource, action) => {
       user: {
         id: req.user.id,
         roles: req.user.roles,
-        groups: req.user.groups
+        groups: req.user.groups,
       },
       resource: resource,
       action: action,
       context: {
         time: new Date().toISOString(),
         ip: req.ip,
-        deviceTrustScore: req.deviceTrustScore
-      }
+        deviceTrustScore: req.deviceTrustScore,
+      },
     };
 
     try {
-      const response = await axios.post('http://opa:8181/v1/data/authz/allow', {
-        input
+      const response = await axios.post("http://opa:8181/v1/data/authz/allow", {
+        input,
       });
 
       if (!response.data.result) {
         return res.status(403).json({
-          error: 'Access denied by policy'
+          error: "Access denied by policy",
         });
       }
 
       next();
     } catch (error) {
-      logger.error('OPA evaluation failed', error);
+      logger.error("OPA evaluation failed", error);
       return res.status(500).json({
-        error: 'Policy evaluation failed'
+        error: "Policy evaluation failed",
       });
     }
   };
 };
 
 // Usage
-app.delete('/api/users/:id',
+app.delete(
+  "/api/users/:id",
   authenticate,
-  enforcePolicy('user', 'delete'),
-  deleteUser
+  enforcePolicy("user", "delete"),
+  deleteUser,
 );
 ```
 
@@ -391,27 +401,27 @@ spec:
     spec:
       serviceAccountName: backend-service
       containers:
-      - name: backend
-        image: backend:v1
-        env:
-        - name: SPIFFE_ENDPOINT_SOCKET
-          value: unix:///run/spire/sockets/agent.sock
-        volumeMounts:
-        - name: spire-agent-socket
-          mountPath: /run/spire/sockets
-          readOnly: true
+        - name: backend
+          image: backend:v1
+          env:
+            - name: SPIFFE_ENDPOINT_SOCKET
+              value: unix:///run/spire/sockets/agent.sock
+          volumeMounts:
+            - name: spire-agent-socket
+              mountPath: /run/spire/sockets
+              readOnly: true
       volumes:
-      - name: spire-agent-socket
-        hostPath:
-          path: /run/spire/sockets
-          type: Directory
+        - name: spire-agent-socket
+          hostPath:
+            path: /run/spire/sockets
+            type: Directory
 ```
 
 **Retrieve Workload Identity**
 
 ```javascript
 // Get SVID (SPIFFE Verifiable Identity Document)
-const { SpiffeWorkloadApi } = require('@spiffe/node-spiffe');
+const { SpiffeWorkloadApi } = require("@spiffe/node-spiffe");
 
 const getWorkloadIdentity = async () => {
   const client = new SpiffeWorkloadApi();
@@ -420,7 +430,7 @@ const getWorkloadIdentity = async () => {
   return {
     spiffeId: svid.spiffeId.toString(),
     certificate: svid.certificate,
-    privateKey: svid.privateKey
+    privateKey: svid.privateKey,
   };
 };
 
@@ -428,7 +438,7 @@ const getWorkloadIdentity = async () => {
 const identity = await getWorkloadIdentity();
 const tlsOptions = {
   cert: identity.certificate,
-  key: identity.privateKey
+  key: identity.privateKey,
 };
 ```
 
@@ -446,18 +456,15 @@ const grantTemporaryAccess = async (userId, resource, duration) => {
     resource,
     grantedAt: Date.now(),
     expiresAt: Date.now() + duration,
-    status: 'active'
+    status: "active",
   };
 
   await AccessGrants.create(grant);
 
   // Schedule automatic revocation
   setTimeout(async () => {
-    await AccessGrants.updateOne(
-      { _id: grant._id },
-      { status: 'expired' }
-    );
-    await auditLog('jit_access_expired', grant);
+    await AccessGrants.updateOne({ _id: grant._id }, { status: "expired" });
+    await auditLog("jit_access_expired", grant);
   }, duration);
 
   return grant;
@@ -468,13 +475,13 @@ const checkJITAccess = async (req, res, next) => {
   const grant = await AccessGrants.findOne({
     userId: req.user.id,
     resource: req.path,
-    status: 'active',
-    expiresAt: { $gt: Date.now() }
+    status: "active",
+    expiresAt: { $gt: Date.now() },
   });
 
   if (!grant) {
     return res.status(403).json({
-      error: 'No active temporary access grant'
+      error: "No active temporary access grant",
     });
   }
 
@@ -482,7 +489,7 @@ const checkJITAccess = async (req, res, next) => {
 };
 
 // Request temporary admin access
-app.post('/api/access/request', authenticate, async (req, res) => {
+app.post("/api/access/request", authenticate, async (req, res) => {
   const { resource, reason, duration } = req.body;
 
   // Require manager approval
@@ -490,21 +497,17 @@ app.post('/api/access/request', authenticate, async (req, res) => {
     requestedBy: req.user.id,
     resource,
     reason,
-    duration
+    duration,
   });
 
   if (!approval.approved) {
     return res.status(403).json({
-      error: 'Access request denied',
-      reason: approval.reason
+      error: "Access request denied",
+      reason: approval.reason,
     });
   }
 
-  const grant = await grantTemporaryAccess(
-    req.user.id,
-    resource,
-    duration
-  );
+  const grant = await grantTemporaryAccess(req.user.id, resource, duration);
 
   res.json({ grant });
 });
@@ -526,7 +529,7 @@ const logSecurityEvent = async (event) => {
     user: {
       id: event.userId,
       ip: event.ip,
-      deviceId: event.deviceId
+      deviceId: event.deviceId,
     },
     action: event.action,
     resource: event.resource,
@@ -534,31 +537,31 @@ const logSecurityEvent = async (event) => {
     context: {
       userAgent: event.userAgent,
       geoLocation: event.geoLocation,
-      deviceTrustScore: event.deviceTrustScore
-    }
+      deviceTrustScore: event.deviceTrustScore,
+    },
   };
 
   await SecurityEvents.create(securityEvent);
 
   // Alert on suspicious activity
-  if (event.severity === 'high' || event.outcome === 'denied') {
+  if (event.severity === "high" || event.outcome === "denied") {
     await alertSecurityTeam(securityEvent);
   }
 };
 
 // Middleware to log all security-relevant events
 app.use((req, res, next) => {
-  res.on('finish', () => {
+  res.on("finish", () => {
     logSecurityEvent({
-      type: 'api_access',
-      severity: res.statusCode >= 400 ? 'high' : 'low',
+      type: "api_access",
+      severity: res.statusCode >= 400 ? "high" : "low",
       userId: req.user?.id,
       ip: req.ip,
-      deviceId: req.headers['x-device-id'],
+      deviceId: req.headers["x-device-id"],
       action: req.method,
       resource: req.path,
-      outcome: res.statusCode < 400 ? 'allowed' : 'denied',
-      userAgent: req.headers['user-agent']
+      outcome: res.statusCode < 400 ? "allowed" : "denied",
+      userAgent: req.headers["user-agent"],
     });
   });
   next();
@@ -570,18 +573,21 @@ app.use((req, res, next) => {
 ## Implementation Roadmap
 
 ### Phase 1: Foundation (0-3 months)
+
 - [ ] Implement SSO with MFA
 - [ ] Deploy device management platform
 - [ ] Enable basic network segmentation
 - [ ] Establish security logging
 
 ### Phase 2: Advanced Controls (3-6 months)
+
 - [ ] Deploy service mesh with mTLS
 - [ ] Implement policy-based access control (OPA)
 - [ ] Deploy workload identity (SPIFFE/SPIRE)
 - [ ] Enable continuous device posture assessment
 
 ### Phase 3: Optimization (6-12 months)
+
 - [ ] Implement JIT access
 - [ ] Deploy behavioral analytics
 - [ ] Automate policy enforcement
@@ -592,24 +598,28 @@ app.use((req, res, next) => {
 ## Best Practices
 
 **Identity**
+
 - Enforce MFA on all accounts
 - Use short-lived credentials (< 1 hour)
 - Implement adaptive authentication based on risk
 - Regular access reviews and least privilege enforcement
 
 **Network**
+
 - Default deny all traffic
 - Encrypt all communication (TLS 1.3+, mTLS)
 - Micro-segmentation at service level
 - Monitor and log all network flows
 
 **Access Control**
+
 - Dynamic, context-aware authorization
 - Time-boxed access grants
 - Require re-authentication for sensitive operations
 - Audit all access decisions
 
 **Monitoring**
+
 - Log all authentication and authorization events
 - Correlate events across identity, device, and network
 - Automated anomaly detection
@@ -619,14 +629,14 @@ app.use((req, res, next) => {
 
 ## Tools and Technologies
 
-| Component | Tools |
-|-----------|-------|
-| **Identity Provider** | Okta, Auth0, Azure AD, Keycloak |
-| **Device Management** | Jamf, Intune, Workspace ONE |
-| **Service Mesh** | Istio, Linkerd, Consul Connect |
-| **Policy Engine** | Open Policy Agent (OPA), Styra |
-| **Workload Identity** | SPIFFE/SPIRE, Vault |
-| **SIEM** | Splunk, Elastic Security, Chronicle |
+| Component             | Tools                               |
+| --------------------- | ----------------------------------- |
+| **Identity Provider** | Okta, Auth0, Azure AD, Keycloak     |
+| **Device Management** | Jamf, Intune, Workspace ONE         |
+| **Service Mesh**      | Istio, Linkerd, Consul Connect      |
+| **Policy Engine**     | Open Policy Agent (OPA), Styra      |
+| **Workload Identity** | SPIFFE/SPIRE, Vault                 |
+| **SIEM**              | Splunk, Elastic Security, Chronicle |
 
 ---
 

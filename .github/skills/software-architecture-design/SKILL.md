@@ -9,17 +9,17 @@ Use this skill for **system-level design decisions** rather than implementation 
 
 ## Quick Reference
 
-| Task | Pattern/Tool | Key Resources | When to Use |
-|------|-------------|---------------|-------------|
-| Choose architecture style | Layered, Microservices, Event-driven, Serverless | [modern-patterns.md](references/modern-patterns.md) | Greenfield projects, major refactors |
-| Design for scale | Load balancing, Caching, Sharding, Read replicas | [scalability-reliability-guide.md](references/scalability-reliability-guide.md) | High-traffic systems, performance goals |
-| Ensure resilience | Circuit breakers, Retries, Bulkheads, Graceful degradation | [scalability-reliability-guide.md](references/scalability-reliability-guide.md) | Distributed systems, external dependencies |
-| Document decisions | Architecture Decision Record (ADR) | [adr-template.md](assets/planning/adr-template.md) | Major technical decisions, tradeoff analysis |
-| Define service boundaries | Domain-Driven Design (DDD), Bounded contexts | [microservices-template.md](assets/patterns/microservices-template.md) | Microservices decomposition |
-| Model data consistency | ACID vs BASE, Event sourcing, CQRS, Saga patterns | [data-architecture-patterns.md](references/data-architecture-patterns.md) | Multi-service transactions |
-| Plan observability | SLIs/SLOs/SLAs, Distributed tracing, Metrics, Logs | [architecture-blueprint.md](assets/planning/architecture-blueprint.md) | Production readiness |
-| Migrate from monolith | Strangler fig, Database decomposition, Shadow traffic | [migration-modernization-guide.md](references/migration-modernization-guide.md) | Legacy modernization |
-| Design inter-service comms | API Gateway, Service mesh, BFF pattern | [api-gateway-service-mesh.md](references/api-gateway-service-mesh.md) | Microservices networking |
+| Task                       | Pattern/Tool                                               | Key Resources                                                                   | When to Use                                  |
+| -------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------- |
+| Choose architecture style  | Layered, Microservices, Event-driven, Serverless           | [modern-patterns.md](references/modern-patterns.md)                             | Greenfield projects, major refactors         |
+| Design for scale           | Load balancing, Caching, Sharding, Read replicas           | [scalability-reliability-guide.md](references/scalability-reliability-guide.md) | High-traffic systems, performance goals      |
+| Ensure resilience          | Circuit breakers, Retries, Bulkheads, Graceful degradation | [scalability-reliability-guide.md](references/scalability-reliability-guide.md) | Distributed systems, external dependencies   |
+| Document decisions         | Architecture Decision Record (ADR)                         | [adr-template.md](assets/planning/adr-template.md)                              | Major technical decisions, tradeoff analysis |
+| Define service boundaries  | Domain-Driven Design (DDD), Bounded contexts               | [microservices-template.md](assets/patterns/microservices-template.md)          | Microservices decomposition                  |
+| Model data consistency     | ACID vs BASE, Event sourcing, CQRS, Saga patterns          | [data-architecture-patterns.md](references/data-architecture-patterns.md)       | Multi-service transactions                   |
+| Plan observability         | SLIs/SLOs/SLAs, Distributed tracing, Metrics, Logs         | [architecture-blueprint.md](assets/planning/architecture-blueprint.md)          | Production readiness                         |
+| Migrate from monolith      | Strangler fig, Database decomposition, Shadow traffic      | [migration-modernization-guide.md](references/migration-modernization-guide.md) | Legacy modernization                         |
+| Design inter-service comms | API Gateway, Service mesh, BFF pattern                     | [api-gateway-service-mesh.md](references/api-gateway-service-mesh.md)           | Microservices networking                     |
 
 ## When to Use This Skill
 
@@ -128,15 +128,15 @@ If live web access is available, consult 2–3 authoritative sources from `data/
 
 Read **at most 2–3 references** per question — pick the ones most relevant to the specific ask. Do not read all of them.
 
-| Reference | Contents | When to Read |
-|-----------|----------|--------------|
-| [modern-patterns.md](references/modern-patterns.md) | 10 architecture patterns with decision trees | Choosing or comparing patterns |
-| [scalability-reliability-guide.md](references/scalability-reliability-guide.md) | CAP theorem, DB scaling, caching, circuit breakers, SRE | Scaling or reliability questions |
-| [data-architecture-patterns.md](references/data-architecture-patterns.md) | CQRS variants, event sourcing, data mesh, sagas, consistency | Data flow across services |
-| [migration-modernization-guide.md](references/migration-modernization-guide.md) | Strangler fig, DB decomposition, feature flags, risk assessment | Refactoring a monolith |
-| [api-gateway-service-mesh.md](references/api-gateway-service-mesh.md) | Gateway patterns, service mesh, mTLS, observability | Inter-service communication |
-| [architecture-trends-2026.md](references/architecture-trends-2026.md) | Platform engineering, data mesh, AI-native systems | Current trends only |
-| [operational-playbook.md](references/operational-playbook.md) | Architecture questions framework, decomposition heuristics | Design discussion framing |
+| Reference                                                                       | Contents                                                        | When to Read                     |
+| ------------------------------------------------------------------------------- | --------------------------------------------------------------- | -------------------------------- |
+| [modern-patterns.md](references/modern-patterns.md)                             | 10 architecture patterns with decision trees                    | Choosing or comparing patterns   |
+| [scalability-reliability-guide.md](references/scalability-reliability-guide.md) | CAP theorem, DB scaling, caching, circuit breakers, SRE         | Scaling or reliability questions |
+| [data-architecture-patterns.md](references/data-architecture-patterns.md)       | CQRS variants, event sourcing, data mesh, sagas, consistency    | Data flow across services        |
+| [migration-modernization-guide.md](references/migration-modernization-guide.md) | Strangler fig, DB decomposition, feature flags, risk assessment | Refactoring a monolith           |
+| [api-gateway-service-mesh.md](references/api-gateway-service-mesh.md)           | Gateway patterns, service mesh, mTLS, observability             | Inter-service communication      |
+| [architecture-trends-2026.md](references/architecture-trends-2026.md)           | Platform engineering, data mesh, AI-native systems              | Current trends only              |
+| [operational-playbook.md](references/operational-playbook.md)                   | Architecture questions framework, decomposition heuristics      | Design discussion framing        |
 
 ### Templates
 

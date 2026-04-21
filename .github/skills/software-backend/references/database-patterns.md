@@ -46,12 +46,12 @@ CREATE INDEX idx_products_category ON products
 
 **When to use JSONB vs separate tables:**
 
-| JSONB | Separate Table |
-|-------|----------------|
-| Schema varies per row | Schema is uniform |
-| Query patterns are simple (key lookup) | Complex joins and aggregations |
-| Data is read-mostly | Data is frequently updated at field level |
-| Fewer than 10-20 keys | Dozens of structured columns |
+| JSONB                                  | Separate Table                            |
+| -------------------------------------- | ----------------------------------------- |
+| Schema varies per row                  | Schema is uniform                         |
+| Query patterns are simple (key lookup) | Complex joins and aggregations            |
+| Data is read-mostly                    | Data is frequently updated at field level |
+| Fewer than 10-20 keys                  | Dozens of structured columns              |
 
 ### Common Table Expressions (CTEs)
 
@@ -185,12 +185,12 @@ Typical limits:
 
 ### Pooling Strategies
 
-| Strategy | Description | Best For |
-|----------|-------------|----------|
-| PgBouncer (external) | Standalone connection pool proxy | Multiple services, serverless |
-| Prisma connection pool | Built into Prisma client | Prisma-based apps |
-| Drizzle + `postgres` driver pool | Driver-level pooling | Drizzle-based apps |
-| Neon pooler / Supabase pooler | Managed pooling service | Serverless, edge functions |
+| Strategy                         | Description                      | Best For                      |
+| -------------------------------- | -------------------------------- | ----------------------------- |
+| PgBouncer (external)             | Standalone connection pool proxy | Multiple services, serverless |
+| Prisma connection pool           | Built into Prisma client         | Prisma-based apps             |
+| Drizzle + `postgres` driver pool | Driver-level pooling             | Drizzle-based apps            |
+| Neon pooler / Supabase pooler    | Managed pooling service          | Serverless, edge functions    |
 
 ### PgBouncer Configuration
 
@@ -226,7 +226,7 @@ query_timeout = 30           ; kill queries running longer than 30s
 ### Prisma Connection Pool Tuning
 
 ```typescript
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient({
   datasources: {
@@ -264,13 +264,13 @@ MUST be less than PostgreSQL max_connections
 
 ### Strategy Comparison
 
-| Strategy | Description | Downtime | Risk |
-|----------|-------------|----------|------|
-| Expand-Contract | Add new → migrate data → remove old | Zero | Low |
-| Backward-Compatible | New schema works with old AND new code | Zero | Low |
-| Shadow Table | Write to both during transition | Zero | Medium |
-| Blue-Green DB | Two databases, switch at cutover | Brief | Medium |
-| Big Bang | Apply all changes at once, deploy new code | Required | High |
+| Strategy            | Description                                | Downtime | Risk   |
+| ------------------- | ------------------------------------------ | -------- | ------ |
+| Expand-Contract     | Add new → migrate data → remove old        | Zero     | Low    |
+| Backward-Compatible | New schema works with old AND new code     | Zero     | Low    |
+| Shadow Table        | Write to both during transition            | Zero     | Medium |
+| Blue-Green DB       | Two databases, switch at cutover           | Brief    | Medium |
+| Big Bang            | Apply all changes at once, deploy new code | Required | High   |
 
 ### Expand-Contract Pattern (Recommended)
 
@@ -351,17 +351,17 @@ NEVER use ALTER TABLE ... RENAME COLUMN in production with live traffic.
 
 ### Prisma vs Drizzle vs Raw SQL
 
-| Feature | Prisma | Drizzle | Raw SQL (Kysely/sqlc) |
-|---------|--------|---------|----------------------|
-| Type safety | Generated types from schema | Schema-as-code types | Generated from SQL / builder |
-| Learning curve | Low (schema DSL) | Low (SQL-like TS API) | Medium (SQL knowledge) |
-| Migration approach | Prisma Migrate (declarative) | Drizzle Kit (SQL-based) | Manual SQL files |
-| Query complexity | Great for CRUD, limited for complex SQL | Handles complex SQL well | Full SQL power |
-| Performance | Good (query engine overhead) | Excellent (thin layer) | Best (direct driver) |
-| Edge/Serverless | Prisma Accelerate, or driver adapters | Native, lightweight | Native |
-| Introspection | Schema pull from existing DB | Schema pull | N/A (you write SQL) |
-| Relations | Declarative, auto joins | Explicit joins (SQL-like) | Manual joins |
-| Best for | Rapid development, CRUD-heavy | Performance-sensitive, SQL-experienced teams | Complex queries, DBA teams |
+| Feature            | Prisma                                  | Drizzle                                      | Raw SQL (Kysely/sqlc)        |
+| ------------------ | --------------------------------------- | -------------------------------------------- | ---------------------------- |
+| Type safety        | Generated types from schema             | Schema-as-code types                         | Generated from SQL / builder |
+| Learning curve     | Low (schema DSL)                        | Low (SQL-like TS API)                        | Medium (SQL knowledge)       |
+| Migration approach | Prisma Migrate (declarative)            | Drizzle Kit (SQL-based)                      | Manual SQL files             |
+| Query complexity   | Great for CRUD, limited for complex SQL | Handles complex SQL well                     | Full SQL power               |
+| Performance        | Good (query engine overhead)            | Excellent (thin layer)                       | Best (direct driver)         |
+| Edge/Serverless    | Prisma Accelerate, or driver adapters   | Native, lightweight                          | Native                       |
+| Introspection      | Schema pull from existing DB            | Schema pull                                  | N/A (you write SQL)          |
+| Relations          | Declarative, auto joins                 | Explicit joins (SQL-like)                    | Manual joins                 |
+| Best for           | Rapid development, CRUD-heavy           | Performance-sensitive, SQL-experienced teams | Complex queries, DBA teams   |
 
 ### Decision Criteria
 
@@ -387,15 +387,15 @@ Choosing ORM/query layer:
 
 // Type-safe queries
 const user = await prisma.user.findUnique({
-  where: { email: 'user@example.com' },
-  include: { orders: { take: 5, orderBy: { createdAt: 'desc' } } },
+  where: { email: "user@example.com" },
+  include: { orders: { take: 5, orderBy: { createdAt: "desc" } } },
 });
 
 // Transaction
 const [order, inventory] = await prisma.$transaction([
   prisma.order.create({ data: { userId: user.id, total: 99.99 } }),
   prisma.inventory.update({
-    where: { productId: 'abc' },
+    where: { productId: "abc" },
     data: { quantity: { decrement: 1 } },
   }),
 ]);
@@ -404,20 +404,22 @@ const [order, inventory] = await prisma.$transaction([
 ### Drizzle Example
 
 ```typescript
-import { pgTable, uuid, text, numeric, timestamp } from 'drizzle-orm/pg-core';
-import { eq, desc } from 'drizzle-orm';
+import { pgTable, uuid, text, numeric, timestamp } from "drizzle-orm/pg-core";
+import { eq, desc } from "drizzle-orm";
 
 // Schema as TypeScript code
-export const users = pgTable('users', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  email: text('email').notNull().unique(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
+export const users = pgTable("users", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: text("email").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const orders = pgTable('orders', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').references(() => users.id).notNull(),
-  total: numeric('total', { precision: 10, scale: 2 }).notNull(),
+export const orders = pgTable("orders", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .references(() => users.id)
+    .notNull(),
+  total: numeric("total", { precision: 10, scale: 2 }).notNull(),
 });
 
 // SQL-like queries
@@ -425,7 +427,7 @@ const userOrders = await db
   .select()
   .from(users)
   .leftJoin(orders, eq(users.id, orders.userId))
-  .where(eq(users.email, 'user@example.com'))
+  .where(eq(users.email, "user@example.com"))
   .orderBy(desc(orders.total))
   .limit(5);
 ```
@@ -436,13 +438,13 @@ const userOrders = await db
 
 ### Index Types
 
-| Index Type | Use When | Example |
-|------------|----------|---------|
-| B-tree (default) | Equality, range, sorting, prefix LIKE | `CREATE INDEX idx_email ON users (email)` |
-| GIN | JSONB containment, array overlap, full-text | `CREATE INDEX idx_meta ON products USING GIN (metadata)` |
-| GiST | Geometric, range types, full-text (ranking) | `CREATE INDEX idx_geo ON locations USING GIST (coordinates)` |
-| BRIN | Large sequential/append-only tables (time-series) | `CREATE INDEX idx_time ON events USING BRIN (created_at)` |
-| Hash | Equality-only (rare, B-tree is usually better) | `CREATE INDEX idx_hash ON sessions USING HASH (token)` |
+| Index Type       | Use When                                          | Example                                                      |
+| ---------------- | ------------------------------------------------- | ------------------------------------------------------------ |
+| B-tree (default) | Equality, range, sorting, prefix LIKE             | `CREATE INDEX idx_email ON users (email)`                    |
+| GIN              | JSONB containment, array overlap, full-text       | `CREATE INDEX idx_meta ON products USING GIN (metadata)`     |
+| GiST             | Geometric, range types, full-text (ranking)       | `CREATE INDEX idx_geo ON locations USING GIST (coordinates)` |
+| BRIN             | Large sequential/append-only tables (time-series) | `CREATE INDEX idx_time ON events USING BRIN (created_at)`    |
+| Hash             | Equality-only (rare, B-tree is usually better)    | `CREATE INDEX idx_hash ON sessions USING HASH (token)`       |
 
 ### Partial Indexes
 
@@ -478,12 +480,12 @@ WHERE status = 'active' AND created_at > '2026-01-01';
 
 ### Index Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|-------------|---------|-----|
-| Index every column | Write performance degrades, storage bloat | Index only queried columns |
-| Missing composite index | Sequential scans on filtered + sorted queries | Analyze query patterns, add composites |
-| Unused indexes | Storage and write overhead for no read benefit | Check `pg_stat_user_indexes` for unused indexes |
-| Over-indexing JSONB | GIN indexes on large JSONB are expensive | Use partial GIN or expression indexes |
+| Anti-Pattern            | Problem                                        | Fix                                             |
+| ----------------------- | ---------------------------------------------- | ----------------------------------------------- |
+| Index every column      | Write performance degrades, storage bloat      | Index only queried columns                      |
+| Missing composite index | Sequential scans on filtered + sorted queries  | Analyze query patterns, add composites          |
+| Unused indexes          | Storage and write overhead for no read benefit | Check `pg_stat_user_indexes` for unused indexes |
+| Over-indexing JSONB     | GIN indexes on large JSONB are expensive       | Use partial GIN or expression indexes           |
 
 ```sql
 -- Find unused indexes
@@ -515,13 +517,13 @@ LIMIT 10;
 
 **What to look for:**
 
-| Red Flag | Meaning | Fix |
-|----------|---------|-----|
-| `Seq Scan` on large table | No useful index | Add appropriate index |
-| `Sort` with high cost | In-memory or disk sort | Add index matching ORDER BY |
-| `Nested Loop` with high rows | N+1 at database level | Consider Hash Join (rewrite query) |
-| `Rows Removed by Filter` >> actual rows | Index not selective enough | More selective index or partial index |
-| `Buffers: shared read` >> `shared hit` | Data not cached | Increase `shared_buffers` or optimize query |
+| Red Flag                                | Meaning                    | Fix                                         |
+| --------------------------------------- | -------------------------- | ------------------------------------------- |
+| `Seq Scan` on large table               | No useful index            | Add appropriate index                       |
+| `Sort` with high cost                   | In-memory or disk sort     | Add index matching ORDER BY                 |
+| `Nested Loop` with high rows            | N+1 at database level      | Consider Hash Join (rewrite query)          |
+| `Rows Removed by Filter` >> actual rows | Index not selective enough | More selective index or partial index       |
+| `Buffers: shared read` >> `shared hit`  | Data not cached            | Increase `shared_buffers` or optimize query |
 
 ### Query Optimization Checklist
 
@@ -543,10 +545,12 @@ LIMIT 10;
 
 ```typescript
 // N+1: 1 query for users + N queries for orders
-const users = await db.query('SELECT * FROM users LIMIT 100');
+const users = await db.query("SELECT * FROM users LIMIT 100");
 for (const user of users) {
   // This runs 100 separate queries!
-  user.orders = await db.query('SELECT * FROM orders WHERE user_id = $1', [user.id]);
+  user.orders = await db.query("SELECT * FROM orders WHERE user_id = $1", [
+    user.id,
+  ]);
 }
 
 // Fix 1: JOIN (single query)
@@ -558,9 +562,11 @@ const usersWithOrders = await db.query(`
 `);
 
 // Fix 2: Batch load (2 queries)
-const users = await db.query('SELECT * FROM users LIMIT 100');
-const userIds = users.map(u => u.id);
-const orders = await db.query('SELECT * FROM orders WHERE user_id = ANY($1)', [userIds]);
+const users = await db.query("SELECT * FROM users LIMIT 100");
+const userIds = users.map((u) => u.id);
+const orders = await db.query("SELECT * FROM orders WHERE user_id = ANY($1)", [
+  userIds,
+]);
 // Group orders by user in application code
 ```
 
@@ -569,7 +575,7 @@ const orders = await db.query('SELECT * FROM orders WHERE user_id = ANY($1)', [u
 ```typescript
 // Prisma: use include/select (eager loading)
 const users = await prisma.user.findMany({
-  include: { orders: true },  // Single query with JOIN
+  include: { orders: true }, // Single query with JOIN
   take: 100,
 });
 
@@ -583,12 +589,12 @@ const result = await db
 
 ### Detection Tools
 
-| Tool | How It Detects | Language |
-|------|---------------|---------|
-| Prisma query log | Shows all SQL queries | TypeScript |
-| pg_stat_statements | Tracks query frequency and duration | PostgreSQL |
-| DataLoader pattern | Batches multiple lookups into single query | Any (GraphQL) |
-| OpenTelemetry DB spans | Trace shows repeated similar queries | Any |
+| Tool                   | How It Detects                             | Language      |
+| ---------------------- | ------------------------------------------ | ------------- |
+| Prisma query log       | Shows all SQL queries                      | TypeScript    |
+| pg_stat_statements     | Tracks query frequency and duration        | PostgreSQL    |
+| DataLoader pattern     | Batches multiple lookups into single query | Any (GraphQL) |
+| OpenTelemetry DB spans | Trace shows repeated similar queries       | Any           |
 
 ---
 
@@ -596,16 +602,16 @@ const result = await db
 
 ### Key Metrics
 
-| Metric | Source | Alert Threshold |
-|--------|--------|-----------------|
-| Active connections | `pg_stat_activity` | > 80% of `max_connections` |
-| Long-running queries | `pg_stat_activity` | > 30s duration |
-| Dead tuples (bloat) | `pg_stat_user_tables` | > 10% of live tuples |
-| Replication lag | `pg_stat_replication` | > 10s |
-| Cache hit ratio | `pg_stat_database` | < 99% |
-| Transaction rate | `pg_stat_database` | Sudden drop or spike |
-| Disk usage | OS / cloud metrics | > 80% capacity |
-| Lock waits | `pg_stat_activity` | > 5s wait time |
+| Metric               | Source                | Alert Threshold            |
+| -------------------- | --------------------- | -------------------------- |
+| Active connections   | `pg_stat_activity`    | > 80% of `max_connections` |
+| Long-running queries | `pg_stat_activity`    | > 30s duration             |
+| Dead tuples (bloat)  | `pg_stat_user_tables` | > 10% of live tuples       |
+| Replication lag      | `pg_stat_replication` | > 10s                      |
+| Cache hit ratio      | `pg_stat_database`    | < 99%                      |
+| Transaction rate     | `pg_stat_database`    | Sudden drop or spike       |
+| Disk usage           | OS / cloud metrics    | > 80% capacity             |
+| Lock waits           | `pg_stat_activity`    | > 5s wait time             |
 
 ### Essential Monitoring Queries
 
@@ -654,16 +660,16 @@ LIMIT 20;
 
 ## Anti-Patterns
 
-| Anti-Pattern | Impact | Fix |
-|-------------|--------|-----|
-| No connection pooling | Connection exhaustion | PgBouncer or ORM pool |
-| Missing indexes on foreign keys | Slow JOINs and CASCADE deletes | Index all FK columns |
-| `SELECT *` everywhere | Wasted bandwidth, prevents index-only scans | Select only needed columns |
-| Large transactions | Lock contention, replication lag | Keep transactions short and focused |
-| No query timeout | Runaway queries consume connections | `statement_timeout = '30s'` |
-| Storing files in database | Bloated tables, slow backups | Use object storage (S3) + URL reference |
-| UUID v4 as primary key without care | B-tree index fragmentation | Use UUIDv7 (time-ordered) or BIGSERIAL |
-| No `VACUUM` monitoring | Table bloat, slow scans | Monitor `autovacuum`, tune settings |
+| Anti-Pattern                        | Impact                                      | Fix                                     |
+| ----------------------------------- | ------------------------------------------- | --------------------------------------- |
+| No connection pooling               | Connection exhaustion                       | PgBouncer or ORM pool                   |
+| Missing indexes on foreign keys     | Slow JOINs and CASCADE deletes              | Index all FK columns                    |
+| `SELECT *` everywhere               | Wasted bandwidth, prevents index-only scans | Select only needed columns              |
+| Large transactions                  | Lock contention, replication lag            | Keep transactions short and focused     |
+| No query timeout                    | Runaway queries consume connections         | `statement_timeout = '30s'`             |
+| Storing files in database           | Bloated tables, slow backups                | Use object storage (S3) + URL reference |
+| UUID v4 as primary key without care | B-tree index fragmentation                  | Use UUIDv7 (time-ordered) or BIGSERIAL  |
+| No `VACUUM` monitoring              | Table bloat, slow scans                     | Monitor `autovacuum`, tune settings     |
 
 ---
 

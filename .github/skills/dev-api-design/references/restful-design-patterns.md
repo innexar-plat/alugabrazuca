@@ -83,6 +83,7 @@ POST   /api/v1/payments/:id/refund     # Refund payment
 ```
 
 **Action endpoint criteria:**
+
 - Use POST method (actions change state)
 - Action name should be a verb (activate, cancel, ship)
 - Only when standard CRUD doesn't fit the business logic
@@ -95,11 +96,13 @@ POST   /api/v1/payments/:id/refund     # Refund payment
 ### GET - Read Resources
 
 **Characteristics:**
+
 - **Idempotent**: Multiple identical requests have same effect
 - **Safe**: No side effects, doesn't change server state
 - **Cacheable**: Responses can be cached by default
 
 **Examples:**
+
 ```
 GET /api/v1/users              # List users
 GET /api/v1/users/:id          # Get specific user
@@ -107,6 +110,7 @@ GET /api/v1/users/:id/orders   # Get user's orders
 ```
 
 **Response:**
+
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -124,17 +128,20 @@ Content-Type: application/json
 ### POST - Create Resources
 
 **Characteristics:**
+
 - **Not idempotent**: Multiple requests create multiple resources
 - **Not safe**: Changes server state
 - **Not cacheable**: Fresh data needed
 
 **Examples:**
+
 ```
 POST /api/v1/users             # Create new user
 POST /api/v1/orders            # Create new order
 ```
 
 **Request:**
+
 ```http
 POST /api/v1/users
 Content-Type: application/json
@@ -146,6 +153,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```http
 HTTP/1.1 201 Created
 Location: /api/v1/users/456
@@ -162,6 +170,7 @@ Content-Type: application/json
 ```
 
 **Best practices:**
+
 - Return `201 Created` status
 - Include `Location` header with new resource URI
 - Return created resource in response body
@@ -171,15 +180,18 @@ Content-Type: application/json
 ### PUT - Replace Resource
 
 **Characteristics:**
+
 - **Idempotent**: Multiple identical requests have same effect
 - **Replaces entire resource**: All fields must be provided
 
 **Examples:**
+
 ```
 PUT /api/v1/users/:id          # Replace entire user
 ```
 
 **Request:**
+
 ```http
 PUT /api/v1/users/123
 Content-Type: application/json
@@ -192,6 +204,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -208,6 +221,7 @@ Content-Type: application/json
 ```
 
 **When to use PUT vs PATCH:**
+
 - **PUT**: When client sends complete resource representation
 - **PATCH**: When client sends only changed fields
 
@@ -216,15 +230,18 @@ Content-Type: application/json
 ### PATCH - Partial Update
 
 **Characteristics:**
+
 - **Idempotent**: Multiple identical requests have same effect
 - **Updates specific fields**: Only changed fields provided
 
 **Examples:**
+
 ```
 PATCH /api/v1/users/:id        # Update specific user fields
 ```
 
 **Request:**
+
 ```http
 PATCH /api/v1/users/123
 Content-Type: application/json
@@ -235,6 +252,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -255,20 +273,24 @@ Content-Type: application/json
 ### DELETE - Remove Resource
 
 **Characteristics:**
+
 - **Idempotent**: Multiple deletes have same effect (resource stays deleted)
 - **Returns 204 or 200**: Depending on whether response body is included
 
 **Examples:**
+
 ```
 DELETE /api/v1/users/:id       # Delete user
 ```
 
 **Response (no body):**
+
 ```http
 HTTP/1.1 204 No Content
 ```
 
 **Response (with body):**
+
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -280,6 +302,7 @@ Content-Type: application/json
 ```
 
 **Soft delete pattern:**
+
 ```
 # Mark as deleted instead of removing from database
 PATCH /api/v1/users/:id
@@ -294,34 +317,34 @@ PATCH /api/v1/users/:id
 
 ### Success Codes (2xx)
 
-| Code | Meaning | Use Case |
-|------|---------|----------|
-| `200 OK` | Successful request | GET, PUT, PATCH with response body |
-| `201 Created` | Resource created | POST successful creation |
-| `202 Accepted` | Request accepted for processing | Async operations, queued jobs |
-| `204 No Content` | Successful, no body to return | DELETE, POST/PUT without response |
+| Code             | Meaning                         | Use Case                           |
+| ---------------- | ------------------------------- | ---------------------------------- |
+| `200 OK`         | Successful request              | GET, PUT, PATCH with response body |
+| `201 Created`    | Resource created                | POST successful creation           |
+| `202 Accepted`   | Request accepted for processing | Async operations, queued jobs      |
+| `204 No Content` | Successful, no body to return   | DELETE, POST/PUT without response  |
 
 ### Client Error Codes (4xx)
 
-| Code | Meaning | Use Case |
-|------|---------|----------|
-| `400 Bad Request` | Malformed syntax | Invalid JSON, missing required headers |
-| `401 Unauthorized` | Authentication required | Missing or invalid credentials |
-| `403 Forbidden` | Authenticated but insufficient permissions | User lacks role/permission |
-| `404 Not Found` | Resource doesn't exist | Invalid resource ID |
-| `405 Method Not Allowed` | HTTP method not supported | POST to read-only endpoint |
-| `409 Conflict` | Resource state conflict | Duplicate email, version mismatch |
-| `422 Unprocessable Entity` | Validation error | Invalid email format, out-of-range values |
-| `429 Too Many Requests` | Rate limit exceeded | Client exceeded quota |
+| Code                       | Meaning                                    | Use Case                                  |
+| -------------------------- | ------------------------------------------ | ----------------------------------------- |
+| `400 Bad Request`          | Malformed syntax                           | Invalid JSON, missing required headers    |
+| `401 Unauthorized`         | Authentication required                    | Missing or invalid credentials            |
+| `403 Forbidden`            | Authenticated but insufficient permissions | User lacks role/permission                |
+| `404 Not Found`            | Resource doesn't exist                     | Invalid resource ID                       |
+| `405 Method Not Allowed`   | HTTP method not supported                  | POST to read-only endpoint                |
+| `409 Conflict`             | Resource state conflict                    | Duplicate email, version mismatch         |
+| `422 Unprocessable Entity` | Validation error                           | Invalid email format, out-of-range values |
+| `429 Too Many Requests`    | Rate limit exceeded                        | Client exceeded quota                     |
 
 ### Server Error Codes (5xx)
 
-| Code | Meaning | Use Case |
-|------|---------|----------|
-| `500 Internal Server Error` | Unexpected server error | Unhandled exception |
-| `502 Bad Gateway` | Invalid upstream response | Downstream service error |
-| `503 Service Unavailable` | Temporary unavailability | Maintenance, overloaded |
-| `504 Gateway Timeout` | Upstream timeout | Downstream service timeout |
+| Code                        | Meaning                   | Use Case                   |
+| --------------------------- | ------------------------- | -------------------------- |
+| `500 Internal Server Error` | Unexpected server error   | Unhandled exception        |
+| `502 Bad Gateway`           | Invalid upstream response | Downstream service error   |
+| `503 Service Unavailable`   | Temporary unavailability  | Maintenance, overloaded    |
+| `504 Gateway Timeout`       | Upstream timeout          | Downstream service timeout |
 
 ---
 
@@ -332,6 +355,7 @@ PATCH /api/v1/users/:id
 **GET, PUT, DELETE, HEAD, OPTIONS** - Multiple identical requests have the same effect as a single request.
 
 **Example - DELETE:**
+
 ```
 DELETE /api/v1/users/123  # First call: deletes user, returns 204
 DELETE /api/v1/users/123  # Second call: user already gone, returns 404 (or 204)
@@ -342,6 +366,7 @@ DELETE /api/v1/users/123  # Second call: user already gone, returns 404 (or 204)
 **POST** - Each request creates a new resource.
 
 **Example:**
+
 ```
 POST /api/v1/orders
 { "productId": "abc", "quantity": 1 }
@@ -373,18 +398,21 @@ Server stores idempotency key and returns cached response for duplicate requests
 **Principle:** Each request must contain all information needed to process it.
 
 **BAD: Bad (Stateful):**
+
 ```
 # Server stores "current user" in session
 GET /api/v1/current-user/orders
 ```
 
 **GOOD: Good (Stateless):**
+
 ```
 GET /api/v1/users/:userId/orders
 Authorization: Bearer <token>
 ```
 
 **Benefits of stateless APIs:**
+
 - Horizontal scalability (any server can handle any request)
 - Simpler caching
 - Better fault tolerance

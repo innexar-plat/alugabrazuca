@@ -1,6 +1,7 @@
 # BrasilQuartos — Resumo do Blueprint MVP
 
 ## Sobre
+
 Plataforma de aluguel de quartos nos EUA e Europa para brasileiros.
 Conecta anfitriões (quem tem quarto) com inquilinos (quem busca quarto).
 
@@ -9,6 +10,7 @@ Conecta anfitriões (quem tem quarto) com inquilinos (quem busca quarto).
 ## Módulos Planejados — Resumo Executivo
 
 ### 1. Auth (Autenticação & Perfil)
+
 - Cadastro por e-mail + Google OAuth
 - Login com JWT (access + refresh token)
 - Perfil completo com foto, bio, idiomas, cidade
@@ -17,6 +19,7 @@ Conecta anfitriões (quem tem quarto) com inquilinos (quem busca quarto).
 - 15 endpoints
 
 ### 2. Listing (Anúncio de Quarto) ⭐ Módulo mais complexo
+
 - Wizard de criação em 9 passos
 - 80+ campos detalhando: tipo do quarto, cama (single/double/queen/king), móveis, banheiro (suíte/privativo/compartilhado), cozinha (acesso/horário/eletrodomésticos), lavanderia (frequência/custo), estacionamento, preço, depósito, contas incluídas, regras da casa (pets/fumo/casal/crianças/visitas), preferências de inquilino, fotos (3-20), vídeo tour
 - Lifecycle: draft → pending_review → active → paused/rented/expired
@@ -24,6 +27,7 @@ Conecta anfitriões (quem tem quarto) com inquilinos (quem busca quarto).
 - 12 endpoints
 
 ### 3. Search (Busca Pública)
+
 - 30+ filtros (localização, preço, tipo, banheiro, cozinha, regras)
 - 5 opções de ordenação
 - Mapa interativo com pins (Mapbox)
@@ -32,6 +36,7 @@ Conecta anfitriões (quem tem quarto) com inquilinos (quem busca quarto).
 - 5 endpoints
 
 ### 4. Landing Page & SEO
+
 - Hero + busca rápida + como funciona
 - Quartos em destaque + cidades populares
 - Números da plataforma + depoimentos
@@ -40,6 +45,7 @@ Conecta anfitriões (quem tem quarto) com inquilinos (quem busca quarto).
 - 4 endpoints
 
 ### 5. Inquiries (Solicitações de Contato)
+
 - 3 tipos: visita, informação, candidatura
 - Formulário com mensagem, data, ocupantes, pets, apresentação
 - Anfitrião aceita/recusa/responde
@@ -48,6 +54,7 @@ Conecta anfitriões (quem tem quarto) com inquilinos (quem busca quarto).
 - 8 endpoints
 
 ### 6. Messages (Mensagens)
+
 - Conversas assíncronas vinculadas a solicitações aceitas
 - Indicador de não lidas
 - Bloquear/reportar usuário
@@ -55,6 +62,7 @@ Conecta anfitriões (quem tem quarto) com inquilinos (quem busca quarto).
 - 8 endpoints
 
 ### 7. Reviews (Avaliações)
+
 - Bidirecional: inquilino ↔ anfitrião
 - 5-7 critérios por tipo com nota 1-5
 - Sistema de "reveal simultâneo"
@@ -62,12 +70,14 @@ Conecta anfitriões (quem tem quarto) com inquilinos (quem busca quarto).
 - 5 endpoints
 
 ### 8. Favorites (Favoritos)
+
 - Toggle favoritar/desfavoritar
 - Lista de favoritos com paginação
 - 1 tabela: `favorites`
 - 4 endpoints
 
 ### 9. Admin (Painel Administrativo)
+
 - Dashboard com métricas
 - Moderação de anúncios (fila de revisão)
 - Gestão de usuários (suspender/banir)
@@ -76,6 +86,7 @@ Conecta anfitriões (quem tem quarto) com inquilinos (quem busca quarto).
 - 11 endpoints
 
 ### 10. Verification (Verificação de ID)
+
 - 3 níveis: e-mail → telefone → documento
 - Upload de documento com selfie
 - Revisão manual (MVP) ou OCR (futuro)
@@ -83,6 +94,7 @@ Conecta anfitriões (quem tem quarto) com inquilinos (quem busca quarto).
 - 7 endpoints
 
 ### 11. Monetization (Monetização)
+
 - 3 planos: Free, Pro ($19/mês), Business ($49/mês)
 - Anúncio em destaque: $9-29
 - Integração Stripe (assinaturas + pagamentos)
@@ -90,6 +102,7 @@ Conecta anfitriões (quem tem quarto) com inquilinos (quem busca quarto).
 - 7 endpoints
 
 ### 12. Notifications (Notificações)
+
 - E-mail + in-app (push futuro)
 - 20+ tipos de notificação
 - Preferências configuráveis
@@ -98,6 +111,7 @@ Conecta anfitriões (quem tem quarto) com inquilinos (quem busca quarto).
 - 6 endpoints
 
 ### 13. Infra (Infraestrutura)
+
 - Storage: AWS S3 + CloudFront
 - Cache: Redis
 - E-mail: Resend/SES
@@ -110,15 +124,15 @@ Conecta anfitriões (quem tem quarto) com inquilinos (quem busca quarto).
 
 ## Totais
 
-| Métrica | Quantidade |
-|---------|-----------|
-| Módulos | 13 |
-| Tabelas no banco | ~20 |
-| Endpoints da API | ~92 |
-| Campos do anúncio | ~80 |
-| Filtros de busca | ~30 |
-| Templates de e-mail | ~12 |
-| Páginas frontend | ~25 |
+| Métrica             | Quantidade |
+| ------------------- | ---------- |
+| Módulos             | 13         |
+| Tabelas no banco    | ~20        |
+| Endpoints da API    | ~92        |
+| Campos do anúncio   | ~80        |
+| Filtros de busca    | ~30        |
+| Templates de e-mail | ~12        |
+| Páginas frontend    | ~25        |
 
 ---
 

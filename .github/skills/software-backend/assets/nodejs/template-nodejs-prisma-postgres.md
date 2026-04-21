@@ -1,6 +1,6 @@
 # Backend Engineering - Node.js + Prisma + PostgreSQL Template
 
-*Purpose: A comprehensive template for building production-grade REST APIs with Node.js, Prisma ORM, and PostgreSQL.*
+_Purpose: A comprehensive template for building production-grade REST APIs with Node.js, Prisma ORM, and PostgreSQL._
 
 ---
 
@@ -28,6 +28,7 @@ Use this template when building:
 [Brief description of the API purpose]
 
 **Tech Stack:**
+
 - [ ] Node.js (v18+ recommended)
 - [ ] TypeScript
 - [ ] Express.js / Fastify / NestJS
@@ -37,11 +38,13 @@ Use this template when building:
 - [ ] BullMQ (background jobs)
 
 **Team:**
+
 - Owner: [Name]
 - Backend Lead: [Name]
 - Database Admin: [Name]
 
 **Timeline:**
+
 - Start: [YYYY-MM-DD]
 - MVP: [YYYY-MM-DD]
 - Launch: [YYYY-MM-DD]
@@ -154,10 +157,10 @@ SENTRY_DSN=your-sentry-dsn
 
 ```typescript
 // src/config/env.ts
-import { z } from 'zod';
+import { z } from "zod";
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production', 'test']),
+  NODE_ENV: z.enum(["development", "production", "test"]),
   PORT: z.string().transform(Number),
   DATABASE_URL: z.string().url(),
   REDIS_URL: z.string().url(),
@@ -169,6 +172,7 @@ export const env = envSchema.parse(process.env);
 ```
 
 **Checklist:**
+
 - [ ] All required variables defined
 - [ ] Validation at startup
 - [ ] Separate `.env` per environment (dev/staging/prod)
@@ -248,11 +252,11 @@ enum Role {
 
 ```typescript
 // src/config/database.ts
-import { PrismaClient } from '@prisma/client';
-import { env } from './env';
+import { PrismaClient } from "@prisma/client";
+import { env } from "./env";
 
 const prisma = new PrismaClient({
-  log: env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  log: env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
 });
 
 export { prisma };
@@ -275,6 +279,7 @@ npx prisma studio
 ```
 
 **Checklist:**
+
 - [ ] Schema follows naming conventions
 - [ ] Indexes on foreign keys and query columns
 - [ ] Cascade deletes configured
@@ -289,26 +294,28 @@ npx prisma studio
 
 ```typescript
 // src/app.ts
-import express from 'express';
-import helmet from 'helmet';
-import cors from 'cors';
-import compression from 'compression';
-import { rateLimit } from 'express-rate-limit';
-import routes from './api/routes';
-import { errorHandler } from './api/middlewares/error.middleware';
-import { requestLogger } from './api/middlewares/logger.middleware';
+import express from "express";
+import helmet from "helmet";
+import cors from "cors";
+import compression from "compression";
+import { rateLimit } from "express-rate-limit";
+import routes from "./api/routes";
+import { errorHandler } from "./api/middlewares/error.middleware";
+import { requestLogger } from "./api/middlewares/logger.middleware";
 
 const app = express();
 
 // Security
 app.use(helmet());
-app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: process.env.ALLOWED_ORIGINS?.split(",") || "*",
+    credentials: true,
+  }),
+);
 
 // Parsing
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 // Compression
@@ -319,18 +326,18 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
 });
-app.use('/api/', limiter);
+app.use("/api/", limiter);
 
 // Logging
 app.use(requestLogger);
 
 // Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
 // Routes
-app.use('/api/v1', routes);
+app.use("/api/v1", routes);
 
 // Error handling
 app.use(errorHandler);
@@ -342,10 +349,10 @@ export { app };
 
 ```typescript
 // src/server.ts
-import { app } from './app';
-import { env } from './config/env';
-import { logger } from './config/logger';
-import { prisma } from './config/database';
+import { app } from "./app";
+import { env } from "./config/env";
+import { logger } from "./config/logger";
+import { prisma } from "./config/database";
 
 const PORT = env.PORT || 3000;
 
@@ -355,7 +362,7 @@ const server = app.listen(PORT, () => {
 
 // Graceful shutdown
 const shutdown = async () => {
-  logger.info('Shutting down gracefully...');
+  logger.info("Shutting down gracefully...");
 
   server.close(async () => {
     await prisma.$disconnect();
@@ -364,16 +371,17 @@ const shutdown = async () => {
 
   // Force shutdown after 10 seconds
   setTimeout(() => {
-    logger.error('Forced shutdown');
+    logger.error("Forced shutdown");
     process.exit(1);
   }, 10000);
 };
 
-process.on('SIGTERM', shutdown);
-process.on('SIGINT', shutdown);
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
 ```
 
 **Checklist:**
+
 - [ ] Security headers (Helmet)
 - [ ] CORS configured
 - [ ] Rate limiting enabled
@@ -389,17 +397,17 @@ process.on('SIGINT', shutdown);
 
 ```typescript
 // src/services/auth.service.ts
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { prisma } from '../config/database';
-import { env } from '../config/env';
-import { AppError } from '../utils/errors';
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { prisma } from "../config/database";
+import { env } from "../config/env";
+import { AppError } from "../utils/errors";
 
 class AuthService {
   async register(email: string, password: string, name: string) {
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      throw new AppError(409, 'Email already registered');
+      throw new AppError(409, "Email already registered");
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -417,16 +425,16 @@ class AuthService {
   async login(email: string, password: string) {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      throw new AppError(401, 'Invalid credentials');
+      throw new AppError(401, "Invalid credentials");
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
-      throw new AppError(401, 'Invalid credentials');
+      throw new AppError(401, "Invalid credentials");
     }
 
     if (!user.isActive) {
-      throw new AppError(403, 'Account is deactivated');
+      throw new AppError(403, "Account is deactivated");
     }
 
     const token = this.generateToken(user.id, user.role);
@@ -443,11 +451,9 @@ class AuthService {
   }
 
   private generateToken(userId: string, role: string) {
-    return jwt.sign(
-      { userId, role },
-      env.JWT_SECRET,
-      { expiresIn: env.JWT_EXPIRES_IN }
-    );
+    return jwt.sign({ userId, role }, env.JWT_SECRET, {
+      expiresIn: env.JWT_EXPIRES_IN,
+    });
   }
 }
 
@@ -458,22 +464,22 @@ export const authService = new AuthService();
 
 ```typescript
 // src/api/middlewares/auth.middleware.ts
-import jwt from 'jsonwebtoken';
-import { Request, Response, NextFunction } from 'express';
-import { prisma } from '../../config/database';
-import { env } from '../../config/env';
-import { AppError } from '../../utils/errors';
+import jwt from "jsonwebtoken";
+import { Request, Response, NextFunction } from "express";
+import { prisma } from "../../config/database";
+import { env } from "../../config/env";
+import { AppError } from "../../utils/errors";
 
 export const authenticate = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    const token = req.headers.authorization?.replace("Bearer ", "");
 
     if (!token) {
-      throw new AppError(401, 'Authentication required');
+      throw new AppError(401, "Authentication required");
     }
 
     const payload = jwt.verify(token, env.JWT_SECRET) as {
@@ -487,20 +493,20 @@ export const authenticate = async (
     });
 
     if (!user || !user.isActive) {
-      throw new AppError(401, 'Invalid or expired token');
+      throw new AppError(401, "Invalid or expired token");
     }
 
     req.user = user;
     next();
   } catch (error) {
-    next(new AppError(401, 'Invalid or expired token'));
+    next(new AppError(401, "Invalid or expired token"));
   }
 };
 
 export const authorize = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
-      return next(new AppError(403, 'Insufficient permissions'));
+      return next(new AppError(403, "Insufficient permissions"));
     }
     next();
   };
@@ -508,6 +514,7 @@ export const authorize = (...roles: string[]) => {
 ```
 
 **Checklist:**
+
 - [ ] Password hashing with bcrypt (12 rounds minimum)
 - [ ] JWT token with expiration
 - [ ] Refresh token mechanism (if needed)
@@ -522,23 +529,23 @@ export const authorize = (...roles: string[]) => {
 
 ```typescript
 // src/api/routes/users.routes.ts
-import { Router } from 'express';
-import { usersController } from '../controllers/users.controller';
-import { authenticate, authorize } from '../middlewares/auth.middleware';
-import { validate } from '../middlewares/validation.middleware';
-import { updateUserSchema } from '../validators/users.schema';
+import { Router } from "express";
+import { usersController } from "../controllers/users.controller";
+import { authenticate, authorize } from "../middlewares/auth.middleware";
+import { validate } from "../middlewares/validation.middleware";
+import { updateUserSchema } from "../validators/users.schema";
 
 const router = Router();
 
-router.get('/', authenticate, authorize('ADMIN'), usersController.getAll);
-router.get('/:id', authenticate, usersController.getById);
+router.get("/", authenticate, authorize("ADMIN"), usersController.getAll);
+router.get("/:id", authenticate, usersController.getById);
 router.patch(
-  '/:id',
+  "/:id",
   authenticate,
   validate(updateUserSchema),
-  usersController.update
+  usersController.update,
 );
-router.delete('/:id', authenticate, authorize('ADMIN'), usersController.delete);
+router.delete("/:id", authenticate, authorize("ADMIN"), usersController.delete);
 
 export default router;
 ```
@@ -547,8 +554,8 @@ export default router;
 
 ```typescript
 // src/api/controllers/users.controller.ts
-import { Request, Response, NextFunction } from 'express';
-import { usersService } from '../../services/users.service';
+import { Request, Response, NextFunction } from "express";
+import { usersService } from "../../services/users.service";
 
 class UsersController {
   async getAll(req: Request, res: Response, next: NextFunction) {
@@ -596,6 +603,7 @@ export const usersController = new UsersController();
 ```
 
 **Checklist:**
+
 - [ ] Proper HTTP methods (GET, POST, PUT, PATCH, DELETE)
 - [ ] Authentication on protected routes
 - [ ] Authorization checks
@@ -608,8 +616,8 @@ export const usersController = new UsersController();
 
 ```typescript
 // src/repositories/users.repository.ts
-import { prisma } from '../config/database';
-import { Prisma } from '@prisma/client';
+import { prisma } from "../config/database";
+import { Prisma } from "@prisma/client";
 
 interface PaginationParams {
   cursor?: string;
@@ -621,7 +629,7 @@ class UsersRepository {
     const users = await prisma.user.findMany({
       take: limit + 1,
       ...(cursor && { skip: 1, cursor: { id: cursor } }),
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       select: {
         id: true,
         email: true,
@@ -676,6 +684,7 @@ export const usersRepository = new UsersRepository();
 ```
 
 **Checklist:**
+
 - [ ] Repository layer isolates data access
 - [ ] Select only needed fields
 - [ ] Support pagination
@@ -689,11 +698,11 @@ export const usersRepository = new UsersRepository();
 
 ```typescript
 // tests/unit/services/auth.service.test.ts
-import { authService } from '../../../src/services/auth.service';
-import { prisma } from '../../../src/config/database';
-import bcrypt from 'bcrypt';
+import { authService } from "../../../src/services/auth.service";
+import { prisma } from "../../../src/config/database";
+import bcrypt from "bcrypt";
 
-jest.mock('../../../src/config/database', () => ({
+jest.mock("../../../src/config/database", () => ({
   prisma: {
     user: {
       findUnique: jest.fn(),
@@ -702,36 +711,36 @@ jest.mock('../../../src/config/database', () => ({
   },
 }));
 
-describe('AuthService', () => {
-  describe('register', () => {
-    it('should create user with hashed password', async () => {
+describe("AuthService", () => {
+  describe("register", () => {
+    it("should create user with hashed password", async () => {
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
       (prisma.user.create as jest.Mock).mockResolvedValue({
-        id: '1',
-        email: 'test@example.com',
-        name: 'Test User',
-        role: 'USER',
+        id: "1",
+        email: "test@example.com",
+        name: "Test User",
+        role: "USER",
       });
 
       const result = await authService.register(
-        'test@example.com',
-        'password123',
-        'Test User'
+        "test@example.com",
+        "password123",
+        "Test User",
       );
 
-      expect(result.user.email).toBe('test@example.com');
+      expect(result.user.email).toBe("test@example.com");
       expect(result.token).toBeDefined();
     });
 
-    it('should throw error if email exists', async () => {
+    it("should throw error if email exists", async () => {
       (prisma.user.findUnique as jest.Mock).mockResolvedValue({
-        id: '1',
-        email: 'test@example.com',
+        id: "1",
+        email: "test@example.com",
       });
 
       await expect(
-        authService.register('test@example.com', 'password123', 'Test User')
-      ).rejects.toThrow('Email already registered');
+        authService.register("test@example.com", "password123", "Test User"),
+      ).rejects.toThrow("Email already registered");
     });
   });
 });
@@ -741,11 +750,11 @@ describe('AuthService', () => {
 
 ```typescript
 // tests/integration/api/auth.test.ts
-import request from 'supertest';
-import { app } from '../../../src/app';
-import { prisma } from '../../../src/config/database';
+import request from "supertest";
+import { app } from "../../../src/app";
+import { prisma } from "../../../src/config/database";
 
-describe('POST /api/v1/auth/register', () => {
+describe("POST /api/v1/auth/register", () => {
   beforeAll(async () => {
     // Setup test database
   });
@@ -754,44 +763,45 @@ describe('POST /api/v1/auth/register', () => {
     await prisma.$disconnect();
   });
 
-  it('should register new user', async () => {
+  it("should register new user", async () => {
     const response = await request(app)
-      .post('/api/v1/auth/register')
+      .post("/api/v1/auth/register")
       .send({
-        email: 'newuser@example.com',
-        password: 'password123',
-        name: 'New User',
+        email: "newuser@example.com",
+        password: "password123",
+        name: "New User",
       })
       .expect(201);
 
-    expect(response.body.user.email).toBe('newuser@example.com');
+    expect(response.body.user.email).toBe("newuser@example.com");
     expect(response.body.token).toBeDefined();
   });
 
-  it('should return 409 if email exists', async () => {
+  it("should return 409 if email exists", async () => {
     // First registration
-    await request(app).post('/api/v1/auth/register').send({
-      email: 'duplicate@example.com',
-      password: 'password123',
-      name: 'User',
+    await request(app).post("/api/v1/auth/register").send({
+      email: "duplicate@example.com",
+      password: "password123",
+      name: "User",
     });
 
     // Duplicate registration
     const response = await request(app)
-      .post('/api/v1/auth/register')
+      .post("/api/v1/auth/register")
       .send({
-        email: 'duplicate@example.com',
-        password: 'password123',
-        name: 'User 2',
+        email: "duplicate@example.com",
+        password: "password123",
+        name: "User 2",
       })
       .expect(409);
 
-    expect(response.body.message).toBe('Email already registered');
+    expect(response.body.message).toBe("Email already registered");
   });
 });
 ```
 
 **Checklist:**
+
 - [ ] Unit tests for services and utilities
 - [ ] Integration tests for API endpoints
 - [ ] Test database separate from development
@@ -837,7 +847,7 @@ CMD ["npm", "start"]
 ## 10.2 docker-compose.yml
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   app:
@@ -874,6 +884,7 @@ volumes:
 ```
 
 **Checklist:**
+
 - [ ] Multi-stage build for smaller image
 - [ ] Non-root user
 - [ ] Health checks
@@ -885,6 +896,7 @@ volumes:
 # 11. Production Checklist
 
 ## 11.1 Security
+
 - [ ] HTTPS enabled
 - [ ] Security headers (Helmet)
 - [ ] Rate limiting
@@ -897,6 +909,7 @@ volumes:
 - [ ] Dependency vulnerability scanning
 
 ## 11.2 Performance
+
 - [ ] Database indexes on query columns
 - [ ] Connection pooling configured
 - [ ] Caching layer (Redis)
@@ -905,6 +918,7 @@ volumes:
 - [ ] Query optimization (select only needed fields)
 
 ## 11.3 Monitoring
+
 - [ ] Structured logging (Pino/Winston)
 - [ ] Error tracking (Sentry)
 - [ ] APM (New Relic/Datadog)
@@ -913,6 +927,7 @@ volumes:
 - [ ] Cache hit ratio monitoring
 
 ## 11.4 Deployment
+
 - [ ] CI/CD pipeline configured
 - [ ] Automated tests in pipeline
 - [ ] Database migrations automated
@@ -929,39 +944,40 @@ volumes:
 
 ```typescript
 // src/config/swagger.ts
-import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerJSDoc from "swagger-jsdoc";
 
 const options = {
   definition: {
-    openapi: '3.0.0',
+    openapi: "3.0.0",
     info: {
-      title: 'My API',
-      version: '1.0.0',
-      description: 'API documentation',
+      title: "My API",
+      version: "1.0.0",
+      description: "API documentation",
     },
     servers: [
       {
-        url: 'http://localhost:3000/api/v1',
-        description: 'Development server',
+        url: "http://localhost:3000/api/v1",
+        description: "Development server",
       },
     ],
     components: {
       securitySchemes: {
         bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
         },
       },
     },
   },
-  apis: ['./src/api/routes/*.ts'],
+  apis: ["./src/api/routes/*.ts"],
 };
 
 export const swaggerSpec = swaggerJSDoc(options);
 ```
 
 **Checklist:**
+
 - [ ] API documentation generated
 - [ ] All endpoints documented
 - [ ] Request/response schemas defined

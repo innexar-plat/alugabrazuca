@@ -8,13 +8,13 @@ Comprehensive incident response procedures covering team structure, detection, c
 
 Every incident needs clear ownership. Scale team size to incident severity.
 
-| Role | Responsibility | Who (Typical) |
-|------|---------------|---------------|
-| **Incident Commander (IC)** | Owns decision authority, coordinates response, sets priorities | Engineering manager, senior SRE, CISO |
-| **Technical Lead** | Investigates root cause, directs containment and remediation | Senior engineer with domain knowledge |
-| **Communications Lead** | Drafts internal/external messaging, manages stakeholder updates | Head of comms, product manager, legal |
-| **Scribe** | Records timeline, decisions, actions in real time | Any team member |
-| **Subject Matter Expert** | Provides domain-specific knowledge (e.g., auth, infra, data) | Relevant engineer or architect |
+| Role                        | Responsibility                                                  | Who (Typical)                         |
+| --------------------------- | --------------------------------------------------------------- | ------------------------------------- |
+| **Incident Commander (IC)** | Owns decision authority, coordinates response, sets priorities  | Engineering manager, senior SRE, CISO |
+| **Technical Lead**          | Investigates root cause, directs containment and remediation    | Senior engineer with domain knowledge |
+| **Communications Lead**     | Drafts internal/external messaging, manages stakeholder updates | Head of comms, product manager, legal |
+| **Scribe**                  | Records timeline, decisions, actions in real time               | Any team member                       |
+| **Subject Matter Expert**   | Provides domain-specific knowledge (e.g., auth, infra, data)    | Relevant engineer or architect        |
 
 ### Escalation Contact Sheet
 
@@ -43,12 +43,12 @@ Cyber Insurance      | [Broker/Carrier] | —                | +1-XXX-XXX-XXXX
 
 ### Severity Classification
 
-| Severity | Definition | Response Time | Escalation |
-|----------|-----------|---------------|------------|
-| **P0 — Critical** | Active data breach, credential compromise affecting production, ransomware, supply chain attack | Immediate (< 15 min) | IC + CISO + Legal + Exec |
-| **P1 — High** | Confirmed vulnerability actively exploited, unauthorized access detected, customer PII exposed | < 1 hour | IC + Technical Lead + Comms |
-| **P2 — Medium** | Vulnerability discovered (not exploited), suspicious activity requiring investigation, failed intrusion attempt | < 4 hours | Technical Lead + Security team |
-| **P3 — Low** | Minor policy violation, low-risk vulnerability, security tool misconfiguration | < 24 hours | Security team standard triage |
+| Severity          | Definition                                                                                                      | Response Time        | Escalation                     |
+| ----------------- | --------------------------------------------------------------------------------------------------------------- | -------------------- | ------------------------------ |
+| **P0 — Critical** | Active data breach, credential compromise affecting production, ransomware, supply chain attack                 | Immediate (< 15 min) | IC + CISO + Legal + Exec       |
+| **P1 — High**     | Confirmed vulnerability actively exploited, unauthorized access detected, customer PII exposed                  | < 1 hour             | IC + Technical Lead + Comms    |
+| **P2 — Medium**   | Vulnerability discovered (not exploited), suspicious activity requiring investigation, failed intrusion attempt | < 4 hours            | Technical Lead + Security team |
+| **P3 — Low**      | Minor policy violation, low-risk vulnerability, security tool misconfiguration                                  | < 24 hours           | Security team standard triage  |
 
 ### Triage Decision Tree
 
@@ -71,15 +71,15 @@ Alert received:
 
 ### Detection Sources
 
-| Source | What It Catches | Priority |
-|--------|----------------|----------|
-| SIEM alerts (Splunk, Datadog, ELK) | Anomalous patterns, correlation rules | Automated, high priority |
-| WAF/IDS (Cloudflare, AWS WAF) | Known attack signatures, rate anomalies | Automated |
-| Dependency scanner (Snyk, Dependabot) | Vulnerable packages | Automated, P2-P3 |
-| Bug bounty / responsible disclosure | External findings | Manual, severity varies |
-| Customer report | Data they should not see, account compromise | Manual, triage immediately |
-| Employee report | Suspicious email, credential phishing | Manual, triage within 1 hour |
-| Code review finding | Hardcoded secrets, auth bypass | Manual, P2-P3 |
+| Source                                | What It Catches                              | Priority                     |
+| ------------------------------------- | -------------------------------------------- | ---------------------------- |
+| SIEM alerts (Splunk, Datadog, ELK)    | Anomalous patterns, correlation rules        | Automated, high priority     |
+| WAF/IDS (Cloudflare, AWS WAF)         | Known attack signatures, rate anomalies      | Automated                    |
+| Dependency scanner (Snyk, Dependabot) | Vulnerable packages                          | Automated, P2-P3             |
+| Bug bounty / responsible disclosure   | External findings                            | Manual, severity varies      |
+| Customer report                       | Data they should not see, account compromise | Manual, triage immediately   |
+| Employee report                       | Suspicious email, credential phishing        | Manual, triage within 1 hour |
+| Code review finding                   | Hardcoded secrets, auth bypass               | Manual, P2-P3                |
 
 ---
 
@@ -192,12 +192,12 @@ aws cloudtrail lookup-events \
 
 ### Forensic Imaging
 
-| Asset Type | Tool | Procedure |
-|------------|------|-----------|
-| Cloud VM | Cloud provider snapshot | Create snapshot before any changes; tag with incident ID |
-| Container | `docker commit` + `docker save` | Capture running state; preserve image layers |
-| Database | Point-in-time snapshot | Use cloud provider snapshot; do not rely on logical backup alone |
-| Memory | `LiME` (Linux), cloud memory capture | Capture before reboot; volatile evidence lost on power cycle |
+| Asset Type | Tool                                 | Procedure                                                        |
+| ---------- | ------------------------------------ | ---------------------------------------------------------------- |
+| Cloud VM   | Cloud provider snapshot              | Create snapshot before any changes; tag with incident ID         |
+| Container  | `docker commit` + `docker save`      | Capture running state; preserve image layers                     |
+| Database   | Point-in-time snapshot               | Use cloud provider snapshot; do not rely on logical backup alone |
+| Memory     | `LiME` (Linux), cloud memory capture | Capture before reboot; volatile evidence lost on power cycle     |
 
 ### Chain of Custody
 
@@ -350,13 +350,13 @@ RECOVERY SEQUENCE:
 
 After every incident, add or improve monitoring:
 
-| What to Add | Why | Tool |
-|-------------|-----|------|
-| Alert for the specific attack pattern | Catch recurrence | SIEM rule |
-| Anomaly detection on affected data store | Detect similar attacks | Datadog, CloudWatch |
-| Canary tokens in sensitive locations | Early warning for access | canarytokens.org |
-| Enhanced logging on affected endpoints | Deeper visibility | Application logging |
-| Failed auth rate alert | Brute-force detection | Rate limiter + alerting |
+| What to Add                              | Why                      | Tool                    |
+| ---------------------------------------- | ------------------------ | ----------------------- |
+| Alert for the specific attack pattern    | Catch recurrence         | SIEM rule               |
+| Anomaly detection on affected data store | Detect similar attacks   | Datadog, CloudWatch     |
+| Canary tokens in sensitive locations     | Early warning for access | canarytokens.org        |
+| Enhanced logging on affected endpoints   | Deeper visibility        | Application logging     |
+| Failed auth rate alert                   | Brute-force detection    | Rate limiter + alerting |
 
 ---
 
@@ -439,13 +439,13 @@ REQUIRED INFORMATION:
 
 ### US State Breach Notification
 
-| State | Deadline | Threshold | AG Notification |
-|-------|----------|-----------|-----------------|
-| California (CCPA/CPRA) | "Expedient" (typically 45 days) | Unencrypted PI | > 500 residents |
-| New York (SHIELD Act) | "Expedient" | Private information | Any number |
-| Texas | 60 days | Sensitive PI | > 250 residents |
-| Florida | 30 days | PI | > 500 residents |
-| Illinois (PIPA) | "Expedient" | PI | Any number |
+| State                  | Deadline                        | Threshold           | AG Notification |
+| ---------------------- | ------------------------------- | ------------------- | --------------- |
+| California (CCPA/CPRA) | "Expedient" (typically 45 days) | Unencrypted PI      | > 500 residents |
+| New York (SHIELD Act)  | "Expedient"                     | Private information | Any number      |
+| Texas                  | 60 days                         | Sensitive PI        | > 250 residents |
+| Florida                | 30 days                         | PI                  | > 500 residents |
+| Illinois (PIPA)        | "Expedient"                     | PI                  | Any number      |
 
 **Note**: State laws change frequently. Verify current requirements with legal counsel for each incident.
 
@@ -457,13 +457,13 @@ Security Orchestration, Automation, and Response (SOAR) can automate repetitive 
 
 ### Automatable Actions
 
-| Trigger | Automated Action | Tool |
-|---------|------------------|------|
-| GitHub secret detected | Revoke token, notify owner, create ticket | GitHub Advanced Security + webhook |
-| Multiple failed logins (>10 in 5 min) | Temporary IP block, alert security team | WAF rule + SIEM |
-| Known malicious IP detected | Block at edge, enrich with threat intel | Cloudflare + threat feed |
-| Vulnerability scan finds critical CVE | Create P1 ticket, notify owners, block deploy | Snyk + Jira integration |
-| Anomalous data access pattern | Capture session details, alert, prepare for containment | SIEM + SOAR |
+| Trigger                               | Automated Action                                        | Tool                               |
+| ------------------------------------- | ------------------------------------------------------- | ---------------------------------- |
+| GitHub secret detected                | Revoke token, notify owner, create ticket               | GitHub Advanced Security + webhook |
+| Multiple failed logins (>10 in 5 min) | Temporary IP block, alert security team                 | WAF rule + SIEM                    |
+| Known malicious IP detected           | Block at edge, enrich with threat intel                 | Cloudflare + threat feed           |
+| Vulnerability scan finds critical CVE | Create P1 ticket, notify owners, block deploy           | Snyk + Jira integration            |
+| Anomalous data access pattern         | Capture session details, alert, prepare for containment | SIEM + SOAR                        |
 
 ### Example: Automated Secret Leak Response
 
@@ -492,7 +492,7 @@ jobs:
         with:
           project: SEC
           issuetype: Incident
-          summary: 'Secret leaked: ${{ steps.alert.outputs.type }}'
+          summary: "Secret leaked: ${{ steps.alert.outputs.type }}"
           description: |
             A secret of type ${{ steps.alert.outputs.type }} was detected.
             Location: ${{ steps.alert.outputs.location }}
@@ -501,7 +501,7 @@ jobs:
       - name: Notify security team
         uses: slackapi/slack-github-action@v1
         with:
-          channel-id: 'C0SECURITY'
+          channel-id: "C0SECURITY"
           slack-message: |
             :rotating_light: Secret leak detected
             Type: ${{ steps.alert.outputs.type }}
@@ -512,16 +512,16 @@ jobs:
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|-------------|-------------|------------------|
-| No documented IR plan | Chaos during real incident | Write and rehearse IR plan quarterly |
-| Single point of contact | Unavailable person blocks response | Primary + backup for every role |
-| Investigating before containing | Attack continues during analysis | Contain first, investigate second |
-| Deleting evidence during cleanup | Cannot determine scope or root cause | Preserve first, then clean |
-| Blaming individuals in postmortem | People hide information next time | Blameless postmortem culture |
-| Notifying only after full investigation | Regulatory deadlines missed | Start notification clock at awareness |
-| No IR rehearsal | First real incident exposes all gaps | Quarterly tabletop exercises |
-| Shared credentials for IR tools | Audit trail impossible | Individual accounts for all IR systems |
+| Anti-Pattern                            | Why It Fails                         | Correct Approach                       |
+| --------------------------------------- | ------------------------------------ | -------------------------------------- |
+| No documented IR plan                   | Chaos during real incident           | Write and rehearse IR plan quarterly   |
+| Single point of contact                 | Unavailable person blocks response   | Primary + backup for every role        |
+| Investigating before containing         | Attack continues during analysis     | Contain first, investigate second      |
+| Deleting evidence during cleanup        | Cannot determine scope or root cause | Preserve first, then clean             |
+| Blaming individuals in postmortem       | People hide information next time    | Blameless postmortem culture           |
+| Notifying only after full investigation | Regulatory deadlines missed          | Start notification clock at awareness  |
+| No IR rehearsal                         | First real incident exposes all gaps | Quarterly tabletop exercises           |
+| Shared credentials for IR tools         | Audit trail impossible               | Individual accounts for all IR systems |
 
 ---
 

@@ -15,20 +15,20 @@ Defaults to bias toward: type-safe boundaries (validation at the edge), OpenTele
 
 ## Quick Reference
 
-| Task | Default Picks | Notes |
-|------|---------------|-------|
-| REST API | Fastify / Express / NestJS | Prefer typed boundaries + explicit timeouts |
-| Edge API | Hono / platform-native handlers | Keep work stateless, CPU-light |
-| Type-Safe API | tRPC | Prefer for TS monorepos and internal APIs |
-| GraphQL API | Apollo Server / Pothos | Prefer for complex client-driven queries |
-| Database | PostgreSQL | Use pooling + migrations + query budgets |
-| ORM / Query Layer | Prisma / Drizzle / SQLAlchemy / GORM / SeaORM / EF Core | Prefer explicit transactions |
-| Authentication | OIDC/OAuth + sessions/JWT | Prefer httpOnly cookies for browsers |
-| Validation | Zod / Pydantic / validator libs | Validate at the boundary, not deep inside |
-| Caching | Redis (or managed) | Use TTLs + invalidation strategy |
-| Background Jobs | BullMQ / platform queues | Make jobs idempotent + retry-safe |
-| Testing | Unit + integration + contract/E2E | Keep most tests below the UI layer |
-| Observability | Structured logs + OpenTelemetry | Correlation IDs end-to-end |
+| Task              | Default Picks                                           | Notes                                       |
+| ----------------- | ------------------------------------------------------- | ------------------------------------------- |
+| REST API          | Fastify / Express / NestJS                              | Prefer typed boundaries + explicit timeouts |
+| Edge API          | Hono / platform-native handlers                         | Keep work stateless, CPU-light              |
+| Type-Safe API     | tRPC                                                    | Prefer for TS monorepos and internal APIs   |
+| GraphQL API       | Apollo Server / Pothos                                  | Prefer for complex client-driven queries    |
+| Database          | PostgreSQL                                              | Use pooling + migrations + query budgets    |
+| ORM / Query Layer | Prisma / Drizzle / SQLAlchemy / GORM / SeaORM / EF Core | Prefer explicit transactions                |
+| Authentication    | OIDC/OAuth + sessions/JWT                               | Prefer httpOnly cookies for browsers        |
+| Validation        | Zod / Pydantic / validator libs                         | Validate at the boundary, not deep inside   |
+| Caching           | Redis (or managed)                                      | Use TTLs + invalidation strategy            |
+| Background Jobs   | BullMQ / platform queues                                | Make jobs idempotent + retry-safe           |
+| Testing           | Unit + integration + contract/E2E                       | Keep most tests below the UI layer          |
+| Observability     | Structured logs + OpenTelemetry                         | Correlation IDs end-to-end                  |
 
 ## Scope
 
@@ -55,15 +55,15 @@ Use a different skill when:
 
 Pick based on the strongest constraint, not feature lists:
 
-| Constraint | Default Pick | Why |
-|-----------|-------------|-----|
-| Team knows TypeScript only | Fastify/Hono + Prisma/Drizzle | Ecosystem depth, hiring ease |
-| Need <50ms P95, CPU-bound work | Go (net/http + sqlc/pgx) | Goroutines isolate CPU work; no event-loop risk |
-| Data-heavy / ML integration | Python (FastAPI + SQLAlchemy) | Best ecosystem for numpy/pandas/ML pipelines |
-| Memory-safety critical | Rust (Axum + SeaORM/SQLx) | Zero-cost abstractions, no GC |
-| Enterprise/.NET team | C# (ASP.NET Core + EF Core) | Azure integration, mature tooling |
-| Edge/serverless | Hono / platform-native handlers | Stateless, CPU-light, fast cold starts |
-| Fintech/audit-sensitive | Go + sqlc (or raw SQL) | ORM magic is a liability; you need auditable SQL |
+| Constraint                     | Default Pick                    | Why                                              |
+| ------------------------------ | ------------------------------- | ------------------------------------------------ |
+| Team knows TypeScript only     | Fastify/Hono + Prisma/Drizzle   | Ecosystem depth, hiring ease                     |
+| Need <50ms P95, CPU-bound work | Go (net/http + sqlc/pgx)        | Goroutines isolate CPU work; no event-loop risk  |
+| Data-heavy / ML integration    | Python (FastAPI + SQLAlchemy)   | Best ecosystem for numpy/pandas/ML pipelines     |
+| Memory-safety critical         | Rust (Axum + SeaORM/SQLx)       | Zero-cost abstractions, no GC                    |
+| Enterprise/.NET team           | C# (ASP.NET Core + EF Core)     | Azure integration, mature tooling                |
+| Edge/serverless                | Hono / platform-native handlers | Stateless, CPU-light, fast cold starts           |
+| Fintech/audit-sensitive        | Go + sqlc (or raw SQL)          | ORM magic is a liability; you need auditable SQL |
 
 For detailed framework/ORM/auth/caching selection trees, see [references/edge-deployment-guide.md](references/edge-deployment-guide.md) and language-specific references.
 See [assets/](assets/) for starter templates per language.
@@ -80,28 +80,28 @@ All mutating operations MUST support idempotency for retry safety.
 
 ```typescript
 // Idempotency key header
-const idempotencyKey = request.headers['idempotency-key'];
+const idempotencyKey = request.headers["idempotency-key"];
 const cached = await redis.get(`idem:${idempotencyKey}`);
 if (cached) return JSON.parse(cached);
 
 const result = await processOperation();
-await redis.set(`idem:${idempotencyKey}`, JSON.stringify(result), 'EX', 86400);
+await redis.set(`idem:${idempotencyKey}`, JSON.stringify(result), "EX", 86400);
 return result;
 ```
 
-| Do | Avoid |
-|----|-------|
-| Store idempotency keys with TTL (24h typical) | Processing duplicate requests |
-| Return cached response for duplicate keys | Different responses for same key |
-| Use client-generated UUIDs | Server-generated keys |
+| Do                                            | Avoid                            |
+| --------------------------------------------- | -------------------------------- |
+| Store idempotency keys with TTL (24h typical) | Processing duplicate requests    |
+| Return cached response for duplicate keys     | Different responses for same key |
+| Use client-generated UUIDs                    | Server-generated keys            |
 
 ### Pagination Patterns
 
-| Pattern | Use When | Example |
-|---------|----------|---------|
+| Pattern      | Use When                       | Example                   |
+| ------------ | ------------------------------ | ------------------------- |
 | Cursor-based | Large datasets, real-time data | `?cursor=abc123&limit=20` |
-| Offset-based | Small datasets, random access | `?page=3&per_page=20` |
-| Keyset | Sorted data, high performance | `?after_id=1000&limit=20` |
+| Offset-based | Small datasets, random access  | `?page=3&per_page=20`     |
+| Keyset       | Sorted data, high performance  | `?after_id=1000&limit=20` |
 
 **Prefer cursor-based pagination** for APIs with frequent inserts.
 
@@ -123,30 +123,30 @@ Use a consistent machine-readable error format (RFC 9457 Problem Details): https
 
 ```typescript
 // Liveness: Is the process running?
-app.get('/health/live', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+app.get("/health/live", (req, res) => {
+  res.status(200).json({ status: "ok" });
 });
 
 // Readiness: Can the service handle traffic?
-app.get('/health/ready', async (req, res) => {
+app.get("/health/ready", async (req, res) => {
   const dbOk = await checkDatabase();
   const cacheOk = await checkRedis();
   if (dbOk && cacheOk) {
-    res.status(200).json({ status: 'ready', db: 'ok', cache: 'ok' });
+    res.status(200).json({ status: "ready", db: "ok", cache: "ok" });
   } else {
-    res.status(503).json({ status: 'not ready', db: dbOk, cache: cacheOk });
+    res.status(503).json({ status: "not ready", db: dbOk, cache: cacheOk });
   }
 });
 ```
 
 ### Common Mistakes (Non-Obvious)
 
-| Avoid | Instead | Why |
-|-------|---------|-----|
-| N+1 queries | `include`/`select` or DataLoader | 10-100x perf hit; easy to miss in ORM code |
-| No request timeouts | Timeouts on HTTP clients, DB, handlers | Hung deps cascade; see Production Hardening below |
-| Missing connection pooling | Prisma pool / PgBouncer / pgx pool | Exhaustion under load on shared DB tiers |
-| Catching errors silently | Log + rethrow or handle explicitly | Hidden failures, impossible to debug |
+| Avoid                      | Instead                                | Why                                               |
+| -------------------------- | -------------------------------------- | ------------------------------------------------- |
+| N+1 queries                | `include`/`select` or DataLoader       | 10-100x perf hit; easy to miss in ORM code        |
+| No request timeouts        | Timeouts on HTTP clients, DB, handlers | Hung deps cascade; see Production Hardening below |
+| Missing connection pooling | Prisma pool / PgBouncer / pgx pool     | Exhaustion under load on shared DB tiers          |
+| Catching errors silently   | Log + rethrow or handle explicitly     | Hidden failures, impossible to debug              |
 
 ---
 
@@ -166,15 +166,15 @@ const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
 await prisma.$queryRaw`SET statement_timeout = '3000'`;
 
 // Express/Fastify request timeout
-server.register(import('@fastify/timeout'), { timeout: 30000 });
+server.register(import("@fastify/timeout"), { timeout: 30000 });
 ```
 
-| Layer | Default Timeout | Rationale |
-|-------|----------------|-----------|
-| HTTP client calls | 5s | External APIs shouldn't block you |
-| Database queries | 3s | Slow queries = missing index or bad plan |
-| Request handler | 30s | Safety net for the whole request lifecycle |
-| Background jobs | 5min | Jobs that run longer need chunking |
+| Layer             | Default Timeout | Rationale                                  |
+| ----------------- | --------------- | ------------------------------------------ |
+| HTTP client calls | 5s              | External APIs shouldn't block you          |
+| Database queries  | 3s              | Slow queries = missing index or bad plan   |
+| Request handler   | 30s             | Safety net for the whole request lifecycle |
+| Background jobs   | 5min            | Jobs that run longer need chunking         |
 
 ### Field-Level Selection (Don't `SELECT *`)
 
@@ -187,7 +187,7 @@ const users = await prisma.user.findMany({ include: { posts: true } });
 // GOOD: fetch only what the endpoint needs
 const users = await prisma.user.findMany({
   select: { id: true, name: true, email: true },
-  include: { posts: { select: { id: true, title: true } } }
+  include: { posts: { select: { id: true, title: true } } },
 });
 ```
 
@@ -228,14 +228,14 @@ Red flags in the output: `Seq Scan` on large tables, `Nested Loop` with high row
 
 When a service is slow, work through these layers in order. Fix the cheapest layer first — don't add caching before fixing N+1 queries.
 
-| Step | What to Check | Fix |
-|------|--------------|-----|
-| 1. Query analysis | Enable query logging, find N+1s and slow queries | Rewrite with `include`/joins, add `select` for field-level optimization |
-| 2. Indexing | Run `EXPLAIN ANALYZE` on slow queries | Add composite indexes matching WHERE + ORDER BY patterns |
-| 3. Connection pooling | Check connection count vs. pool size | Configure pool limits (Prisma `connection_limit`, PgBouncer, pgx pool) |
-| 4. Caching | Identify read-heavy, rarely-changing data | Add Redis/in-memory cache with TTL + invalidation strategy |
-| 5. Timeouts | Check for missing timeouts on DB, HTTP, handlers | Add timeouts at every layer (see Production Hardening above) |
-| 6. Platform tuning | Shared DB limits, cold starts, memory | Upgrade tier, add read replicas, tune runtime settings |
+| Step                  | What to Check                                    | Fix                                                                     |
+| --------------------- | ------------------------------------------------ | ----------------------------------------------------------------------- |
+| 1. Query analysis     | Enable query logging, find N+1s and slow queries | Rewrite with `include`/joins, add `select` for field-level optimization |
+| 2. Indexing           | Run `EXPLAIN ANALYZE` on slow queries            | Add composite indexes matching WHERE + ORDER BY patterns                |
+| 3. Connection pooling | Check connection count vs. pool size             | Configure pool limits (Prisma `connection_limit`, PgBouncer, pgx pool)  |
+| 4. Caching            | Identify read-heavy, rarely-changing data        | Add Redis/in-memory cache with TTL + invalidation strategy              |
+| 5. Timeouts           | Check for missing timeouts on DB, HTTP, handlers | Add timeouts at every layer (see Production Hardening above)            |
+| 6. Platform tuning    | Shared DB limits, cold starts, memory            | Upgrade tier, add read replicas, tune runtime settings                  |
 
 **Key principle**: always measure before and after. Use structured logging with request IDs to trace specific slow requests end-to-end.
 
@@ -250,6 +250,7 @@ Backend architecture decisions directly impact cost and revenue. See [references
 ## Navigation
 
 **Resources**
+
 - [references/backend-best-practices.md](references/backend-best-practices.md) - Template authoring guide, quality checklist, and shared utilities pointers
 - [references/edge-deployment-guide.md](references/edge-deployment-guide.md) - Edge computing patterns, Cloudflare Workers vs Vercel Edge, tRPC, Hono, Bun
 - [references/infrastructure-economics.md](references/infrastructure-economics.md) - Cost modeling, performance SLAs -> revenue, FinOps practices, cloud optimization
@@ -264,6 +265,7 @@ Backend architecture decisions directly impact cost and revenue. See [references
 - Shared checklists: [../software-clean-code-standard/assets/checklists/backend-api-review-checklist.md](../software-clean-code-standard/assets/checklists/backend-api-review-checklist.md), [../software-clean-code-standard/assets/checklists/secure-code-review-checklist.md](../software-clean-code-standard/assets/checklists/secure-code-review-checklist.md)
 
 **Shared Utilities** (Centralized patterns - extract, don't duplicate)
+
 - [../software-clean-code-standard/utilities/auth-utilities.md](../software-clean-code-standard/utilities/auth-utilities.md) - Argon2id, jose JWT, OAuth 2.1/PKCE
 - [../software-clean-code-standard/utilities/error-handling.md](../software-clean-code-standard/utilities/error-handling.md) - Effect Result types, correlation IDs
 - [../software-clean-code-standard/utilities/config-validation.md](../software-clean-code-standard/utilities/config-validation.md) - Zod 3.24+, Valibot, secrets management
@@ -274,6 +276,7 @@ Backend architecture decisions directly impact cost and revenue. See [references
 - [../software-clean-code-standard/references/clean-code-standard.md](../software-clean-code-standard/references/clean-code-standard.md) - Canonical clean code rules (`CC-*`) for citation
 
 **Templates**
+
 - [assets/nodejs/template-nodejs-prisma-postgres.md](assets/nodejs/template-nodejs-prisma-postgres.md) - Node.js + Prisma + PostgreSQL
 - [assets/go/template-go-fiber-gorm.md](assets/go/template-go-fiber-gorm.md) - Go + Fiber + GORM + PostgreSQL
 - [assets/rust/template-rust-axum-seaorm.md](assets/rust/template-rust-axum-seaorm.md) - Rust + Axum + SeaORM + PostgreSQL
@@ -281,6 +284,7 @@ Backend architecture decisions directly impact cost and revenue. See [references
 - [assets/csharp/template-csharp-aspnet-efcore.md](assets/csharp/template-csharp-aspnet-efcore.md) - C# + ASP.NET Core + Entity Framework Core + PostgreSQL
 
 **Related Skills**
+
 - [../software-architecture-design/SKILL.md](../software-architecture-design/SKILL.md) - System decomposition, SLAs, and data flows
 - [../software-security-appsec/SKILL.md](../software-security-appsec/SKILL.md) - Authentication/authorization and secure API design
 - [../ops-devops-platform/SKILL.md](../ops-devops-platform/SKILL.md) - CI/CD, infrastructure, and deployment safety
@@ -335,6 +339,7 @@ When users ask version-sensitive recommendation questions, do a quick freshness 
 ---
 
 ## Operational Playbooks
+
 - [references/operational-playbook.md](references/operational-playbook.md) - Full backend architecture patterns, checklists, TypeScript notes, and decision tables
 
 ## Fact-Checking

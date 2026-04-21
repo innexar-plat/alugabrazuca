@@ -48,7 +48,9 @@ export function FeaturedSection({ listings }: FeaturedSectionProps) {
               <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                 {listing.photos?.[0] ? (
                   <img
-                    src={resolveMediaUrl(listing.photos[0].thumbnailUrl || listing.photos[0].url)}
+                    src={resolveMediaUrl(
+                      listing.photos[0].thumbnailUrl || listing.photos[0].url,
+                    )}
                     alt={listing.title}
                     className="h-full w-full object-cover transition-transform group-hover:scale-105"
                     loading="lazy"

@@ -24,13 +24,13 @@ Measuring code review effectiveness without creating perverse incentives. This g
 
 ### Goals of Review Metrics
 
-| Goal | What Metrics Help With |
-|------|------------------------|
-| Speed | Are PRs getting reviewed quickly enough to unblock developers? |
-| Quality | Are reviews catching real bugs before they reach production? |
-| Fairness | Is review load distributed evenly across the team? |
-| Sustainability | Are reviewers burning out from review volume? |
-| Process health | Is the review process improving over time? |
+| Goal           | What Metrics Help With                                         |
+| -------------- | -------------------------------------------------------------- |
+| Speed          | Are PRs getting reviewed quickly enough to unblock developers? |
+| Quality        | Are reviews catching real bugs before they reach production?   |
+| Fairness       | Is review load distributed evenly across the team?             |
+| Sustainability | Are reviewers burning out from review volume?                  |
+| Process health | Is the review process improving over time?                     |
 
 ### What Metrics Cannot Tell You
 
@@ -47,12 +47,12 @@ Always interpret metrics in context. Use them as diagnostic signals, not perform
 
 ### Key Metrics
 
-| Metric | Definition | Target | Why It Matters |
-|--------|-----------|--------|----------------|
-| Time to First Response (TTFR) | Time from PR creation to first substantive reviewer comment | < 4 hours (business hours) | Long TTFR blocks authors and creates context-switching |
-| Time to Approval (TTA) | Time from PR creation to final approval | < 24 hours (P2), < 4 hours (P0) | Determines merge velocity |
-| Time to Merge (TTM) | Time from PR creation to merge | < 48 hours (P2) | Includes CI, post-review fixes, and merge queue |
-| Pickup Time | Time from review request to reviewer starting | < 2 hours | Indicates reviewer availability |
+| Metric                        | Definition                                                  | Target                          | Why It Matters                                         |
+| ----------------------------- | ----------------------------------------------------------- | ------------------------------- | ------------------------------------------------------ |
+| Time to First Response (TTFR) | Time from PR creation to first substantive reviewer comment | < 4 hours (business hours)      | Long TTFR blocks authors and creates context-switching |
+| Time to Approval (TTA)        | Time from PR creation to final approval                     | < 24 hours (P2), < 4 hours (P0) | Determines merge velocity                              |
+| Time to Merge (TTM)           | Time from PR creation to merge                              | < 48 hours (P2)                 | Includes CI, post-review fixes, and merge queue        |
+| Pickup Time                   | Time from review request to reviewer starting               | < 2 hours                       | Indicates reviewer availability                        |
 
 ### Measurement
 
@@ -75,12 +75,12 @@ GROUP BY pr.id, pr.created_at;
 
 ### SLA by Priority
 
-| Priority | First Response SLA | Approval SLA |
-|----------|-------------------|--------------|
-| P0 (Security/Incident) | 1 hour | 4 hours |
-| P1 (Bug fix, blocker) | 4 hours | 24 hours |
-| P2 (Feature work) | 8 hours | 48 hours |
-| P3 (Docs, refactoring) | 24 hours | 72 hours |
+| Priority               | First Response SLA | Approval SLA |
+| ---------------------- | ------------------ | ------------ |
+| P0 (Security/Incident) | 1 hour             | 4 hours      |
+| P1 (Bug fix, blocker)  | 4 hours            | 24 hours     |
+| P2 (Feature work)      | 8 hours            | 48 hours     |
+| P3 (Docs, refactoring) | 24 hours           | 72 hours     |
 
 ### Turnaround Distribution
 
@@ -103,25 +103,25 @@ The P90 and P95 values matter more than the median. A median of 3 hours is fine,
 
 ### Defects Found in Review
 
-| Metric | Definition | How to Measure |
-|--------|-----------|----------------|
-| Comments per PR | Average number of substantive comments | Count comments excluding bot, nit, style |
-| Blocking findings per PR | Average P0/P1 issues found | Count comments tagged as blocking |
-| Issues found by category | Security, correctness, performance, style | Categorize review comments |
-| Review depth score | Ratio of files reviewed to files changed | Track "viewed" checkmarks in GitHub |
+| Metric                   | Definition                                | How to Measure                           |
+| ------------------------ | ----------------------------------------- | ---------------------------------------- |
+| Comments per PR          | Average number of substantive comments    | Count comments excluding bot, nit, style |
+| Blocking findings per PR | Average P0/P1 issues found                | Count comments tagged as blocking        |
+| Issues found by category | Security, correctness, performance, style | Categorize review comments               |
+| Review depth score       | Ratio of files reviewed to files changed  | Track "viewed" checkmarks in GitHub      |
 
 ### Categorizing Review Comments
 
 Establish a tagging system for review comments to track what reviewers catch:
 
-| Category | Tag | Example |
-|----------|-----|---------|
-| Security | `security` | Missing input validation, hardcoded secret |
-| Correctness | `bug` | Off-by-one error, missing null check |
-| Performance | `perf` | N+1 query, missing index |
-| Design | `design` | Poor abstraction, wrong pattern |
-| Maintainability | `readability` | Unclear naming, missing documentation |
-| Style | `nit` | Formatting, import order |
+| Category        | Tag           | Example                                    |
+| --------------- | ------------- | ------------------------------------------ |
+| Security        | `security`    | Missing input validation, hardcoded secret |
+| Correctness     | `bug`         | Off-by-one error, missing null check       |
+| Performance     | `perf`        | N+1 query, missing index                   |
+| Design          | `design`      | Poor abstraction, wrong pattern            |
+| Maintainability | `readability` | Unclear naming, missing documentation      |
+| Style           | `nit`         | Formatting, import order                   |
 
 ### Review Comment Quality Ratio
 
@@ -162,13 +162,13 @@ Warning: > 40% (review process needs significant improvement)
 
 ### Tracking Post-Merge Defects
 
-| Source | How to Correlate |
-|--------|------------------|
-| Bug tickets filed | Tag with originating PR number |
-| Reverts | Track which PRs were reverted and why |
-| Hotfixes | Link hotfix PRs to the PR that introduced the issue |
-| Incident reports | Link incidents to contributing PRs |
-| Security advisories | Track vulnerabilities traced to specific changes |
+| Source              | How to Correlate                                    |
+| ------------------- | --------------------------------------------------- |
+| Bug tickets filed   | Tag with originating PR number                      |
+| Reverts             | Track which PRs were reverted and why               |
+| Hotfixes            | Link hotfix PRs to the PR that introduced the issue |
+| Incident reports    | Link incidents to contributing PRs                  |
+| Security advisories | Track vulnerabilities traced to specific changes    |
 
 ### Escape Rate by Category
 
@@ -198,12 +198,12 @@ When a defect escapes:
 
 ### Key Metrics
 
-| Metric | Definition | Target |
-|--------|-----------|--------|
-| Review rounds | Number of request-changes/re-review cycles | 1-2 rounds |
-| Comments per round | Average comments in each iteration | Decreasing per round |
-| Rework time | Time author spends addressing review feedback | < 4 hours per round |
-| Abandonment rate | PRs closed without merge after review | < 5% |
+| Metric             | Definition                                    | Target               |
+| ------------------ | --------------------------------------------- | -------------------- |
+| Review rounds      | Number of request-changes/re-review cycles    | 1-2 rounds           |
+| Comments per round | Average comments in each iteration            | Decreasing per round |
+| Rework time        | Time author spends addressing review feedback | < 4 hours per round  |
+| Abandonment rate   | PRs closed without merge after review         | < 5%                 |
 
 ### Iteration Analysis
 
@@ -217,12 +217,12 @@ PR Iteration Breakdown (last 30 days):
 
 ### What High Iteration Counts Indicate
 
-| Iteration Count | Possible Cause | Action |
-|----------------|----------------|--------|
-| 1 round consistently | Well-written PRs or rubber-stamping | Check defect escape rate |
-| 2 rounds average | Normal, healthy process | Maintain |
-| 3+ rounds frequently | Unclear requirements, scope creep, perfectionism | Review process, not code |
-| 4+ rounds | Misaligned expectations between author and reviewer | Pair programming may help |
+| Iteration Count      | Possible Cause                                      | Action                    |
+| -------------------- | --------------------------------------------------- | ------------------------- |
+| 1 round consistently | Well-written PRs or rubber-stamping                 | Check defect escape rate  |
+| 2 rounds average     | Normal, healthy process                             | Maintain                  |
+| 3+ rounds frequently | Unclear requirements, scope creep, perfectionism    | Review process, not code  |
+| 4+ rounds            | Misaligned expectations between author and reviewer | Pair programming may help |
 
 ---
 
@@ -230,12 +230,12 @@ PR Iteration Breakdown (last 30 days):
 
 ### Load Metrics
 
-| Metric | Definition | Target |
-|--------|-----------|--------|
-| Reviews per person per week | Number of PRs reviewed | 5-10 (varies by team size) |
-| Review hours per person per week | Time spent reviewing | 4-8 hours (20% of time) |
-| Pending review queue | PRs waiting for a specific reviewer | < 3 at any time |
-| Review distribution Gini coefficient | Evenness of review distribution | < 0.3 (lower is more even) |
+| Metric                               | Definition                          | Target                     |
+| ------------------------------------ | ----------------------------------- | -------------------------- |
+| Reviews per person per week          | Number of PRs reviewed              | 5-10 (varies by team size) |
+| Review hours per person per week     | Time spent reviewing                | 4-8 hours (20% of time)    |
+| Pending review queue                 | PRs waiting for a specific reviewer | < 3 at any time            |
+| Review distribution Gini coefficient | Evenness of review distribution     | < 0.3 (lower is more even) |
 
 ### Detecting Imbalances
 
@@ -287,12 +287,12 @@ Unhealthy:
 
 ### How Review Practices Affect DORA
 
-| DORA Metric | Review Impact |
-|-------------|---------------|
-| **Deployment Frequency** | Long review cycles reduce deploy frequency; smaller PRs with faster review enable daily deploys |
+| DORA Metric               | Review Impact                                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------------------------ |
+| **Deployment Frequency**  | Long review cycles reduce deploy frequency; smaller PRs with faster review enable daily deploys  |
 | **Lead Time for Changes** | Review turnaround is often the largest component of lead time; TTFR and TTA directly affect this |
-| **Change Failure Rate** | Thorough reviews reduce post-deploy failures; measure defect escape rate |
-| **Mean Time to Recovery** | Fast review of hotfix PRs (P0 SLA) directly affects MTTR |
+| **Change Failure Rate**   | Thorough reviews reduce post-deploy failures; measure defect escape rate                         |
+| **Mean Time to Recovery** | Fast review of hotfix PRs (P0 SLA) directly affects MTTR                                         |
 
 ### Correlating Review Metrics with DORA
 
@@ -324,13 +324,13 @@ Focus improvement efforts on review turnaround when this pattern appears.
 
 ### Common Gaming Patterns
 
-| Metric | Gaming Behavior | Why It Is Harmful |
-|--------|----------------|-------------------|
-| TTFR | Quick "I'll look later" comment | Inflates response time without actual review |
-| Comments per PR | Adding trivial nit comments | Wastes author time, does not improve quality |
-| Approval speed | Rubber-stamping to hit SLA | Defects escape to production |
-| Reviews per week | Claiming reviews done by bots/auto-approve | Misrepresents actual review effort |
-| Defect escape rate | Not filing bugs found post-merge | Hides real quality signal |
+| Metric             | Gaming Behavior                            | Why It Is Harmful                            |
+| ------------------ | ------------------------------------------ | -------------------------------------------- |
+| TTFR               | Quick "I'll look later" comment            | Inflates response time without actual review |
+| Comments per PR    | Adding trivial nit comments                | Wastes author time, does not improve quality |
+| Approval speed     | Rubber-stamping to hit SLA                 | Defects escape to production                 |
+| Reviews per week   | Claiming reviews done by bots/auto-approve | Misrepresents actual review effort           |
+| Defect escape rate | Not filing bugs found post-merge           | Hides real quality signal                    |
 
 ### Principles for Healthy Metrics
 
@@ -391,26 +391,26 @@ Score interpretation:
 
 ### Key Dashboard Components
 
-| Panel | Metrics | Visualization |
-|-------|---------|---------------|
-| Turnaround | TTFR, TTA, TTM (P50 and P90) | Time series + gauge |
-| Quality | Defect escape rate, quality ratio | Percentage + trend |
-| Throughput | PRs merged, avg iterations | Counter + bar chart |
-| Balance | Review distribution, queue depth | Heatmap + bar chart |
-| SLA compliance | % of PRs within SLA by priority | Stacked bar chart |
-| Trends | All metrics over 12 weeks | Sparklines |
+| Panel          | Metrics                           | Visualization       |
+| -------------- | --------------------------------- | ------------------- |
+| Turnaround     | TTFR, TTA, TTM (P50 and P90)      | Time series + gauge |
+| Quality        | Defect escape rate, quality ratio | Percentage + trend  |
+| Throughput     | PRs merged, avg iterations        | Counter + bar chart |
+| Balance        | Review distribution, queue depth  | Heatmap + bar chart |
+| SLA compliance | % of PRs within SLA by priority   | Stacked bar chart   |
+| Trends         | All metrics over 12 weeks         | Sparklines          |
 
 ### Data Sources
 
-| Platform | API for Metrics |
-|----------|----------------|
-| GitHub | GraphQL API (pullRequests, reviews, comments) |
-| GitLab | REST API (/merge_requests, /approvals) |
-| Bitbucket | REST API (/pullrequests, /activity) |
-| Graphite | CLI + API for stack metrics |
-| LinearB | Built-in engineering metrics |
-| Swarmia | Built-in review analytics |
-| Jellyfish | Engineering management platform |
+| Platform  | API for Metrics                               |
+| --------- | --------------------------------------------- |
+| GitHub    | GraphQL API (pullRequests, reviews, comments) |
+| GitLab    | REST API (/merge_requests, /approvals)        |
+| Bitbucket | REST API (/pullrequests, /activity)           |
+| Graphite  | CLI + API for stack metrics                   |
+| LinearB   | Built-in engineering metrics                  |
+| Swarmia   | Built-in review analytics                     |
+| Jellyfish | Engineering management platform               |
 
 ---
 
@@ -451,7 +451,7 @@ Score interpretation:
 name: Review Metrics
 on:
   schedule:
-    - cron: '0 9 * * 1'  # Every Monday at 9 AM
+    - cron: "0 9 * * 1" # Every Monday at 9 AM
   workflow_dispatch:
 
 jobs:

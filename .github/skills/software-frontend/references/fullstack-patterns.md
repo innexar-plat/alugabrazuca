@@ -17,6 +17,7 @@ Complete examples showing frontend and backend working together in Next.js appli
 ## Overview
 
 These examples demonstrate how to build full-stack features using:
+
 - **Backend**: Node.js + Prisma + PostgreSQL (API routes or Server Components)
 - **Frontend**: Next.js 16 + TypeScript + Tailwind CSS + shadcn/ui
 
@@ -62,7 +63,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'USER' | 'ADMIN';
+  role: "USER" | "ADMIN";
 }
 
 export interface AuthResponse {
@@ -86,12 +87,12 @@ export interface RegisterRequest {
 
 ```typescript
 // app/api/auth/login/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { prisma } from '@/lib/db';
-import type { LoginRequest, AuthResponse } from '@/types/auth';
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { prisma } from "@/lib/db";
+import type { LoginRequest, AuthResponse } from "@/types/auth";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -112,29 +113,29 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
+        { error: "Invalid credentials" },
+        { status: 401 },
       );
     }
 
     // Verify password
     const isValidPassword = await bcrypt.compare(
       validatedData.password,
-      user.password
+      user.password,
     );
 
     if (!isValidPassword) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
+        { error: "Invalid credentials" },
+        { status: 401 },
       );
     }
 
     // Check if user is active
     if (!user.isActive) {
       return NextResponse.json(
-        { error: 'Account is deactivated' },
-        { status: 403 }
+        { error: "Account is deactivated" },
+        { status: 403 },
       );
     }
 
@@ -142,7 +143,7 @@ export async function POST(request: NextRequest) {
     const token = jwt.sign(
       { userId: user.id, role: user.role },
       process.env.JWT_SECRET!,
-      { expiresIn: '7d' }
+      { expiresIn: "7d" },
     );
 
     // Prepare response
@@ -160,15 +161,15 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation error', details: error.errors },
-        { status: 400 }
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Login error:', error);
+    console.error("Login error:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }
@@ -178,12 +179,12 @@ export async function POST(request: NextRequest) {
 
 ```typescript
 // app/api/auth/register/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { prisma } from '@/lib/db';
-import type { RegisterRequest, AuthResponse } from '@/types/auth';
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { prisma } from "@/lib/db";
+import type { RegisterRequest, AuthResponse } from "@/types/auth";
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -205,8 +206,8 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'Email already registered' },
-        { status: 409 }
+        { error: "Email already registered" },
+        { status: 409 },
       );
     }
 
@@ -226,7 +227,7 @@ export async function POST(request: NextRequest) {
     const token = jwt.sign(
       { userId: user.id, role: user.role },
       process.env.JWT_SECRET!,
-      { expiresIn: '7d' }
+      { expiresIn: "7d" },
     );
 
     // Prepare response
@@ -244,15 +245,15 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation error', details: error.errors },
-        { status: 400 }
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Registration error:', error);
+    console.error("Registration error:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }
@@ -264,9 +265,9 @@ export async function POST(request: NextRequest) {
 
 ```typescript
 // lib/store/auth-store.ts
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type { User } from '@/types/auth';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import type { User } from "@/types/auth";
 
 interface AuthStore {
   user: User | null;
@@ -286,9 +287,9 @@ export const useAuthStore = create<AuthStore>()(
       isAuthenticated: () => get().token !== null,
     }),
     {
-      name: 'auth-storage',
-    }
-  )
+      name: "auth-storage",
+    },
+  ),
 );
 ```
 
@@ -465,16 +466,16 @@ export default function LoginPage() {
 
 ```typescript
 // middleware.ts
-import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { NextRequest, NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get('auth-token')?.value;
+  const token = request.cookies.get("auth-token")?.value;
 
   // Check if accessing protected route
-  if (request.nextUrl.pathname.startsWith('/dashboard')) {
+  if (request.nextUrl.pathname.startsWith("/dashboard")) {
     if (!token) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.redirect(new URL("/login", request.url));
     }
 
     try {
@@ -482,7 +483,7 @@ export function middleware(request: NextRequest) {
       jwt.verify(token, process.env.JWT_SECRET!);
       return NextResponse.next();
     } catch (error) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.redirect(new URL("/login", request.url));
     }
   }
 
@@ -490,7 +491,7 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'],
+  matcher: ["/dashboard/:path*"],
 };
 ```
 
@@ -567,11 +568,11 @@ export interface PostsListResponse {
 
 ```typescript
 // app/api/posts/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { prisma } from '@/lib/db';
-import { getCurrentUser } from '@/lib/auth';
-import type { CreatePostInput, PostsListResponse } from '@/types/post';
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth";
+import type { CreatePostInput, PostsListResponse } from "@/types/post";
 
 const createPostSchema = z.object({
   title: z.string().min(1).max(200),
@@ -584,9 +585,9 @@ const createPostSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const page = parseInt(searchParams.get('page') || '1');
-    const pageSize = parseInt(searchParams.get('pageSize') || '10');
-    const published = searchParams.get('published') === 'true';
+    const page = parseInt(searchParams.get("page") || "1");
+    const pageSize = parseInt(searchParams.get("pageSize") || "10");
+    const published = searchParams.get("published") === "true";
 
     const skip = (page - 1) * pageSize;
 
@@ -602,7 +603,7 @@ export async function GET(request: NextRequest) {
             },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip,
         take: pageSize,
       }),
@@ -612,7 +613,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     const response: PostsListResponse = {
-      posts: posts.map(post => ({
+      posts: posts.map((post) => ({
         ...post,
         createdAt: post.createdAt.toISOString(),
         updatedAt: post.updatedAt.toISOString(),
@@ -627,10 +628,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Error fetching posts:', error);
+    console.error("Error fetching posts:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch posts' },
-      { status: 500 }
+      { error: "Failed to fetch posts" },
+      { status: 500 },
     );
   }
 }
@@ -641,10 +642,7 @@ export async function POST(request: NextRequest) {
     // Get authenticated user
     const user = await getCurrentUser(request);
     if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body: CreatePostInput = await request.json();
@@ -675,20 +673,20 @@ export async function POST(request: NextRequest) {
         createdAt: post.createdAt.toISOString(),
         updatedAt: post.updatedAt.toISOString(),
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation error', details: error.errors },
-        { status: 400 }
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error creating post:', error);
+    console.error("Error creating post:", error);
     return NextResponse.json(
-      { error: 'Failed to create post' },
-      { status: 500 }
+      { error: "Failed to create post" },
+      { status: 500 },
     );
   }
 }
@@ -696,11 +694,11 @@ export async function POST(request: NextRequest) {
 
 ```typescript
 // app/api/posts/[id]/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { prisma } from '@/lib/db';
-import { getCurrentUser } from '@/lib/auth';
-import type { UpdatePostInput } from '@/types/post';
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth";
+import type { UpdatePostInput } from "@/types/post";
 
 const updatePostSchema = z.object({
   title: z.string().min(1).max(200).optional(),
@@ -712,7 +710,7 @@ const updatePostSchema = z.object({
 // GET /api/posts/[id] - Get single post
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const post = await prisma.post.findUnique({
@@ -729,10 +727,7 @@ export async function GET(
     });
 
     if (!post) {
-      return NextResponse.json(
-        { error: 'Post not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -741,10 +736,10 @@ export async function GET(
       updatedAt: post.updatedAt.toISOString(),
     });
   } catch (error) {
-    console.error('Error fetching post:', error);
+    console.error("Error fetching post:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch post' },
-      { status: 500 }
+      { error: "Failed to fetch post" },
+      { status: 500 },
     );
   }
 }
@@ -752,16 +747,13 @@ export async function GET(
 // PATCH /api/posts/[id] - Update post
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     // Get authenticated user
     const user = await getCurrentUser(request);
     if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if post exists and user is author
@@ -770,17 +762,11 @@ export async function PATCH(
     });
 
     if (!existingPost) {
-      return NextResponse.json(
-        { error: 'Post not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    if (existingPost.authorId !== user.id && user.role !== 'ADMIN') {
-      return NextResponse.json(
-        { error: 'Forbidden' },
-        { status: 403 }
-      );
+    if (existingPost.authorId !== user.id && user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const body: UpdatePostInput = await request.json();
@@ -811,15 +797,15 @@ export async function PATCH(
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation error', details: error.errors },
-        { status: 400 }
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error updating post:', error);
+    console.error("Error updating post:", error);
     return NextResponse.json(
-      { error: 'Failed to update post' },
-      { status: 500 }
+      { error: "Failed to update post" },
+      { status: 500 },
     );
   }
 }
@@ -827,16 +813,13 @@ export async function PATCH(
 // DELETE /api/posts/[id] - Delete post
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     // Get authenticated user
     const user = await getCurrentUser(request);
     if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if post exists and user is author
@@ -845,17 +828,11 @@ export async function DELETE(
     });
 
     if (!existingPost) {
-      return NextResponse.json(
-        { error: 'Post not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    if (existingPost.authorId !== user.id && user.role !== 'ADMIN') {
-      return NextResponse.json(
-        { error: 'Forbidden' },
-        { status: 403 }
-      );
+    if (existingPost.authorId !== user.id && user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Delete post
@@ -864,14 +841,14 @@ export async function DELETE(
     });
 
     return NextResponse.json(
-      { message: 'Post deleted successfully' },
-      { status: 200 }
+      { message: "Post deleted successfully" },
+      { status: 200 },
     );
   } catch (error) {
-    console.error('Error deleting post:', error);
+    console.error("Error deleting post:", error);
     return NextResponse.json(
-      { error: 'Failed to delete post' },
-      { status: 500 }
+      { error: "Failed to delete post" },
+      { status: 500 },
     );
   }
 }
@@ -1271,8 +1248,8 @@ Using Server Components to eliminate API calls.
 
 ```typescript
 // lib/db/posts.ts
-import { prisma } from './prisma';
-import { cache } from 'react';
+import { prisma } from "./prisma";
+import { cache } from "react";
 
 // Cache the database query for the request lifecycle
 export const getPosts = cache(async (published?: boolean) => {
@@ -1287,7 +1264,7 @@ export const getPosts = cache(async (published?: boolean) => {
         },
       },
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
   });
 });
 
@@ -1362,13 +1339,13 @@ Using Server Actions to avoid API routes for mutations.
 
 ```typescript
 // app/actions/posts.ts
-'use server';
+"use server";
 
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
-import { z } from 'zod';
-import { prisma } from '@/lib/db';
-import { getCurrentUser } from '@/lib/auth';
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { z } from "zod";
+import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth";
 
 const createPostSchema = z.object({
   title: z.string().min(1).max(200),
@@ -1381,15 +1358,15 @@ export async function createPost(formData: FormData) {
   // Get authenticated user
   const user = await getCurrentUser();
   if (!user) {
-    throw new Error('Unauthorized');
+    throw new Error("Unauthorized");
   }
 
   // Parse and validate form data
   const data = {
-    title: formData.get('title') as string,
-    content: formData.get('content') as string,
-    excerpt: formData.get('excerpt') as string,
-    published: formData.get('published') === 'on',
+    title: formData.get("title") as string,
+    content: formData.get("content") as string,
+    excerpt: formData.get("excerpt") as string,
+    published: formData.get("published") === "on",
   };
 
   const validatedData = createPostSchema.parse(data);
@@ -1403,8 +1380,8 @@ export async function createPost(formData: FormData) {
   });
 
   // Revalidate relevant paths
-  revalidatePath('/posts');
-  revalidatePath('/blog');
+  revalidatePath("/posts");
+  revalidatePath("/blog");
 
   // Redirect to new post
   redirect(`/posts/${post.id}`);
@@ -1414,7 +1391,7 @@ export async function updatePost(id: string, formData: FormData) {
   // Get authenticated user
   const user = await getCurrentUser();
   if (!user) {
-    throw new Error('Unauthorized');
+    throw new Error("Unauthorized");
   }
 
   // Check ownership
@@ -1423,19 +1400,19 @@ export async function updatePost(id: string, formData: FormData) {
   });
 
   if (!existingPost) {
-    throw new Error('Post not found');
+    throw new Error("Post not found");
   }
 
-  if (existingPost.authorId !== user.id && user.role !== 'ADMIN') {
-    throw new Error('Forbidden');
+  if (existingPost.authorId !== user.id && user.role !== "ADMIN") {
+    throw new Error("Forbidden");
   }
 
   // Parse and validate form data
   const data = {
-    title: formData.get('title') as string,
-    content: formData.get('content') as string,
-    excerpt: formData.get('excerpt') as string,
-    published: formData.get('published') === 'on',
+    title: formData.get("title") as string,
+    content: formData.get("content") as string,
+    excerpt: formData.get("excerpt") as string,
+    published: formData.get("published") === "on",
   };
 
   const validatedData = createPostSchema.parse(data);
@@ -1447,9 +1424,9 @@ export async function updatePost(id: string, formData: FormData) {
   });
 
   // Revalidate relevant paths
-  revalidatePath('/posts');
+  revalidatePath("/posts");
   revalidatePath(`/posts/${id}`);
-  revalidatePath('/blog');
+  revalidatePath("/blog");
 
   // Redirect to updated post
   redirect(`/posts/${id}`);
@@ -1459,7 +1436,7 @@ export async function deletePost(id: string) {
   // Get authenticated user
   const user = await getCurrentUser();
   if (!user) {
-    throw new Error('Unauthorized');
+    throw new Error("Unauthorized");
   }
 
   // Check ownership
@@ -1468,11 +1445,11 @@ export async function deletePost(id: string) {
   });
 
   if (!existingPost) {
-    throw new Error('Post not found');
+    throw new Error("Post not found");
   }
 
-  if (existingPost.authorId !== user.id && user.role !== 'ADMIN') {
-    throw new Error('Forbidden');
+  if (existingPost.authorId !== user.id && user.role !== "ADMIN") {
+    throw new Error("Forbidden");
   }
 
   // Delete post
@@ -1481,16 +1458,16 @@ export async function deletePost(id: string) {
   });
 
   // Revalidate and redirect
-  revalidatePath('/posts');
-  revalidatePath('/blog');
-  redirect('/posts');
+  revalidatePath("/posts");
+  revalidatePath("/blog");
+  redirect("/posts");
 }
 
 export async function togglePublishPost(id: string) {
   // Get authenticated user
   const user = await getCurrentUser();
   if (!user) {
-    throw new Error('Unauthorized');
+    throw new Error("Unauthorized");
   }
 
   // Check ownership
@@ -1499,11 +1476,11 @@ export async function togglePublishPost(id: string) {
   });
 
   if (!existingPost) {
-    throw new Error('Post not found');
+    throw new Error("Post not found");
   }
 
-  if (existingPost.authorId !== user.id && user.role !== 'ADMIN') {
-    throw new Error('Forbidden');
+  if (existingPost.authorId !== user.id && user.role !== "ADMIN") {
+    throw new Error("Forbidden");
   }
 
   // Toggle published status
@@ -1515,9 +1492,9 @@ export async function togglePublishPost(id: string) {
   });
 
   // Revalidate paths
-  revalidatePath('/posts');
+  revalidatePath("/posts");
   revalidatePath(`/posts/${id}`);
-  revalidatePath('/blog');
+  revalidatePath("/blog");
 }
 ```
 
@@ -1632,11 +1609,11 @@ tRPC eliminates REST/GraphQL boilerplate with full TypeScript type safety from b
 
 ## Why tRPC in 2026?
 
-| Approach | Boilerplate | Type Safety | Runtime Validation |
-|----------|-------------|-------------|-------------------|
-| REST + fetch | High (manual types) | Manual | Manual |
-| GraphQL | Medium (codegen) | Generated | Schema-based |
-| **tRPC** | **Minimal** | **Automatic** | **Zod built-in** |
+| Approach     | Boilerplate         | Type Safety   | Runtime Validation |
+| ------------ | ------------------- | ------------- | ------------------ |
+| REST + fetch | High (manual types) | Manual        | Manual             |
+| GraphQL      | Medium (codegen)    | Generated     | Schema-based       |
+| **tRPC**     | **Minimal**         | **Automatic** | **Zod built-in**   |
 
 **Best for**: Full-stack TypeScript apps where you control both client and server.
 
@@ -1652,9 +1629,9 @@ npm install @trpc/server @trpc/client @trpc/react-query @tanstack/react-query zo
 
 ```typescript
 // server/trpc/trpc.ts
-import { initTRPC, TRPCError } from '@trpc/server';
-import { Context } from './context';
-import superjson from 'superjson';
+import { initTRPC, TRPCError } from "@trpc/server";
+import { Context } from "./context";
+import superjson from "superjson";
 
 const t = initTRPC.context<Context>().create({
   transformer: superjson,
@@ -1669,7 +1646,7 @@ export const publicProcedure = t.procedure;
 // Protected procedure - requires authentication
 export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
   if (!ctx.user) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' });
+    throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({ ctx: { ...ctx, user: ctx.user } });
 });
@@ -1679,13 +1656,13 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 
 ```typescript
 // server/trpc/context.ts
-import { inferAsyncReturnType } from '@trpc/server';
-import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch';
-import { prisma } from '@/lib/db';
-import { verifyToken } from '@/lib/auth';
+import { inferAsyncReturnType } from "@trpc/server";
+import { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
+import { prisma } from "@/lib/db";
+import { verifyToken } from "@/lib/auth";
 
 export async function createContext({ req }: FetchCreateContextFnOptions) {
-  const token = req.headers.get('authorization')?.replace('Bearer ', '');
+  const token = req.headers.get("authorization")?.replace("Bearer ", "");
   const user = token ? await verifyToken(token) : null;
 
   return { prisma, user };
@@ -1698,22 +1675,24 @@ export type Context = inferAsyncReturnType<typeof createContext>;
 
 ```typescript
 // server/trpc/routers/post.ts
-import { z } from 'zod';
-import { router, publicProcedure, protectedProcedure } from '../trpc';
-import { TRPCError } from '@trpc/server';
+import { z } from "zod";
+import { router, publicProcedure, protectedProcedure } from "../trpc";
+import { TRPCError } from "@trpc/server";
 
 export const postRouter = router({
   // Public: Get all published posts
   list: publicProcedure
-    .input(z.object({
-      page: z.number().default(1),
-      pageSize: z.number().default(10),
-    }))
+    .input(
+      z.object({
+        page: z.number().default(1),
+        pageSize: z.number().default(10),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       const posts = await ctx.prisma.post.findMany({
         where: { published: true },
         include: { author: { select: { id: true, name: true } } },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip: (input.page - 1) * input.pageSize,
         take: input.pageSize,
       });
@@ -1721,25 +1700,25 @@ export const postRouter = router({
     }),
 
   // Public: Get single post by ID
-  byId: publicProcedure
-    .input(z.string())
-    .query(async ({ ctx, input }) => {
-      const post = await ctx.prisma.post.findUnique({
-        where: { id: input },
-        include: { author: { select: { id: true, name: true, email: true } } },
-      });
-      if (!post) throw new TRPCError({ code: 'NOT_FOUND' });
-      return post;
-    }),
+  byId: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    const post = await ctx.prisma.post.findUnique({
+      where: { id: input },
+      include: { author: { select: { id: true, name: true, email: true } } },
+    });
+    if (!post) throw new TRPCError({ code: "NOT_FOUND" });
+    return post;
+  }),
 
   // Protected: Create post
   create: protectedProcedure
-    .input(z.object({
-      title: z.string().min(1).max(200),
-      content: z.string().min(1),
-      excerpt: z.string().max(500).optional(),
-      published: z.boolean().default(false),
-    }))
+    .input(
+      z.object({
+        title: z.string().min(1).max(200),
+        content: z.string().min(1),
+        excerpt: z.string().max(500).optional(),
+        published: z.boolean().default(false),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       return ctx.prisma.post.create({
         data: { ...input, authorId: ctx.user.id },
@@ -1748,21 +1727,23 @@ export const postRouter = router({
 
   // Protected: Update post
   update: protectedProcedure
-    .input(z.object({
-      id: z.string(),
-      title: z.string().min(1).max(200).optional(),
-      content: z.string().min(1).optional(),
-      excerpt: z.string().max(500).optional(),
-      published: z.boolean().optional(),
-    }))
+    .input(
+      z.object({
+        id: z.string(),
+        title: z.string().min(1).max(200).optional(),
+        content: z.string().min(1).optional(),
+        excerpt: z.string().max(500).optional(),
+        published: z.boolean().optional(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const { id, ...data } = input;
 
       // Check ownership
       const post = await ctx.prisma.post.findUnique({ where: { id } });
-      if (!post) throw new TRPCError({ code: 'NOT_FOUND' });
-      if (post.authorId !== ctx.user.id && ctx.user.role !== 'ADMIN') {
-        throw new TRPCError({ code: 'FORBIDDEN' });
+      if (!post) throw new TRPCError({ code: "NOT_FOUND" });
+      if (post.authorId !== ctx.user.id && ctx.user.role !== "ADMIN") {
+        throw new TRPCError({ code: "FORBIDDEN" });
       }
 
       return ctx.prisma.post.update({ where: { id }, data });
@@ -1773,9 +1754,9 @@ export const postRouter = router({
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
       const post = await ctx.prisma.post.findUnique({ where: { id: input } });
-      if (!post) throw new TRPCError({ code: 'NOT_FOUND' });
-      if (post.authorId !== ctx.user.id && ctx.user.role !== 'ADMIN') {
-        throw new TRPCError({ code: 'FORBIDDEN' });
+      if (!post) throw new TRPCError({ code: "NOT_FOUND" });
+      if (post.authorId !== ctx.user.id && ctx.user.role !== "ADMIN") {
+        throw new TRPCError({ code: "FORBIDDEN" });
       }
 
       await ctx.prisma.post.delete({ where: { id: input } });
@@ -1788,9 +1769,9 @@ export const postRouter = router({
 
 ```typescript
 // server/trpc/routers/_app.ts
-import { router } from '../trpc';
-import { postRouter } from './post';
-import { userRouter } from './user';
+import { router } from "../trpc";
+import { postRouter } from "./post";
+import { userRouter } from "./user";
 
 export const appRouter = router({
   post: postRouter,
@@ -1804,13 +1785,13 @@ export type AppRouter = typeof appRouter;
 
 ```typescript
 // app/api/trpc/[trpc]/route.ts
-import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
-import { appRouter } from '@/server/trpc/routers/_app';
-import { createContext } from '@/server/trpc/context';
+import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import { appRouter } from "@/server/trpc/routers/_app";
+import { createContext } from "@/server/trpc/context";
 
 const handler = (req: Request) =>
   fetchRequestHandler({
-    endpoint: '/api/trpc',
+    endpoint: "/api/trpc",
     req,
     router: appRouter,
     createContext,
@@ -1825,8 +1806,8 @@ export { handler as GET, handler as POST };
 
 ```typescript
 // lib/trpc/client.ts
-import { createTRPCReact } from '@trpc/react-query';
-import type { AppRouter } from '@/server/trpc/routers/_app';
+import { createTRPCReact } from "@trpc/react-query";
+import type { AppRouter } from "@/server/trpc/routers/_app";
 
 export const trpc = createTRPCReact<AppRouter>();
 ```
@@ -1967,7 +1948,7 @@ export function CreatePostTRPC() {
 
 ```typescript
 // FAIL REST: Manual types, no type safety
-const res = await fetch('/api/posts');
+const res = await fetch("/api/posts");
 const posts: Post[] = await res.json(); // Hope this matches!
 
 // PASS tRPC: Automatic types, full type safety
@@ -1977,13 +1958,13 @@ const { data: posts } = trpc.post.list.useQuery({ page: 1 });
 
 ## When to Use tRPC
 
-| Use Case | tRPC | REST/GraphQL |
-|----------|------|--------------|
-| Full-stack TypeScript | PASS Best | OK |
-| Public API for third parties | FAIL | PASS REST |
-| Mobile app + web | FAIL | PASS REST/GraphQL |
-| Complex queries/subscriptions | OK | PASS GraphQL |
-| Rapid prototyping | PASS Best | Slower |
+| Use Case                      | tRPC      | REST/GraphQL      |
+| ----------------------------- | --------- | ----------------- |
+| Full-stack TypeScript         | PASS Best | OK                |
+| Public API for third parties  | FAIL      | PASS REST         |
+| Mobile app + web              | FAIL      | PASS REST/GraphQL |
+| Complex queries/subscriptions | OK        | PASS GraphQL      |
+| Rapid prototyping             | PASS Best | Slower            |
 
 **Key insight**: tRPC shines when you control both client and server in TypeScript. For public APIs or non-TypeScript clients, use REST or GraphQL.
 
@@ -1992,33 +1973,39 @@ const { data: posts } = trpc.post.list.useQuery({ page: 1 });
 # Key Patterns Summary
 
 ## Type Sharing
+
 [OK] Define types once in `src/types/`
 [OK] Import in both frontend and backend
 [OK] Use `satisfies` for type checking
 
 ## Data Fetching
+
 [OK] **Server Components**: Direct database access (no API)
 [OK] **Client Components**: SWR or React Query with API routes
 [OK] **Server Actions**: For mutations without API routes
 
 ## Authentication
+
 [OK] Store token in Zustand + localStorage
 [OK] Send token in `Authorization` header
 [OK] Verify token in API routes and Server Actions
 [OK] Use middleware for protected routes
 
 ## Validation
+
 [OK] **Client-side**: Zod + React Hook Form
 [OK] **Server-side**: Always validate with Zod
 [OK] Share schemas between client and server
 
 ## Error Handling
+
 [OK] **API Routes**: Return proper HTTP status codes
 [OK] **Forms**: Display validation errors clearly
 [OK] **Server Components**: Use error boundaries
 [OK] **Server Actions**: Throw errors, caught by error boundaries
 
 ## Performance
+
 [OK] **Server Components**: Fetch data server-side
 [OK] **Caching**: Use `cache()` for database queries
 [OK] **Revalidation**: `revalidatePath()` after mutations

@@ -1,6 +1,7 @@
 # Módulo 6 — Mensagens (`messages`)
 
 ## Visão Geral
+
 Sistema de mensagens assíncronas entre inquilino e anfitrião. Vinculado a uma solicitação aceita ou a um anúncio.
 
 ---
@@ -8,6 +9,7 @@ Sistema de mensagens assíncronas entre inquilino e anfitrião. Vinculado a uma 
 ## 6.1 Conversas
 
 ### Regras
+
 - Conversa é criada automaticamente quando uma solicitação é aceita
 - Cada conversa está vinculada a 1 anúncio + 2 participantes (host + tenant)
 - Mensagens são assíncronas (polling ou SSE, sem WebSocket no MVP)
@@ -16,23 +18,23 @@ Sistema de mensagens assíncronas entre inquilino e anfitrião. Vinculado a uma 
 
 ### Campos da mensagem
 
-| Campo | Tipo | Obrigatório | Descrição |
-|-------|------|-------------|-----------|
-| `conversationId` | UUID | ✅ | Conversa |
-| `senderId` | UUID | auto | Quem enviou |
-| `content` | text | ✅ | Texto da mensagem (max 2000 chars) |
-| `type` | enum | auto | `text`, `system`, `image` |
-| `readAt` | timestamp | auto | Quando foi lida |
+| Campo            | Tipo      | Obrigatório | Descrição                          |
+| ---------------- | --------- | ----------- | ---------------------------------- |
+| `conversationId` | UUID      | ✅          | Conversa                           |
+| `senderId`       | UUID      | auto        | Quem enviou                        |
+| `content`        | text      | ✅          | Texto da mensagem (max 2000 chars) |
+| `type`           | enum      | auto        | `text`, `system`, `image`          |
+| `readAt`         | timestamp | auto        | Quando foi lida                    |
 
 ---
 
 ## 6.2 Status da Conversa
 
-| Status | Descrição |
-|--------|-----------|
-| `active` | Conversa aberta |
+| Status     | Descrição                          |
+| ---------- | ---------------------------------- |
+| `active`   | Conversa aberta                    |
 | `archived` | Arquivada por um dos participantes |
-| `blocked` | Um participante bloqueou o outro |
+| `blocked`  | Um participante bloqueou o outro   |
 
 ---
 
@@ -90,22 +92,22 @@ created_at      TIMESTAMP NOT NULL DEFAULT NOW()
 
 ## 6.5 Endpoints
 
-| Método | Rota | Descrição | Auth |
-|--------|------|-----------|------|
-| GET | `/api/v1/conversations` | Listar minhas conversas | ✅ |
-| GET | `/api/v1/conversations/:id` | Detalhe + mensagens | ✅ participante |
-| POST | `/api/v1/conversations/:id/messages` | Enviar mensagem | ✅ participante |
-| PATCH | `/api/v1/conversations/:id/read` | Marcar como lidas | ✅ participante |
-| POST | `/api/v1/conversations/:id/archive` | Arquivar | ✅ participante |
-| POST | `/api/v1/conversations/:id/block` | Bloquear usuário | ✅ participante |
-| POST | `/api/v1/conversations/:id/report` | Reportar conversa | ✅ participante |
-| GET | `/api/v1/conversations/unread-count` | Total não lidas | ✅ |
+| Método | Rota                                 | Descrição               | Auth            |
+| ------ | ------------------------------------ | ----------------------- | --------------- |
+| GET    | `/api/v1/conversations`              | Listar minhas conversas | ✅              |
+| GET    | `/api/v1/conversations/:id`          | Detalhe + mensagens     | ✅ participante |
+| POST   | `/api/v1/conversations/:id/messages` | Enviar mensagem         | ✅ participante |
+| PATCH  | `/api/v1/conversations/:id/read`     | Marcar como lidas       | ✅ participante |
+| POST   | `/api/v1/conversations/:id/archive`  | Arquivar                | ✅ participante |
+| POST   | `/api/v1/conversations/:id/block`    | Bloquear usuário        | ✅ participante |
+| POST   | `/api/v1/conversations/:id/report`   | Reportar conversa       | ✅ participante |
+| GET    | `/api/v1/conversations/unread-count` | Total não lidas         | ✅              |
 
 ---
 
 ## 6.6 Páginas Frontend
 
-| Rota | Página | Auth |
-|------|--------|------|
-| `/messages` | Lista de conversas | ✅ |
-| `/messages/:id` | Conversa aberta | ✅ |
+| Rota            | Página             | Auth |
+| --------------- | ------------------ | ---- |
+| `/messages`     | Lista de conversas | ✅   |
+| `/messages/:id` | Conversa aberta    | ✅   |

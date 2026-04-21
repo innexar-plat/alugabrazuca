@@ -51,19 +51,19 @@ express-api/
 
 > **Important**: The code patterns in this template should be extracted to `src/utils/`. **Do not duplicate** these utilities across controllers/services.
 
-| Utility | Extract To | Reference |
-|---------|------------|-----------|
-| Config (Zod validation) | `src/config/index.ts` | [config-validation.md](../../../software-clean-code-standard/utilities/config-validation.md) |
-| JWT (`createToken`, `verifyToken`) | `src/utils/jwt.ts` | [auth-utilities.md](../../../software-clean-code-standard/utilities/auth-utilities.md) |
-| Password (`hashPassword`, `comparePassword`) | `src/utils/password.ts` | [auth-utilities.md](../../../software-clean-code-standard/utilities/auth-utilities.md) |
-| Errors (`ApiError`, `errorHandler`) | `src/utils/errors.ts` | [error-handling.md](../../../software-clean-code-standard/utilities/error-handling.md) |
-| Logging (Winston/Pino) | `src/utils/logger.ts` | [logging-utilities.md](../../../software-clean-code-standard/utilities/logging-utilities.md) |
+| Utility                                      | Extract To              | Reference                                                                                    |
+| -------------------------------------------- | ----------------------- | -------------------------------------------------------------------------------------------- |
+| Config (Zod validation)                      | `src/config/index.ts`   | [config-validation.md](../../../software-clean-code-standard/utilities/config-validation.md) |
+| JWT (`createToken`, `verifyToken`)           | `src/utils/jwt.ts`      | [auth-utilities.md](../../../software-clean-code-standard/utilities/auth-utilities.md)       |
+| Password (`hashPassword`, `comparePassword`) | `src/utils/password.ts` | [auth-utilities.md](../../../software-clean-code-standard/utilities/auth-utilities.md)       |
+| Errors (`ApiError`, `errorHandler`)          | `src/utils/errors.ts`   | [error-handling.md](../../../software-clean-code-standard/utilities/error-handling.md)       |
+| Logging (Winston/Pino)                       | `src/utils/logger.ts`   | [logging-utilities.md](../../../software-clean-code-standard/utilities/logging-utilities.md) |
 
 **Pattern**: Create utilities once in `src/utils/`, import everywhere via:
 
 ```typescript
-import { hashPassword, verifyToken } from '@/utils/auth';
-import { ApiError, NotFoundError } from '@/utils/errors';
+import { hashPassword, verifyToken } from "@/utils/auth";
+import { ApiError, NotFoundError } from "@/utils/errors";
 ```
 
 ## 1. Dependencies (package.json)
@@ -140,28 +140,33 @@ import { ApiError, NotFoundError } from '@/utils/errors';
 ## 3. Configuration (src/config/index.ts)
 
 ```typescript
-import dotenv from 'dotenv';
-import { z } from 'zod';
+import dotenv from "dotenv";
+import { z } from "zod";
 
 dotenv.config();
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  PORT: z.string().default('3000'),
+  NODE_ENV: z
+    .enum(["development", "production", "test"])
+    .default("development"),
+  PORT: z.string().default("3000"),
   DATABASE_URL: z.string(),
   JWT_SECRET: z.string(),
-  JWT_ACCESS_EXPIRE: z.string().default('15m'),
-  JWT_REFRESH_EXPIRE: z.string().default('7d'),
+  JWT_ACCESS_EXPIRE: z.string().default("15m"),
+  JWT_REFRESH_EXPIRE: z.string().default("7d"),
   REDIS_URL: z.string().optional(),
-  CORS_ORIGINS: z.string().default('http://localhost:3000'),
-  RATE_LIMIT_WINDOW_MS: z.string().default('60000'),
-  RATE_LIMIT_MAX_REQUESTS: z.string().default('100'),
+  CORS_ORIGINS: z.string().default("http://localhost:3000"),
+  RATE_LIMIT_WINDOW_MS: z.string().default("60000"),
+  RATE_LIMIT_MAX_REQUESTS: z.string().default("100"),
 });
 
 const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
-  console.error('Invalid environment variables:', parsed.error.flatten().fieldErrors);
+  console.error(
+    "Invalid environment variables:",
+    parsed.error.flatten().fieldErrors,
+  );
   process.exit(1);
 }
 
@@ -180,7 +185,7 @@ export const config = {
     url: parsed.data.REDIS_URL,
   },
   cors: {
-    origins: parsed.data.CORS_ORIGINS.split(','),
+    origins: parsed.data.CORS_ORIGINS.split(","),
   },
   rateLimit: {
     windowMs: parseInt(parsed.data.RATE_LIMIT_WINDOW_MS),
@@ -192,15 +197,15 @@ export const config = {
 ## 4. Database Client (src/db/client.ts)
 
 ```typescript
-import { PrismaClient } from '@prisma/client';
-import { config } from '../config';
+import { PrismaClient } from "@prisma/client";
+import { config } from "../config";
 
 const prisma = new PrismaClient({
-  log: config.env === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  log: config.env === "development" ? ["query", "error", "warn"] : ["error"],
 });
 
 // Graceful shutdown
-process.on('beforeExit', async () => {
+process.on("beforeExit", async () => {
   await prisma.$disconnect();
 });
 
@@ -243,7 +248,7 @@ model User {
 ## 6. Request Validators (src/validators/user.validator.ts)
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 export const createUserSchema = z.object({
   body: z.object({
@@ -256,7 +261,7 @@ export const createUserSchema = z.object({
 export const updateUserSchema = z.object({
   body: z.object({
     fullName: z.string().min(2).max(100).optional(),
-    status: z.enum(['ACTIVE', 'INACTIVE', 'SUSPENDED']).optional(),
+    status: z.enum(["ACTIVE", "INACTIVE", "SUSPENDED"]).optional(),
   }),
   params: z.object({
     id: z.string().uuid(),
@@ -271,8 +276,12 @@ export const getUserSchema = z.object({
 
 export const listUsersSchema = z.object({
   query: z.object({
-    limit: z.string().transform(Number).pipe(z.number().min(1).max(100)).default('20'),
-    offset: z.string().transform(Number).pipe(z.number().min(0)).default('0'),
+    limit: z
+      .string()
+      .transform(Number)
+      .pipe(z.number().min(1).max(100))
+      .default("20"),
+    offset: z.string().transform(Number).pipe(z.number().min(0)).default("0"),
     sort: z.string().optional(),
   }),
 });
@@ -294,9 +303,9 @@ export type LoginInput = z.infer<typeof loginSchema>;
 ## 7. Validation Middleware (src/middleware/validate.ts)
 
 ```typescript
-import { Request, Response, NextFunction } from 'express';
-import { ZodSchema, ZodError } from 'zod';
-import { ApiError } from '../utils/errors';
+import { Request, Response, NextFunction } from "express";
+import { ZodSchema, ZodError } from "zod";
+import { ApiError } from "../utils/errors";
 
 export const validate = (schema: ZodSchema) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -310,16 +319,16 @@ export const validate = (schema: ZodSchema) => {
     } catch (error) {
       if (error instanceof ZodError) {
         const errors = error.errors.map((e) => ({
-          field: e.path.join('.'),
+          field: e.path.join("."),
           message: e.message,
           code: e.code,
         }));
 
         next(
-          new ApiError(422, 'Validation Error', {
+          new ApiError(422, "Validation Error", {
             errors,
-            type: 'https://api.example.com/errors/validation',
-          })
+            type: "https://api.example.com/errors/validation",
+          }),
         );
       } else {
         next(error);
@@ -332,8 +341,8 @@ export const validate = (schema: ZodSchema) => {
 ## 8. JWT Utilities (src/utils/jwt.ts)
 
 ```typescript
-import jwt from 'jsonwebtoken';
-import { config } from '../config';
+import jwt from "jsonwebtoken";
+import { config } from "../config";
 
 export interface JwtPayload {
   userId: string;
@@ -357,7 +366,7 @@ export const verifyToken = (token: string): JwtPayload => {
   try {
     return jwt.verify(token, config.jwt.secret) as JwtPayload;
   } catch (error) {
-    throw new Error('Invalid token');
+    throw new Error("Invalid token");
   }
 };
 ```
@@ -365,7 +374,7 @@ export const verifyToken = (token: string): JwtPayload => {
 ## 9. Password Utilities (src/utils/password.ts)
 
 ```typescript
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;
 
@@ -375,7 +384,7 @@ export const hashPassword = async (password: string): Promise<string> => {
 
 export const comparePassword = async (
   password: string,
-  hash: string
+  hash: string,
 ): Promise<boolean> => {
   return bcrypt.compare(password, hash);
 };
@@ -384,9 +393,9 @@ export const comparePassword = async (
 ## 10. Auth Middleware (src/middleware/auth.ts)
 
 ```typescript
-import { Request, Response, NextFunction } from 'express';
-import { verifyToken, JwtPayload } from '../utils/jwt';
-import { ApiError } from '../utils/errors';
+import { Request, Response, NextFunction } from "express";
+import { verifyToken, JwtPayload } from "../utils/jwt";
+import { ApiError } from "../utils/errors";
 
 declare global {
   namespace Express {
@@ -396,11 +405,15 @@ declare global {
   }
 }
 
-export const authenticate = (req: Request, res: Response, next: NextFunction) => {
+export const authenticate = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new ApiError(401, 'No token provided');
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      throw new ApiError(401, "No token provided");
     }
 
     const token = authHeader.substring(7);
@@ -409,13 +422,17 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     req.user = payload;
     next();
   } catch (error) {
-    next(new ApiError(401, 'Invalid or expired token'));
+    next(new ApiError(401, "Invalid or expired token"));
   }
 };
 
-export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
+export const requireAdmin = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   if (!req.user?.isAdmin) {
-    return next(new ApiError(403, 'Admin privileges required'));
+    return next(new ApiError(403, "Admin privileges required"));
   }
   next();
 };
@@ -424,17 +441,17 @@ export const requireAdmin = (req: Request, res: Response, next: NextFunction) =>
 ## 11. Error Handler (src/middleware/errorHandler.ts)
 
 ```typescript
-import { Request, Response, NextFunction } from 'express';
-import { config } from '../config';
+import { Request, Response, NextFunction } from "express";
+import { config } from "../config";
 
 export class ApiError extends Error {
   constructor(
     public statusCode: number,
     public message: string,
-    public details?: any
+    public details?: any,
   ) {
     super(message);
-    this.name = 'ApiError';
+    this.name = "ApiError";
   }
 }
 
@@ -442,36 +459,41 @@ export const errorHandler = (
   error: Error | ApiError,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (error instanceof ApiError) {
     return res.status(error.statusCode).json({
-      type: error.details?.type || `https://api.example.com/errors/${error.statusCode}`,
+      type:
+        error.details?.type ||
+        `https://api.example.com/errors/${error.statusCode}`,
       title: error.message,
       status: error.statusCode,
       detail: error.message,
       instance: req.path,
       ...(error.details && { errors: error.details.errors }),
-      ...(config.env === 'development' && { stack: error.stack }),
+      ...(config.env === "development" && { stack: error.stack }),
     });
   }
 
   // Unhandled errors
-  console.error('Unhandled error:', error);
+  console.error("Unhandled error:", error);
   res.status(500).json({
-    type: 'https://api.example.com/errors/500',
-    title: 'Internal Server Error',
+    type: "https://api.example.com/errors/500",
+    title: "Internal Server Error",
     status: 500,
-    detail: config.env === 'production' ? 'An unexpected error occurred' : error.message,
+    detail:
+      config.env === "production"
+        ? "An unexpected error occurred"
+        : error.message,
     instance: req.path,
-    ...(config.env === 'development' && { stack: error.stack }),
+    ...(config.env === "development" && { stack: error.stack }),
   });
 };
 
 export const notFoundHandler = (req: Request, res: Response) => {
   res.status(404).json({
-    type: 'https://api.example.com/errors/404',
-    title: 'Not Found',
+    type: "https://api.example.com/errors/404",
+    title: "Not Found",
     status: 404,
     detail: `Route ${req.method} ${req.path} not found`,
     instance: req.path,
@@ -482,17 +504,17 @@ export const notFoundHandler = (req: Request, res: Response) => {
 ## 12. Rate Limiting (src/middleware/rateLimit.ts)
 
 ```typescript
-import rateLimit from 'express-rate-limit';
-import { config } from '../config';
+import rateLimit from "express-rate-limit";
+import { config } from "../config";
 
 export const rateLimiter = rateLimit({
   windowMs: config.rateLimit.windowMs,
   max: config.rateLimit.maxRequests,
   message: {
-    type: 'https://api.example.com/errors/429',
-    title: 'Too Many Requests',
+    type: "https://api.example.com/errors/429",
+    title: "Too Many Requests",
     status: 429,
-    detail: 'Rate limit exceeded',
+    detail: "Rate limit exceeded",
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -502,23 +524,23 @@ export const rateLimiter = rateLimit({
 ## 13. User Service (src/services/user.service.ts)
 
 ```typescript
-import { prisma } from '../db/client';
-import { hashPassword } from '../utils/password';
-import { ApiError } from '../middleware/errorHandler';
-import { User, UserStatus } from '@prisma/client';
+import { prisma } from "../db/client";
+import { hashPassword } from "../utils/password";
+import { ApiError } from "../middleware/errorHandler";
+import { User, UserStatus } from "@prisma/client";
 
 export class UserService {
   async createUser(data: {
     email: string;
     password: string;
     fullName: string;
-  }): Promise<Omit<User, 'password'>> {
+  }): Promise<Omit<User, "password">> {
     const existing = await prisma.user.findUnique({
       where: { email: data.email },
     });
 
     if (existing) {
-      throw new ApiError(409, 'Email already registered');
+      throw new ApiError(409, "Email already registered");
     }
 
     const hashedPassword = await hashPassword(data.password);
@@ -543,7 +565,7 @@ export class UserService {
     return user;
   }
 
-  async getUserById(id: string): Promise<Omit<User, 'password'> | null> {
+  async getUserById(id: string): Promise<Omit<User, "password"> | null> {
     return prisma.user.findUnique({
       where: { id },
       select: {
@@ -569,7 +591,7 @@ export class UserService {
       prisma.user.findMany({
         take: limit,
         skip: offset,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         select: {
           id: true,
           email: true,
@@ -588,8 +610,8 @@ export class UserService {
 
   async updateUser(
     id: string,
-    data: { fullName?: string; status?: UserStatus }
-  ): Promise<Omit<User, 'password'>> {
+    data: { fullName?: string; status?: UserStatus },
+  ): Promise<Omit<User, "password">> {
     const user = await prisma.user.update({
       where: { id },
       data,
@@ -620,11 +642,11 @@ export const userService = new UserService();
 ## 14. Auth Controller (src/controllers/auth.controller.ts)
 
 ```typescript
-import { Request, Response, NextFunction } from 'express';
-import { userService } from '../services/user.service';
-import { comparePassword } from '../utils/password';
-import { createAccessToken, createRefreshToken } from '../utils/jwt';
-import { ApiError } from '../middleware/errorHandler';
+import { Request, Response, NextFunction } from "express";
+import { userService } from "../services/user.service";
+import { comparePassword } from "../utils/password";
+import { createAccessToken, createRefreshToken } from "../utils/jwt";
+import { ApiError } from "../middleware/errorHandler";
 
 export class AuthController {
   async login(req: Request, res: Response, next: NextFunction) {
@@ -633,7 +655,7 @@ export class AuthController {
 
       const user = await userService.getUserByEmail(email);
       if (!user || !(await comparePassword(password, user.password))) {
-        throw new ApiError(401, 'Invalid email or password');
+        throw new ApiError(401, "Invalid email or password");
       }
 
       const payload = {
@@ -648,7 +670,7 @@ export class AuthController {
       res.json({
         accessToken,
         refreshToken,
-        tokenType: 'Bearer',
+        tokenType: "Bearer",
         expiresIn: 900, // 15 minutes
       });
     } catch (error) {
@@ -663,9 +685,9 @@ export const authController = new AuthController();
 ## 15. Users Controller (src/controllers/users.controller.ts)
 
 ```typescript
-import { Request, Response, NextFunction } from 'express';
-import { userService } from '../services/user.service';
-import { ApiError } from '../middleware/errorHandler';
+import { Request, Response, NextFunction } from "express";
+import { userService } from "../services/user.service";
+import { ApiError } from "../middleware/errorHandler";
 
 export class UsersController {
   async create(req: Request, res: Response, next: NextFunction) {
@@ -682,7 +704,7 @@ export class UsersController {
       const { limit, offset } = req.query as { limit: string; offset: string };
       const { users, total } = await userService.listUsers(
         parseInt(limit),
-        parseInt(offset)
+        parseInt(offset),
       );
 
       res.json({
@@ -703,7 +725,7 @@ export class UsersController {
     try {
       const user = await userService.getUserById(req.params.id);
       if (!user) {
-        throw new ApiError(404, 'User not found');
+        throw new ApiError(404, "User not found");
       }
       res.json(user);
     } catch (error) {
@@ -715,7 +737,7 @@ export class UsersController {
     try {
       const user = await userService.getUserById(req.user!.userId);
       if (!user) {
-        throw new ApiError(404, 'User not found');
+        throw new ApiError(404, "User not found");
       }
       res.json(user);
     } catch (error) {
@@ -727,7 +749,7 @@ export class UsersController {
     try {
       // Authorization check
       if (req.params.id !== req.user!.userId && !req.user!.isAdmin) {
-        throw new ApiError(403, 'Not authorized to update this user');
+        throw new ApiError(403, "Not authorized to update this user");
       }
 
       const user = await userService.updateUser(req.params.id, req.body);
@@ -753,51 +775,51 @@ export const usersController = new UsersController();
 ## 16. Routes (src/routes/users.routes.ts)
 
 ```typescript
-import { Router } from 'express';
-import { usersController } from '../controllers/users.controller';
-import { authenticate, requireAdmin } from '../middleware/auth';
-import { validate } from '../middleware/validate';
+import { Router } from "express";
+import { usersController } from "../controllers/users.controller";
+import { authenticate, requireAdmin } from "../middleware/auth";
+import { validate } from "../middleware/validate";
 import {
   createUserSchema,
   updateUserSchema,
   getUserSchema,
   listUsersSchema,
-} from '../validators/user.validator';
+} from "../validators/user.validator";
 
 const router = Router();
 
 router.post(
-  '/',
+  "/",
   authenticate,
   requireAdmin,
   validate(createUserSchema),
-  usersController.create
+  usersController.create,
 );
 
-router.get('/', authenticate, validate(listUsersSchema), usersController.list);
+router.get("/", authenticate, validate(listUsersSchema), usersController.list);
 
-router.get('/me', authenticate, usersController.getCurrent);
+router.get("/me", authenticate, usersController.getCurrent);
 
 router.get(
-  '/:id',
+  "/:id",
   authenticate,
   validate(getUserSchema),
-  usersController.getById
+  usersController.getById,
 );
 
 router.patch(
-  '/:id',
+  "/:id",
   authenticate,
   validate(updateUserSchema),
-  usersController.update
+  usersController.update,
 );
 
 router.delete(
-  '/:id',
+  "/:id",
   authenticate,
   requireAdmin,
   validate(getUserSchema),
-  usersController.delete
+  usersController.delete,
 );
 
 export default router;
@@ -806,16 +828,16 @@ export default router;
 ## 17. Express App (src/app.ts)
 
 ```typescript
-import express from 'express';
-import 'express-async-errors';
-import helmet from 'helmet';
-import cors from 'cors';
-import morgan from 'morgan';
-import { config } from './config';
-import { errorHandler, notFoundHandler } from './middleware/errorHandler';
-import { rateLimiter } from './middleware/rateLimit';
-import authRoutes from './routes/auth.routes';
-import usersRoutes from './routes/users.routes';
+import express from "express";
+import "express-async-errors";
+import helmet from "helmet";
+import cors from "cors";
+import morgan from "morgan";
+import { config } from "./config";
+import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
+import { rateLimiter } from "./middleware/rateLimit";
+import authRoutes from "./routes/auth.routes";
+import usersRoutes from "./routes/users.routes";
 
 const app = express();
 
@@ -825,20 +847,20 @@ app.use(cors({ origin: config.cors.origins, credentials: true }));
 app.use(rateLimiter);
 
 // Logging
-app.use(morgan(config.env === 'production' ? 'combined' : 'dev'));
+app.use(morgan(config.env === "production" ? "combined" : "dev"));
 
 // Body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+app.get("/health", (req, res) => {
+  res.json({ status: "healthy", timestamp: new Date().toISOString() });
 });
 
 // API routes
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/users', usersRoutes);
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", usersRoutes);
 
 // Error handling (must be last)
 app.use(notFoundHandler);
@@ -850,9 +872,9 @@ export { app };
 ## 18. Server Entry Point (src/index.ts)
 
 ```typescript
-import { app } from './app';
-import { config } from './config';
-import { prisma } from './db/client';
+import { app } from "./app";
+import { config } from "./config";
+import { prisma } from "./db/client";
 
 const server = app.listen(config.port, () => {
   console.log(`Server running on port ${config.port}`);
@@ -861,7 +883,7 @@ const server = app.listen(config.port, () => {
 
 // Graceful shutdown
 const gracefulShutdown = async () => {
-  console.log('Shutting down gracefully...');
+  console.log("Shutting down gracefully...");
 
   server.close(async () => {
     await prisma.$disconnect();
@@ -869,13 +891,13 @@ const gracefulShutdown = async () => {
   });
 
   setTimeout(() => {
-    console.error('Forced shutdown');
+    console.error("Forced shutdown");
     process.exit(1);
   }, 10000);
 };
 
-process.on('SIGTERM', gracefulShutdown);
-process.on('SIGINT', gracefulShutdown);
+process.on("SIGTERM", gracefulShutdown);
+process.on("SIGINT", gracefulShutdown);
 ```
 
 ## 19. Environment Variables (.env.example)

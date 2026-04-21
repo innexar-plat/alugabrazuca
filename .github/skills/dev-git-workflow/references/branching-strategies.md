@@ -20,17 +20,17 @@ Deep dive into modern Git branching strategies with decision frameworks, migrati
 
 ### Feature Comparison
 
-| Feature | GitHub Flow | Trunk-Based | GitFlow |
-|---------|-------------|-------------|---------|
-| **Complexity** | Low | Low-Medium | High |
-| **Learning Curve** | Easy | Medium | Steep |
-| **Branch Count** | 2-5 | 1-3 | 5-10+ |
-| **Merge Frequency** | Multiple/day | Continuous | Weekly/release |
-| **Release Process** | Tag main | Tag main | Release branches |
-| **Hotfix Process** | Branch from main | Branch from main | Dedicated hotfix/* |
-| **CI/CD Fit** | Excellent | Excellent | Poor |
-| **Team Size** | 1-15 | 5-50+ | Any |
-| **Best For** | Startups, SaaS | Enterprises, CI/CD | Versioned software |
+| Feature             | GitHub Flow      | Trunk-Based        | GitFlow             |
+| ------------------- | ---------------- | ------------------ | ------------------- |
+| **Complexity**      | Low              | Low-Medium         | High                |
+| **Learning Curve**  | Easy             | Medium             | Steep               |
+| **Branch Count**    | 2-5              | 1-3                | 5-10+               |
+| **Merge Frequency** | Multiple/day     | Continuous         | Weekly/release      |
+| **Release Process** | Tag main         | Tag main           | Release branches    |
+| **Hotfix Process**  | Branch from main | Branch from main   | Dedicated hotfix/\* |
+| **CI/CD Fit**       | Excellent        | Excellent          | Poor                |
+| **Team Size**       | 1-15             | 5-50+              | Any                 |
+| **Best For**        | Startups, SaaS   | Enterprises, CI/CD | Versioned software  |
 
 ---
 
@@ -43,6 +43,7 @@ Deep dive into modern Git branching strategies with decision frameworks, migrati
 ### Full Workflow
 
 **1. Create Feature Branch**:
+
 ```bash
 # Always branch from latest main
 git checkout main
@@ -58,6 +59,7 @@ docs/api-documentation
 ```
 
 **2. Develop with Frequent Commits**:
+
 ```bash
 # Make incremental progress
 git commit -m "feat: add dashboard layout component"
@@ -70,14 +72,18 @@ git push origin feature/user-dashboard
 ```
 
 **3. Open Pull Request Early**:
+
 ```markdown
 # Draft PR for early feedback
+
 Title: [WIP] User Dashboard
 
 ## What
+
 Building user dashboard with metrics and activity feed
 
 ## Progress
+
 - [x] Layout component
 - [x] Metrics cards
 - [ ] Activity feed
@@ -85,11 +91,13 @@ Building user dashboard with metrics and activity feed
 - [ ] E2E tests
 
 ## Questions
+
 - Should we show real-time metrics or daily aggregates?
 - Any design feedback on the layout?
 ```
 
 **4. Review & Iterate**:
+
 ```bash
 # Address review comments
 git commit -m "refactor: extract metrics calculation logic"
@@ -103,6 +111,7 @@ git push --force-with-lease origin feature/user-dashboard
 ```
 
 **5. Merge & Deploy**:
+
 ```bash
 # After approval, merge via GitHub/GitLab UI
 # Or locally:
@@ -127,7 +136,7 @@ For large features that can't ship atomically:
 
 ```javascript
 // Use feature flags to hide incomplete work
-import { featureFlags } from './config';
+import { featureFlags } from "./config";
 
 function Dashboard() {
   if (!featureFlags.userDashboard) {
@@ -141,6 +150,7 @@ function Dashboard() {
 ```
 
 **Advantages**:
+
 - Deploy incomplete code safely
 - Test in production with limited users
 - Gradual rollout capability
@@ -164,6 +174,7 @@ function Dashboard() {
 ### Full Workflow
 
 **1. Create Micro-Branch**:
+
 ```bash
 # Branch for single, focused change
 git checkout -b feat/add-user-filter main
@@ -181,6 +192,7 @@ git commit -m "feat: integrate user filter with table"
 ```
 
 **2. Use Feature Flags for Large Features**:
+
 ```python
 # Feature flag in code
 from feature_flags import is_enabled
@@ -196,6 +208,7 @@ def process_payment(order):
 ```
 
 **3. Merge Rapidly**:
+
 ```bash
 # Push and create PR immediately
 git push origin feat/add-user-filter
@@ -215,6 +228,7 @@ git push origin --delete feat/add-user-filter
 ```
 
 **4. Continuous Deployment**:
+
 ```yaml
 # .github/workflows/main.yml
 name: CI/CD
@@ -283,6 +297,7 @@ hotfix/security-patch (from main)
 ### Full Workflow
 
 **1. Feature Development**:
+
 ```bash
 # Create feature branch from develop
 git checkout develop
@@ -308,6 +323,7 @@ git branch -d feature/user-authentication
 ```
 
 **2. Release Preparation**:
+
 ```bash
 # Create release branch from develop
 git checkout develop
@@ -337,6 +353,7 @@ git branch -d release/v2.1.0
 ```
 
 **3. Hotfix Process**:
+
 ```bash
 # Critical bug in production
 git checkout main
@@ -371,6 +388,7 @@ git branch -d hotfix/security-patch
 **Why Migrate**: Faster releases, simpler workflow, better CI/CD fit
 
 **Step 1: Simplify Branches**:
+
 ```bash
 # Merge all open features to develop
 git checkout develop
@@ -388,6 +406,7 @@ git push origin --delete develop
 ```
 
 **Step 2: Adopt GitHub Flow**:
+
 ```bash
 # New workflow: feature branches from main
 git checkout main
@@ -396,6 +415,7 @@ git checkout -b feature/new-feature
 ```
 
 **Step 3: Update CI/CD**:
+
 ```yaml
 # Before (GitFlow)
 on:
@@ -413,6 +433,7 @@ on:
 **Why Migrate**: Scale to larger teams, reduce merge conflicts
 
 **Step 1: Add Feature Flags**:
+
 ```javascript
 // Install feature flag library
 npm install @openfeature/server-sdk
@@ -424,6 +445,7 @@ if (featureFlags.isEnabled('new-search')) {
 ```
 
 **Step 2: Enforce Short-Lived Branches**:
+
 ```yaml
 # .github/workflows/pr-checks.yml
 - name: Check branch age
@@ -436,6 +458,7 @@ if (featureFlags.isEnabled('new-search')) {
 ```
 
 **Step 3: Increase Merge Frequency**:
+
 ```bash
 # Before: Merge when feature complete
 # After: Merge daily with feature flags
@@ -454,12 +477,14 @@ git push
 **Recommendation**: **GitHub Flow**
 
 **Why**:
+
 - Minimal overhead
 - Fast iteration
 - Easy to understand
 - No coordination needed
 
 **Setup**:
+
 ```bash
 # Branch protection on main
 Protected branches: main
@@ -473,11 +498,13 @@ Require status checks: Yes (CI)
 **Recommendation**: **GitHub Flow** or **Trunk-Based**
 
 **Why**:
+
 - Enough developers for merge conflicts
 - Need faster integration (trunk-based)
 - Or keep simple with GitHub Flow + feature flags
 
 **Setup**:
+
 ```bash
 # Trunk-based setup
 Protected branches: main
@@ -492,11 +519,13 @@ Feature flags: Required for large features
 **Recommendation**: **Trunk-Based Development**
 
 **Why**:
+
 - Reduces merge conflicts through rapid integration
 - Scales to hundreds of developers
 - Requires mature CI/CD and testing
 
 **Setup**:
+
 ```bash
 # Enterprise trunk-based
 Protected branches: main, release/*
@@ -513,11 +542,13 @@ Deployment: Automated to staging, manual to prod
 **Recommendation**: **GitFlow**
 
 **Why**:
+
 - Support multiple versions (e.g., 2.x and 3.x)
 - Scheduled releases (monthly, quarterly)
 - Need structured release process
 
 **Setup**:
+
 ```bash
 # GitFlow setup
 Protected branches: main, develop
@@ -568,6 +599,7 @@ Version tags: Required on main
 **Problem**: Feature branch open for weeks, massive merge conflicts
 
 **Fix**: Use stacked diffs or feature flags
+
 ```bash
 # Bad
 git checkout -b feature/rewrite-everything
@@ -584,6 +616,7 @@ git checkout -b feat/migrate-clients (200 lines)
 **Problem**: Pyramid of branches, unclear base
 
 **Fix**: Always branch from main or develop
+
 ```bash
 # Bad
 feature/A -> feature/B -> feature/C
@@ -599,6 +632,7 @@ main -> feature/C (merge)
 **Problem**: Accidental direct commits to main
 
 **Fix**: Enable branch protection
+
 ```yaml
 # GitHub branch protection
 main:
@@ -634,6 +668,7 @@ git push origin feature/add-export
 ```
 
 **Results**:
+
 - Features ship in hours, not days
 - Minimal process overhead
 - High deployment frequency
@@ -656,6 +691,7 @@ git push origin feat/fraud-detection
 ```
 
 **Results**:
+
 - Reduced merge conflicts by 70%
 - Faster integration
 - Safe production testing with flags
@@ -683,6 +719,7 @@ git tag v4.0.0
 ```
 
 **Results**:
+
 - Structured release process
 - Support for multiple versions
 - Predictable release schedule

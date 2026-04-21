@@ -8,16 +8,16 @@
 
 ## Quick Decision: Choosing a Real-Time Pattern
 
-| Factor | WebSocket | SSE | Long Polling | GraphQL Subscriptions |
-|---|---|---|---|---|
-| Direction | Bidirectional | Server → Client | Server → Client | Server → Client |
-| Protocol | ws:// / wss:// | HTTP/2 (text/event-stream) | HTTP | ws:// via graphql-ws |
-| Browser support | All modern | All modern (no IE) | Universal | Requires client library |
-| Reconnection | Manual (implement yourself) | Built-in (EventSource) | Built-in (next request) | Library-managed |
-| Binary data | Yes | No (text only) | Yes (base64) | No (JSON) |
-| Max connections | OS/server limits | 6 per domain (HTTP/1.1), unlimited (HTTP/2) | Standard HTTP limits | Same as WebSocket |
-| Load balancer | Sticky sessions or Redis pub/sub | Standard HTTP | Standard HTTP | Sticky sessions or Redis pub/sub |
-| Use when | Chat, gaming, collaborative editing | Notifications, feeds, dashboards | Legacy clients, simplest fallback | Already using GraphQL |
+| Factor          | WebSocket                           | SSE                                         | Long Polling                      | GraphQL Subscriptions            |
+| --------------- | ----------------------------------- | ------------------------------------------- | --------------------------------- | -------------------------------- |
+| Direction       | Bidirectional                       | Server → Client                             | Server → Client                   | Server → Client                  |
+| Protocol        | ws:// / wss://                      | HTTP/2 (text/event-stream)                  | HTTP                              | ws:// via graphql-ws             |
+| Browser support | All modern                          | All modern (no IE)                          | Universal                         | Requires client library          |
+| Reconnection    | Manual (implement yourself)         | Built-in (EventSource)                      | Built-in (next request)           | Library-managed                  |
+| Binary data     | Yes                                 | No (text only)                              | Yes (base64)                      | No (JSON)                        |
+| Max connections | OS/server limits                    | 6 per domain (HTTP/1.1), unlimited (HTTP/2) | Standard HTTP limits              | Same as WebSocket                |
+| Load balancer   | Sticky sessions or Redis pub/sub    | Standard HTTP                               | Standard HTTP                     | Sticky sessions or Redis pub/sub |
+| Use when        | Chat, gaming, collaborative editing | Notifications, feeds, dashboards            | Legacy clients, simplest fallback | Already using GraphQL            |
 
 ### Decision Tree
 
@@ -68,7 +68,7 @@ const WebSocket = require("ws");
 const wss = new WebSocket.Server({ port: 8080 });
 
 const HEARTBEAT_INTERVAL = 30000; // 30 seconds
-const HEARTBEAT_TIMEOUT = 10000;  // 10 seconds to respond
+const HEARTBEAT_TIMEOUT = 10000; // 10 seconds to respond
 
 wss.on("connection", (ws) => {
   ws.isAlive = true;
@@ -112,7 +112,8 @@ class ReconnectingWebSocket {
     };
 
     this.ws.onclose = (event) => {
-      if (event.code !== 1000) { // Not a clean close
+      if (event.code !== 1000) {
+        // Not a clean close
         this.scheduleReconnect();
       }
     };
@@ -134,13 +135,13 @@ class ReconnectingWebSocket {
 
 ### Connection State Management
 
-| State | Description | Client Action |
-|---|---|---|
-| CONNECTING | Handshake in progress | Show "connecting" indicator |
-| OPEN | Connected and ready | Normal operation |
-| CLOSING | Close initiated | Disable send, show status |
-| CLOSED | Connection terminated | Attempt reconnection |
-| RECONNECTING | Between attempts | Show "reconnecting" with attempt count |
+| State        | Description           | Client Action                          |
+| ------------ | --------------------- | -------------------------------------- |
+| CONNECTING   | Handshake in progress | Show "connecting" indicator            |
+| OPEN         | Connected and ready   | Normal operation                       |
+| CLOSING      | Close initiated       | Disable send, show status              |
+| CLOSED       | Connection terminated | Attempt reconnection                   |
+| RECONNECTING | Between attempts      | Show "reconnecting" with attempt count |
 
 ### WebSocket Message Protocol Design
 
@@ -156,14 +157,14 @@ class ReconnectingWebSocket {
 
 **Message type conventions:**
 
-| Type | Direction | Purpose |
-|---|---|---|
-| `subscribe` | Client → Server | Join a channel/topic |
-| `unsubscribe` | Client → Server | Leave a channel/topic |
-| `message` | Bidirectional | Application data |
-| `ack` | Server → Client | Confirm receipt of client message |
-| `error` | Server → Client | Error notification |
-| `ping` / `pong` | Bidirectional | Application-level heartbeat |
+| Type            | Direction       | Purpose                           |
+| --------------- | --------------- | --------------------------------- |
+| `subscribe`     | Client → Server | Join a channel/topic              |
+| `unsubscribe`   | Client → Server | Leave a channel/topic             |
+| `message`       | Bidirectional   | Application data                  |
+| `ack`           | Server → Client | Confirm receipt of client message |
+| `error`         | Server → Client | Error notification                |
+| `ping` / `pong` | Bidirectional   | Application-level heartbeat       |
 
 ---
 
@@ -178,8 +179,8 @@ app.get("/events", (req, res) => {
   res.writeHead(200, {
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache",
-    "Connection": "keep-alive",
-    "X-Accel-Buffering": "no" // Disable Nginx buffering
+    Connection: "keep-alive",
+    "X-Accel-Buffering": "no", // Disable Nginx buffering
   });
 
   // Send initial connection event
@@ -187,7 +188,9 @@ app.get("/events", (req, res) => {
 
   // Send periodic updates
   const interval = setInterval(() => {
-    res.write(`id: ${Date.now()}\nevent: update\ndata: ${JSON.stringify(getData())}\n\n`);
+    res.write(
+      `id: ${Date.now()}\nevent: update\ndata: ${JSON.stringify(getData())}\n\n`,
+    );
   }, 5000);
 
   req.on("close", () => {
@@ -291,7 +294,7 @@ useServer(
       return { user: await validateToken(token) };
     },
   },
-  wsServer
+  wsServer,
 );
 ```
 
@@ -331,12 +334,12 @@ Clients ──→ Load Balancer ──→ Server Instance A ──┐
 
 ### Load Balancer Configuration
 
-| Load Balancer | WebSocket Support | Key Config |
-|---|---|---|
-| Nginx | Yes | `proxy_set_header Upgrade $http_upgrade;` |
-| ALB (AWS) | Yes | Idle timeout up to 4000s |
-| Cloudflare | Yes | 100s idle timeout (configurable on enterprise) |
-| HAProxy | Yes | `option http-server-close` disable |
+| Load Balancer | WebSocket Support | Key Config                                     |
+| ------------- | ----------------- | ---------------------------------------------- |
+| Nginx         | Yes               | `proxy_set_header Upgrade $http_upgrade;`      |
+| ALB (AWS)     | Yes               | Idle timeout up to 4000s                       |
+| Cloudflare    | Yes               | 100s idle timeout (configurable on enterprise) |
+| HAProxy       | Yes               | `option http-server-close` disable             |
 
 **Nginx WebSocket proxy:**
 
@@ -354,12 +357,12 @@ location /ws {
 
 ### Connection Limits Reference
 
-| Resource | Typical Limit | Tuning |
-|---|---|---|
-| OS file descriptors | 1024 default | `ulimit -n 65535` |
-| Node.js per-process | ~10K-50K concurrent | Cluster mode or multiple processes |
-| Nginx | 512 per worker | `worker_connections 10240;` |
-| Redis Pub/Sub | 10K subscribers/channel | Shard channels by topic prefix |
+| Resource            | Typical Limit           | Tuning                             |
+| ------------------- | ----------------------- | ---------------------------------- |
+| OS file descriptors | 1024 default            | `ulimit -n 65535`                  |
+| Node.js per-process | ~10K-50K concurrent     | Cluster mode or multiple processes |
+| Nginx               | 512 per worker          | `worker_connections 10240;`        |
+| Redis Pub/Sub       | 10K subscribers/channel | Shard channels by topic prefix     |
 
 ---
 
@@ -385,12 +388,12 @@ location /ws {
 
 ### Authentication Patterns for WebSocket
 
-| Pattern | Pros | Cons |
-|---|---|---|
-| Token in query string | Simple, works everywhere | Token in URL logs |
-| Token in first message | Clean URL | Unauthenticated window |
-| Cookie-based | Automatic, secure | CORS complexity |
-| Connection params (graphql-ws) | Clean, typed | Library-specific |
+| Pattern                        | Pros                     | Cons                   |
+| ------------------------------ | ------------------------ | ---------------------- |
+| Token in query string          | Simple, works everywhere | Token in URL logs      |
+| Token in first message         | Clean URL                | Unauthenticated window |
+| Cookie-based                   | Automatic, secure        | CORS complexity        |
+| Connection params (graphql-ws) | Clean, typed             | Library-specific       |
 
 **Recommended:** Token in connection params or first message, with a 5-second auth timeout.
 
@@ -398,18 +401,18 @@ location /ws {
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|---|---|---|
-| No heartbeat/ping-pong | Zombie connections accumulate | Implement 30s ping, terminate on missed pong |
-| No reconnection logic | Client disconnects permanently | Exponential backoff with jitter |
-| Sending large payloads over WebSocket | Memory pressure, slow parsing | Paginate large data; use REST for bulk |
-| Using WebSocket for request-response | Adds complexity over HTTP | Use REST/GraphQL for request-response; WS for push |
-| No message size limits | DoS via oversized messages | Set `maxPayload` (e.g., 1MB) |
-| Broadcasting to all connections | Does not scale, wasted bandwidth | Use channels/topics, send only relevant updates |
-| Storing session state in-process only | Breaks with multiple instances | Use Redis or external store for connection state |
-| SSE without `X-Accel-Buffering: no` | Nginx buffers events, appears broken | Disable proxy buffering for SSE endpoints |
-| No graceful degradation | Complete failure if WS unavailable | Fallback to SSE → long polling |
-| Authentication only at connection time | Long-lived connections bypass token expiry | Periodic re-authentication or token refresh |
+| Anti-Pattern                           | Problem                                    | Fix                                                |
+| -------------------------------------- | ------------------------------------------ | -------------------------------------------------- |
+| No heartbeat/ping-pong                 | Zombie connections accumulate              | Implement 30s ping, terminate on missed pong       |
+| No reconnection logic                  | Client disconnects permanently             | Exponential backoff with jitter                    |
+| Sending large payloads over WebSocket  | Memory pressure, slow parsing              | Paginate large data; use REST for bulk             |
+| Using WebSocket for request-response   | Adds complexity over HTTP                  | Use REST/GraphQL for request-response; WS for push |
+| No message size limits                 | DoS via oversized messages                 | Set `maxPayload` (e.g., 1MB)                       |
+| Broadcasting to all connections        | Does not scale, wasted bandwidth           | Use channels/topics, send only relevant updates    |
+| Storing session state in-process only  | Breaks with multiple instances             | Use Redis or external store for connection state   |
+| SSE without `X-Accel-Buffering: no`    | Nginx buffers events, appears broken       | Disable proxy buffering for SSE endpoints          |
+| No graceful degradation                | Complete failure if WS unavailable         | Fallback to SSE → long polling                     |
+| Authentication only at connection time | Long-lived connections bypass token expiry | Periodic re-authentication or token refresh        |
 
 ---
 

@@ -14,16 +14,26 @@ interface CitiesSectionProps {
 }
 
 const CITY_IMAGES: Record<string, string> = {
-  orlando: "https://images.unsplash.com/photo-1575089976121-8ed774c2a52c?w=400&h=300&fit=crop",
-  miami: "https://images.unsplash.com/photo-1506966953602-c20cc11f75e3?w=400&h=300&fit=crop",
-  newark: "https://images.unsplash.com/photo-1496588152823-86ff7695e68f?w=400&h=300&fit=crop",
-  boston: "https://images.unsplash.com/photo-1501979376754-2ff867a4f659?w=400&h=300&fit=crop",
-  lisboa: "https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=400&h=300&fit=crop",
-  lisbon: "https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=400&h=300&fit=crop",
-  dublin: "https://images.unsplash.com/photo-1549918864-48ac978761a4?w=400&h=300&fit=crop",
-  london: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=300&fit=crop",
-  londres: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=300&fit=crop",
-  madrid: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=400&h=300&fit=crop",
+  orlando:
+    "https://images.unsplash.com/photo-1575089976121-8ed774c2a52c?w=400&h=300&fit=crop",
+  miami:
+    "https://images.unsplash.com/photo-1506966953602-c20cc11f75e3?w=400&h=300&fit=crop",
+  newark:
+    "https://images.unsplash.com/photo-1496588152823-86ff7695e68f?w=400&h=300&fit=crop",
+  boston:
+    "https://images.unsplash.com/photo-1501979376754-2ff867a4f659?w=400&h=300&fit=crop",
+  lisboa:
+    "https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=400&h=300&fit=crop",
+  lisbon:
+    "https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=400&h=300&fit=crop",
+  dublin:
+    "https://images.unsplash.com/photo-1549918864-48ac978761a4?w=400&h=300&fit=crop",
+  london:
+    "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=300&fit=crop",
+  londres:
+    "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=300&fit=crop",
+  madrid:
+    "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=400&h=300&fit=crop",
 };
 
 export function CitiesSection({ cities }: CitiesSectionProps) {
@@ -41,7 +51,10 @@ export function CitiesSection({ cities }: CitiesSectionProps) {
 
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {cities.slice(0, 8).map((city) => {
-            const key = city.city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const key = city.city
+              .toLowerCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "");
             const imageUrl = CITY_IMAGES[key];
 
             return (

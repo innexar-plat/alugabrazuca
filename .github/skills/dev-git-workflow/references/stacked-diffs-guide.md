@@ -25,6 +25,7 @@ Comprehensive guide to implementing stacked diffs workflows for faster code revi
 ### Traditional vs Stacked Approach
 
 **Traditional Large PR**:
+
 ```
 feature/checkout (2000 lines)
   ├── Add cart models
@@ -38,6 +39,7 @@ Merge time: 3-5 days
 ```
 
 **Stacked Diffs**:
+
 ```
 Stack 1: feat/cart-models (200 lines)
   └─ Stack 2: feat/cart-api (250 lines)
@@ -94,6 +96,7 @@ Total merge time: 1-2 days
 GitLab added native stacked diffs support in 2024.
 
 **Create stacked MR**:
+
 ```bash
 # Create first MR to main
 git checkout -b feat/cart-models main
@@ -109,6 +112,7 @@ git push origin feat/cart-api
 ```
 
 **Key Points**:
+
 - Target branch of dependent MR = previous MR's branch
 - GitLab automatically updates stack when base MR merges
 - Native UI shows stack relationships
@@ -152,6 +156,7 @@ glab stack list
 - See [glab stack documentation](https://docs.gitlab.com/cli/stack/) for full reference
 
 **Legacy approach** (manual MR chaining):
+
 ```bash
 # Create stacked MRs manually
 glab mr create --target-branch feat/cart-models
@@ -165,23 +170,25 @@ GitHub doesn't natively support stacked diffs. Several tools enable stacking wor
 
 For a comprehensive comparison, see [The Stacking Workflow](https://www.stacking.dev/).
 
-| Tool | Description | Pros | Cons |
-|------|-------------|------|------|
-| [Charcoal](https://github.com/danerwilliams/charcoal) | Open-source fork of Graphite CLI | Free, no limits | Community-maintained |
-| [ghstack](https://github.com/ezyang/ghstack) | CLI for stacking on GitHub | Open-source, simple | Single commit per PR required |
-| [Sapling](https://sapling-scm.com/) | Meta's source control system | Full-featured, maintained by Meta | Learning curve |
-| [spr](https://github.com/ejoffe/spr) | Stacked PRs for GitHub | Lightweight, simple | Single commit per PR |
-| [git-branchless](https://github.com/arxanas/git-branchless) | High-level Git CLI | Powerful, undo support | Complex for beginners |
+| Tool                                                        | Description                      | Pros                              | Cons                          |
+| ----------------------------------------------------------- | -------------------------------- | --------------------------------- | ----------------------------- |
+| [Charcoal](https://github.com/danerwilliams/charcoal)       | Open-source fork of Graphite CLI | Free, no limits                   | Community-maintained          |
+| [ghstack](https://github.com/ezyang/ghstack)                | CLI for stacking on GitHub       | Open-source, simple               | Single commit per PR required |
+| [Sapling](https://sapling-scm.com/)                         | Meta's source control system     | Full-featured, maintained by Meta | Learning curve                |
+| [spr](https://github.com/ejoffe/spr)                        | Stacked PRs for GitHub           | Lightweight, simple               | Single commit per PR          |
+| [git-branchless](https://github.com/arxanas/git-branchless) | High-level Git CLI               | Powerful, undo support            | Complex for beginners         |
 
 #### Option 1: Graphite CLI (Recommended)
 
 **Install**:
+
 ```bash
 npm install -g @withgraphite/graphite-cli
 gt auth
 ```
 
 **Workflow**:
+
 ```bash
 # Initialize repository
 gt repo init
@@ -221,6 +228,7 @@ gt stack submit
 ```
 
 **Graphite Commands**:
+
 ```bash
 # Navigation
 gt up          # Move up stack
@@ -240,6 +248,7 @@ gt upstack onto   # Rebase current branch + upstack onto target
 ```
 
 **Handle changes to earlier stacks**:
+
 ```bash
 # Make changes to feat/cart-models
 gt checkout feat/cart-models
@@ -270,6 +279,7 @@ git push origin feat/cart-api
 ```
 
 **Manual Rebase After Base PR Merges**:
+
 ```bash
 # After feat/cart-models merges to main
 git checkout feat/cart-api
@@ -280,6 +290,7 @@ git push --force-with-lease origin feat/cart-api
 ```
 
 **Challenges with Manual Approach**:
+
 - Must manually change PR target after base merges
 - No visual stack representation
 - Rebasing requires careful coordination
@@ -305,6 +316,7 @@ Stack 2: Add payment integration (1200 lines)
 ### 2. Ensure Each Stack is Independently Reviewable
 
 Each stack should:
+
 - Have clear, focused purpose
 - Include relevant tests
 - Be self-contained logic
@@ -356,9 +368,11 @@ This is **Part 3 of 5** in the cart feature stack:
 ## Dependencies
 
 This PR depends on:
+
 - #235 (cart CRUD API) - must merge first
 
 This PR blocks:
+
 - #237 (cart UI) - builds on this validation
 ```
 
@@ -502,6 +516,7 @@ if (featureFlags.cartEnabled) {
 ### Graphite Web App
 
 Visual stack view at https://app.graphite.dev:
+
 - Drag-and-drop to reorder stacks
 - See CI status for entire stack
 - Merge stacks in order with one click
@@ -509,6 +524,7 @@ Visual stack view at https://app.graphite.dev:
 ### GitLab Merge Request Stack View
 
 GitLab UI shows stack relationships:
+
 ```
 [MR !456] feat/cart-ui -> feat/cart-api
   ↓ depends on
@@ -520,6 +536,7 @@ GitLab UI shows stack relationships:
 ### ASCII Stack Visualization
 
 Use `gt log short` (Graphite):
+
 ```
 ◉  feat/payment (under review)
 │
@@ -539,12 +556,14 @@ Use `gt log short` (Graphite):
 ### Migrate Existing Large PR to Stacks
 
 **Step 1: Analyze PR Structure**
+
 ```bash
 git log feat/large-feature --oneline
 # Identify logical groupings of commits
 ```
 
 **Step 2: Extract Stacks**
+
 ```bash
 # Create Stack 1 from first logical group
 git checkout -b feat/stack-1 main
@@ -558,6 +577,7 @@ git push origin feat/stack-2
 ```
 
 **Step 3: Create PRs**
+
 ```bash
 # Stack 1 -> main
 # Stack 2 -> Stack 1
@@ -567,15 +587,18 @@ git push origin feat/stack-2
 ### Gradual Team Adoption
 
 **Phase 1: Pilot Team (Week 1-2)**
+
 - 1-2 developers try stacked diffs
 - Document learnings and pain points
 
 **Phase 2: Expand (Week 3-4)**
+
 - Share pilot results with team
 - Train additional developers
 - Set stack size guidelines
 
 **Phase 3: Team-Wide (Month 2)**
+
 - Require stacked diffs for features > 500 LOC
 - Add stack visualization to PR template
 - Track metrics (review time, merge rate)
@@ -586,21 +609,21 @@ git push origin feat/stack-2
 
 ### Stack Effectiveness
 
-| Metric | Before Stacks | With Stacks | Improvement |
-|--------|--------------|-------------|-------------|
-| Avg PR size | 800 LOC | 300 LOC | 62% reduction |
-| Avg review time | 3.5 hours | 1.2 hours | 66% faster |
-| PRs merged same day | 40% | 75% | 88% increase |
-| Merge conflicts per PR | 4.2 | 1.1 | 74% reduction |
-| Bug escape rate | 8% | 3% | 62% improvement |
+| Metric                 | Before Stacks | With Stacks | Improvement     |
+| ---------------------- | ------------- | ----------- | --------------- |
+| Avg PR size            | 800 LOC       | 300 LOC     | 62% reduction   |
+| Avg review time        | 3.5 hours     | 1.2 hours   | 66% faster      |
+| PRs merged same day    | 40%           | 75%         | 88% increase    |
+| Merge conflicts per PR | 4.2           | 1.1         | 74% reduction   |
+| Bug escape rate        | 8%            | 3%          | 62% improvement |
 
 ### CI/CD Impact
 
-| Metric | Impact |
-|--------|--------|
-| CI runs per feature | +150% (more PRs) |
-| CI cost per feature | +25% (caching helps) |
-| Time to first CI feedback | -60% (smaller PRs) |
+| Metric                    | Impact               |
+| ------------------------- | -------------------- |
+| CI runs per feature       | +150% (more PRs)     |
+| CI cost per feature       | +25% (caching helps) |
+| Time to first CI feedback | -60% (smaller PRs)   |
 
 ---
 
@@ -626,6 +649,7 @@ git push origin feat/stack-2
 Use format: `feat/<feature>-<number>-<description>`
 
 Example:
+
 - `feat/cart-01-models`
 - `feat/cart-02-api`
 - `feat/cart-03-ui`
@@ -635,11 +659,13 @@ Example:
 Each stacked PR must include:
 
 ### Stack Context
+
 - Part X of Y in <feature> stack
 - Link to previous and next PRs
 - High-level feature description
 
 ### This Stack
+
 - What this specific stack adds
 - Why this order/split
 - Testing completed
@@ -663,6 +689,7 @@ Each stacked PR must include:
 ### Problem: Rebase Conflicts Across Multiple Stacks
 
 **Solution**: Resolve bottom-up
+
 ```bash
 # Start with bottom stack
 gt checkout feat/cart-models
@@ -677,6 +704,7 @@ gt stack restack
 ### Problem: CI Failing Due to Missing Dependencies
 
 **Solution**: Ensure each stack includes dependencies
+
 ```bash
 # BAD: Bad: Stack 2 depends on Stack 1 code but doesn't include it
 Stack 1: Add CartModel class
@@ -690,6 +718,7 @@ Stack 2: Add CartService using CartModel + tests (passes CI)
 ### Problem: PR Merge Order Confusion
 
 **Solution**: Document order clearly
+
 ```markdown
 ## Merge Order (IMPORTANT)
 
@@ -702,12 +731,12 @@ Stack 2: Add CartService using CartModel + tests (passes CI)
 
 ## Tools Comparison
 
-| Tool | Platform | Pros | Cons | Cost |
-|------|----------|------|------|------|
-| **Graphite** | GitHub | Best UX, automation, visual UI | Requires CLI | Free (< 10 devs) |
-| **GitLab CLI** | GitLab | Native support, no external tool | GitLab only | Free |
-| **git-stack** | GitHub | Open-source, lightweight | Basic features | Free |
-| **Manual** | Any | Full control, no dependencies | Error-prone, tedious | Free |
+| Tool           | Platform | Pros                             | Cons                 | Cost             |
+| -------------- | -------- | -------------------------------- | -------------------- | ---------------- |
+| **Graphite**   | GitHub   | Best UX, automation, visual UI   | Requires CLI         | Free (< 10 devs) |
+| **GitLab CLI** | GitLab   | Native support, no external tool | GitLab only          | Free             |
+| **git-stack**  | GitHub   | Open-source, lightweight         | Basic features       | Free             |
+| **Manual**     | Any      | Full control, no dependencies    | Error-prone, tedious | Free             |
 
 ---
 

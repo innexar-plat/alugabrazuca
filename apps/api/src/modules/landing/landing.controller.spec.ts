@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { Test, TestingModule } from '@nestjs/testing';
-import { LandingController } from './landing.controller';
-import { LandingService } from './landing.service';
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { Test, TestingModule } from "@nestjs/testing";
+import { LandingController } from "./landing.controller";
+import { LandingService } from "./landing.service";
 
-describe('LandingController', () => {
+describe("LandingController", () => {
   let controller: LandingController;
 
   const mockService = {
@@ -25,13 +25,13 @@ describe('LandingController', () => {
     controller = module.get(LandingController);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined();
   });
 
-  describe('getFeatured', () => {
-    it('should delegate to service.getFeatured', async () => {
-      const expected = { data: [{ id: '1', title: 'Room' }] };
+  describe("getFeatured", () => {
+    it("should delegate to service.getFeatured", async () => {
+      const expected = { data: [{ id: "1", title: "Room" }] };
       mockService.getFeatured.mockResolvedValue(expected);
 
       const result = await controller.getFeatured();
@@ -41,9 +41,9 @@ describe('LandingController', () => {
     });
   });
 
-  describe('getCities', () => {
-    it('should delegate to service.getCities', async () => {
-      const expected = { data: [{ city: 'Orlando', count: 5 }] };
+  describe("getCities", () => {
+    it("should delegate to service.getCities", async () => {
+      const expected = { data: [{ city: "Orlando", count: 5 }] };
       mockService.getCities.mockResolvedValue(expected);
 
       const result = await controller.getCities();
@@ -53,10 +53,15 @@ describe('LandingController', () => {
     });
   });
 
-  describe('getStats', () => {
-    it('should delegate to service.getStats', async () => {
+  describe("getStats", () => {
+    it("should delegate to service.getStats", async () => {
       const expected = {
-        data: { activeListings: 10, totalCities: 3, totalUsers: 50, totalReviews: 0 },
+        data: {
+          activeListings: 10,
+          totalCities: 3,
+          totalUsers: 50,
+          totalReviews: 0,
+        },
       };
       mockService.getStats.mockResolvedValue(expected);
 
@@ -67,9 +72,9 @@ describe('LandingController', () => {
     });
   });
 
-  describe('getTestimonials', () => {
-    it('should delegate to service.getTestimonials', async () => {
-      const expected = { data: [{ id: '1', name: 'Ana', text: 'Great!' }] };
+  describe("getTestimonials", () => {
+    it("should delegate to service.getTestimonials", async () => {
+      const expected = { data: [{ id: "1", name: "Ana", text: "Great!" }] };
       mockService.getTestimonials.mockResolvedValue(expected);
 
       const result = await controller.getTestimonials();
@@ -79,15 +84,15 @@ describe('LandingController', () => {
     });
   });
 
-  describe('submitContact', () => {
-    it('should delegate to service.submitContact with dto', async () => {
+  describe("submitContact", () => {
+    it("should delegate to service.submitContact with dto", async () => {
       const dto = {
-        name: 'João',
-        email: 'joao@test.com',
-        subject: 'Dúvida',
-        message: 'Gostaria de saber mais sobre a plataforma.',
+        name: "João",
+        email: "joao@test.com",
+        subject: "Dúvida",
+        message: "Gostaria de saber mais sobre a plataforma.",
       };
-      const expected = { message: 'Message sent successfully' };
+      const expected = { message: "Message sent successfully" };
       mockService.submitContact.mockResolvedValue(expected);
 
       const result = await controller.submitContact(dto);

@@ -19,26 +19,26 @@ Risk-based quality engineering strategy for modern software delivery.
 
 ## Use Instead
 
-| Need | Skill |
-|------|-------|
-| Debug failing tests or incidents | [qa-debugging](../qa-debugging/SKILL.md) |
-| Test LLM agents/personas | [qa-agent-testing](../qa-agent-testing/SKILL.md) |
+| Need                                | Skill                                                            |
+| ----------------------------------- | ---------------------------------------------------------------- |
+| Debug failing tests or incidents    | [qa-debugging](../qa-debugging/SKILL.md)                         |
+| Test LLM agents/personas            | [qa-agent-testing](../qa-agent-testing/SKILL.md)                 |
 | Perform security audit/threat model | [software-security-appsec](../software-security-appsec/SKILL.md) |
-| Design CI/CD pipelines and infra | [ops-devops-platform](../ops-devops-platform/SKILL.md) |
+| Design CI/CD pipelines and infra    | [ops-devops-platform](../ops-devops-platform/SKILL.md)           |
 
 ## Quick Reference
 
-| Test Type | Goal | Typical Use |
-|-----------|------|-------------|
-| Unit | Prove logic and invariants fast | Pure functions, core business rules |
-| Component | Validate UI behavior in isolation | UI components and state transitions |
-| Integration | Validate boundaries with real deps | API + DB, queues, external adapters |
-| Contract | Prevent breaking changes cross-team | OpenAPI/AsyncAPI/JSON Schema/Protobuf |
-| E2E | Validate critical user journeys | 1–2 “money paths” per product area |
-| Performance | Enforce budgets and capacity | Load, stress, soak, regression trends |
-| Visual | Catch UI regressions | Layout/visual diffs on stable pages |
-| Accessibility | Automate WCAG checks | axe smoke + targeted manual audits |
-| Security | Catch common web vulns early | DAST smoke + critical checks in CI |
+| Test Type     | Goal                                | Typical Use                           |
+| ------------- | ----------------------------------- | ------------------------------------- |
+| Unit          | Prove logic and invariants fast     | Pure functions, core business rules   |
+| Component     | Validate UI behavior in isolation   | UI components and state transitions   |
+| Integration   | Validate boundaries with real deps  | API + DB, queues, external adapters   |
+| Contract      | Prevent breaking changes cross-team | OpenAPI/AsyncAPI/JSON Schema/Protobuf |
+| E2E           | Validate critical user journeys     | 1–2 “money paths” per product area    |
+| Performance   | Enforce budgets and capacity        | Load, stress, soak, regression trends |
+| Visual        | Catch UI regressions                | Layout/visual diffs on stable pages   |
+| Accessibility | Automate WCAG checks                | axe smoke + targeted manual audits    |
+| Security      | Catch common web vulns early        | DAST smoke + critical checks in CI    |
 
 ## Default Workflow
 
@@ -106,10 +106,10 @@ Need to test: [Feature Type]
 
 ### CI Economics
 
-| Budget | Target |
-|--------|--------|
-| PR gate | p50 ≤ 10 min, p95 ≤ 20 min |
-| Mainline health | ≥ 99% green builds/day |
+| Budget          | Target                     |
+| --------------- | -------------------------- |
+| PR gate         | p50 ≤ 10 min, p95 ≤ 20 min |
+| Mainline health | ≥ 99% green builds/day     |
 
 ### Flake Management
 
@@ -124,7 +124,7 @@ Need to test: [Feature Type]
 ### AAA Pattern
 
 ```javascript
-it('should apply discount', () => {
+it("should apply discount", () => {
   // Arrange
   const order = { total: 150 };
   // Act
@@ -148,13 +148,13 @@ class LoginPage {
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Solution |
-|--------------|---------|----------|
-| Testing implementation | Breaks on refactor | Test behavior |
-| Shared mutable state | Flaky tests | Isolate test data |
-| sleep() in tests | Slow, unreliable | Use proper waits |
-| Everything E2E | Slow, expensive | Use test pyramid |
-| Ignoring flaky tests | False confidence | Fix or quarantine |
+| Anti-Pattern           | Problem            | Solution          |
+| ---------------------- | ------------------ | ----------------- |
+| Testing implementation | Breaks on refactor | Test behavior     |
+| Shared mutable state   | Flaky tests        | Isolate test data |
+| sleep() in tests       | Slow, unreliable   | Use proper waits  |
+| Everything E2E         | Slow, expensive    | Use test pyramid  |
+| Ignoring flaky tests   | False confidence   | Fix or quarantine |
 
 ## Do / Avoid
 
@@ -191,42 +191,42 @@ Before release, run a coverage audit that maps product features/backlog IDs to d
 
 ## Resources
 
-| Resource | Purpose |
-|----------|---------|
-| [comprehensive-testing-guide.md](references/comprehensive-testing-guide.md) | End-to-end playbook across layers |
-| [operational-playbook.md](references/operational-playbook.md) | Testing pyramid, BDD, CI gates |
-| [shift-left-testing.md](references/shift-left-testing.md) | Contract-first, BDD, continuous testing |
-| [test-automation-patterns.md](references/test-automation-patterns.md) | Reliable patterns and anti-patterns |
-| [playwright-webapp-testing.md](references/playwright-webapp-testing.md) | Playwright patterns |
-| [chaos-resilience-testing.md](references/chaos-resilience-testing.md) | Chaos engineering |
-| [observability-driven-testing.md](references/observability-driven-testing.md) | OpenTelemetry, trace-based |
-| [contract-testing-2026.md](references/contract-testing-2026.md) | Pact, Specmatic |
-| [synthetic-test-data.md](references/synthetic-test-data.md) | Privacy-safe, ephemeral test data |
-| [test-environment-management.md](references/test-environment-management.md) | Environment provisioning and lifecycle |
-| [quality-metrics-dashboard.md](references/quality-metrics-dashboard.md) | Quality metrics and dashboards |
-| [compliance-testing.md](references/compliance-testing.md) | SOC2, HIPAA, GDPR, PCI-DSS testing |
+| Resource                                                                                  | Purpose                                         |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| [comprehensive-testing-guide.md](references/comprehensive-testing-guide.md)               | End-to-end playbook across layers               |
+| [operational-playbook.md](references/operational-playbook.md)                             | Testing pyramid, BDD, CI gates                  |
+| [shift-left-testing.md](references/shift-left-testing.md)                                 | Contract-first, BDD, continuous testing         |
+| [test-automation-patterns.md](references/test-automation-patterns.md)                     | Reliable patterns and anti-patterns             |
+| [playwright-webapp-testing.md](references/playwright-webapp-testing.md)                   | Playwright patterns                             |
+| [chaos-resilience-testing.md](references/chaos-resilience-testing.md)                     | Chaos engineering                               |
+| [observability-driven-testing.md](references/observability-driven-testing.md)             | OpenTelemetry, trace-based                      |
+| [contract-testing-2026.md](references/contract-testing-2026.md)                           | Pact, Specmatic                                 |
+| [synthetic-test-data.md](references/synthetic-test-data.md)                               | Privacy-safe, ephemeral test data               |
+| [test-environment-management.md](references/test-environment-management.md)               | Environment provisioning and lifecycle          |
+| [quality-metrics-dashboard.md](references/quality-metrics-dashboard.md)                   | Quality metrics and dashboards                  |
+| [compliance-testing.md](references/compliance-testing.md)                                 | SOC2, HIPAA, GDPR, PCI-DSS testing              |
 | [feature-matrix-vs-test-matrix-gate.md](references/feature-matrix-vs-test-matrix-gate.md) | Release-blocking feature-to-test coverage audit |
 
 ## Templates
 
-| Template | Purpose |
-|----------|---------|
-| [template-test-case-design.md](assets/template-test-case-design.md) | Given/When/Then and test oracles |
-| [test-strategy-template.md](assets/test-strategy-template.md) | Risk-based strategy |
-| [template-flaky-test-triage.md](assets/runbooks/template-flaky-test-triage-deflake-runbook.md) | Flake triage runbook |
-| [template-jest-vitest.md](assets/unit/template-jest-vitest.md) | Unit test patterns |
-| [template-api-integration.md](assets/integration/template-api-integration.md) | API + DB integration tests |
-| [template-playwright.md](assets/e2e/template-playwright.md) | Playwright E2E |
-| [template-visual-testing.md](assets/visual-regression/template-visual-testing.md) | Visual regression testing |
-| [template-k6-load-testing.md](assets/performance/template-k6-load-testing.md) | k6 performance |
-| [automation-pipeline-template.md](assets/automation-pipeline-template.md) | CI stages, budgets, gates |
-| [template-cucumber-gherkin.md](assets/bdd/template-cucumber-gherkin.md) | BDD feature files and steps |
-| [template-release-coverage-audit.md](assets/runbooks/template-release-coverage-audit.md) | Feature matrix vs test matrix release audit |
+| Template                                                                                       | Purpose                                     |
+| ---------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| [template-test-case-design.md](assets/template-test-case-design.md)                            | Given/When/Then and test oracles            |
+| [test-strategy-template.md](assets/test-strategy-template.md)                                  | Risk-based strategy                         |
+| [template-flaky-test-triage.md](assets/runbooks/template-flaky-test-triage-deflake-runbook.md) | Flake triage runbook                        |
+| [template-jest-vitest.md](assets/unit/template-jest-vitest.md)                                 | Unit test patterns                          |
+| [template-api-integration.md](assets/integration/template-api-integration.md)                  | API + DB integration tests                  |
+| [template-playwright.md](assets/e2e/template-playwright.md)                                    | Playwright E2E                              |
+| [template-visual-testing.md](assets/visual-regression/template-visual-testing.md)              | Visual regression testing                   |
+| [template-k6-load-testing.md](assets/performance/template-k6-load-testing.md)                  | k6 performance                              |
+| [automation-pipeline-template.md](assets/automation-pipeline-template.md)                      | CI stages, budgets, gates                   |
+| [template-cucumber-gherkin.md](assets/bdd/template-cucumber-gherkin.md)                        | BDD feature files and steps                 |
+| [template-release-coverage-audit.md](assets/runbooks/template-release-coverage-audit.md)       | Feature matrix vs test matrix release audit |
 
 ## Data
 
-| File | Purpose |
-|------|---------|
+| File                              | Purpose             |
+| --------------------------------- | ------------------- |
 | [sources.json](data/sources.json) | External references |
 
 ## Related Skills
@@ -268,6 +268,7 @@ npm run build
 ### Agent Output Contract for QA Handoff
 
 Always report:
+
 - commands run,
 - pass/fail per gate,
 - whether failures are pre-existing or introduced,

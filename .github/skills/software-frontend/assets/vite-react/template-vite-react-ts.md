@@ -66,7 +66,7 @@ my-app/
 
 ```tsx
 // src/components/Counter.tsx
-import { useState } from 'react';
+import { useState } from "react";
 
 export function Counter() {
   const [count, setCount] = useState(0);
@@ -86,7 +86,7 @@ export function Counter() {
 
 ```tsx
 // src/pages/BlogList.tsx
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 
 interface Post {
   id: number;
@@ -95,14 +95,14 @@ interface Post {
 }
 
 async function fetchPosts(): Promise<Post[]> {
-  const res = await fetch('https://api.example.com/posts');
-  if (!res.ok) throw new Error('Failed to fetch');
+  const res = await fetch("https://api.example.com/posts");
+  if (!res.ok) throw new Error("Failed to fetch");
   return res.json();
 }
 
 export function BlogList() {
   const { data, isLoading, error } = useQuery({
-    queryKey: ['posts'],
+    queryKey: ["posts"],
     queryFn: fetchPosts,
   });
 
@@ -126,7 +126,7 @@ export function BlogList() {
 
 ```tsx
 // src/hooks/useAuth.ts
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 interface User {
   id: number;
@@ -139,28 +139,30 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
-      fetchUser(token).then(setUser).finally(() => setLoading(false));
+      fetchUser(token)
+        .then(setUser)
+        .finally(() => setLoading(false));
     } else {
       setLoading(false);
     }
   }, []);
 
   const login = async (credentials: { email: string; password: string }) => {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
     });
     const data = await res.json();
     setUser(data.user);
-    localStorage.setItem('token', data.token);
+    localStorage.setItem("token", data.token);
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
   };
 
   return {
@@ -180,14 +182,14 @@ export function useAuth() {
 ### vite.config.ts
 
 ```typescript
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': '/src',
+      "@": "/src",
     },
   },
   server: {

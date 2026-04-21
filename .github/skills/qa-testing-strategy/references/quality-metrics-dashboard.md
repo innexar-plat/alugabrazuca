@@ -23,14 +23,14 @@ Quality metrics collection, reporting, trend analysis, and team dashboards -- fr
 
 ### Primary Quality Indicators
 
-| Metric | Formula | Target | Collection Source |
-|--------|---------|--------|-------------------|
-| **Defect Escape Rate** | Prod bugs / total bugs found | <10% | Defect tracker (Jira, Linear) |
-| **Mean Time to Detect (MTTD)** | Avg time from defect introduction to detection | <24 hours | Git blame + bug report timestamps |
-| **Test Pass Rate** | Passing tests / total tests | >98% | CI test reporters |
-| **Flake Rate** | Flaky runs / total runs | <3% | CI analytics |
-| **Code Coverage (delta)** | Coverage change on PR | +/- 0% (no decrease) | Coverage tools (Istanbul, JaCoCo) |
-| **Coverage Trend** | Coverage over time | Increasing or stable | Coverage history |
+| Metric                         | Formula                                        | Target               | Collection Source                 |
+| ------------------------------ | ---------------------------------------------- | -------------------- | --------------------------------- |
+| **Defect Escape Rate**         | Prod bugs / total bugs found                   | <10%                 | Defect tracker (Jira, Linear)     |
+| **Mean Time to Detect (MTTD)** | Avg time from defect introduction to detection | <24 hours            | Git blame + bug report timestamps |
+| **Test Pass Rate**             | Passing tests / total tests                    | >98%                 | CI test reporters                 |
+| **Flake Rate**                 | Flaky runs / total runs                        | <3%                  | CI analytics                      |
+| **Code Coverage (delta)**      | Coverage change on PR                          | +/- 0% (no decrease) | Coverage tools (Istanbul, JaCoCo) |
+| **Coverage Trend**             | Coverage over time                             | Increasing or stable | Coverage history                  |
 
 ### Defect Escape Rate Calculation
 
@@ -98,35 +98,35 @@ def calculate_mttd(defects: list[dict]) -> timedelta:
 
 ## Test Suite Health Metrics
 
-| Metric | Formula | Target | Why It Matters |
-|--------|---------|--------|----------------|
-| **Suite Execution Time** | Wall-clock time for full suite | <15 min (E2E), <5 min (unit) | Developer feedback speed |
-| **Suite Stability** | Runs with 0 flakes / total runs | >95% | Trust in CI signal |
-| **Test Count Trend** | Tests added vs removed per sprint | Net positive | Coverage growth |
-| **Slowest Tests (P95)** | 95th percentile test duration | <30s (E2E), <1s (unit) | CI pipeline bottlenecks |
-| **Quarantined Test Count** | Tests in quarantine | Decreasing trend | Tech debt indicator |
-| **Disabled Test Count** | Skipped / disabled tests | <5% of total | Hidden coverage gaps |
+| Metric                     | Formula                           | Target                       | Why It Matters           |
+| -------------------------- | --------------------------------- | ---------------------------- | ------------------------ |
+| **Suite Execution Time**   | Wall-clock time for full suite    | <15 min (E2E), <5 min (unit) | Developer feedback speed |
+| **Suite Stability**        | Runs with 0 flakes / total runs   | >95%                         | Trust in CI signal       |
+| **Test Count Trend**       | Tests added vs removed per sprint | Net positive                 | Coverage growth          |
+| **Slowest Tests (P95)**    | 95th percentile test duration     | <30s (E2E), <1s (unit)       | CI pipeline bottlenecks  |
+| **Quarantined Test Count** | Tests in quarantine               | Decreasing trend             | Tech debt indicator      |
+| **Disabled Test Count**    | Skipped / disabled tests          | <5% of total                 | Hidden coverage gaps     |
 
 ### Suite Health Report Script
 
 ```typescript
 // scripts/suite-health-report.ts
-import { execSync } from 'child_process';
+import { execSync } from "child_process";
 
 interface TestResult {
   name: string;
   duration: number;
-  status: 'passed' | 'failed' | 'skipped' | 'flaky';
+  status: "passed" | "failed" | "skipped" | "flaky";
 }
 
 function generateReport(results: TestResult[]) {
   const total = results.length;
-  const passed = results.filter(r => r.status === 'passed').length;
-  const failed = results.filter(r => r.status === 'failed').length;
-  const flaky = results.filter(r => r.status === 'flaky').length;
-  const skipped = results.filter(r => r.status === 'skipped').length;
+  const passed = results.filter((r) => r.status === "passed").length;
+  const failed = results.filter((r) => r.status === "failed").length;
+  const flaky = results.filter((r) => r.status === "flaky").length;
+  const skipped = results.filter((r) => r.status === "skipped").length;
 
-  const durations = results.map(r => r.duration).sort((a, b) => a - b);
+  const durations = results.map((r) => r.duration).sort((a, b) => a - b);
   const p50 = durations[Math.floor(durations.length * 0.5)];
   const p95 = durations[Math.floor(durations.length * 0.95)];
   const totalDuration = durations.reduce((sum, d) => sum + d, 0);
@@ -149,7 +149,10 @@ function generateReport(results: TestResult[]) {
     slowest: results
       .sort((a, b) => b.duration - a.duration)
       .slice(0, 10)
-      .map(r => ({ name: r.name, duration: `${(r.duration / 1000).toFixed(2)}s` })),
+      .map((r) => ({
+        name: r.name,
+        duration: `${(r.duration / 1000).toFixed(2)}s`,
+      })),
   };
 }
 ```
@@ -179,9 +182,9 @@ function generateReport(results: TestResult[]) {
 // playwright.config.ts
 export default defineConfig({
   reporter: [
-    ['junit', { outputFile: 'results/junit.xml' }],
-    ['json', { outputFile: 'results/results.json' }],
-    ['html', { open: 'never' }],
+    ["junit", { outputFile: "results/junit.xml" }],
+    ["json", { outputFile: "results/results.json" }],
+    ["html", { open: "never" }],
   ],
 });
 ```
@@ -339,37 +342,37 @@ def generate_markdown_report(metrics_history: list[dict]) -> str:
 
 Focus on outcomes and trends, not technical details.
 
-| Metric | Visualization | Update Frequency |
-|--------|---------------|------------------|
-| Defect Escape Rate (monthly) | Single number + trend line | Weekly |
-| Release Cadence | Bar chart (releases/month) | Weekly |
-| Deployment Success Rate | Percentage gauge | Daily |
-| Mean Time to Recovery (MTTR) | Single number | Weekly |
-| Customer-Reported Bugs | Trend line | Weekly |
+| Metric                       | Visualization              | Update Frequency |
+| ---------------------------- | -------------------------- | ---------------- |
+| Defect Escape Rate (monthly) | Single number + trend line | Weekly           |
+| Release Cadence              | Bar chart (releases/month) | Weekly           |
+| Deployment Success Rate      | Percentage gauge           | Daily            |
+| Mean Time to Recovery (MTTR) | Single number              | Weekly           |
+| Customer-Reported Bugs       | Trend line                 | Weekly           |
 
 ### Team Lead View
 
 Focus on team health and process effectiveness.
 
-| Metric | Visualization | Update Frequency |
-|--------|---------------|------------------|
-| Test Pass Rate by suite | Stacked bar chart | Daily |
-| Flake Rate trend | Line chart (7-day rolling) | Daily |
-| CI Pipeline Duration | Line chart | Daily |
-| Quarantined Test Count | Single number + trend | Daily |
-| Coverage by module | Heatmap | Weekly |
-| PR Review-to-Merge Time | Histogram | Weekly |
+| Metric                  | Visualization              | Update Frequency |
+| ----------------------- | -------------------------- | ---------------- |
+| Test Pass Rate by suite | Stacked bar chart          | Daily            |
+| Flake Rate trend        | Line chart (7-day rolling) | Daily            |
+| CI Pipeline Duration    | Line chart                 | Daily            |
+| Quarantined Test Count  | Single number + trend      | Daily            |
+| Coverage by module      | Heatmap                    | Weekly           |
+| PR Review-to-Merge Time | Histogram                  | Weekly           |
 
 ### Individual Contributor View
 
 Focus on actionable signals.
 
-| Metric | Visualization | Update Frequency |
-|--------|---------------|------------------|
-| My recent test failures | List with links | Real-time |
-| My flaky tests | Table with flake % | Daily |
-| My PR coverage delta | Inline in PR | Per-PR |
-| Slowest tests I own | Ranked list | Weekly |
+| Metric                  | Visualization      | Update Frequency |
+| ----------------------- | ------------------ | ---------------- |
+| My recent test failures | List with links    | Real-time        |
+| My flaky tests          | Table with flake % | Daily            |
+| My PR coverage delta    | Inline in PR       | Per-PR           |
+| Slowest tests I own     | Ranked list        | Weekly           |
 
 ---
 
@@ -539,25 +542,25 @@ def release_readiness_score(metrics: dict) -> dict:
 
 ### Readiness Thresholds
 
-| Score | Recommendation | Action |
-|-------|---------------|--------|
-| 85-100 | SHIP | Clear to deploy |
-| 70-84 | HOLD | Review failing components, decide |
-| <70 | BLOCK | Do not deploy; fix blocking issues |
+| Score  | Recommendation | Action                             |
+| ------ | -------------- | ---------------------------------- |
+| 85-100 | SHIP           | Clear to deploy                    |
+| 70-84  | HOLD           | Review failing components, decide  |
+| <70    | BLOCK          | Do not deploy; fix blocking issues |
 
 ---
 
 ## Metric Anti-Patterns
 
-| Anti-Pattern | Problem | Better Approach |
-|-------------|---------|-----------------|
-| **Vanity metrics** (total test count) | More tests does not equal more quality | Track defect escape rate, not test count |
-| **Goodhart's Law** (gaming coverage) | Writing tests to hit % target, not to find bugs | Measure mutation score or defect escape rate |
-| **Averaging flake rate** | Hides badly flaky individual tests | Track per-test flake rate, fix top offenders |
-| **100% coverage mandate** | Diminishing returns past 80-85% | Risk-weighted coverage targets by module |
-| **Test count as productivity** | Incentivizes trivial tests | Track bugs found per test, not tests written |
-| **Monthly reporting only** | Too slow for actionable feedback | Daily automated dashboards + weekly review |
-| **Ignoring test duration** | Slow feedback loops reduce developer velocity | Track and budget suite execution time |
+| Anti-Pattern                          | Problem                                         | Better Approach                              |
+| ------------------------------------- | ----------------------------------------------- | -------------------------------------------- |
+| **Vanity metrics** (total test count) | More tests does not equal more quality          | Track defect escape rate, not test count     |
+| **Goodhart's Law** (gaming coverage)  | Writing tests to hit % target, not to find bugs | Measure mutation score or defect escape rate |
+| **Averaging flake rate**              | Hides badly flaky individual tests              | Track per-test flake rate, fix top offenders |
+| **100% coverage mandate**             | Diminishing returns past 80-85%                 | Risk-weighted coverage targets by module     |
+| **Test count as productivity**        | Incentivizes trivial tests                      | Track bugs found per test, not tests written |
+| **Monthly reporting only**            | Too slow for actionable feedback                | Daily automated dashboards + weekly review   |
+| **Ignoring test duration**            | Slow feedback loops reduce developer velocity   | Track and budget suite execution time        |
 
 ### Goodhart's Law in Practice
 

@@ -9,7 +9,8 @@ import { TestimonialsSection } from "@/components/landing/testimonials-section";
 import { ForHostsSection } from "@/components/landing/for-hosts-section";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/json-ld";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
 
 async function fetchLandingData() {
   try {
@@ -18,7 +19,9 @@ async function fetchLandingData() {
         fetch(`${API_BASE}/landing/featured`, { next: { revalidate: 300 } }),
         fetch(`${API_BASE}/landing/cities`, { next: { revalidate: 300 } }),
         fetch(`${API_BASE}/landing/stats`, { next: { revalidate: 600 } }),
-        fetch(`${API_BASE}/landing/testimonials`, { next: { revalidate: 3600 } }),
+        fetch(`${API_BASE}/landing/testimonials`, {
+          next: { revalidate: 3600 },
+        }),
       ]);
 
     const featured =
@@ -43,7 +46,12 @@ async function fetchLandingData() {
     return {
       featured: [],
       cities: [],
-      stats: { activeListings: 0, totalCities: 0, totalUsers: 0, totalReviews: 0 },
+      stats: {
+        activeListings: 0,
+        totalCities: 0,
+        totalUsers: 0,
+        totalReviews: 0,
+      },
       testimonials: [],
     };
   }

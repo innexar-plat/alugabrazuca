@@ -64,14 +64,14 @@ Only make changes that are directly requested or clearly necessary. Don't add fe
 
 Seven patterns govern how the agent works. Apply always: Metacognitive + PEV + Inversion. Apply when appropriate: Reflection, Tree of Thoughts, Ensemble.
 
-| Pattern | When | Signal |
-|---------|------|--------|
-| **Inversion** | Problem-solving, debugging, architecture | "What would guarantee failure?" -- eliminate wrong answers first |
-| **Reflection** | Writing 50+ lines of code | Generate, critique, refine before presenting |
-| **PEV** | Before commits/deploys | Plan, Execute, Verify outcomes |
-| **Metacognitive** | Always, especially high-stakes | Express confidence: High/Medium/Low/Don't Know. Never hallucinate. |
-| **Tree of Thoughts** | Complex decisions | Generate 2-3 approaches with pros/cons, recommend one |
-| **Ensemble** | Important architectural choices | Consider builder/quality/user/maintenance perspectives |
+| Pattern              | When                                     | Signal                                                             |
+| -------------------- | ---------------------------------------- | ------------------------------------------------------------------ |
+| **Inversion**        | Problem-solving, debugging, architecture | "What would guarantee failure?" -- eliminate wrong answers first   |
+| **Reflection**       | Writing 50+ lines of code                | Generate, critique, refine before presenting                       |
+| **PEV**              | Before commits/deploys                   | Plan, Execute, Verify outcomes                                     |
+| **Metacognitive**    | Always, especially high-stakes           | Express confidence: High/Medium/Low/Don't Know. Never hallucinate. |
+| **Tree of Thoughts** | Complex decisions                        | Generate 2-3 approaches with pros/cons, recommend one              |
+| **Ensemble**         | Important architectural choices          | Consider builder/quality/user/maintenance perspectives             |
 
 ---
 
@@ -135,6 +135,7 @@ Use the generator scripts in `workspace/generators/` to create workspace items:
 ## Verification-First Development
 
 Establish verification criteria BEFORE implementing:
+
 - Test cases, screenshots, expected outputs, build/lint commands
 - For UI changes: before/after screenshots
 - For bug fixes: address root causes, don't suppress errors
@@ -169,14 +170,14 @@ The pattern provides error diversity (two models catch different bugs), context 
 
 Squire includes reusable prompt templates for common tasks (see `prompts/`):
 
-| Framework | Purpose |
-|-----------|---------|
-| `code-review.md` | Systematic code review across 7 dimensions |
-| `debug-systematic.md` | Structured debugging: reproduce, isolate, hypothesize, fix |
-| `ship-readiness.md` | Go/no-go deployment checklist |
-| `performance-audit.md` | Measure-first performance investigation |
-| `security-audit.md` | STRIDE-based security evaluation |
-| `test-strategy.md` | Test pyramid planning and coverage |
+| Framework              | Purpose                                                    |
+| ---------------------- | ---------------------------------------------------------- |
+| `code-review.md`       | Systematic code review across 7 dimensions                 |
+| `debug-systematic.md`  | Structured debugging: reproduce, isolate, hypothesize, fix |
+| `ship-readiness.md`    | Go/no-go deployment checklist                              |
+| `performance-audit.md` | Measure-first performance investigation                    |
+| `security-audit.md`    | STRIDE-based security evaluation                           |
+| `test-strategy.md`     | Test pyramid planning and coverage                         |
 
 ---
 
@@ -184,14 +185,14 @@ Squire includes reusable prompt templates for common tasks (see `prompts/`):
 
 Squire includes templates for common project documents (see `doc-templates/`):
 
-| Template | Purpose |
-|----------|---------|
-| `feature-spec.md` | Feature specification with technical design |
-| `bug-investigation.md` | Structured bug report and investigation log |
-| `adr.md` | Architecture Decision Record |
-| `deployment-checklist.md` | Pre/post deploy verification |
-| `implementation-plan.md` | Step-by-step implementation plan |
-| `api-endpoint-design.md` | API endpoint specification |
+| Template                  | Purpose                                     |
+| ------------------------- | ------------------------------------------- |
+| `feature-spec.md`         | Feature specification with technical design |
+| `bug-investigation.md`    | Structured bug report and investigation log |
+| `adr.md`                  | Architecture Decision Record                |
+| `deployment-checklist.md` | Pre/post deploy verification                |
+| `implementation-plan.md`  | Step-by-step implementation plan            |
+| `api-endpoint-design.md`  | API endpoint specification                  |
 
 ---
 

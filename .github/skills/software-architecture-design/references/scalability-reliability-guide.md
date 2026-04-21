@@ -5,11 +5,13 @@
 ### CAP Theorem
 
 You can only achieve 2 out of 3:
+
 - **C**onsistency - All nodes see the same data
 - **A**vailability - Every request receives a response
 - **P**artition tolerance - System continues despite network failures
 
 **Practical choices**:
+
 - **CP**: Traditional databases (PostgreSQL, MongoDB with strong consistency)
 - **AP**: NoSQL databases (Cassandra, DynamoDB), eventual consistency
 - **Reality**: Partition tolerance is mandatory (networks fail), so choose CA or AP
@@ -17,11 +19,13 @@ You can only achieve 2 out of 3:
 ### Scalability Dimensions
 
 **Vertical scaling** (scale up):
+
 - Add more CPU, RAM, storage to single machine
 - Limits: Hardware maximums (~1TB RAM, ~128 CPU cores)
 - Use case: Databases, monolithic apps
 
 **Horizontal scaling** (scale out):
+
 - Add more machines
 - Limits: Architecture complexity
 - Use case: Stateless services, distributed systems
@@ -31,6 +35,7 @@ You can only achieve 2 out of 3:
 ### 1. Database Scaling
 
 **Read replicas**:
+
 ```
 ┌───────────┐
 │  Primary  │───┐ (writes)
@@ -42,6 +47,7 @@ You can only achieve 2 out of 3:
 ```
 
 **Sharding** (horizontal partitioning):
+
 ```
 User IDs 1-1000000    → Shard 1
 User IDs 1000001-2000000 → Shard 2
@@ -54,6 +60,7 @@ Sharding strategies:
 ```
 
 **Example - PostgreSQL**:
+
 ```sql
 -- Partition by range
 CREATE TABLE orders (
@@ -71,6 +78,7 @@ CREATE TABLE orders_q2 PARTITION OF orders
 ```
 
 **CQRS for read scaling**:
+
 ```typescript
 // Write model (normalized)
 class OrderWriteModel {
@@ -92,6 +100,7 @@ class OrderReadModel {
 ### 2. Caching Strategies
 
 **Cache hierarchy**:
+
 ```
 Request
   │
@@ -108,6 +117,7 @@ Request
 **Cache patterns**:
 
 **Cache-Aside** (lazy loading):
+
 ```typescript
 async function getUser(id: string): Promise<User> {
   // 1. Try cache
@@ -125,6 +135,7 @@ async function getUser(id: string): Promise<User> {
 ```
 
 **Write-Through**:
+
 ```typescript
 async function updateUser(id: string, data: Partial<User>) {
   // 1. Write to database
@@ -138,6 +149,7 @@ async function updateUser(id: string, data: Partial<User>) {
 ```
 
 **Write-Behind** (async):
+
 ```typescript
 async function updateUser(id: string, data: Partial<User>) {
   // 1. Write to cache immediately (fast response)
@@ -145,25 +157,26 @@ async function updateUser(id: string, data: Partial<User>) {
   await cache.set(`user:${id}`, JSON.stringify(user), { ttl: 3600 });
 
   // 2. Queue database write (async)
-  await queue.publish('user.update', { id, data });
+  await queue.publish("user.update", { id, data });
 
   return user;
 }
 ```
 
 **Cache invalidation strategies**:
+
 ```typescript
 // 1. TTL (Time To Live)
-cache.set('key', value, { ttl: 3600 }); // 1 hour
+cache.set("key", value, { ttl: 3600 }); // 1 hour
 
 // 2. Event-based invalidation
-eventBus.on('user.updated', async (userId) => {
+eventBus.on("user.updated", async (userId) => {
   await cache.delete(`user:${userId}`);
 });
 
 // 3. Cache tags
-cache.set('user:123', user, { tags: ['users', 'active-users'] });
-cache.invalidateTag('active-users'); // Clear all with this tag
+cache.set("user:123", user, { tags: ["users", "active-users"] });
+cache.invalidateTag("active-users"); // Clear all with this tag
 ```
 
 ### 3. Load Balancing
@@ -171,6 +184,7 @@ cache.invalidateTag('active-users'); // Clear all with this tag
 **Algorithms**:
 
 **Round Robin** (simplest):
+
 ```
 Request 1 → Server A
 Request 2 → Server B
@@ -179,6 +193,7 @@ Request 4 → Server A (cycle repeats)
 ```
 
 **Least Connections**:
+
 ```
 Server A: 5 connections
 Server B: 3 connections  ← Route here
@@ -186,6 +201,7 @@ Server C: 8 connections
 ```
 
 **Consistent Hashing** (for stateful sessions):
+
 ```typescript
 function getServer(userId: string, servers: Server[]): Server {
   const hash = hashFunction(userId);
@@ -196,6 +212,7 @@ function getServer(userId: string, servers: Server[]): Server {
 ```
 
 **Nginx configuration**:
+
 ```nginx
 upstream backend {
   least_conn;  # Algorithm
@@ -217,6 +234,7 @@ server {
 ### 4. Asynchronous Processing
 
 **Message Queue Pattern**:
+
 ```
 ┌────────┐       ┌───────┐       ┌────────┐
 │  API   │──────▶│ Queue │──────▶│ Worker │
@@ -233,23 +251,24 @@ Benefits:
 ```
 
 **Implementation**:
+
 ```typescript
 // Producer (API)
-app.post('/process-video', async (req, res) => {
+app.post("/process-video", async (req, res) => {
   const videoId = req.body.videoId;
 
   // Queue the work (don't process synchronously)
-  await queue.send('video-processing', {
+  await queue.send("video-processing", {
     videoId,
-    priority: req.body.priority || 'normal'
+    priority: req.body.priority || "normal",
   });
 
   // Immediate response
-  res.json({ status: 'queued', videoId });
+  res.json({ status: "queued", videoId });
 });
 
 // Consumer (Worker)
-queue.on('video-processing', async (job) => {
+queue.on("video-processing", async (job) => {
   try {
     await processVideo(job.data.videoId);
     await job.complete();
@@ -268,20 +287,20 @@ Prevent cascade failures when dependencies fail:
 class CircuitBreaker {
   private failureCount = 0;
   private lastFailureTime = 0;
-  private state: 'closed' | 'open' | 'half-open' = 'closed';
+  private state: "closed" | "open" | "half-open" = "closed";
 
   constructor(
-    private threshold = 5,        // Failures before opening
-    private timeout = 60000,      // Time to stay open (ms)
-    private resetTimeout = 30000  // Time to try half-open
+    private threshold = 5, // Failures before opening
+    private timeout = 60000, // Time to stay open (ms)
+    private resetTimeout = 30000, // Time to try half-open
   ) {}
 
   async execute<T>(fn: () => Promise<T>): Promise<T> {
-    if (this.state === 'open') {
+    if (this.state === "open") {
       if (Date.now() - this.lastFailureTime > this.resetTimeout) {
-        this.state = 'half-open';
+        this.state = "half-open";
       } else {
-        throw new Error('Circuit breaker is OPEN');
+        throw new Error("Circuit breaker is OPEN");
       }
     }
 
@@ -297,7 +316,7 @@ class CircuitBreaker {
 
   private onSuccess() {
     this.failureCount = 0;
-    this.state = 'closed';
+    this.state = "closed";
   }
 
   private onFailure() {
@@ -305,7 +324,7 @@ class CircuitBreaker {
     this.lastFailureTime = Date.now();
 
     if (this.failureCount >= this.threshold) {
-      this.state = 'open';
+      this.state = "open";
     }
   }
 }
@@ -313,14 +332,14 @@ class CircuitBreaker {
 // Usage
 const breaker = new CircuitBreaker();
 
-app.get('/external-api', async (req, res) => {
+app.get("/external-api", async (req, res) => {
   try {
     const data = await breaker.execute(() =>
-      fetch('https://external-api.com/data')
+      fetch("https://external-api.com/data"),
     );
     res.json(data);
   } catch (error) {
-    res.status(503).json({ error: 'Service temporarily unavailable' });
+    res.status(503).json({ error: "Service temporarily unavailable" });
   }
 });
 ```
@@ -330,59 +349,61 @@ app.get('/external-api', async (req, res) => {
 ### 1. Health Checks
 
 **Kubernetes liveness & readiness**:
+
 ```yaml
 apiVersion: v1
 kind: Pod
 spec:
   containers:
-  - name: app
-    image: myapp:1.0
-    livenessProbe:
-      httpGet:
-        path: /health/live
-        port: 8080
-      initialDelaySeconds: 30
-      periodSeconds: 10
-      failureThreshold: 3
+    - name: app
+      image: myapp:1.0
+      livenessProbe:
+        httpGet:
+          path: /health/live
+          port: 8080
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        failureThreshold: 3
 
-    readinessProbe:
-      httpGet:
-        path: /health/ready
-        port: 8080
-      initialDelaySeconds: 5
-      periodSeconds: 5
-      failureThreshold: 2
+      readinessProbe:
+        httpGet:
+          path: /health/ready
+          port: 8080
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        failureThreshold: 2
 ```
 
 **Health check endpoint**:
+
 ```typescript
-app.get('/health/live', (req, res) => {
+app.get("/health/live", (req, res) => {
   // Basic check: is the app running?
-  res.json({ status: 'ok' });
+  res.json({ status: "ok" });
 });
 
-app.get('/health/ready', async (req, res) => {
+app.get("/health/ready", async (req, res) => {
   // Comprehensive check: can the app serve traffic?
   const checks = await Promise.all([
     checkDatabase(),
     checkRedis(),
-    checkMessageQueue()
+    checkMessageQueue(),
   ]);
 
-  const healthy = checks.every(c => c.healthy);
+  const healthy = checks.every((c) => c.healthy);
 
   res.status(healthy ? 200 : 503).json({
-    status: healthy ? 'ready' : 'not ready',
-    checks
+    status: healthy ? "ready" : "not ready",
+    checks,
   });
 });
 
 async function checkDatabase(): Promise<HealthCheck> {
   try {
-    await db.raw('SELECT 1');
-    return { name: 'database', healthy: true };
+    await db.raw("SELECT 1");
+    return { name: "database", healthy: true };
   } catch (error) {
-    return { name: 'database', healthy: false, error: error.message };
+    return { name: "database", healthy: false, error: error.message };
   }
 }
 ```
@@ -393,7 +414,7 @@ async function checkDatabase(): Promise<HealthCheck> {
 async function retryWithBackoff<T>(
   fn: () => Promise<T>,
   maxRetries = 3,
-  baseDelay = 1000
+  baseDelay = 1000,
 ): Promise<T> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -412,18 +433,19 @@ async function retryWithBackoff<T>(
     }
   }
 
-  throw new Error('Max retries exceeded');
+  throw new Error("Max retries exceeded");
 }
 
 // Usage
 const data = await retryWithBackoff(() =>
-  fetch('https://api.example.com/data')
+  fetch("https://api.example.com/data"),
 );
 ```
 
 ### 3. Rate Limiting
 
 **Token bucket algorithm**:
+
 ```typescript
 class RateLimiter {
   private tokens: Map<string, { count: number; lastRefill: number }>;
@@ -437,13 +459,16 @@ class RateLimiter {
 
   async isAllowed(key: string): Promise<boolean> {
     const now = Date.now();
-    const bucket = this.tokens.get(key) || { count: this.maxTokens, lastRefill: now };
+    const bucket = this.tokens.get(key) || {
+      count: this.maxTokens,
+      lastRefill: now,
+    };
 
     // Refill tokens based on time elapsed
     const elapsed = (now - bucket.lastRefill) / 1000;
     bucket.count = Math.min(
       this.maxTokens,
-      bucket.count + elapsed * this.refillRate
+      bucket.count + elapsed * this.refillRate,
     );
     bucket.lastRefill = now;
 
@@ -466,7 +491,7 @@ app.use(async (req, res, next) => {
   const allowed = await limiter.isAllowed(key);
 
   if (!allowed) {
-    return res.status(429).json({ error: 'Too many requests' });
+    return res.status(429).json({ error: "Too many requests" });
   }
 
   next();
@@ -474,11 +499,12 @@ app.use(async (req, res, next) => {
 ```
 
 **Redis-based distributed rate limiting**:
+
 ```typescript
 async function isRateLimited(userId: string): Promise<boolean> {
   const key = `rate-limit:${userId}`;
   const limit = 100; // requests
-  const window = 60;  // seconds
+  const window = 60; // seconds
 
   const current = await redis.incr(key);
 
@@ -493,11 +519,12 @@ async function isRateLimited(userId: string): Promise<boolean> {
 ### 4. Graceful Degradation
 
 **Feature flags**:
+
 ```typescript
 const features = {
-  recommendations: { enabled: true, fallback: 'popular' },
-  search: { enabled: true, fallback: 'cached' },
-  analytics: { enabled: true, fallback: 'disabled' }
+  recommendations: { enabled: true, fallback: "popular" },
+  search: { enabled: true, fallback: "cached" },
+  analytics: { enabled: true, fallback: "disabled" },
 };
 
 async function getRecommendations(userId: string) {
@@ -508,7 +535,7 @@ async function getRecommendations(userId: string) {
   try {
     return await mlService.getPersonalizedRecommendations(userId);
   } catch (error) {
-    logger.error('Recommendations service failed', { error });
+    logger.error("Recommendations service failed", { error });
     return getPopularItems(); // Graceful degradation
   }
 }
@@ -523,20 +550,22 @@ Isolate resources to prevent total system failure:
 const pools = {
   critical: new Pool({ max: 50 }), // Always available
   analytics: new Pool({ max: 20 }), // Can fail without affecting critical
-  background: new Pool({ max: 10 })  // Lowest priority
+  background: new Pool({ max: 10 }), // Lowest priority
 };
 
 // Critical operation (user authentication)
 async function authenticateUser(credentials: Credentials) {
-  return pools.critical.query('SELECT * FROM users WHERE email = $1', [credentials.email]);
+  return pools.critical.query("SELECT * FROM users WHERE email = $1", [
+    credentials.email,
+  ]);
 }
 
 // Analytics (can fail without breaking core functionality)
 async function trackEvent(event: Event) {
   try {
-    return pools.analytics.query('INSERT INTO analytics ...', event);
+    return pools.analytics.query("INSERT INTO analytics ...", event);
   } catch (error) {
-    logger.error('Analytics failed', { error }); // Log but don't throw
+    logger.error("Analytics failed", { error }); // Log but don't throw
   }
 }
 ```
@@ -546,19 +575,21 @@ async function trackEvent(event: Event) {
 ### Key Metrics (SRE)
 
 **Golden Signals**:
+
 1. **Latency** - Time to serve a request
 2. **Traffic** - Requests per second
 3. **Errors** - Rate of failed requests
 4. **Saturation** - Resource utilization
 
 **SLI/SLO/SLA**:
+
 ```yaml
 # Service Level Indicator (SLI)
 availability: "percentage of successful requests"
 latency_p99: "99th percentile response time"
 
 # Service Level Objective (SLO)
-availability_target: 99.9%  # "Three nines"
+availability_target: 99.9% # "Three nines"
 latency_p99_target: 200ms
 
 # Service Level Agreement (SLA) - Customer commitment
@@ -567,6 +598,7 @@ penalty: "10% credit if violated"
 ```
 
 **Error budget**:
+
 ```
 Monthly error budget = (1 - SLO) × total requests
 If SLO = 99.9%, error budget = 0.1% = 43.2 minutes/month downtime
@@ -584,18 +616,19 @@ If budget exhausted:
 ### Distributed Tracing
 
 **OpenTelemetry example**:
-```typescript
-import { trace } from '@opentelemetry/api';
 
-const tracer = trace.getTracer('my-service');
+```typescript
+import { trace } from "@opentelemetry/api";
+
+const tracer = trace.getTracer("my-service");
 
 async function handleRequest(req, res) {
-  const span = tracer.startSpan('handle-request', {
+  const span = tracer.startSpan("handle-request", {
     attributes: {
-      'http.method': req.method,
-      'http.url': req.url,
-      'user.id': req.user?.id
-    }
+      "http.method": req.method,
+      "http.url": req.url,
+      "user.id": req.user?.id,
+    },
   });
 
   try {
@@ -614,8 +647,8 @@ async function handleRequest(req, res) {
 }
 
 async function getUserWithTracing(userId: string) {
-  return tracer.startActiveSpan('get-user', async (span) => {
-    span.setAttribute('user.id', userId);
+  return tracer.startActiveSpan("get-user", async (span) => {
+    span.setAttribute("user.id", userId);
     const user = await db.users.findById(userId);
     span.end();
     return user;
@@ -626,6 +659,7 @@ async function getUserWithTracing(userId: string) {
 ## Performance Benchmarks
 
 **Target latencies (95th percentile)**:
+
 - Database query: <10ms
 - Cache hit: <1ms
 - Internal API call: <50ms
@@ -634,6 +668,7 @@ async function getUserWithTracing(userId: string) {
 - API response: <100ms
 
 **Capacity planning**:
+
 ```
 Required capacity = (Peak RPS × Average latency) / Target CPU utilization
 

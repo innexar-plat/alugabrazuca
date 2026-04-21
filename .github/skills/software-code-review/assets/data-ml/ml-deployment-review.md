@@ -7,6 +7,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 ## Deployment Architecture
 
 ### Service Design
+
 - [ ] Deployment type appropriate (real-time API, batch, streaming)
 - [ ] Architecture diagram documented
 - [ ] Scalability strategy defined
@@ -14,6 +15,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Disaster recovery plan documented
 
 ### Model Serving
+
 - [ ] Serving framework appropriate (FastAPI, TorchServe, TensorFlow Serving, BentoML, etc.)
 - [ ] Model loading strategy defined
 - [ ] Model versioning supported
@@ -22,6 +24,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Blue/green deployment possible
 
 ### Infrastructure
+
 - [ ] Compute resources right-sized
 - [ ] Auto-scaling configured
 - [ ] Load balancing configured
@@ -33,6 +36,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 ## API Design (Real-Time Serving)
 
 ### Request/Response Contract
+
 - [ ] Input schema clearly defined
 - [ ] Output schema clearly defined
 - [ ] Versioned API endpoints (/v1/, /v2/)
@@ -41,6 +45,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Error responses standardized
 
 ### Endpoint Implementation
+
 - [ ] RESTful design principles followed
 - [ ] HTTP methods appropriate (POST for predictions)
 - [ ] Status codes correct (200, 400, 500, 503)
@@ -49,6 +54,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Pagination for batch predictions
 
 ### API Documentation
+
 - [ ] OpenAPI/Swagger documentation generated
 - [ ] Example requests/responses provided
 - [ ] Error codes documented
@@ -60,6 +66,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 ## Model Lifecycle
 
 ### Model Loading
+
 - [ ] Model loaded efficiently on startup
 - [ ] Lazy loading for large models (if needed)
 - [ ] Model preloaded to avoid cold start
@@ -67,6 +74,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Model format validated on load
 
 ### Model Updates
+
 - [ ] Hot-swapping supported (if needed)
 - [ ] Model version managed explicitly
 - [ ] Rollback mechanism implemented
@@ -74,6 +82,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Model registry integration
 
 ### Model Caching
+
 - [ ] Models cached in memory appropriately
 - [ ] Cache eviction policy defined
 - [ ] Multiple model versions supported
@@ -84,6 +93,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 ## Preprocessing & Postprocessing
 
 ### Input Preprocessing
+
 - [ ] Preprocessing matches training pipeline
 - [ ] Train-serve skew prevented
 - [ ] Feature transformations correct
@@ -91,6 +101,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Input validation comprehensive
 
 ### Feature Engineering
+
 - [ ] Features computed identically to training
 - [ ] Feature store integration (if applicable)
 - [ ] Feature versioning tracked
@@ -98,6 +109,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Feature lag handled correctly
 
 ### Output Postprocessing
+
 - [ ] Predictions transformed to business-friendly format
 - [ ] Probability calibration applied (if needed)
 - [ ] Thresholds applied correctly
@@ -109,6 +121,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 ## Performance & Latency
 
 ### Inference Optimization
+
 - [ ] Batch inference used where possible
 - [ ] Model quantization applied (if applicable)
 - [ ] GPU utilization optimized
@@ -116,6 +129,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Unnecessary computation eliminated
 
 ### Latency Requirements
+
 - [ ] Latency SLA defined and measured
 - [ ] P50, P95, P99 latencies tracked
 - [ ] Timeout settings appropriate
@@ -123,6 +137,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Performance benchmarks documented
 
 ### Throughput
+
 - [ ] Throughput requirements defined
 - [ ] Concurrent request handling optimized
 - [ ] Request queuing strategy defined
@@ -134,6 +149,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 ## Batch Inference
 
 ### Batch Processing
+
 - [ ] Batch size optimized for throughput
 - [ ] Parallelization strategy defined
 - [ ] Partitioning for distributed processing
@@ -141,6 +157,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Resumability for long-running jobs
 
 ### Data I/O
+
 - [ ] Efficient data loading (lazy, streaming)
 - [ ] Output writing optimized (batched writes)
 - [ ] File formats efficient (Parquet, etc.)
@@ -148,6 +165,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Temporary files cleaned up
 
 ### Orchestration
+
 - [ ] Batch job scheduling defined
 - [ ] Dependencies managed (Airflow, etc.)
 - [ ] Retry logic for failed batches
@@ -159,6 +177,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 ## Monitoring & Observability
 
 ### Performance Monitoring
+
 - [ ] Latency metrics tracked (P50, P95, P99)
 - [ ] Throughput metrics tracked
 - [ ] Error rate monitored
@@ -166,6 +185,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Queue depth monitored
 
 ### Model Performance
+
 - [ ] Prediction distribution tracked
 - [ ] Data drift detection enabled
 - [ ] Model drift detection enabled
@@ -173,12 +193,14 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Comparison to baseline automated
 
 ### Business Metrics
+
 - [ ] Business KPIs tracked
 - [ ] Prediction impact measured
 - [ ] A/B test results tracked
 - [ ] ROI/value metrics computed
 
 ### Logging
+
 - [ ] Structured logging used
 - [ ] Request/response logged (with sampling)
 - [ ] Predictions logged for debugging
@@ -190,6 +212,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 ## Error Handling & Reliability
 
 ### Error Handling
+
 - [ ] All error paths handled explicitly
 - [ ] User-facing errors informative
 - [ ] Internal errors logged with context
@@ -197,6 +220,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Graceful degradation where possible
 
 ### Fallback Strategies
+
 - [ ] Fallback model available (if needed)
 - [ ] Default predictions for edge cases
 - [ ] Circuit breaker for failing models
@@ -204,6 +228,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Timeout handling appropriate
 
 ### Data Validation
+
 - [ ] Input data validated before inference
 - [ ] Out-of-range values handled
 - [ ] Missing features handled
@@ -215,6 +240,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 ## Security
 
 ### Authentication & Authorization
+
 - [ ] API authentication required
 - [ ] Token validation implemented
 - [ ] Rate limiting per user/API key
@@ -222,6 +248,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] API keys rotated regularly
 
 ### Input Validation
+
 - [ ] Input sanitization to prevent injection
 - [ ] Input size limits enforced
 - [ ] Malicious input detection
@@ -229,6 +256,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] SSRF prevention
 
 ### Data Privacy
+
 - [ ] PII handling compliant with regulations
 - [ ] Predictions not logged with PII (or anonymized)
 - [ ] Data retention policy enforced
@@ -236,6 +264,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Encryption at rest (if required)
 
 ### Model Security
+
 - [ ] Model files access-controlled
 - [ ] Model intellectual property protected
 - [ ] Adversarial input detection (if applicable)
@@ -247,6 +276,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 ## Testing
 
 ### Unit Tests
+
 - [ ] Preprocessing functions tested
 - [ ] Postprocessing functions tested
 - [ ] Input validation tested
@@ -254,6 +284,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Error handling paths tested
 
 ### Integration Tests
+
 - [ ] End-to-end API tests
 - [ ] Model inference tests on sample data
 - [ ] Error response tests
@@ -261,6 +292,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Load tests
 
 ### Model Validation Tests
+
 - [ ] Model output sanity checks
 - [ ] Model predictions within expected range
 - [ ] Model consistency checks (same input → same output)
@@ -272,6 +304,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 ## Deployment Pipeline
 
 ### CI/CD Integration
+
 - [ ] Automated testing in CI
 - [ ] Model validation checks automated
 - [ ] Deployment pipeline defined
@@ -279,6 +312,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Rollback procedure automated
 
 ### Environment Management
+
 - [ ] Dev/staging/prod environments
 - [ ] Environment parity maintained
 - [ ] Configuration per environment
@@ -286,6 +320,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Secrets management (Vault, AWS Secrets Manager)
 
 ### Versioning
+
 - [ ] Model version tracked per deployment
 - [ ] API version tracked
 - [ ] Code version tracked (git tag)
@@ -297,6 +332,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 ## Scalability & Reliability
 
 ### Horizontal Scaling
+
 - [ ] Stateless service design
 - [ ] Auto-scaling rules configured
 - [ ] Load balancer configured
@@ -304,6 +340,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Distributed caching (if needed)
 
 ### High Availability
+
 - [ ] Multi-instance deployment
 - [ ] Health checks configured
 - [ ] Graceful shutdown implemented
@@ -311,6 +348,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Retry logic for transient failures
 
 ### Resource Management
+
 - [ ] Resource limits enforced
 - [ ] Memory leaks prevented
 - [ ] Connection pooling configured
@@ -322,6 +360,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 ## Cost Optimization
 
 ### Compute Efficiency
+
 - [ ] Right-sized instances for workload
 - [ ] Spot/preemptible instances used (batch)
 - [ ] Auto-scaling for cost optimization
@@ -329,6 +368,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] GPU usage justified and optimized
 
 ### Cost Monitoring
+
 - [ ] Cost per prediction tracked
 - [ ] Cost budget alerts configured
 - [ ] Cost trends monitored
@@ -340,6 +380,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 ## Documentation & Handover
 
 ### Deployment Documentation
+
 - [ ] Architecture diagram available
 - [ ] Deployment steps documented
 - [ ] Configuration guide provided
@@ -347,6 +388,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Dependencies documented
 
 ### Operational Runbook
+
 - [ ] Monitoring dashboard links provided
 - [ ] Alert definitions documented
 - [ ] Troubleshooting guide available
@@ -354,6 +396,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Escalation process defined
 
 ### Model Documentation
+
 - [ ] Model card available
 - [ ] Input/output contract documented
 - [ ] Performance SLA documented
@@ -361,6 +404,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Model version and lineage tracked
 
 ### Maintenance
+
 - [ ] Owners and contacts listed
 - [ ] On-call rotation defined
 - [ ] Incident response process documented
@@ -372,6 +416,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 ## Compliance & Governance
 
 ### Regulatory Compliance
+
 - [ ] GDPR/CCPA compliance verified
 - [ ] Data residency requirements met
 - [ ] Audit logs enabled
@@ -379,6 +424,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Model bias and fairness assessed
 
 ### Model Governance
+
 - [ ] Model approval process followed
 - [ ] Model risk assessment completed
 - [ ] Model documentation complete
@@ -386,6 +432,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 - [ ] Model retirement plan defined
 
 ### Change Management
+
 - [ ] Change requests documented
 - [ ] Impact analysis performed
 - [ ] Stakeholder approval obtained
@@ -397,6 +444,7 @@ Specialized checklist for reviewing ML model deployment code (serving, APIs, bat
 ## Final Checklist
 
 Before approving ML deployment code:
+
 - [ ] Deployment architecture reviewed and approved
 - [ ] Performance meets SLA requirements
 - [ ] Security review completed

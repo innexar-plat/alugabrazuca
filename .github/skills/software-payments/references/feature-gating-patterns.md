@@ -17,12 +17,14 @@ Simple "has completed purchase or has active subscription at correct tier" check
 export function hasBinaryAccess(
   tier: SubscriptionTier,
   feature: Feature,
-  purchases: Purchase[]
+  purchases: Purchase[],
 ): boolean {
   // Subscription grants access
   if (hasFeatureAccess(tier, feature)) return true;
   // One-time purchase grants access
-  return purchases.some(p => p.feature === feature && p.status === 'completed');
+  return purchases.some(
+    (p) => p.feature === feature && p.status === "completed",
+  );
 }
 ```
 
@@ -42,8 +44,10 @@ RETURNING remaining;
 ```typescript
 // Application-level consumable check
 async function consumeCredit(userId: string, pool: string): Promise<boolean> {
-  const { data, error } = await supabase
-    .rpc('decrement_pool', { p_user_id: userId, p_pool: pool });
+  const { data, error } = await supabase.rpc("decrement_pool", {
+    p_user_id: userId,
+    p_pool: pool,
+  });
 
   if (error || !data || data.length === 0) {
     // Pool exhausted or DB error — deny access
@@ -75,16 +79,20 @@ Start with the full response object, then override only the gated fields. New fi
 
 ```typescript
 // PASS: Forward-compatible — new fields automatically pass through
-function buildGatedResponse(fullResponse: FullResponse, userTier: Tier): GatedResponse {
+function buildGatedResponse(
+  fullResponse: FullResponse,
+  userTier: Tier,
+): GatedResponse {
   return {
     ...fullResponse,
     // Override only gated fields
-    transits: hasAccess(userTier, 'transits')
-      ? fullResponse.transits
-      : [],
-    transitsGated: !hasAccess(userTier, 'transits'),
-    transitTeaser: !hasAccess(userTier, 'transits')
-      ? { count: fullResponse.transits.length, topTransit: fullResponse.transits[0]?.name }
+    transits: hasAccess(userTier, "transits") ? fullResponse.transits : [],
+    transitsGated: !hasAccess(userTier, "transits"),
+    transitTeaser: !hasAccess(userTier, "transits")
+      ? {
+          count: fullResponse.transits.length,
+          topTransit: fullResponse.transits[0]?.name,
+        }
       : undefined,
   };
 }
@@ -142,17 +150,21 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
   if (!user) return;
 
   // Revoke subscription access
-  await db.subscriptions.update({
-    tier: 'free',
-    status: 'canceled',
-    updated_at: new Date(),
-  }).where({ user_id: user.id });
+  await db.subscriptions
+    .update({
+      tier: "free",
+      status: "canceled",
+      updated_at: new Date(),
+    })
+    .where({ user_id: user.id });
 
   // Zero out consumable pools
-  await db.askCosmosBonusPool.update({
-    remaining: 0,
-    updated_at: new Date(),
-  }).where({ user_id: user.id });
+  await db.askCosmosBonusPool
+    .update({
+      remaining: 0,
+      updated_at: new Date(),
+    })
+    .where({ user_id: user.id });
 
   // Clear feature cache
   await invalidateFeatureCache(user.id);
@@ -168,7 +180,7 @@ When subscription state changes (cancellation, downgrade, refund), immediately c
 async function invalidateFeatureCache(userId: string): Promise<void> {
   await redis.del(`user_features:${userId}`);
   // If using in-memory cache, also publish invalidation event
-  await redis.publish('feature_cache_invalidate', userId);
+  await redis.publish("feature_cache_invalidate", userId);
 }
 ```
 
@@ -176,12 +188,12 @@ async function invalidateFeatureCache(userId: string): Promise<void> {
 
 Features that invoke LLMs or expensive compute need per-user rate limits independent of subscription tier to prevent abuse.
 
-| Feature | Limit | Window | Rationale |
-|---------|-------|--------|-----------|
-| `write:ask-cosmos` | 20 | per hour | LLM inference cost |
-| `write:dreams` | 20 | per day | LLM interpretation cost |
-| `write:chart-pdf` | 10 | per hour | PDF rendering + compute |
-| `read:compatibility` | 50 | per hour | Prevent scraping |
+| Feature              | Limit | Window   | Rationale               |
+| -------------------- | ----- | -------- | ----------------------- |
+| `write:ask-cosmos`   | 20    | per hour | LLM inference cost      |
+| `write:dreams`       | 20    | per day  | LLM interpretation cost |
+| `write:chart-pdf`    | 10    | per hour | PDF rendering + compute |
+| `read:compatibility` | 50    | per hour | Prevent scraping        |
 
 ```typescript
 // Rate limit check before expensive operation
@@ -192,8 +204,8 @@ if (current === 1) {
 }
 if (current > limit) {
   return Response.json(
-    { error: 'rate_limited', retryAfter: await redis.ttl(key) },
-    { status: 429 }
+    { error: "rate_limited", retryAfter: await redis.ttl(key) },
+    { status: 429 },
   );
 }
 ```
@@ -216,8 +228,8 @@ type GatedField<T> =
 
 ```typescript
 type ChartResponse = {
-  sunSign: string;          // Always available (free tier)
-  moonSign: string;         // Always available (free tier)
+  sunSign: string; // Always available (free tier)
+  moonSign: string; // Always available (free tier)
   transits: GatedField<Transit[]>;
   houseSystems: GatedField<HouseSystem[]>;
   yearAhead: GatedField<YearAheadReport>;
@@ -227,15 +239,30 @@ function buildChartResponse(data: FullChartData, tier: Tier): ChartResponse {
   return {
     sunSign: data.sunSign,
     moonSign: data.moonSign,
-    transits: hasAccess(tier, 'transits')
+    transits: hasAccess(tier, "transits")
       ? { gated: false, data: data.transits }
-      : { gated: true, teaser: { count: data.transits.length, preview: data.transits[0]?.summary ?? '' } },
-    houseSystems: hasAccess(tier, 'house_systems')
+      : {
+          gated: true,
+          teaser: {
+            count: data.transits.length,
+            preview: data.transits[0]?.summary ?? "",
+          },
+        },
+    houseSystems: hasAccess(tier, "house_systems")
       ? { gated: false, data: data.houseSystems }
-      : { gated: true, teaser: { count: data.houseSystems.length, preview: 'Placidus, Whole Sign, ...' } },
-    yearAhead: hasAccess(tier, 'year_ahead')
+      : {
+          gated: true,
+          teaser: {
+            count: data.houseSystems.length,
+            preview: "Placidus, Whole Sign, ...",
+          },
+        },
+    yearAhead: hasAccess(tier, "year_ahead")
       ? { gated: false, data: data.yearAhead }
-      : { gated: true, teaser: { count: 12, preview: 'Your year begins with a powerful...' } },
+      : {
+          gated: true,
+          teaser: { count: 12, preview: "Your year begins with a powerful..." },
+        },
   };
 }
 ```
@@ -250,7 +277,12 @@ type GatedFieldProps<T> = {
   fallback?: (teaser: { count: number; preview: string }) => React.ReactNode;
 };
 
-function GatedFieldView<T>({ field, feature, children, fallback }: GatedFieldProps<T>) {
+function GatedFieldView<T>({
+  field,
+  feature,
+  children,
+  fallback,
+}: GatedFieldProps<T>) {
   if (!field.gated) {
     return <>{children(field.data)}</>;
   }
@@ -265,16 +297,16 @@ function GatedFieldView<T>({ field, feature, children, fallback }: GatedFieldPro
 // Usage
 <GatedFieldView field={response.transits} feature="transits">
   {(transits) => <TransitList transits={transits} />}
-</GatedFieldView>
+</GatedFieldView>;
 ```
 
 ### Why Discriminated Union over Optional Fields
 
-| Approach | Pros | Cons |
-|----------|------|------|
-| `data?: T` (optional) | Simple | No teaser, no way to distinguish "empty" from "gated" |
-| `data: T \| GatedTeaser` (union, no discriminant) | Compact | Requires `Array.isArray()` or `instanceof` checks; easy to forget |
-| `GatedField<T>` (discriminated union) | Type-safe, exhaustive switch, teaser included | Slightly more verbose response |
+| Approach                                          | Pros                                          | Cons                                                              |
+| ------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------- |
+| `data?: T` (optional)                             | Simple                                        | No teaser, no way to distinguish "empty" from "gated"             |
+| `data: T \| GatedTeaser` (union, no discriminant) | Compact                                       | Requires `Array.isArray()` or `instanceof` checks; easy to forget |
+| `GatedField<T>` (discriminated union)             | Type-safe, exhaustive switch, teaser included | Slightly more verbose response                                    |
 
 The discriminated union forces the client to handle both branches. TypeScript narrows the type after checking `field.gated`, so accessing `field.data` on a gated field is a compile error.
 

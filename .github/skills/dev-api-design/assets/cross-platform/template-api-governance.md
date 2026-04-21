@@ -19,25 +19,25 @@ Production-grade API governance covering deprecation, compatibility, multi-tenan
 
 ### Resource Design
 
-| Check | Pass | Notes |
-|-------|------|-------|
-| Resource names are nouns (not verbs) | [ ] | |
-| Collection endpoints use plural | [ ] | |
-| Nested resources max 2 levels deep | [ ] | |
-| IDs are opaque (no business meaning) | [ ] | |
-| URL paths are lowercase with hyphens | [ ] | |
-| Query params documented with types | [ ] | |
+| Check                                | Pass | Notes |
+| ------------------------------------ | ---- | ----- |
+| Resource names are nouns (not verbs) | [ ]  |       |
+| Collection endpoints use plural      | [ ]  |       |
+| Nested resources max 2 levels deep   | [ ]  |       |
+| IDs are opaque (no business meaning) | [ ]  |       |
+| URL paths are lowercase with hyphens | [ ]  |       |
+| Query params documented with types   | [ ]  |       |
 
 ### Request/Response Design
 
-| Check | Pass | Notes |
-|-------|------|-------|
-| Request body schema defined | [ ] | |
-| Response envelope consistent | [ ] | |
-| Pagination implemented for lists | [ ] | |
-| Timestamps use ISO 8601 | [ ] | |
-| Null handling explicit | [ ] | |
-| Field casing consistent (camelCase) | [ ] | |
+| Check                               | Pass | Notes |
+| ----------------------------------- | ---- | ----- |
+| Request body schema defined         | [ ]  |       |
+| Response envelope consistent        | [ ]  |       |
+| Pagination implemented for lists    | [ ]  |       |
+| Timestamps use ISO 8601             | [ ]  |       |
+| Null handling explicit              | [ ]  |       |
+| Field casing consistent (camelCase) | [ ]  |       |
 
 ---
 
@@ -45,12 +45,12 @@ Production-grade API governance covering deprecation, compatibility, multi-tenan
 
 ### Deprecation Timeline
 
-| Phase | Duration | Actions |
-|-------|----------|---------|
-| **Announce** | T-90 days | Add `Deprecation` header, update docs |
-| **Warn** | T-60 days | Log warnings for deprecated endpoint usage |
-| **Migrate** | T-30 days | Direct outreach to heavy users |
-| **Sunset** | T-0 | Return 410 Gone (not 404) |
+| Phase        | Duration  | Actions                                    |
+| ------------ | --------- | ------------------------------------------ |
+| **Announce** | T-90 days | Add `Deprecation` header, update docs      |
+| **Warn**     | T-60 days | Log warnings for deprecated endpoint usage |
+| **Migrate**  | T-30 days | Direct outreach to heavy users             |
+| **Sunset**   | T-0       | Return 410 Gone (not 404)                  |
 
 ### Deprecation Headers
 
@@ -71,20 +71,24 @@ Link: <https://api.example.com/v2/users>; rel="successor-version"
 **Replacement**: [New endpoint or version]
 
 ### What's Changing
+
 [Description of deprecated functionality]
 
 ### Migration Guide
+
 1. [Step 1]
 2. [Step 2]
 3. [Step 3]
 
 ### Timeline
+
 - [ ] 90 days: Deprecation announced
 - [ ] 60 days: Warning logs enabled
 - [ ] 30 days: Direct migration outreach
 - [ ] 0 days: Endpoint returns 410 Gone
 
 ### Support
+
 Contact api-support@example.com for migration assistance.
 ```
 
@@ -154,12 +158,12 @@ User:
 
 ### Tenant Identification Methods
 
-| Method | Use When | Example |
-|--------|----------|---------|
-| **Subdomain** | B2B SaaS | `acme.api.example.com` |
+| Method          | Use When          | Example                      |
+| --------------- | ----------------- | ---------------------------- |
+| **Subdomain**   | B2B SaaS          | `acme.api.example.com`       |
 | **Path prefix** | Multi-tenant APIs | `/tenants/{tenant_id}/users` |
-| **Header** | Internal services | `X-Tenant-ID: acme` |
-| **JWT claim** | Auth-integrated | `tenant_id` in token payload |
+| **Header**      | Internal services | `X-Tenant-ID: acme`          |
+| **JWT claim**   | Auth-integrated   | `tenant_id` in token payload |
 
 ### Multi-Tenant Request Template
 
@@ -183,11 +187,11 @@ X-Tenant-ID: acme  # Redundant with JWT, but explicit
 
 ### Tenant Data Isolation Patterns
 
-| Pattern | Security | Complexity | Use When |
-|---------|----------|------------|----------|
-| **Shared tables + tenant_id** | Medium | Low | Most SaaS apps |
-| **Schema per tenant** | High | Medium | Compliance requirements |
-| **Database per tenant** | Highest | High | Enterprise, regulated |
+| Pattern                       | Security | Complexity | Use When                |
+| ----------------------------- | -------- | ---------- | ----------------------- |
+| **Shared tables + tenant_id** | Medium   | Low        | Most SaaS apps          |
+| **Schema per tenant**         | High     | Medium     | Compliance requirements |
+| **Database per tenant**       | Highest  | High       | Enterprise, regulated   |
 
 ---
 
@@ -222,17 +226,17 @@ X-Tenant-ID: acme  # Redundant with JWT, but explicit
 
 ### Error Code Registry
 
-| Code | HTTP Status | Retryable | Description |
-|------|-------------|-----------|-------------|
-| `invalid_request` | 400 | No | Malformed request syntax |
-| `validation_error` | 422 | No | Field validation failed |
-| `authentication_required` | 401 | No | Missing or invalid auth |
-| `permission_denied` | 403 | No | Insufficient permissions |
-| `resource_not_found` | 404 | No | Resource does not exist |
-| `conflict` | 409 | No | Resource state conflict |
-| `rate_limited` | 429 | Yes | Too many requests |
-| `internal_error` | 500 | Yes | Server error (with backoff) |
-| `service_unavailable` | 503 | Yes | Temporary overload |
+| Code                      | HTTP Status | Retryable | Description                 |
+| ------------------------- | ----------- | --------- | --------------------------- |
+| `invalid_request`         | 400         | No        | Malformed request syntax    |
+| `validation_error`        | 422         | No        | Field validation failed     |
+| `authentication_required` | 401         | No        | Missing or invalid auth     |
+| `permission_denied`       | 403         | No        | Insufficient permissions    |
+| `resource_not_found`      | 404         | No        | Resource does not exist     |
+| `conflict`                | 409         | No        | Resource state conflict     |
+| `rate_limited`            | 429         | Yes       | Too many requests           |
+| `internal_error`          | 500         | Yes       | Server error (with backoff) |
+| `service_unavailable`     | 503         | Yes       | Temporary overload          |
 
 ### Retryability Header
 
@@ -257,15 +261,15 @@ X-RateLimit-Reset: 1701388800
 
 ### SDK Feature Requirements
 
-| Feature | Priority | Notes |
-|---------|----------|-------|
-| Type safety | Required | Generated types from OpenAPI |
-| Authentication | Required | Handle token refresh |
-| Retry logic | Required | Exponential backoff |
-| Rate limit handling | Required | Respect Retry-After |
-| Pagination helpers | Recommended | Iterator patterns |
-| Request/response logging | Recommended | Debug mode |
-| Timeout configuration | Recommended | Client-side timeouts |
+| Feature                  | Priority    | Notes                        |
+| ------------------------ | ----------- | ---------------------------- |
+| Type safety              | Required    | Generated types from OpenAPI |
+| Authentication           | Required    | Handle token refresh         |
+| Retry logic              | Required    | Exponential backoff          |
+| Rate limit handling      | Required    | Respect Retry-After          |
+| Pagination helpers       | Recommended | Iterator patterns            |
+| Request/response logging | Recommended | Debug mode                   |
+| Timeout configuration    | Recommended | Client-side timeouts         |
 
 ### SDK Error Handling Pattern
 
@@ -321,14 +325,14 @@ try {
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|--------------|---------|-----|
-| **Instant deprecation** | Breaks existing clients | 90-day minimum sunset |
-| **Silent breaking changes** | Client failures in production | Versioning + changelog |
-| **Tenant ID in URL only** | Forgery risk | Validate against auth token |
-| **Generic error messages** | Poor developer experience | Specific error codes |
-| **No rate limit headers** | Clients can't back off properly | Include X-RateLimit-* |
-| **Version in request body** | Hard to route, debug | Version in URL or header |
+| Anti-Pattern                | Problem                         | Fix                         |
+| --------------------------- | ------------------------------- | --------------------------- |
+| **Instant deprecation**     | Breaks existing clients         | 90-day minimum sunset       |
+| **Silent breaking changes** | Client failures in production   | Versioning + changelog      |
+| **Tenant ID in URL only**   | Forgery risk                    | Validate against auth token |
+| **Generic error messages**  | Poor developer experience       | Specific error codes        |
+| **No rate limit headers**   | Clients can't back off properly | Include X-RateLimit-\*      |
+| **Version in request body** | Hard to route, debug            | Version in URL or header    |
 
 ---
 

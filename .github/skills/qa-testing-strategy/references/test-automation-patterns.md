@@ -28,6 +28,7 @@ Modern patterns and anti-patterns for reliable, maintainable test automation.
 **Use when:** Writing E2E tests with multiple page interactions.
 
 **Benefits:**
+
 - Encapsulates page structure
 - Reduces code duplication
 - Easier maintenance when UI changes
@@ -41,20 +42,26 @@ export class CheckoutPage {
   constructor(private page: Page) {}
 
   // Locators (lazy evaluation)
-  get addressInput() { return this.page.getByLabel('Address') }
-  get cityInput() { return this.page.getByLabel('City') }
-  get submitButton() { return this.page.getByRole('button', { name: 'Submit' }) }
+  get addressInput() {
+    return this.page.getByLabel("Address");
+  }
+  get cityInput() {
+    return this.page.getByLabel("City");
+  }
+  get submitButton() {
+    return this.page.getByRole("button", { name: "Submit" });
+  }
 
   // Actions
   async fillShippingInfo(address: string, city: string) {
-    await this.addressInput.fill(address)
-    await this.cityInput.fill(city)
-    await this.submitButton.click()
+    await this.addressInput.fill(address);
+    await this.cityInput.fill(city);
+    await this.submitButton.click();
   }
 
   // Assertions
   async expectSuccessMessage() {
-    await expect(this.page.getByText('Order placed')).toBeVisible()
+    await expect(this.page.getByText("Order placed")).toBeVisible();
   }
 }
 ```
@@ -68,6 +75,7 @@ export class CheckoutPage {
 **Use when:** Creating test data with complex structures.
 
 **Benefits:**
+
 - Consistent test data
 - Easy to create variations
 - Reduces magic values
@@ -82,18 +90,18 @@ export class UserFactory {
       id: faker.string.uuid(),
       email: faker.internet.email(),
       name: faker.person.fullName(),
-      role: 'user',
+      role: "user",
       createdAt: new Date(),
-      ...overrides
-    }
+      ...overrides,
+    };
   }
 
   static createAdmin() {
-    return this.create({ role: 'admin', permissions: ['all'] })
+    return this.create({ role: "admin", permissions: ["all"] });
   }
 
   static createMany(count: number, overrides = {}) {
-    return Array.from({ length: count }, () => this.create(overrides))
+    return Array.from({ length: count }, () => this.create(overrides));
   }
 }
 ```
@@ -105,6 +113,7 @@ export class UserFactory {
 **Use when:** Tests need consistent setup data.
 
 **Benefits:**
+
 - Predictable test state
 - Reusable across tests
 - Easier debugging
@@ -116,26 +125,26 @@ export class UserFactory {
 // fixtures/products.ts
 export const testProducts = {
   laptop: {
-    id: 'prod-1',
-    name: 'MacBook Pro',
+    id: "prod-1",
+    name: "MacBook Pro",
     price: 2499,
-    stock: 10
+    stock: 10,
   },
   mouse: {
-    id: 'prod-2',
-    name: 'Logitech MX',
+    id: "prod-2",
+    name: "Logitech MX",
     price: 99,
-    stock: 50
-  }
-}
+    stock: 50,
+  },
+};
 
 // Usage
-import { testProducts } from './fixtures/products'
+import { testProducts } from "./fixtures/products";
 
-test('add product to cart', async () => {
-  await addToCart(testProducts.laptop)
-  expect(getCartTotal()).toBe(2499)
-})
+test("add product to cart", async () => {
+  await addToCart(testProducts.laptop);
+  expect(getCartTotal()).toBe(2499);
+});
 ```
 
 ---
@@ -147,36 +156,39 @@ test('add product to cart', async () => {
 **Types:**
 
 **Mock** - Verify interactions (how many times called, with what args)
+
 ```typescript
 const emailService = {
-  send: jest.fn().mockResolvedValue({ success: true })
-}
+  send: jest.fn().mockResolvedValue({ success: true }),
+};
 
-await service.createUser(userData)
+await service.createUser(userData);
 expect(emailService.send).toHaveBeenCalledWith({
-  to: 'user@example.com',
-  template: 'welcome'
-})
+  to: "user@example.com",
+  template: "welcome",
+});
 ```
 
 **Stub** - Provide predefined responses
+
 ```typescript
 const paymentGateway = {
-  charge: () => Promise.resolve({ transactionId: 'TX123', status: 'success' })
-}
+  charge: () => Promise.resolve({ transactionId: "TX123", status: "success" }),
+};
 ```
 
 **Fake** - Working implementation (in-memory DB, mock server)
+
 ```typescript
 class FakeDatabase {
-  private data = new Map()
+  private data = new Map();
 
   async save(key, value) {
-    this.data.set(key, value)
+    this.data.set(key, value);
   }
 
   async get(key) {
-    return this.data.get(key)
+    return this.data.get(key);
   }
 }
 ```
@@ -192,20 +204,21 @@ class FakeDatabase {
 **Structure:**
 
 ```typescript
-test('should calculate discount', () => {
+test("should calculate discount", () => {
   // Arrange - Setup test data
-  const order = { total: 100, items: 5 }
-  const discountService = new DiscountService()
+  const order = { total: 100, items: 5 };
+  const discountService = new DiscountService();
 
   // Act - Execute the operation
-  const finalPrice = discountService.apply(order)
+  const finalPrice = discountService.apply(order);
 
   // Assert - Verify the outcome
-  expect(finalPrice).toBe(90) // 10% discount
-})
+  expect(finalPrice).toBe(90); // 10% discount
+});
 ```
 
 **Benefits:**
+
 - Clear test structure
 - Easy to understand
 - Identifies what's being tested
@@ -217,6 +230,7 @@ test('should calculate discount', () => {
 **Use when:** Always.
 
 **Principles:**
+
 - Each test is independent
 - No shared mutable state
 - Tests can run in any order
@@ -226,28 +240,28 @@ test('should calculate discount', () => {
 
 ```typescript
 // BAD: Bad - Shared state
-let user: User
+let user: User;
 
 beforeAll(() => {
-  user = createUser() // Shared across all tests
-})
+  user = createUser(); // Shared across all tests
+});
 
-test('update user', () => {
-  user.name = 'Updated' // Mutates shared state
-})
+test("update user", () => {
+  user.name = "Updated"; // Mutates shared state
+});
 
-test('delete user', () => {
-  deleteUser(user.id) // Now first test will fail if this runs first
-})
+test("delete user", () => {
+  deleteUser(user.id); // Now first test will fail if this runs first
+});
 
 // GOOD: Good - Isolated state
 beforeEach(() => {
-  user = createUser() // Fresh user for each test
-})
+  user = createUser(); // Fresh user for each test
+});
 
 afterEach(() => {
-  cleanupUser(user.id) // Clean up after each test
-})
+  cleanupUser(user.id); // Clean up after each test
+});
 ```
 
 ---
@@ -257,6 +271,7 @@ afterEach(() => {
 **Use when:** Testing microservice APIs.
 
 **Benefits:**
+
 - Catches integration issues early
 - Faster than E2E tests
 - Consumer-driven contracts
@@ -266,32 +281,32 @@ afterEach(() => {
 
 ```typescript
 // Consumer test (Frontend)
-describe('User API', () => {
-  it('should get user by ID', async () => {
+describe("User API", () => {
+  it("should get user by ID", async () => {
     await provider.addInteraction({
-      state: 'user with ID 1 exists',
-      uponReceiving: 'a request for user 1',
+      state: "user with ID 1 exists",
+      uponReceiving: "a request for user 1",
       withRequest: {
-        method: 'GET',
-        path: '/users/1'
+        method: "GET",
+        path: "/users/1",
       },
       willRespondWith: {
         status: 200,
-        body: { id: 1, email: 'user@example.com' }
-      }
-    })
+        body: { id: 1, email: "user@example.com" },
+      },
+    });
 
-    const user = await api.getUser(1)
-    expect(user.email).toBe('user@example.com')
-  })
-})
+    const user = await api.getUser(1);
+    expect(user.email).toBe("user@example.com");
+  });
+});
 
 // Provider verification (Backend)
 new Verifier({
-  provider: 'UserAPI',
-  providerBaseUrl: 'http://localhost:3000',
-  pactUrls: ['./pacts/frontend-userapi.json']
-}).verifyProvider()
+  provider: "UserAPI",
+  providerBaseUrl: "http://localhost:3000",
+  pactUrls: ["./pacts/frontend-userapi.json"],
+}).verifyProvider();
 ```
 
 ---
@@ -306,24 +321,24 @@ new Verifier({
 
 ```typescript
 // Playwright (built-in)
-await expect(page.getByText('Loaded')).toBeVisible({ timeout: 5000 })
+await expect(page.getByText("Loaded")).toBeVisible({ timeout: 5000 });
 
 // Jest with custom retry
 async function retryOperation(operation, maxRetries = 3) {
   for (let i = 0; i < maxRetries; i++) {
     try {
-      return await operation()
+      return await operation();
     } catch (error) {
-      if (i === maxRetries - 1) throw error
-      await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)))
+      if (i === maxRetries - 1) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
     }
   }
 }
 
-test('fetch data with retry', async () => {
-  const data = await retryOperation(() => fetchData())
-  expect(data).toBeDefined()
-})
+test("fetch data with retry", async () => {
+  const data = await retryOperation(() => fetchData());
+  expect(data).toBeDefined();
+});
 ```
 
 ---
@@ -333,6 +348,7 @@ test('fetch data with retry', async () => {
 **Use when:** Testing output that changes rarely (config, serialization).
 
 **Benefits:**
+
 - Catches unintended changes
 - Quick to write
 - Good for regression testing
@@ -342,18 +358,18 @@ test('fetch data with retry', async () => {
 **Example:**
 
 ```typescript
-test('config snapshot', () => {
-  const config = getConfig()
-  expect(config).toMatchSnapshot()
-})
+test("config snapshot", () => {
+  const config = getConfig();
+  expect(config).toMatchSnapshot();
+});
 
-test('user profile snapshot', () => {
-  const profile = getUserProfile('user-123')
+test("user profile snapshot", () => {
+  const profile = getUserProfile("user-123");
   expect(profile).toMatchSnapshot({
     createdAt: expect.any(Date), // Dynamic values
-    id: expect.any(String)
-  })
-})
+    id: expect.any(String),
+  });
+});
 ```
 
 **When to update snapshots:** Only when change is intentional. Review diffs carefully.
@@ -365,6 +381,7 @@ test('user profile snapshot', () => {
 **Use when:** Running different test suites.
 
 **Categories:**
+
 - **@smoke** - Critical paths, run on every commit
 - **@regression** - Full suite, run nightly
 - **@slow** - Long-running tests
@@ -404,15 +421,15 @@ npm test -- --tags "not @slow"
 
 ```typescript
 describe.each([
-  { input: 'hello', expected: 'HELLO' },
-  { input: 'world', expected: 'WORLD' },
-  { input: '', expected: '' },
-  { input: '123', expected: '123' }
-])('uppercase($input)', ({ input, expected }) => {
+  { input: "hello", expected: "HELLO" },
+  { input: "world", expected: "WORLD" },
+  { input: "", expected: "" },
+  { input: "123", expected: "123" },
+])("uppercase($input)", ({ input, expected }) => {
   it(`should return ${expected}`, () => {
-    expect(uppercase(input)).toBe(expected)
-  })
-})
+    expect(uppercase(input)).toBe(expected);
+  });
+});
 ```
 
 **Example (Cucumber Scenario Outline)**:
@@ -439,17 +456,17 @@ Scenario Outline: Validate email
 
 ```typescript
 // BAD: Bad - Tests internal method
-test('should call internal helper', () => {
-  const spy = jest.spyOn(service, 'internalHelper')
-  service.publicMethod()
-  expect(spy).toHaveBeenCalled()
-})
+test("should call internal helper", () => {
+  const spy = jest.spyOn(service, "internalHelper");
+  service.publicMethod();
+  expect(spy).toHaveBeenCalled();
+});
 
 // GOOD: Good - Tests public behavior
-test('should return correct result', () => {
-  const result = service.publicMethod()
-  expect(result).toBe(expectedValue)
-})
+test("should return correct result", () => {
+  const result = service.publicMethod();
+  expect(result).toBe(expectedValue);
+});
 ```
 
 ---
@@ -459,12 +476,14 @@ test('should return correct result', () => {
 **Problem:** Tests pass/fail randomly, undermining trust.
 
 **Common causes:**
+
 - Race conditions (async timing)
 - Shared mutable state
 - External dependencies (network, time)
 - Test order dependencies
 
 **Solutions:**
+
 - Use explicit waits (not sleep)
 - Isolate tests (fresh state per test)
 - Mock time and external services
@@ -472,11 +491,11 @@ test('should return correct result', () => {
 
 ```typescript
 // BAD: Bad - Sleep (flaky)
-await sleep(1000) // Hope data loads in 1 second
+await sleep(1000); // Hope data loads in 1 second
 
 // GOOD: Good - Explicit wait
-await page.waitForSelector('[data-loaded="true"]')
-await expect(page.getByText('Data loaded')).toBeVisible()
+await page.waitForSelector('[data-loaded="true"]');
+await expect(page.getByText("Data loaded")).toBeVisible();
 ```
 
 ---
@@ -489,17 +508,17 @@ await expect(page.getByText('Data loaded')).toBeVisible()
 
 ```typescript
 // BAD: Bad - Mocking everything
-const database = { save: jest.fn(), find: jest.fn() }
-const cache = { get: jest.fn(), set: jest.fn() }
-const logger = { log: jest.fn() }
-const emailService = { send: jest.fn() }
+const database = { save: jest.fn(), find: jest.fn() };
+const cache = { get: jest.fn(), set: jest.fn() };
+const logger = { log: jest.fn() };
+const emailService = { send: jest.fn() };
 
 // Unit test passes, but real integration is untested
 
 // GOOD: Good - Use real implementations for internal code
-const database = new InMemoryDatabase() // Real logic
-const cache = new InMemoryCache()       // Real logic
-const emailService = mockEmailService() // Mock external service
+const database = new InMemoryDatabase(); // Real logic
+const cache = new InMemoryCache(); // Real logic
+const emailService = mockEmailService(); // Mock external service
 ```
 
 **Guideline:** Mock external boundaries, use real implementations internally.
@@ -514,16 +533,17 @@ const emailService = mockEmailService() // Mock external service
 
 ```typescript
 // BAD: Bad - Implementation-coupled selectors
-await page.locator('.btn.btn-primary.submit-btn-v2').click()
-await page.locator('div > div > div > button:nth-child(3)').click()
+await page.locator(".btn.btn-primary.submit-btn-v2").click();
+await page.locator("div > div > div > button:nth-child(3)").click();
 
 // GOOD: Good - Semantic selectors
-await page.getByRole('button', { name: 'Submit' }).click()
-await page.getByTestId('submit-button').click()
-await page.getByLabel('Submit form').click()
+await page.getByRole("button", { name: "Submit" }).click();
+await page.getByTestId("submit-button").click();
+await page.getByLabel("Submit form").click();
 ```
 
 **Best to worst:**
+
 1. data-testid
 2. ARIA role + accessible name
 3. User-visible text
@@ -540,36 +560,36 @@ await page.getByLabel('Submit form').click()
 
 ```typescript
 // BAD: Bad - Tests multiple behaviors
-test('user service', async () => {
-  const user = await service.create({ email: 'test@example.com' })
-  expect(user.id).toBeDefined()
+test("user service", async () => {
+  const user = await service.create({ email: "test@example.com" });
+  expect(user.id).toBeDefined();
 
-  const found = await service.findById(user.id)
-  expect(found).toBeDefined()
+  const found = await service.findById(user.id);
+  expect(found).toBeDefined();
 
-  await service.delete(user.id)
-  const deleted = await service.findById(user.id)
-  expect(deleted).toBeNull()
-})
+  await service.delete(user.id);
+  const deleted = await service.findById(user.id);
+  expect(deleted).toBeNull();
+});
 
 // GOOD: Good - One behavior per test
-test('should create user', async () => {
-  const user = await service.create({ email: 'test@example.com' })
-  expect(user.id).toBeDefined()
-})
+test("should create user", async () => {
+  const user = await service.create({ email: "test@example.com" });
+  expect(user.id).toBeDefined();
+});
 
-test('should find user by ID', async () => {
-  const user = await service.create({ email: 'test@example.com' })
-  const found = await service.findById(user.id)
-  expect(found).toBeDefined()
-})
+test("should find user by ID", async () => {
+  const user = await service.create({ email: "test@example.com" });
+  const found = await service.findById(user.id);
+  expect(found).toBeDefined();
+});
 
-test('should delete user', async () => {
-  const user = await service.create({ email: 'test@example.com' })
-  await service.delete(user.id)
-  const deleted = await service.findById(user.id)
-  expect(deleted).toBeNull()
-})
+test("should delete user", async () => {
+  const user = await service.create({ email: "test@example.com" });
+  await service.delete(user.id);
+  const deleted = await service.findById(user.id);
+  expect(deleted).toBeNull();
+});
 ```
 
 ---

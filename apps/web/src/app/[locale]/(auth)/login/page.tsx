@@ -1,41 +1,41 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
-import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { api } from '@/lib/api';
-import { useAuth } from '@/components/providers/auth-provider';
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { api } from "@/lib/api";
+import { useAuth } from "@/components/providers/auth-provider";
 
 export default function LoginPage() {
-  const t = useTranslations('auth.login');
+  const t = useTranslations("auth.login");
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
-      const res = await api.post<{ accessToken: string }>('/auth/login', {
+      const res = await api.post<{ accessToken: string }>("/auth/login", {
         email,
         password,
       });
       await login(res.accessToken);
-      const returnUrl = searchParams.get('returnUrl') || '/';
+      const returnUrl = searchParams.get("returnUrl") || "/";
       router.push(returnUrl);
     } catch (err: unknown) {
       const apiErr = err as { status?: number };
-      if (apiErr.status === 401) setError(t('invalidCredentials'));
-      else if (apiErr.status === 403) setError(t('emailNotVerified'));
-      else if (apiErr.status === 429) setError(t('tooManyAttempts'));
+      if (apiErr.status === 401) setError(t("invalidCredentials"));
+      else if (apiErr.status === 403) setError(t("emailNotVerified"));
+      else if (apiErr.status === 429) setError(t("tooManyAttempts"));
       else setError((err as Error).message);
     } finally {
       setLoading(false);
@@ -46,10 +46,10 @@ export default function LoginPage() {
     <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-8 shadow-lg">
       <div className="mb-6 text-center">
         <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
-          {t('title')}
+          {t("title")}
         </h1>
         <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-          {t('subtitle')}
+          {t("subtitle")}
         </p>
       </div>
 
@@ -65,7 +65,7 @@ export default function LoginPage() {
             htmlFor="email"
             className="mb-1 block text-sm font-medium text-[hsl(var(--foreground))]"
           >
-            {t('email')}
+            {t("email")}
           </label>
           <input
             id="email"
@@ -82,7 +82,7 @@ export default function LoginPage() {
             htmlFor="password"
             className="mb-1 block text-sm font-medium text-[hsl(var(--foreground))]"
           >
-            {t('password')}
+            {t("password")}
           </label>
           <input
             id="password"
@@ -99,7 +99,7 @@ export default function LoginPage() {
             href="/forgot-password"
             className="text-sm text-[hsl(var(--primary))] hover:underline"
           >
-            {t('forgotPassword')}
+            {t("forgotPassword")}
           </Link>
         </div>
 
@@ -108,17 +108,17 @@ export default function LoginPage() {
           disabled={loading}
           className="w-full rounded-lg bg-[hsl(var(--primary))] px-4 py-2.5 text-sm font-semibold text-[hsl(var(--primary-foreground))] transition-opacity hover:opacity-90 disabled:opacity-50"
         >
-          {loading ? '...' : t('submit')}
+          {loading ? "..." : t("submit")}
         </button>
       </form>
 
       <div className="mt-4 text-center text-sm text-[hsl(var(--muted-foreground))]">
-        {t('noAccount')}{' '}
+        {t("noAccount")}{" "}
         <Link
           href="/register"
           className="font-medium text-[hsl(var(--primary))] hover:underline"
         >
-          {t('createAccount')}
+          {t("createAccount")}
         </Link>
       </div>
     </div>

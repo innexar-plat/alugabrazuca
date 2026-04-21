@@ -21,14 +21,14 @@ Patterns for managing state in modern frontend applications: server state vs cli
 
 ### The Critical Distinction
 
-| Characteristic | Server State | Client State |
-|----------------|-------------|-------------|
-| Source of truth | Remote server/database | User's browser |
-| Persistence | Survives page refresh | Lost on refresh (unless persisted) |
-| Shared | Multiple users see same data | Unique to this user session |
-| Examples | User profiles, posts, products | UI state, form drafts, theme preference |
-| Caching behavior | Stale-while-revalidate | Immediate updates |
-| Synchronization | Must sync with server | Local only |
+| Characteristic   | Server State                   | Client State                            |
+| ---------------- | ------------------------------ | --------------------------------------- |
+| Source of truth  | Remote server/database         | User's browser                          |
+| Persistence      | Survives page refresh          | Lost on refresh (unless persisted)      |
+| Shared           | Multiple users see same data   | Unique to this user session             |
+| Examples         | User profiles, posts, products | UI state, form drafts, theme preference |
+| Caching behavior | Stale-while-revalidate         | Immediate updates                       |
+| Synchronization  | Must sync with server          | Local only                              |
 
 ### Why This Matters
 
@@ -98,18 +98,18 @@ function App() {
 // Think of them as cache keys
 
 // Simple key
-useQuery({ queryKey: ['users'], queryFn: fetchUsers });
+useQuery({ queryKey: ["users"], queryFn: fetchUsers });
 
 // Parameterized key
 useQuery({
-  queryKey: ['users', userId],
+  queryKey: ["users", userId],
   queryFn: () => fetchUser(userId),
 });
 
 // Complex key with filters
 useQuery({
-  queryKey: ['users', { role: 'admin', page: 2, sort: 'name' }],
-  queryFn: () => fetchUsers({ role: 'admin', page: 2, sort: 'name' }),
+  queryKey: ["users", { role: "admin", page: 2, sort: "name" }],
+  queryFn: () => fetchUsers({ role: "admin", page: 2, sort: "name" }),
 });
 
 // Key structure convention:
@@ -129,16 +129,16 @@ const createUser = useMutation({
   mutationFn: (newUser: CreateUserInput) => api.createUser(newUser),
   onSuccess: () => {
     // Invalidate all queries starting with 'users'
-    queryClient.invalidateQueries({ queryKey: ['users'] });
+    queryClient.invalidateQueries({ queryKey: ["users"] });
   },
 });
 
 // Targeted invalidation
-queryClient.invalidateQueries({ queryKey: ['users', 'list'] });
+queryClient.invalidateQueries({ queryKey: ["users", "list"] });
 // Does NOT invalidate ['users', 'detail', userId]
 
 // Manual cache update (skip refetch)
-queryClient.setQueryData(['users', 'detail', userId], updatedUser);
+queryClient.setQueryData(["users", "detail", userId], updatedUser);
 ```
 
 ### Optimistic Updates
@@ -150,18 +150,22 @@ const updateUser = useMutation({
   // Optimistic update: update UI immediately
   onMutate: async (newData) => {
     // Cancel outgoing refetches
-    await queryClient.cancelQueries({ queryKey: ['users', 'detail', newData.id] });
+    await queryClient.cancelQueries({
+      queryKey: ["users", "detail", newData.id],
+    });
 
     // Snapshot previous value
-    const previousUser = queryClient.getQueryData(
-      ['users', 'detail', newData.id]
-    );
+    const previousUser = queryClient.getQueryData([
+      "users",
+      "detail",
+      newData.id,
+    ]);
 
     // Optimistically update cache
-    queryClient.setQueryData(
-      ['users', 'detail', newData.id],
-      (old: User) => ({ ...old, ...newData })
-    );
+    queryClient.setQueryData(["users", "detail", newData.id], (old: User) => ({
+      ...old,
+      ...newData,
+    }));
 
     // Return context for rollback
     return { previousUser };
@@ -171,8 +175,8 @@ const updateUser = useMutation({
   onError: (err, newData, context) => {
     if (context?.previousUser) {
       queryClient.setQueryData(
-        ['users', 'detail', newData.id],
-        context.previousUser
+        ["users", "detail", newData.id],
+        context.previousUser,
       );
     }
   },
@@ -180,7 +184,7 @@ const updateUser = useMutation({
   // Always refetch after success or error
   onSettled: (data, error, variables) => {
     queryClient.invalidateQueries({
-      queryKey: ['users', 'detail', variables.id]
+      queryKey: ["users", "detail", variables.id],
     });
   },
 });
@@ -191,34 +195,30 @@ const updateUser = useMutation({
 ```typescript
 // Query that depends on another query's result
 const { data: user } = useQuery({
-  queryKey: ['user', userId],
+  queryKey: ["user", userId],
   queryFn: () => fetchUser(userId),
 });
 
 const { data: projects } = useQuery({
-  queryKey: ['projects', user?.organizationId],
+  queryKey: ["projects", user?.organizationId],
   queryFn: () => fetchProjects(user!.organizationId),
-  enabled: !!user?.organizationId,  // Only run when user data is available
+  enabled: !!user?.organizationId, // Only run when user data is available
 });
 ```
 
 ### Infinite Queries (Pagination)
 
 ```typescript
-const {
-  data,
-  fetchNextPage,
-  hasNextPage,
-  isFetchingNextPage,
-} = useInfiniteQuery({
-  queryKey: ['posts', 'infinite'],
-  queryFn: ({ pageParam }) => fetchPosts({ cursor: pageParam, limit: 20 }),
-  initialPageParam: undefined as string | undefined,
-  getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-});
+const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+  useInfiniteQuery({
+    queryKey: ["posts", "infinite"],
+    queryFn: ({ pageParam }) => fetchPosts({ cursor: pageParam, limit: 20 }),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+  });
 
 // Flatten all pages
-const allPosts = data?.pages.flatMap(page => page.posts) ?? [];
+const allPosts = data?.pages.flatMap((page) => page.posts) ?? [];
 ```
 
 ---
@@ -228,8 +228,8 @@ const allPosts = data?.pages.flatMap(page => page.posts) ?? [];
 ### Store Design
 
 ```typescript
-import { create } from 'zustand';
-import { persist, devtools } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist, devtools } from "zustand/middleware";
 
 // Simple store
 interface CounterStore {
@@ -245,7 +245,7 @@ const useCounterStore = create<CounterStore>()(
     increment: () => set((state) => ({ count: state.count + 1 })),
     decrement: () => set((state) => ({ count: state.count - 1 })),
     reset: () => set({ count: 0 }),
-  }))
+  })),
 );
 ```
 
@@ -262,31 +262,25 @@ interface AuthSlice {
 
 interface UISlice {
   sidebarOpen: boolean;
-  theme: 'light' | 'dark';
+  theme: "light" | "dark";
   toggleSidebar: () => void;
-  setTheme: (theme: 'light' | 'dark') => void;
+  setTheme: (theme: "light" | "dark") => void;
 }
 
-const createAuthSlice: StateCreator<
-  AuthSlice & UISlice,
-  [],
-  [],
-  AuthSlice
-> = (set) => ({
+const createAuthSlice: StateCreator<AuthSlice & UISlice, [], [], AuthSlice> = (
+  set,
+) => ({
   user: null,
   token: null,
   setAuth: (user, token) => set({ user, token }),
   logout: () => set({ user: null, token: null }),
 });
 
-const createUISlice: StateCreator<
-  AuthSlice & UISlice,
-  [],
-  [],
-  UISlice
-> = (set) => ({
+const createUISlice: StateCreator<AuthSlice & UISlice, [], [], UISlice> = (
+  set,
+) => ({
   sidebarOpen: true,
-  theme: 'light',
+  theme: "light",
   toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
   setTheme: (theme) => set({ theme }),
 });
@@ -300,16 +294,16 @@ const useAppStore = create<AuthSlice & UISlice>()(
         ...createUISlice(...a),
       }),
       {
-        name: 'app-storage',
+        name: "app-storage",
         partialize: (state) => ({
           // Only persist these fields
           user: state.user,
           token: state.token,
           theme: state.theme,
         }),
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 ```
 
@@ -319,23 +313,26 @@ const useAppStore = create<AuthSlice & UISlice>()(
 // Persist to localStorage
 const useStore = create<MyState>()(
   persist(
-    (set) => ({ /* ... */ }),
+    (set) => ({
+      /* ... */
+    }),
     {
-      name: 'my-store',           // localStorage key
-      partialize: (state) => ({    // Only persist specific fields
+      name: "my-store", // localStorage key
+      partialize: (state) => ({
+        // Only persist specific fields
         theme: state.theme,
         language: state.language,
       }),
-      version: 1,                  // Schema version for migrations
+      version: 1, // Schema version for migrations
       migrate: (persisted, version) => {
         // Handle store schema migrations
         if (version === 0) {
-          return { ...persisted, newField: 'default' };
+          return { ...persisted, newField: "default" };
         }
         return persisted;
       },
-    }
-  )
+    },
+  ),
 );
 ```
 
@@ -429,16 +426,16 @@ function UserProfile() {
 
 ### When to Use Jotai vs Zustand
 
-| Criterion | Jotai | Zustand |
-|-----------|-------|---------|
-| Mental model | Bottom-up (atoms compose) | Top-down (single store) |
-| Best for | Highly granular, independent pieces of state | App-wide state with related actions |
-| Re-renders | Minimal (atom-level) | Minimal (with selectors) |
-| Async | Built-in (Suspense) | Manual |
-| DevTools | jotai-devtools | zustand/devtools |
-| Persistence | jotai-storage | zustand/persist |
-| Learning curve | Lower (simple API) | Lower (simple API) |
-| TypeScript | Excellent | Excellent |
+| Criterion      | Jotai                                        | Zustand                             |
+| -------------- | -------------------------------------------- | ----------------------------------- |
+| Mental model   | Bottom-up (atoms compose)                    | Top-down (single store)             |
+| Best for       | Highly granular, independent pieces of state | App-wide state with related actions |
+| Re-renders     | Minimal (atom-level)                         | Minimal (with selectors)            |
+| Async          | Built-in (Suspense)                          | Manual                              |
+| DevTools       | jotai-devtools                               | zustand/devtools                    |
+| Persistence    | jotai-storage                                | zustand/persist                     |
+| Learning curve | Lower (simple API)                           | Lower (simple API)                  |
+| TypeScript     | Excellent                                    | Excellent                           |
 
 ---
 
@@ -462,20 +459,20 @@ function UserProfile() {
 
 ```typescript
 // RTK Query: similar to TanStack Query but Redux-integrated
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const api = createApi({
-  reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
-  tagTypes: ['Users', 'Posts'],
+  reducerPath: "api",
+  baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
+  tagTypes: ["Users", "Posts"],
   endpoints: (builder) => ({
     getUsers: builder.query<User[], void>({
-      query: () => '/users',
-      providesTags: ['Users'],
+      query: () => "/users",
+      providesTags: ["Users"],
     }),
     createUser: builder.mutation<User, CreateUserInput>({
-      query: (body) => ({ url: '/users', method: 'POST', body }),
-      invalidatesTags: ['Users'],
+      query: (body) => ({ url: "/users", method: "POST", body }),
+      invalidatesTags: ["Users"],
     }),
   }),
 });
@@ -517,13 +514,13 @@ What kind of state?
 
 ### Recommended Stack (2026)
 
-| Layer | Tool | Purpose |
-|-------|------|---------|
-| Server state | TanStack Query v5 | API data caching and synchronization |
-| Client state | Zustand | Auth, UI preferences, app-wide state |
-| URL state | searchParams / nuqs | Filters, pagination, shareable state |
-| Form state | react-hook-form + Zod | Form validation and management |
-| Component state | useState / useReducer | Local UI state |
+| Layer           | Tool                  | Purpose                              |
+| --------------- | --------------------- | ------------------------------------ |
+| Server state    | TanStack Query v5     | API data caching and synchronization |
+| Client state    | Zustand               | Auth, UI preferences, app-wide state |
+| URL state       | searchParams / nuqs   | Filters, pagination, shareable state |
+| Form state      | react-hook-form + Zod | Form validation and management       |
+| Component state | useState / useReducer | Local UI state                       |
 
 ---
 
@@ -556,8 +553,12 @@ function UserList() {
 
 // CORRECT: TanStack Query handles all of this
 function UserList() {
-  const { data: users, isLoading, error } = useQuery({
-    queryKey: ['users'],
+  const {
+    data: users,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["users"],
     queryFn: fetchUsers,
   });
 }
@@ -587,18 +588,19 @@ function UserList() {
 // ANTI-PATTERN: Storing computed values
 const useStore = create((set) => ({
   items: [],
-  filteredItems: [],  // This is derived from items + filter
-  filter: '',
-  setFilter: (filter) => set((state) => ({
-    filter,
-    filteredItems: state.items.filter(i => i.name.includes(filter)),
-  })),
+  filteredItems: [], // This is derived from items + filter
+  filter: "",
+  setFilter: (filter) =>
+    set((state) => ({
+      filter,
+      filteredItems: state.items.filter((i) => i.name.includes(filter)),
+    })),
 }));
 
 // CORRECT: Compute derived values at render time
 const useStore = create((set) => ({
   items: [],
-  filter: '',
+  filter: "",
   setFilter: (filter) => set({ filter }),
 }));
 
@@ -606,8 +608,8 @@ const useStore = create((set) => ({
 const items = useStore((s) => s.items);
 const filter = useStore((s) => s.filter);
 const filteredItems = useMemo(
-  () => items.filter(i => i.name.includes(filter)),
-  [items, filter]
+  () => items.filter((i) => i.name.includes(filter)),
+  [items, filter],
 );
 ```
 
@@ -617,13 +619,13 @@ const filteredItems = useMemo(
 
 ### Memoization Strategies
 
-| Technique | When to Use |
-|-----------|-------------|
-| `useMemo` | Expensive computations from state |
-| `useCallback` | Callback props to memoized children |
-| Zustand selectors | Subscribe to minimal state slice |
-| Jotai atoms | Automatic granular subscriptions |
-| React Compiler | Automatic memoization (Next.js 16+) |
+| Technique         | When to Use                         |
+| ----------------- | ----------------------------------- |
+| `useMemo`         | Expensive computations from state   |
+| `useCallback`     | Callback props to memoized children |
+| Zustand selectors | Subscribe to minimal state slice    |
+| Jotai atoms       | Automatic granular subscriptions    |
+| React Compiler    | Automatic memoization (Next.js 16+) |
 
 ### Selective Subscriptions (Zustand)
 

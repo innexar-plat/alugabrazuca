@@ -3,10 +3,10 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
-} from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { CreateListingDto, UpdateListingDto, ListingQueryDto } from './dto';
-import { ListingStatus, Prisma } from '@prisma/client';
+} from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { CreateListingDto, UpdateListingDto, ListingQueryDto } from "./dto";
+import { ListingStatus, Prisma } from "@prisma/client";
 
 @Injectable()
 export class ListingService {
@@ -31,7 +31,7 @@ export class ListingService {
     const listing = await this.prisma.listing.findFirst({
       where: { id, deletedAt: null },
       include: {
-        photos: { orderBy: { sortOrder: 'asc' } },
+        photos: { orderBy: { sortOrder: "asc" } },
         host: {
           select: {
             id: true,
@@ -48,21 +48,27 @@ export class ListingService {
     });
 
     if (!listing) {
-      throw new NotFoundException('Listing not found');
+      throw new NotFoundException("Listing not found");
     }
 
     // Non-owner can only see active/rented listings
     const isOwner = userId && listing.hostId === userId;
-    if (!isOwner && listing.status !== ListingStatus.active && listing.status !== ListingStatus.rented) {
-      throw new NotFoundException('Listing not found');
+    if (
+      !isOwner &&
+      listing.status !== ListingStatus.active &&
+      listing.status !== ListingStatus.rented
+    ) {
+      throw new NotFoundException("Listing not found");
     }
 
     // Increment view count for non-owner views (fire and forget)
     if (!isOwner) {
-      this.prisma.listing.update({
-        where: { id },
-        data: { viewCount: { increment: 1 } },
-      }).catch(() => {});
+      this.prisma.listing
+        .update({
+          where: { id },
+          data: { viewCount: { increment: 1 } },
+        })
+        .catch(() => {});
     }
 
     // Hide street address for non-owners
@@ -79,7 +85,13 @@ export class ListingService {
   }
 
   async findMyListings(hostId: string, query: ListingQueryDto) {
-    const { page = 1, limit = 20, sortBy = 'createdAt', order = 'desc', status } = query;
+    const {
+      page = 1,
+      limit = 20,
+      sortBy = "createdAt",
+      order = "desc",
+      status,
+    } = query;
 
     const where: Prisma.ListingWhereInput = {
       hostId,
@@ -91,7 +103,7 @@ export class ListingService {
       this.prisma.listing.findMany({
         where,
         include: {
-          photos: { orderBy: { sortOrder: 'asc' }, take: 1 },
+          photos: { orderBy: { sortOrder: "asc" }, take: 1 },
         },
         orderBy: { [sortBy]: order },
         skip: (page - 1) * limit,
@@ -115,13 +127,19 @@ export class ListingService {
     const listing = await this.findOwnedListing(id, hostId);
 
     // Cannot edit rejected/expired listings
-    if (listing.status === ListingStatus.rejected || listing.status === ListingStatus.expired) {
-      throw new BadRequestException('Cannot edit a listing with status: ' + listing.status);
+    if (
+      listing.status === ListingStatus.rejected ||
+      listing.status === ListingStatus.expired
+    ) {
+      throw new BadRequestException(
+        "Cannot edit a listing with status: " + listing.status,
+      );
     }
 
     // If listing was active, revert to draft on edit (requires re-review)
     const shouldRevertToDraft =
-      listing.status === ListingStatus.active || listing.status === ListingStatus.pending_review;
+      listing.status === ListingStatus.active ||
+      listing.status === ListingStatus.pending_review;
 
     const updateData: any = { ...dto };
 
@@ -139,7 +157,7 @@ export class ListingService {
     const updated = await this.prisma.listing.update({
       where: { id },
       data: updateData,
-      include: { photos: { orderBy: { sortOrder: 'asc' } } },
+      include: { photos: { orderBy: { sortOrder: "asc" } } },
     });
 
     return { data: updated };
@@ -153,7 +171,7 @@ export class ListingService {
       data: { deletedAt: new Date() },
     });
 
-    return { message: 'Listing deleted successfully' };
+    return { message: "Listing deleted successfully" };
   }
 
   // ── Lifecycle Actions ──
@@ -161,14 +179,23 @@ export class ListingService {
   async publish(id: string, hostId: string) {
     const listing = await this.findOwnedListing(id, hostId);
 
-    if (listing.status !== ListingStatus.draft && listing.status !== ListingStatus.paused) {
-      throw new BadRequestException('Only draft or paused listings can be published');
+    if (
+      listing.status !== ListingStatus.draft &&
+      listing.status !== ListingStatus.paused
+    ) {
+      throw new BadRequestException(
+        "Only draft or paused listings can be published",
+      );
     }
 
     // Check minimum requirements
-    const photoCount = await this.prisma.listingPhoto.count({ where: { listingId: id } });
+    const photoCount = await this.prisma.listingPhoto.count({
+      where: { listingId: id },
+    });
     if (photoCount < 3) {
-      throw new BadRequestException('At least 3 photos are required to publish');
+      throw new BadRequestException(
+        "At least 3 photos are required to publish",
+      );
     }
 
     const updated = await this.prisma.listing.update({
@@ -183,7 +210,7 @@ export class ListingService {
     const listing = await this.findOwnedListing(id, hostId);
 
     if (listing.status !== ListingStatus.active) {
-      throw new BadRequestException('Only active listings can be paused');
+      throw new BadRequestException("Only active listings can be paused");
     }
 
     const updated = await this.prisma.listing.update({
@@ -198,7 +225,7 @@ export class ListingService {
     const listing = await this.findOwnedListing(id, hostId);
 
     if (listing.status !== ListingStatus.paused) {
-      throw new BadRequestException('Only paused listings can be resumed');
+      throw new BadRequestException("Only paused listings can be resumed");
     }
 
     const updated = await this.prisma.listing.update({
@@ -212,8 +239,13 @@ export class ListingService {
   async markRented(id: string, hostId: string) {
     const listing = await this.findOwnedListing(id, hostId);
 
-    if (listing.status !== ListingStatus.active && listing.status !== ListingStatus.paused) {
-      throw new BadRequestException('Only active or paused listings can be marked as rented');
+    if (
+      listing.status !== ListingStatus.active &&
+      listing.status !== ListingStatus.paused
+    ) {
+      throw new BadRequestException(
+        "Only active or paused listings can be marked as rented",
+      );
     }
 
     const updated = await this.prisma.listing.update({
@@ -242,9 +274,11 @@ export class ListingService {
     const nextSort = (maxSort._max.sortOrder ?? -1) + 1;
 
     // Check max 20 photos
-    const count = await this.prisma.listingPhoto.count({ where: { listingId } });
+    const count = await this.prisma.listingPhoto.count({
+      where: { listingId },
+    });
     if (count >= 20) {
-      throw new BadRequestException('Maximum of 20 photos allowed');
+      throw new BadRequestException("Maximum of 20 photos allowed");
     }
 
     const photo = await this.prisma.listingPhoto.create({
@@ -268,12 +302,12 @@ export class ListingService {
     });
 
     if (!photo) {
-      throw new NotFoundException('Photo not found');
+      throw new NotFoundException("Photo not found");
     }
 
     await this.prisma.listingPhoto.delete({ where: { id: photoId } });
 
-    return { message: 'Photo deleted successfully' };
+    return { message: "Photo deleted successfully" };
   }
 
   async reorderPhotos(listingId: string, hostId: string, photoIds: string[]) {
@@ -290,7 +324,7 @@ export class ListingService {
 
     const photos = await this.prisma.listingPhoto.findMany({
       where: { listingId },
-      orderBy: { sortOrder: 'asc' },
+      orderBy: { sortOrder: "asc" },
     });
 
     return { data: photos };
@@ -304,11 +338,11 @@ export class ListingService {
     });
 
     if (!listing) {
-      throw new NotFoundException('Listing not found');
+      throw new NotFoundException("Listing not found");
     }
 
     if (listing.hostId !== hostId) {
-      throw new ForbiddenException('You do not own this listing');
+      throw new ForbiddenException("You do not own this listing");
     }
 
     return listing;

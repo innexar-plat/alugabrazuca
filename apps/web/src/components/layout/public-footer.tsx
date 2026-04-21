@@ -20,7 +20,7 @@ export function PublicFooter() {
                 width={220}
                 height={56}
                 className="h-14"
-                style={{ width: 'auto' }}
+                style={{ width: "auto" }}
                 loading="lazy"
               />
             </Link>

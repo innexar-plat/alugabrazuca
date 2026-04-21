@@ -20,15 +20,15 @@ stripe trigger invoice.payment_failed
 
 ## Test Card Numbers
 
-| Card | Scenario |
-|------|----------|
-| `4242 4242 4242 4242` | Successful payment |
-| `4000 0000 0000 0002` | Declined |
-| `4000 0000 0000 3220` | 3D Secure required |
-| `4000 0025 0000 3155` | Requires authentication |
-| `4000 0000 0000 9995` | Insufficient funds |
-| `4000 0000 0000 0077` | Charge succeeds, dispute created |
-| `4000 0000 0000 0341` | Attaching card to customer fails |
+| Card                  | Scenario                            |
+| --------------------- | ----------------------------------- |
+| `4242 4242 4242 4242` | Successful payment                  |
+| `4000 0000 0000 0002` | Declined                            |
+| `4000 0000 0000 3220` | 3D Secure required                  |
+| `4000 0025 0000 3155` | Requires authentication             |
+| `4000 0000 0000 9995` | Insufficient funds                  |
+| `4000 0000 0000 0077` | Charge succeeds, dispute created    |
+| `4000 0000 0000 0341` | Attaching card to customer fails    |
 | `4000 0000 0000 3063` | 3D Secure 2 authentication required |
 
 ---
@@ -48,7 +48,7 @@ async function fillStripeCheckout(page: Page) {
   await page.evaluate(() => {
     const radios = document.querySelectorAll('[role="radio"]');
     for (const radio of radios) {
-      if (radio.textContent?.includes('Card')) {
+      if (radio.textContent?.includes("Card")) {
         (radio as HTMLElement).click();
         return;
       }
@@ -56,16 +56,19 @@ async function fillStripeCheckout(page: Page) {
   });
   await page.waitForTimeout(2000);
 
-  await page.locator('input[name="cardNumber"]').fill('4242424242424242');
-  await page.locator('input[name="cardExpiry"]').fill('1234');
-  await page.locator('input[name="cardCvc"]').fill('123');
+  await page.locator('input[name="cardNumber"]').fill("4242424242424242");
+  await page.locator('input[name="cardExpiry"]').fill("1234");
+  await page.locator('input[name="cardCvc"]').fill("123");
 
   const nameInput = page.locator('input[name="billingName"]');
   if (await nameInput.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await nameInput.fill('Test User');
+    await nameInput.fill("Test User");
   }
 
-  await page.locator('button:has-text("Start trial"), button:has-text("Subscribe")').first().click();
+  await page
+    .locator('button:has-text("Start trial"), button:has-text("Subscribe")')
+    .first()
+    .click();
   await page.waitForURL(/localhost/, { timeout: 60000 });
 }
 ```
@@ -83,20 +86,20 @@ async function syncSubscriptionState(email: string) {
 
   const subscriptions = await stripe.subscriptions.list({
     customer: customerId,
-    status: 'all',
+    status: "all",
     limit: 10,
   });
 
   const active = subscriptions.data.find(
-    s => s.status === 'active' || s.status === 'trialing'
+    (s) => s.status === "active" || s.status === "trialing",
   );
 
   // Upsert to local DB with current Stripe state
   await db.subscriptions.upsert({
     stripe_customer_id: customerId,
     stripe_subscription_id: active?.id,
-    tier: active ? getTierFromPriceId(active.items.data[0].price.id) : 'free',
-    status: active ? mapStripeStatus(active.status) : 'active',
+    tier: active ? getTierFromPriceId(active.items.data[0].price.id) : "free",
+    status: active ? mapStripeStatus(active.status) : "active",
   });
 }
 ```

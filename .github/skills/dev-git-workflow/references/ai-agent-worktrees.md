@@ -92,14 +92,14 @@ sequenceDiagram
 
 ## When to Use Worktrees with AI Agents
 
-| Scenario | Worktree? | Why |
-|----------|-----------|-----|
-| Single agent, single feature | Optional | Branch checkout is fine |
-| Single agent, context isolation needed | Yes | Keeps main checkout clean for human work |
-| Multiple agents working in parallel | **Required** | Prevents file conflicts between agents |
-| Agent + human working simultaneously | **Recommended** | Human keeps main checkout; agent works in worktree |
-| CI/CD bot building while you develop | Yes | Avoids lock contention on `.git/index` |
-| Codex (cloud sandbox) | No | Codex creates its own sandbox per task |
+| Scenario                               | Worktree?       | Why                                                |
+| -------------------------------------- | --------------- | -------------------------------------------------- |
+| Single agent, single feature           | Optional        | Branch checkout is fine                            |
+| Single agent, context isolation needed | Yes             | Keeps main checkout clean for human work           |
+| Multiple agents working in parallel    | **Required**    | Prevents file conflicts between agents             |
+| Agent + human working simultaneously   | **Recommended** | Human keeps main checkout; agent works in worktree |
+| CI/CD bot building while you develop   | Yes             | Avoids lock contention on `.git/index`             |
+| Codex (cloud sandbox)                  | No              | Codex creates its own sandbox per task             |
 
 **Rule of thumb:** If more than one actor (human or agent) touches the repo simultaneously, use worktrees.
 
@@ -213,12 +213,14 @@ If tests fail before any changes, the worktree has a pre-existing issue — repo
 Claude Code has native worktree support via the `EnterWorktree` tool.
 
 **Interactive session (single agent):**
+
 ```
 # Claude Code creates and enters a worktree automatically
 # via the EnterWorktree tool during brainstorming/execution skills
 ```
 
 **Headless / multi-agent via CLI:**
+
 ```bash
 # Launch agent 1 in its own worktree
 cd .worktrees/feature-auth
@@ -242,7 +244,7 @@ Output: working tests, conventional commits on feature/auth branch
 
 ### OpenAI Codex
 
-Codex runs in cloud sandboxes — each task already gets an isolated environment. Worktrees are not needed for Codex's own execution. However, when *you* review Codex output locally:
+Codex runs in cloud sandboxes — each task already gets an isolated environment. Worktrees are not needed for Codex's own execution. However, when _you_ review Codex output locally:
 
 ```bash
 # Create a worktree to review/test Codex's branch locally
@@ -333,12 +335,12 @@ git check-ignore -q .worktrees || {
 
 Multiple worktrees share the same `.git` directory (via `.git/worktrees/`). Most Git operations are safe in parallel, but some can contend:
 
-| Operation | Safe in parallel? | Notes |
-|-----------|-------------------|-------|
-| `git add` / `git commit` | Yes | Each worktree has its own index |
-| `git fetch` | Yes | Updates shared refs safely |
-| `git gc` / `git prune` | **No** | Run only when no agent is active |
-| `git worktree add/remove` | **No** | Serialize worktree management |
+| Operation                 | Safe in parallel? | Notes                            |
+| ------------------------- | ----------------- | -------------------------------- |
+| `git add` / `git commit`  | Yes               | Each worktree has its own index  |
+| `git fetch`               | Yes               | Updates shared refs safely       |
+| `git gc` / `git prune`    | **No**            | Run only when no agent is active |
+| `git worktree add/remove` | **No**            | Serialize worktree management    |
 
 ### Preventing cross-agent file conflicts
 
@@ -419,31 +421,31 @@ git worktree prune
 
 ## Decision Table
 
-| Question | Answer | Action |
-|----------|--------|--------|
-| How many agents run at once? | 1 | Worktree optional; branch checkout is fine |
-| | 2+ | One worktree per agent (required) |
-| Human working at same time? | Yes | Agent(s) in worktrees; human in main checkout |
-| | No | Agent can use main checkout |
-| Agent is cloud-based (Codex)? | Yes | No local worktree needed; agent has its own sandbox |
-| | Reviewing locally | Create worktree to test agent's branch |
-| Agents touch same files? | Yes | Serialize via wave dispatch; do not parallelize |
-| | No | Safe to parallelize in separate worktrees |
-| Project has CI that runs locally? | Yes | Worktrees prevent CI and agent from competing |
+| Question                          | Answer            | Action                                              |
+| --------------------------------- | ----------------- | --------------------------------------------------- |
+| How many agents run at once?      | 1                 | Worktree optional; branch checkout is fine          |
+|                                   | 2+                | One worktree per agent (required)                   |
+| Human working at same time?       | Yes               | Agent(s) in worktrees; human in main checkout       |
+|                                   | No                | Agent can use main checkout                         |
+| Agent is cloud-based (Codex)?     | Yes               | No local worktree needed; agent has its own sandbox |
+|                                   | Reviewing locally | Create worktree to test agent's branch              |
+| Agents touch same files?          | Yes               | Serialize via wave dispatch; do not parallelize     |
+|                                   | No                | Safe to parallelize in separate worktrees           |
+| Project has CI that runs locally? | Yes               | Worktrees prevent CI and agent from competing       |
 
 ---
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|--------------|---------|-----|
-| **Two agents in one worktree** | File conflicts, corrupted state | One worktree per agent, always |
-| **Worktree not in `.gitignore`** | Worktree contents tracked by Git | `git check-ignore` before creating |
-| **Running `git gc` during parallel work** | Can corrupt shared refs | Only run when all agents are idle |
-| **No file ownership in handoff** | Agents overwrite each other's work | Define `Owned files` / `Do-not-touch` per agent |
-| **Forgetting to install deps** | Agent hits import errors, wastes tokens | Auto-detect and run setup after worktree creation |
-| **Leaving stale worktrees** | Disk bloat, confusing `git worktree list` | Clean up after branch merge |
-| **Nesting worktrees inside worktrees** | Git confusion, broken refs | Always create worktrees from the main checkout |
+| Anti-Pattern                              | Problem                                   | Fix                                               |
+| ----------------------------------------- | ----------------------------------------- | ------------------------------------------------- |
+| **Two agents in one worktree**            | File conflicts, corrupted state           | One worktree per agent, always                    |
+| **Worktree not in `.gitignore`**          | Worktree contents tracked by Git          | `git check-ignore` before creating                |
+| **Running `git gc` during parallel work** | Can corrupt shared refs                   | Only run when all agents are idle                 |
+| **No file ownership in handoff**          | Agents overwrite each other's work        | Define `Owned files` / `Do-not-touch` per agent   |
+| **Forgetting to install deps**            | Agent hits import errors, wastes tokens   | Auto-detect and run setup after worktree creation |
+| **Leaving stale worktrees**               | Disk bloat, confusing `git worktree list` | Clean up after branch merge                       |
+| **Nesting worktrees inside worktrees**    | Git confusion, broken refs                | Always create worktrees from the main checkout    |
 
 ---
 

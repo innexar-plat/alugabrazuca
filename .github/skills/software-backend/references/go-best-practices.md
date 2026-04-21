@@ -25,6 +25,7 @@ Comprehensive guide for building production-grade backend services with Go.
 ### Effective Go Idioms
 
 **Simplicity over Cleverness**
+
 ```go
 // Good: Clear and straightforward
 func isValid(user *User) bool {
@@ -38,6 +39,7 @@ func isValid(user *User) bool {
 ```
 
 **Accept Interfaces, Return Structs**
+
 ```go
 // Good: Interface parameter for flexibility
 type Storage interface {
@@ -56,6 +58,7 @@ func ProcessData(db *PostgresDB, data []byte) error {
 ```
 
 **Error Handling**
+
 ```go
 // Good: Check errors immediately
 result, err := doSomething()
@@ -81,6 +84,7 @@ func (e *ValidationError) Error() string {
 ### Goroutine Management
 
 **Worker Pool Pattern**
+
 ```go
 type Job struct {
     ID   int
@@ -119,6 +123,7 @@ func main() {
 ```
 
 **Context for Cancellation**
+
 ```go
 func fetchData(ctx context.Context, url string) ([]byte, error) {
     req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
@@ -143,6 +148,7 @@ data, err := fetchData(ctx, "https://api.example.com/data")
 ```
 
 **Fan-Out, Fan-In Pattern**
+
 ```go
 func fanOut(input <-chan int, workers int) []<-chan int {
     channels := make([]<-chan int, workers)
@@ -178,6 +184,7 @@ func fanIn(channels ...<-chan int) <-chan int {
 ### Synchronization
 
 **Use sync.WaitGroup for Goroutine Coordination**
+
 ```go
 func processItems(items []string) {
     var wg sync.WaitGroup
@@ -195,6 +202,7 @@ func processItems(items []string) {
 ```
 
 **Use sync.Once for One-Time Initialization**
+
 ```go
 var (
     instance *Database
@@ -454,6 +462,7 @@ func (r *gormUserRepository) FindByID(id uint) (*User, error) {
 ### Memory Efficiency
 
 **Use Pointers for Large Structs**
+
 ```go
 // Good: Pass pointer to avoid copying
 func ProcessUser(user *User) {
@@ -467,6 +476,7 @@ func ProcessUser(user User) {
 ```
 
 **Preallocate Slices**
+
 ```go
 // Good: Preallocate when size is known
 users := make([]User, 0, 100)
@@ -482,6 +492,7 @@ for i := 0; i < 100; i++ {
 ```
 
 **Use sync.Pool for Frequent Allocations**
+
 ```go
 var bufferPool = sync.Pool{
     New: func() interface{} {

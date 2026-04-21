@@ -34,17 +34,17 @@ RFC 9457 defines a "problem detail" format for HTTP API errors, providing a stan
 
 ### Field Descriptions
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `type` | URI | Yes | URI identifying the error type (for documentation) |
-| `title` | string | Yes | Human-readable error title (consistent per type) |
-| `status` | integer | Yes | HTTP status code |
-| `detail` | string | No | Human-readable explanation (specific to this occurrence) |
-| `instance` | URI | No | URI of the request that caused the error |
-| `code` | string | No | Stable, application-specific error code (for client handling) |
-| `retryable` | boolean | No | Whether retry could succeed without changing the request |
-| `errors` | array | No | Field-level validation errors |
-| `traceId` | string | No | Unique identifier for debugging |
+| Field       | Type    | Required | Description                                                   |
+| ----------- | ------- | -------- | ------------------------------------------------------------- |
+| `type`      | URI     | Yes      | URI identifying the error type (for documentation)            |
+| `title`     | string  | Yes      | Human-readable error title (consistent per type)              |
+| `status`    | integer | Yes      | HTTP status code                                              |
+| `detail`    | string  | No       | Human-readable explanation (specific to this occurrence)      |
+| `instance`  | URI     | No       | URI of the request that caused the error                      |
+| `code`      | string  | No       | Stable, application-specific error code (for client handling) |
+| `retryable` | boolean | No       | Whether retry could succeed without changing the request      |
+| `errors`    | array   | No       | Field-level validation errors                                 |
+| `traceId`   | string  | No       | Unique identifier for debugging                               |
 
 ---
 
@@ -52,37 +52,37 @@ RFC 9457 defines a "problem detail" format for HTTP API errors, providing a stan
 
 ### Success Codes (2xx)
 
-| Code | Name | Use When |
-|------|------|----------|
-| `200 OK` | Standard success | GET, PUT, PATCH with response body |
-| `201 Created` | Resource created | POST successfully creates resource |
-| `202 Accepted` | Async processing | Request accepted, processing later |
-| `204 No Content` | Success, no body | DELETE, POST/PUT with no response |
+| Code             | Name             | Use When                           |
+| ---------------- | ---------------- | ---------------------------------- |
+| `200 OK`         | Standard success | GET, PUT, PATCH with response body |
+| `201 Created`    | Resource created | POST successfully creates resource |
+| `202 Accepted`   | Async processing | Request accepted, processing later |
+| `204 No Content` | Success, no body | DELETE, POST/PUT with no response  |
 
 ### Client Error Codes (4xx)
 
-| Code | Name | Use When |
-|------|------|----------|
-| `400 Bad Request` | Malformed request | Invalid JSON syntax, missing headers |
-| `401 Unauthorized` | Auth required | Missing/invalid credentials |
-| `403 Forbidden` | Insufficient permissions | Valid auth, but lacks permission |
-| `404 Not Found` | Resource not found | Invalid resource ID |
-| `405 Method Not Allowed` | HTTP method unsupported | POST to read-only endpoint |
-| `406 Not Acceptable` | Content type unsupported | Client can't accept response format |
-| `409 Conflict` | Resource conflict | Duplicate resource, optimistic lock |
-| `410 Gone` | Permanently deleted | Resource existed, now deleted |
-| `415 Unsupported Media Type` | Invalid Content-Type | Server can't parse request format |
-| `422 Unprocessable Entity` | Validation error | Valid syntax, invalid semantics |
-| `429 Too Many Requests` | Rate limit exceeded | Client exceeded quota |
+| Code                         | Name                     | Use When                             |
+| ---------------------------- | ------------------------ | ------------------------------------ |
+| `400 Bad Request`            | Malformed request        | Invalid JSON syntax, missing headers |
+| `401 Unauthorized`           | Auth required            | Missing/invalid credentials          |
+| `403 Forbidden`              | Insufficient permissions | Valid auth, but lacks permission     |
+| `404 Not Found`              | Resource not found       | Invalid resource ID                  |
+| `405 Method Not Allowed`     | HTTP method unsupported  | POST to read-only endpoint           |
+| `406 Not Acceptable`         | Content type unsupported | Client can't accept response format  |
+| `409 Conflict`               | Resource conflict        | Duplicate resource, optimistic lock  |
+| `410 Gone`                   | Permanently deleted      | Resource existed, now deleted        |
+| `415 Unsupported Media Type` | Invalid Content-Type     | Server can't parse request format    |
+| `422 Unprocessable Entity`   | Validation error         | Valid syntax, invalid semantics      |
+| `429 Too Many Requests`      | Rate limit exceeded      | Client exceeded quota                |
 
 ### Server Error Codes (5xx)
 
-| Code | Name | Use When |
-|------|------|----------|
-| `500 Internal Server Error` | Unexpected error | Unhandled exception |
-| `502 Bad Gateway` | Upstream error | Invalid response from upstream |
-| `503 Service Unavailable` | Temporary unavailability | Maintenance, overload |
-| `504 Gateway Timeout` | Upstream timeout | Upstream service timeout |
+| Code                        | Name                     | Use When                       |
+| --------------------------- | ------------------------ | ------------------------------ |
+| `500 Internal Server Error` | Unexpected error         | Unhandled exception            |
+| `502 Bad Gateway`           | Upstream error           | Invalid response from upstream |
+| `503 Service Unavailable`   | Temporary unavailability | Maintenance, overload          |
+| `504 Gateway Timeout`       | Upstream timeout         | Upstream service timeout       |
 
 ---
 
@@ -396,8 +396,8 @@ async def http_exception_handler(request, exc):
 ### Express.js (TypeScript)
 
 ```typescript
-import express, { Request, Response, NextFunction } from 'express';
-import { v4 as uuidv4 } from 'uuid';
+import express, { Request, Response, NextFunction } from "express";
+import { v4 as uuidv4 } from "uuid";
 
 interface ErrorDetail {
   field: string;
@@ -420,7 +420,7 @@ class ApiError extends Error {
     public status: number,
     public title: string,
     public detail: string,
-    public errors?: ErrorDetail[]
+    public errors?: ErrorDetail[],
   ) {
     super(detail);
   }
@@ -438,7 +438,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
       detail: err.detail,
       instance: req.path,
       errors: err.errors,
-      traceId
+      traceId,
     };
 
     return res.status(err.status).json(problem);
@@ -446,32 +446,37 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
   // Unhandled error
   const problem: ProblemDetail = {
-    type: 'https://api.example.com/errors/internal-error',
-    title: 'Internal Server Error',
+    type: "https://api.example.com/errors/internal-error",
+    title: "Internal Server Error",
     status: 500,
-    detail: 'An unexpected error occurred',
+    detail: "An unexpected error occurred",
     instance: req.path,
-    traceId
+    traceId,
   };
 
-  console.error('[Error]', traceId, err);
+  console.error("[Error]", traceId, err);
   res.status(500).json(problem);
 });
 
 // Usage
-app.post('/users', (req, res, next) => {
+app.post("/users", (req, res, next) => {
   const errors: ErrorDetail[] = [];
 
   if (!req.body.email) {
     errors.push({
-      field: 'email',
-      code: 'REQUIRED_FIELD',
-      message: 'Email is required'
+      field: "email",
+      code: "REQUIRED_FIELD",
+      message: "Email is required",
     });
   }
 
   if (errors.length > 0) {
-    throw new ApiError(422, 'Validation Error', 'One or more validation errors occurred', errors);
+    throw new ApiError(
+      422,
+      "Validation Error",
+      "One or more validation errors occurred",
+      errors,
+    );
   }
 
   // ... create user
@@ -580,21 +585,21 @@ Hard to debug production issues without correlation ID.
 
 ## Error Response Decision Matrix
 
-| Scenario | Status Code | Error Type |
-|----------|-------------|------------|
-| Missing required field | 422 | Validation Error |
-| Invalid email format | 422 | Validation Error |
-| Duplicate resource (email exists) | 409 | Conflict |
-| Resource not found | 404 | Not Found |
-| Missing auth token | 401 | Unauthorized |
-| Invalid auth token | 401 | Unauthorized |
-| Valid token, insufficient permissions | 403 | Forbidden |
-| Rate limit exceeded | 429 | Too Many Requests |
-| Malformed JSON | 400 | Bad Request |
-| Unsupported Content-Type | 415 | Unsupported Media Type |
-| Unhandled exception | 500 | Internal Server Error |
-| Upstream service error | 502 | Bad Gateway |
-| Upstream timeout | 504 | Gateway Timeout |
+| Scenario                              | Status Code | Error Type             |
+| ------------------------------------- | ----------- | ---------------------- |
+| Missing required field                | 422         | Validation Error       |
+| Invalid email format                  | 422         | Validation Error       |
+| Duplicate resource (email exists)     | 409         | Conflict               |
+| Resource not found                    | 404         | Not Found              |
+| Missing auth token                    | 401         | Unauthorized           |
+| Invalid auth token                    | 401         | Unauthorized           |
+| Valid token, insufficient permissions | 403         | Forbidden              |
+| Rate limit exceeded                   | 429         | Too Many Requests      |
+| Malformed JSON                        | 400         | Bad Request            |
+| Unsupported Content-Type              | 415         | Unsupported Media Type |
+| Unhandled exception                   | 500         | Internal Server Error  |
+| Upstream service error                | 502         | Bad Gateway            |
+| Upstream timeout                      | 504         | Gateway Timeout        |
 
 ---
 

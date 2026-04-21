@@ -13,6 +13,7 @@ Platforms available to UK/EU-based businesses beyond the core Stripe/Adyen stack
 **Signup:** Self-serve at gocardless.com. UK company or sole trader. KYC typically < 24h.
 
 **Pricing (Feb 2026):**
+
 - UK Bacs: 1% + 20p (capped at GBP 4)
 - SEPA: 1% + 20c (capped at EUR 4)
 - ACH: 1% + 30c (capped at USD 5)
@@ -22,7 +23,7 @@ Platforms available to UK/EU-based businesses beyond the core Stripe/Adyen stack
 
 ```typescript
 // GoCardless payment flow (server-side)
-import gocardless from 'gocardless-nodejs';
+import gocardless from "gocardless-nodejs";
 
 const client = gocardless(process.env.GOCARDLESS_ACCESS_TOKEN!, {
   environment: gocardless.Environments.Live,
@@ -39,8 +40,8 @@ const billingRequestFlow = await client.billingRequestFlows.create({
 
 // 2. After mandate setup, create recurring payment
 const payment = await client.payments.create({
-  amount: 999,         // in pence
-  currency: 'GBP',
+  amount: 999, // in pence
+  currency: "GBP",
   links: { mandate: mandateId },
   metadata: { user_id: userId, invoice_id: invoiceId },
 });
@@ -59,6 +60,7 @@ const payment = await client.payments.create({
 **Signup:** Self-serve at mollie.com. EU/UK/CH companies. Typically approved in 1-2 business days.
 
 **Pricing (Feb 2026):**
+
 - Cards: 1.8% + 25c (EU) / 2.8% + 25c (non-EU)
 - iDEAL: 29c flat
 - SEPA DD: 35c flat
@@ -69,19 +71,19 @@ const payment = await client.payments.create({
 
 ```typescript
 // Mollie payment creation (server-side)
-import createMollieClient from '@mollie/api-client';
+import createMollieClient from "@mollie/api-client";
 
 const mollie = createMollieClient({
   apiKey: process.env.MOLLIE_API_KEY!,
 });
 
 const payment = await mollie.payments.create({
-  amount: { currency: 'EUR', value: '9.99' },
-  description: 'Pro plan — monthly',
+  amount: { currency: "EUR", value: "9.99" },
+  description: "Pro plan — monthly",
   redirectUrl: `${appUrl}/checkout/complete`,
   webhookUrl: `${appUrl}/api/mollie/webhook`,
   method: undefined, // Let customer choose (shows all enabled methods)
-  metadata: { user_id: userId, tier: 'pro' },
+  metadata: { user_id: userId, tier: "pro" },
 });
 
 // Redirect customer to payment.getCheckoutUrl()
@@ -100,6 +102,7 @@ const payment = await mollie.payments.create({
 **Signup:** Self-serve at squareup.com/gb. UK sole traders and companies.
 
 **Pricing (Feb 2026):**
+
 - Online: 1.4% + 25p (EU cards) / 2.5% + 25p (non-EU)
 - In-person (POS): 1.75% flat (UK)
 - Invoices: 2.5%
@@ -109,7 +112,7 @@ const payment = await mollie.payments.create({
 
 ```typescript
 // Square online checkout (server-side)
-import { Client, Environment } from 'square';
+import { Client, Environment } from "square";
 
 const square = new Client({
   accessToken: process.env.SQUARE_ACCESS_TOKEN!,
@@ -119,8 +122,8 @@ const square = new Client({
 const { result } = await square.checkout.createPaymentLink({
   idempotencyKey: crypto.randomUUID(),
   quickPay: {
-    name: 'Pro Plan Monthly',
-    priceMoney: { amount: BigInt(999), currency: 'GBP' },
+    name: "Pro Plan Monthly",
+    priceMoney: { amount: BigInt(999), currency: "GBP" },
     locationId: process.env.SQUARE_LOCATION_ID!,
   },
 });
@@ -138,6 +141,7 @@ const { result } = await square.checkout.createPaymentLink({
 **Signup:** Self-serve at developer.paypal.com. Business account required.
 
 **Pricing (Feb 2026):**
+
 - Standard: 2.9% + 30p (UK) — varies by method
 - PayPal Checkout: includes buyer protection
 - No monthly fee
@@ -146,19 +150,21 @@ const { result } = await square.checkout.createPaymentLink({
 
 ```typescript
 // PayPal Commerce Platform order creation (server-side)
-const response = await fetch('https://api-m.paypal.com/v2/checkout/orders', {
-  method: 'POST',
+const response = await fetch("https://api-m.paypal.com/v2/checkout/orders", {
+  method: "POST",
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${accessToken}`,
-    'PayPal-Request-Id': idempotencyKey,
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${accessToken}`,
+    "PayPal-Request-Id": idempotencyKey,
   },
   body: JSON.stringify({
-    intent: 'CAPTURE',
-    purchase_units: [{
-      amount: { currency_code: 'GBP', value: '9.99' },
-      custom_id: userId,
-    }],
+    intent: "CAPTURE",
+    purchase_units: [
+      {
+        amount: { currency_code: "GBP", value: "9.99" },
+        custom_id: userId,
+      },
+    ],
     application_context: {
       return_url: `${appUrl}/paypal/complete`,
       cancel_url: `${appUrl}/paypal/cancel`,
@@ -199,12 +205,12 @@ const response = await fetch('https://api-m.paypal.com/v2/checkout/orders', {
 
 ## Tier 3: Sales-Required (Enterprise)
 
-| Platform | Focus | Min Volume | Notes |
-|----------|-------|-----------|-------|
-| **Checkout.com** | High-volume online payments | ~$500K/yr | Cards, Apple Pay, Google Pay. Strong in UK/EU. Interchange++ pricing. |
-| **TrueLayer** | Open Banking payments (A2A) | Contact sales | UK/EU bank-to-bank via Open Banking APIs. Instant settlement. |
-| **Yapily** | Open Banking infrastructure | Contact sales | Connect to 2000+ banks across EU/UK for AIS and PIS. |
-| **WorldPay (FIS)** | Legacy enterprise payments | Enterprise only | Largest acquirer globally. Complex integration. Legacy but ubiquitous. |
+| Platform           | Focus                       | Min Volume      | Notes                                                                  |
+| ------------------ | --------------------------- | --------------- | ---------------------------------------------------------------------- |
+| **Checkout.com**   | High-volume online payments | ~$500K/yr       | Cards, Apple Pay, Google Pay. Strong in UK/EU. Interchange++ pricing.  |
+| **TrueLayer**      | Open Banking payments (A2A) | Contact sales   | UK/EU bank-to-bank via Open Banking APIs. Instant settlement.          |
+| **Yapily**         | Open Banking infrastructure | Contact sales   | Connect to 2000+ banks across EU/UK for AIS and PIS.                   |
+| **WorldPay (FIS)** | Legacy enterprise payments  | Enterprise only | Largest acquirer globally. Complex integration. Legacy but ubiquitous. |
 
 ---
 
@@ -215,12 +221,14 @@ const response = await fetch('https://api-m.paypal.com/v2/checkout/orders', {
 **UK market:** 15M+ active Open Banking users (Jan 2026). Fastest-growing payment rail.
 
 **Key benefits:**
+
 - Zero card fees (flat per-transaction or percentage, typically 0.1-0.5%)
 - Instant settlement (Faster Payments in UK)
 - No chargebacks (irrevocable bank transfer)
 - Strong authentication built in (bank app approval)
 
 **Integration options:**
+
 - **TrueLayer** (most developer-friendly) — REST API, hosted payment page
 - **Yapily** — lower-level, connect to 2000+ banks
 - **Stripe** — limited Open Banking support via Financial Connections
@@ -232,27 +240,27 @@ const response = await fetch('https://api-m.paypal.com/v2/checkout/orders', {
 
 ## Market Events 2025-26
 
-| Event | Impact |
-|-------|--------|
-| **Mollie acquired GoCardless (2025)** | Combined platform: Mollie's card/local methods + GoCardless DD. Watch for unified API. |
-| **UK Open Banking 15M+ users** | A2A payments becoming mainstream. Consider for high-value checkout. |
-| **BNPL regulation (UK)** | FCA oversight expected 2026-27. Klarna/Clearpay must comply with credit regulations. |
-| **Stripe Managed Payments expanding** | Stripe's MoR offering entering general availability across EU/UK. |
-| **PSD3 / PSR (EU)** | Proposed updates to payment services regulation. Enhanced consumer protection, instant payments mandate. |
+| Event                                 | Impact                                                                                                   |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| **Mollie acquired GoCardless (2025)** | Combined platform: Mollie's card/local methods + GoCardless DD. Watch for unified API.                   |
+| **UK Open Banking 15M+ users**        | A2A payments becoming mainstream. Consider for high-value checkout.                                      |
+| **BNPL regulation (UK)**              | FCA oversight expected 2026-27. Klarna/Clearpay must comply with credit regulations.                     |
+| **Stripe Managed Payments expanding** | Stripe's MoR offering entering general availability across EU/UK.                                        |
+| **PSD3 / PSR (EU)**                   | Proposed updates to payment services regulation. Enhanced consumer protection, instant payments mandate. |
 
 ---
 
 ## Decision Matrix: When to Choose Which
 
-| Scenario | Recommended | Why |
-|----------|-------------|-----|
-| Default SaaS billing | Stripe | Most flexible API, largest ecosystem |
-| EU-focused, need iDEAL/Bancontact | Mollie | Best EU local method coverage |
-| UK Direct Debit recurring | GoCardless | Specialist DD, lowest involuntary churn |
-| Need PayPal button | Stripe (PayPal method) or PayPal Commerce | 400M+ PayPal wallets |
-| Online + in-person POS | Square | Unified commerce platform |
-| BNPL for e-commerce | Klarna (via Stripe/Mollie/direct) | Split payments, merchant paid upfront |
-| High-value A2A transfers | Open Banking (TrueLayer) | Zero card fees, instant settlement |
-| Enterprise high-volume | Checkout.com or Adyen | Interchange++ pricing at scale |
-| Multi-method EU checkout | Mollie or Adyen | 25-250+ local methods |
-| Bank data + payments | Yapily / TrueLayer | PSD2 AIS + PIS combined |
+| Scenario                          | Recommended                               | Why                                     |
+| --------------------------------- | ----------------------------------------- | --------------------------------------- |
+| Default SaaS billing              | Stripe                                    | Most flexible API, largest ecosystem    |
+| EU-focused, need iDEAL/Bancontact | Mollie                                    | Best EU local method coverage           |
+| UK Direct Debit recurring         | GoCardless                                | Specialist DD, lowest involuntary churn |
+| Need PayPal button                | Stripe (PayPal method) or PayPal Commerce | 400M+ PayPal wallets                    |
+| Online + in-person POS            | Square                                    | Unified commerce platform               |
+| BNPL for e-commerce               | Klarna (via Stripe/Mollie/direct)         | Split payments, merchant paid upfront   |
+| High-value A2A transfers          | Open Banking (TrueLayer)                  | Zero card fees, instant settlement      |
+| Enterprise high-volume            | Checkout.com or Adyen                     | Interchange++ pricing at scale          |
+| Multi-method EU checkout          | Mollie or Adyen                           | 25-250+ local methods                   |
+| Bank data + payments              | Yapily / TrueLayer                        | PSD2 AIS + PIS combined                 |

@@ -13,7 +13,17 @@ import {
   Check,
 } from "lucide-react";
 
-const STEP_ICONS = [MapPin, Bed, Bath, Sofa, DollarSign, ShieldCheck, Home, Camera, ClipboardCheck];
+const STEP_ICONS = [
+  MapPin,
+  Bed,
+  Bath,
+  Sofa,
+  DollarSign,
+  ShieldCheck,
+  Home,
+  Camera,
+  ClipboardCheck,
+];
 
 interface WizardProgressProps {
   steps: readonly string[];
@@ -22,7 +32,12 @@ interface WizardProgressProps {
   onStepClick: (index: number) => void;
 }
 
-export function WizardProgress({ steps, labels, current, onStepClick }: WizardProgressProps) {
+export function WizardProgress({
+  steps,
+  labels,
+  current,
+  onStepClick,
+}: WizardProgressProps) {
   return (
     <div className="mb-10">
       {/* Desktop progress */}
@@ -60,7 +75,11 @@ export function WizardProgress({ steps, labels, current, onStepClick }: WizardPr
                         : "border-muted-foreground/30 bg-card text-muted-foreground group-hover:border-muted-foreground/50"
                   }`}
                 >
-                  {isCompleted ? <Check className="h-5 w-5" /> : <Icon className="h-4 w-4" />}
+                  {isCompleted ? (
+                    <Check className="h-5 w-5" />
+                  ) : (
+                    <Icon className="h-4 w-4" />
+                  )}
                 </div>
                 <span
                   className={`text-[11px] font-medium leading-tight text-center ${

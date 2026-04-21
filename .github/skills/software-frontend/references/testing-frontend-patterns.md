@@ -40,13 +40,13 @@ Comprehensive testing patterns for modern frontend applications: testing pyramid
 
 ### What to Test at Each Level
 
-| Level | What to Test | Tools | Speed |
-|-------|-------------|-------|-------|
-| Unit | Utilities, formatters, validators, hooks | Vitest | < 1ms each |
-| Component | Rendered output, user interactions, accessibility | Testing Library + Vitest | < 100ms each |
-| Integration | Feature workflows, API integration (mocked) | Testing Library + MSW | < 500ms each |
-| E2E | Critical user paths, cross-page flows | Playwright | 2-10s each |
-| Visual | UI appearance, layout, responsive design | Chromatic / Playwright screenshots | 5-30s each |
+| Level       | What to Test                                      | Tools                              | Speed        |
+| ----------- | ------------------------------------------------- | ---------------------------------- | ------------ |
+| Unit        | Utilities, formatters, validators, hooks          | Vitest                             | < 1ms each   |
+| Component   | Rendered output, user interactions, accessibility | Testing Library + Vitest           | < 100ms each |
+| Integration | Feature workflows, API integration (mocked)       | Testing Library + MSW              | < 500ms each |
+| E2E         | Critical user paths, cross-page flows             | Playwright                         | 2-10s each   |
+| Visual      | UI appearance, layout, responsive design          | Chromatic / Playwright screenshots | 5-30s each   |
 
 ---
 
@@ -56,20 +56,20 @@ Comprehensive testing patterns for modern frontend applications: testing pyramid
 
 ```typescript
 // vitest.config.ts
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
   test: {
-    environment: 'jsdom',        // or 'happy-dom' (faster)
-    globals: true,               // describe, it, expect globally available
-    setupFiles: ['./tests/setup.ts'],
-    css: true,                   // Process CSS imports
+    environment: "jsdom", // or 'happy-dom' (faster)
+    globals: true, // describe, it, expect globally available
+    setupFiles: ["./tests/setup.ts"],
+    css: true, // Process CSS imports
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'html', 'lcov'],
+      provider: "v8",
+      reporter: ["text", "html", "lcov"],
       thresholds: {
         lines: 80,
         functions: 80,
@@ -85,13 +85,13 @@ export default defineConfig({
 
 ```typescript
 // tests/setup.ts
-import '@testing-library/jest-dom/vitest';
-import { cleanup } from '@testing-library/react';
-import { afterEach, vi } from 'vitest';
-import { server } from './mocks/server';
+import "@testing-library/jest-dom/vitest";
+import { cleanup } from "@testing-library/react";
+import { afterEach, vi } from "vitest";
+import { server } from "./mocks/server";
 
 // MSW server setup
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 afterEach(() => {
   server.resetHandlers();
   cleanup();
@@ -104,10 +104,10 @@ const IntersectionObserverMock = vi.fn(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
 }));
-vi.stubGlobal('IntersectionObserver', IntersectionObserverMock);
+vi.stubGlobal("IntersectionObserver", IntersectionObserverMock);
 
 // Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query: string) => ({
     matches: false,
@@ -126,26 +126,26 @@ Object.defineProperty(window, 'matchMedia', {
 
 ```typescript
 // Mock modules
-vi.mock('@/lib/api', () => ({
+vi.mock("@/lib/api", () => ({
   fetchUsers: vi.fn(),
   createUser: vi.fn(),
 }));
 
 // Mock with implementation
-vi.mock('next/navigation', () => ({
+vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
     refresh: vi.fn(),
     back: vi.fn(),
   }),
   useSearchParams: () => new URLSearchParams(),
-  usePathname: () => '/test',
+  usePathname: () => "/test",
 }));
 
 // Spy on module functions
-import { fetchUsers } from '@/lib/api';
+import { fetchUsers } from "@/lib/api";
 const fetchUsersMock = vi.mocked(fetchUsers);
-fetchUsersMock.mockResolvedValue([{ id: '1', name: 'Test User' }]);
+fetchUsersMock.mockResolvedValue([{ id: "1", name: "Test User" }]);
 ```
 
 ### Snapshot Testing
@@ -154,8 +154,8 @@ fetchUsersMock.mockResolvedValue([{ id: '1', name: 'Test User' }]);
 // Use sparingly -- snapshots are brittle for UI components
 // Good for: serializable data structures, error messages
 
-it('should generate correct config', () => {
-  const config = generateConfig({ env: 'production' });
+it("should generate correct config", () => {
+  const config = generateConfig({ env: "production" });
   expect(config).toMatchInlineSnapshot(`
     {
       "apiUrl": "https://api.example.com",
@@ -223,25 +223,25 @@ it('should fetch user data', async () => {
 
 Use queries in this order of priority (most accessible first):
 
-| Priority | Query | When to Use |
-|----------|-------|-------------|
-| 1 | `getByRole` | Interactive elements (button, link, textbox) |
-| 2 | `getByLabelText` | Form fields with labels |
-| 3 | `getByPlaceholderText` | When label is absent (avoid this pattern) |
-| 4 | `getByText` | Static text content |
-| 5 | `getByDisplayValue` | Current value of form elements |
-| 6 | `getByAltText` | Images |
-| 7 | `getByTestId` | Last resort only |
+| Priority | Query                  | When to Use                                  |
+| -------- | ---------------------- | -------------------------------------------- |
+| 1        | `getByRole`            | Interactive elements (button, link, textbox) |
+| 2        | `getByLabelText`       | Form fields with labels                      |
+| 3        | `getByPlaceholderText` | When label is absent (avoid this pattern)    |
+| 4        | `getByText`            | Static text content                          |
+| 5        | `getByDisplayValue`    | Current value of form elements               |
+| 6        | `getByAltText`         | Images                                       |
+| 7        | `getByTestId`          | Last resort only                             |
 
 ```typescript
 // GOOD: Query by accessible role
-screen.getByRole('button', { name: 'Submit' });
-screen.getByRole('heading', { level: 1 });
-screen.getByRole('textbox', { name: 'Email' });
-screen.getByRole('link', { name: 'Learn more' });
+screen.getByRole("button", { name: "Submit" });
+screen.getByRole("heading", { level: 1 });
+screen.getByRole("textbox", { name: "Email" });
+screen.getByRole("link", { name: "Learn more" });
 
 // AVOID: Query by test ID (not accessible, breaks if refactored)
-screen.getByTestId('submit-button');
+screen.getByTestId("submit-button");
 ```
 
 ### User Events (Preferred over fireEvent)
@@ -280,16 +280,14 @@ it('should submit the form', async () => {
 ```typescript
 // waitFor: poll until assertion passes
 await waitFor(() => {
-  expect(screen.getByText('User loaded')).toBeInTheDocument();
+  expect(screen.getByText("User loaded")).toBeInTheDocument();
 });
 
 // findBy: shorthand for waitFor + getBy
-const element = await screen.findByText('User loaded');
+const element = await screen.findByText("User loaded");
 
 // waitForElementToBeRemoved
-await waitForElementToBeRemoved(() =>
-  screen.queryByText('Loading...')
-);
+await waitForElementToBeRemoved(() => screen.queryByText("Loading..."));
 ```
 
 ### Accessibility Assertions
@@ -484,30 +482,30 @@ npx chromatic --project-token=<TOKEN>
 
 ```typescript
 // Visual regression with Playwright
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test('homepage visual regression', async ({ page }) => {
-  await page.goto('/');
-  await expect(page).toHaveScreenshot('homepage.png', {
-    maxDiffPixels: 100,    // Allow minor differences
-    threshold: 0.2,         // Per-pixel threshold
+test("homepage visual regression", async ({ page }) => {
+  await page.goto("/");
+  await expect(page).toHaveScreenshot("homepage.png", {
+    maxDiffPixels: 100, // Allow minor differences
+    threshold: 0.2, // Per-pixel threshold
   });
 });
 
-test('responsive layout', async ({ page }) => {
-  await page.goto('/');
+test("responsive layout", async ({ page }) => {
+  await page.goto("/");
 
   // Desktop
   await page.setViewportSize({ width: 1280, height: 720 });
-  await expect(page).toHaveScreenshot('homepage-desktop.png');
+  await expect(page).toHaveScreenshot("homepage-desktop.png");
 
   // Tablet
   await page.setViewportSize({ width: 768, height: 1024 });
-  await expect(page).toHaveScreenshot('homepage-tablet.png');
+  await expect(page).toHaveScreenshot("homepage-tablet.png");
 
   // Mobile
   await page.setViewportSize({ width: 375, height: 667 });
-  await expect(page).toHaveScreenshot('homepage-mobile.png');
+  await expect(page).toHaveScreenshot("homepage-mobile.png");
 });
 ```
 
@@ -519,7 +517,7 @@ test('responsive layout', async ({ page }) => {
 
 ```typescript
 // tests/pages/LoginPage.ts
-import { type Page, type Locator } from '@playwright/test';
+import { type Page, type Locator } from "@playwright/test";
 
 export class LoginPage {
   readonly page: Page;
@@ -530,14 +528,14 @@ export class LoginPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.emailInput = page.getByRole('textbox', { name: 'Email' });
-    this.passwordInput = page.getByLabel('Password');
-    this.submitButton = page.getByRole('button', { name: 'Log in' });
-    this.errorMessage = page.getByRole('alert');
+    this.emailInput = page.getByRole("textbox", { name: "Email" });
+    this.passwordInput = page.getByLabel("Password");
+    this.submitButton = page.getByRole("button", { name: "Log in" });
+    this.errorMessage = page.getByRole("alert");
   }
 
   async goto() {
-    await this.page.goto('/login');
+    await this.page.goto("/login");
   }
 
   async login(email: string, password: string) {
@@ -552,9 +550,9 @@ export class LoginPage {
 
 ```typescript
 // tests/fixtures.ts
-import { test as base } from '@playwright/test';
-import { LoginPage } from './pages/LoginPage';
-import { DashboardPage } from './pages/DashboardPage';
+import { test as base } from "@playwright/test";
+import { LoginPage } from "./pages/LoginPage";
+import { DashboardPage } from "./pages/DashboardPage";
 
 type Fixtures = {
   loginPage: LoginPage;
@@ -571,11 +569,11 @@ export const test = base.extend<Fixtures>({
   },
   authenticatedPage: async ({ page }, use) => {
     // Pre-authenticate
-    await page.goto('/login');
-    await page.getByRole('textbox', { name: 'Email' }).fill('test@test.com');
-    await page.getByLabel('Password').fill('password123');
-    await page.getByRole('button', { name: 'Log in' }).click();
-    await page.waitForURL('/dashboard');
+    await page.goto("/login");
+    await page.getByRole("textbox", { name: "Email" }).fill("test@test.com");
+    await page.getByLabel("Password").fill("password123");
+    await page.getByRole("button", { name: "Log in" }).click();
+    await page.waitForURL("/dashboard");
     await use(page);
   },
 });
@@ -584,33 +582,33 @@ export const test = base.extend<Fixtures>({
 ### Network Interception
 
 ```typescript
-test('handles API errors gracefully', async ({ page }) => {
+test("handles API errors gracefully", async ({ page }) => {
   // Intercept API and return error
-  await page.route('/api/users', (route) =>
+  await page.route("/api/users", (route) =>
     route.fulfill({
       status: 500,
-      contentType: 'application/json',
-      body: JSON.stringify({ error: 'Internal Server Error' }),
-    })
+      contentType: "application/json",
+      body: JSON.stringify({ error: "Internal Server Error" }),
+    }),
   );
 
-  await page.goto('/users');
-  await expect(page.getByText('Error loading users')).toBeVisible();
+  await page.goto("/users");
+  await expect(page.getByText("Error loading users")).toBeVisible();
 });
 
-test('displays loading state', async ({ page }) => {
+test("displays loading state", async ({ page }) => {
   // Delay API response
-  await page.route('/api/users', async (route) => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
+  await page.route("/api/users", async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     await route.fulfill({
-      contentType: 'application/json',
-      body: JSON.stringify([{ id: '1', name: 'User' }]),
+      contentType: "application/json",
+      body: JSON.stringify([{ id: "1", name: "User" }]),
     });
   });
 
-  await page.goto('/users');
-  await expect(page.getByText('Loading...')).toBeVisible();
-  await expect(page.getByText('User')).toBeVisible();
+  await page.goto("/users");
+  await expect(page.getByText("Loading...")).toBeVisible();
+  await expect(page.getByText("User")).toBeVisible();
 });
 ```
 
@@ -618,32 +616,29 @@ test('displays loading state', async ({ page }) => {
 
 ```typescript
 // playwright.config.ts
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: './tests/e2e',
+  testDir: "./tests/e2e",
   fullyParallel: true,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: [
-    ['html'],
-    ['junit', { outputFile: 'test-results/junit.xml' }],
-  ],
+  reporter: [["html"], ["junit", { outputFile: "test-results/junit.xml" }]],
   use: {
-    baseURL: 'http://localhost:3000',
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
+    baseURL: "http://localhost:3000",
+    trace: "on-first-retry",
+    screenshot: "only-on-failure",
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
-    { name: 'mobile-chrome', use: { ...devices['Pixel 5'] } },
-    { name: 'mobile-safari', use: { ...devices['iPhone 13'] } },
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
+    { name: "webkit", use: { ...devices["Desktop Safari"] } },
+    { name: "mobile-chrome", use: { ...devices["Pixel 5"] } },
+    { name: "mobile-safari", use: { ...devices["iPhone 13"] } },
   ],
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
+    command: "npm run dev",
+    url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
   },
 });
@@ -657,28 +652,28 @@ export default defineConfig({
 
 ```typescript
 // Server components run on the server -- test them as async functions
-import { render, screen } from '@testing-library/react';
-import UserProfile from '@/app/users/[id]/page';
+import { render, screen } from "@testing-library/react";
+import UserProfile from "@/app/users/[id]/page";
 
 // Mock the data fetching
-vi.mock('@/lib/db/users', () => ({
+vi.mock("@/lib/db/users", () => ({
   getUser: vi.fn().mockResolvedValue({
-    id: '1',
-    name: 'Test User',
-    email: 'test@test.com',
+    id: "1",
+    name: "Test User",
+    email: "test@test.com",
   }),
 }));
 
-it('renders server component with data', async () => {
+it("renders server component with data", async () => {
   // Server components are async -- await the render
   const component = await UserProfile({
-    params: { id: '1' },
+    params: { id: "1" },
   });
 
   render(component);
 
-  expect(screen.getByText('Test User')).toBeInTheDocument();
-  expect(screen.getByText('test@test.com')).toBeInTheDocument();
+  expect(screen.getByText("Test User")).toBeInTheDocument();
+  expect(screen.getByText("test@test.com")).toBeInTheDocument();
 });
 ```
 
@@ -686,38 +681,38 @@ it('renders server component with data', async () => {
 
 ```typescript
 // Test server actions as regular async functions
-import { createPost } from '@/app/actions/posts';
+import { createPost } from "@/app/actions/posts";
 
-vi.mock('@/lib/db', () => ({
+vi.mock("@/lib/db", () => ({
   prisma: {
     post: {
       create: vi.fn().mockResolvedValue({
-        id: '1',
-        title: 'Test Post',
+        id: "1",
+        title: "Test Post",
       }),
     },
   },
 }));
 
-vi.mock('next/cache', () => ({
+vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
-vi.mock('next/navigation', () => ({
+vi.mock("next/navigation", () => ({
   redirect: vi.fn(),
 }));
 
-it('creates a post and redirects', async () => {
+it("creates a post and redirects", async () => {
   const formData = new FormData();
-  formData.set('title', 'Test Post');
-  formData.set('content', 'Test content');
+  formData.set("title", "Test Post");
+  formData.set("content", "Test content");
 
   await createPost(formData);
 
   expect(prisma.post.create).toHaveBeenCalledWith({
     data: expect.objectContaining({
-      title: 'Test Post',
-      content: 'Test content',
+      title: "Test Post",
+      content: "Test content",
     }),
   });
 });
@@ -742,8 +737,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
+          node-version: "22"
+          cache: "npm"
       - run: npm ci
       - run: npx vitest run --coverage
       - name: Upload coverage
@@ -757,8 +752,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
+          node-version: "22"
+          cache: "npm"
       - run: npm ci
       - run: npx playwright install --with-deps
       - run: npx playwright test
@@ -771,14 +766,14 @@ jobs:
 
 ### Test Performance Tips
 
-| Technique | Impact | How |
-|-----------|--------|-----|
-| Use `happy-dom` over `jsdom` | 2-3x faster | `environment: 'happy-dom'` in vitest config |
-| Parallelize tests | Linear speedup | `vitest run --pool=threads` (default) |
-| Mock heavy dependencies | 10-100x faster per test | Mock date-fns, lodash, image processing |
-| Avoid full page renders | 5-10x faster | Test components in isolation |
-| Use `vi.useFakeTimers()` | Eliminate `setTimeout` waits | Control time in tests |
-| Split E2E into shards | Linear speedup | `npx playwright test --shard=1/4` |
+| Technique                    | Impact                       | How                                         |
+| ---------------------------- | ---------------------------- | ------------------------------------------- |
+| Use `happy-dom` over `jsdom` | 2-3x faster                  | `environment: 'happy-dom'` in vitest config |
+| Parallelize tests            | Linear speedup               | `vitest run --pool=threads` (default)       |
+| Mock heavy dependencies      | 10-100x faster per test      | Mock date-fns, lodash, image processing     |
+| Avoid full page renders      | 5-10x faster                 | Test components in isolation                |
+| Use `vi.useFakeTimers()`     | Eliminate `setTimeout` waits | Control time in tests                       |
+| Split E2E into shards        | Linear speedup               | `npx playwright test --shard=1/4`           |
 
 ---
 

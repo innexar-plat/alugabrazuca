@@ -41,6 +41,7 @@ git push origin feat/payments-retry-logic
 ```
 
 **Why trunk-based wins in monorepos**:
+
 - Merge conflicts compound across packages on long-lived branches
 - Feature flags let you merge incomplete work safely
 - Small PRs touching 1-2 packages get reviewed fast
@@ -116,6 +117,7 @@ Define ownership per package directory so PRs auto-assign the right reviewers.
 ```
 
 **Path-based merge rules** (GitHub branch protection):
+
 - Require review from CODEOWNERS for their paths
 - Set different approval counts per path if needed (use Ruleset with path filters)
 - Prevent merging if any CODEOWNERS review is missing
@@ -174,12 +176,12 @@ on:
   push:
     branches: [main]
     paths:
-      - 'packages/payments/**'
-      - 'packages/shared-lib/**'
+      - "packages/payments/**"
+      - "packages/shared-lib/**"
   pull_request:
     paths:
-      - 'packages/payments/**'
-      - 'packages/shared-lib/**'
+      - "packages/payments/**"
+      - "packages/shared-lib/**"
 
 jobs:
   test:
@@ -226,15 +228,15 @@ jobs:
 
 ## Tooling Comparison
 
-| Feature | Nx | Turborepo | Bazel |
-|---------|-----|-----------|-------|
-| **Language** | TypeScript | Go | Java/Starlark |
-| **Affected detection** | Built-in graph | `--filter` flag | Query language |
-| **Remote cache** | Nx Cloud | Vercel Remote Cache | Remote execution |
-| **Learning curve** | Medium | Low | High |
-| **Best for** | JS/TS monorepos | JS/TS monorepos | Polyglot, large scale |
-| **Task orchestration** | Yes | Yes | Yes |
-| **Dependency graph** | Automatic | package.json based | Explicit BUILD files |
+| Feature                | Nx              | Turborepo           | Bazel                 |
+| ---------------------- | --------------- | ------------------- | --------------------- |
+| **Language**           | TypeScript      | Go                  | Java/Starlark         |
+| **Affected detection** | Built-in graph  | `--filter` flag     | Query language        |
+| **Remote cache**       | Nx Cloud        | Vercel Remote Cache | Remote execution      |
+| **Learning curve**     | Medium          | Low                 | High                  |
+| **Best for**           | JS/TS monorepos | JS/TS monorepos     | Polyglot, large scale |
+| **Task orchestration** | Yes             | Yes                 | Yes                   |
+| **Dependency graph**   | Automatic       | package.json based  | Explicit BUILD files  |
 
 ---
 
@@ -242,13 +244,13 @@ jobs:
 
 Monorepos with many packages strain merge queues. Common challenges and mitigations:
 
-| Challenge | Mitigation |
-|-----------|------------|
-| Slow CI blocks the queue | Affected-only CI, remote caching |
-| Many PRs competing to merge | GitHub merge queue with grouping |
-| Flaky tests block unrelated packages | Isolate flaky tests, auto-retry |
+| Challenge                            | Mitigation                             |
+| ------------------------------------ | -------------------------------------- |
+| Slow CI blocks the queue             | Affected-only CI, remote caching       |
+| Many PRs competing to merge          | GitHub merge queue with grouping       |
+| Flaky tests block unrelated packages | Isolate flaky tests, auto-retry        |
 | Dependency graph changes break cache | Pin dependency graph hash in cache key |
-| Large rebases after queue entry | Keep PRs small, merge frequently |
+| Large rebases after queue entry      | Keep PRs small, merge frequently       |
 
 ```yaml
 # GitHub merge queue settings (repo settings > Rules > Rulesets)
@@ -262,23 +264,24 @@ Monorepos with many packages strain merge queues. Common challenges and mitigati
 
 ## Decision Table: Monorepo vs Polyrepo
 
-| Factor | Monorepo | Polyrepo |
-|--------|----------|----------|
-| Shared code between services | Preferred | Publish as packages |
-| Cross-cutting refactors frequent | Preferred | Painful |
-| Teams fully autonomous | Overhead | Preferred |
-| Need atomic multi-package changes | Preferred | Coordinate releases |
-| Repo size > 10 GB | Needs sparse checkout | Natural boundary |
-| Different CI/CD per service | Path triggers | Preferred |
-| Different languages per service | Bazel or separate CI | Preferred |
-| < 5 packages | Either works | Either works |
-| > 20 packages, same stack | Preferred with Nx/Turbo | Management overhead |
+| Factor                            | Monorepo                | Polyrepo            |
+| --------------------------------- | ----------------------- | ------------------- |
+| Shared code between services      | Preferred               | Publish as packages |
+| Cross-cutting refactors frequent  | Preferred               | Painful             |
+| Teams fully autonomous            | Overhead                | Preferred           |
+| Need atomic multi-package changes | Preferred               | Coordinate releases |
+| Repo size > 10 GB                 | Needs sparse checkout   | Natural boundary    |
+| Different CI/CD per service       | Path triggers           | Preferred           |
+| Different languages per service   | Bazel or separate CI    | Preferred           |
+| < 5 packages                      | Either works            | Either works        |
+| > 20 packages, same stack         | Preferred with Nx/Turbo | Management overhead |
 
 ---
 
 ## Do / Avoid
 
 **DO**:
+
 - [OK] Use trunk-based development with short-lived branches
 - [OK] Set up partial clone and sparse checkout for developer onboarding
 - [OK] Define CODEOWNERS per package directory
@@ -288,6 +291,7 @@ Monorepos with many packages strain merge queues. Common challenges and mitigati
 - [OK] Keep cross-package PRs small and atomic
 
 **AVOID**:
+
 - [FAIL] Running full test suite on every PR regardless of what changed
 - [FAIL] Long-lived feature branches spanning multiple packages
 - [FAIL] Skipping CODEOWNERS (leads to changes merged without domain expertise)

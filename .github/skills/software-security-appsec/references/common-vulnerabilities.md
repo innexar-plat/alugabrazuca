@@ -12,8 +12,8 @@ Comprehensive catalog of common security vulnerabilities with prevention strateg
 
 ```javascript
 // Bad: No path validation
-app.get('/files/:filename', (req, res) => {
-  const filepath = path.join('/uploads', req.params.filename);
+app.get("/files/:filename", (req, res) => {
+  const filepath = path.join("/uploads", req.params.filename);
   res.sendFile(filepath);
 });
 
@@ -27,30 +27,30 @@ app.get('/files/:filename', (req, res) => {
 // Good: Validate and sanitize path
 const getFile = (filename) => {
   // Remove path separators and null bytes
-  const clean = path.basename(filename).replace(/\0/g, '');
+  const clean = path.basename(filename).replace(/\0/g, "");
 
   if (clean !== filename || clean.length === 0) {
-    throw new ValidationError('Invalid filename');
+    throw new ValidationError("Invalid filename");
   }
 
   // Resolve to absolute path and verify it's in allowed directory
-  const uploadsDir = path.resolve('/uploads');
+  const uploadsDir = path.resolve("/uploads");
   const filepath = path.resolve(uploadsDir, clean);
 
   if (!filepath.startsWith(uploadsDir)) {
-    throw new SecurityError('Path traversal detected');
+    throw new SecurityError("Path traversal detected");
   }
 
   // Verify file exists and is a file (not directory)
   const stats = fs.statSync(filepath);
   if (!stats.isFile()) {
-    throw new ValidationError('Not a file');
+    throw new ValidationError("Not a file");
   }
 
   return filepath;
 };
 
-app.get('/files/:filename', (req, res) => {
+app.get("/files/:filename", (req, res) => {
   try {
     const filepath = getFile(req.params.filename);
     res.sendFile(filepath);
@@ -70,7 +70,7 @@ app.get('/files/:filename', (req, res) => {
 
 ```javascript
 // Bad: Unsafe deserialization
-app.post('/api/load-config', (req, res) => {
+app.post("/api/load-config", (req, res) => {
   const config = eval(req.body.config); // BAD: Extremely dangerous
   res.json(config);
 });
@@ -89,24 +89,24 @@ const loadConfig = (configString) => {
 
     // Validate schema
     const schema = Joi.object({
-      theme: Joi.string().valid('light', 'dark'),
-      language: Joi.string().valid('en', 'es', 'fr'),
-      notifications: Joi.boolean()
+      theme: Joi.string().valid("light", "dark"),
+      language: Joi.string().valid("en", "es", "fr"),
+      notifications: Joi.boolean(),
     });
 
     const { error, value } = schema.validate(config);
 
     if (error) {
-      throw new ValidationError('Invalid configuration');
+      throw new ValidationError("Invalid configuration");
     }
 
     return value;
   } catch (error) {
-    throw new ValidationError('Failed to parse configuration');
+    throw new ValidationError("Failed to parse configuration");
   }
 };
 
-app.post('/api/load-config', (req, res) => {
+app.post("/api/load-config", (req, res) => {
   const config = loadConfig(req.body.config);
   res.json(config);
 });
@@ -122,9 +122,9 @@ app.post('/api/load-config', (req, res) => {
 
 ```javascript
 // Bad: Parse XML without disabling external entities
-const xml2js = require('xml2js');
+const xml2js = require("xml2js");
 
-app.post('/api/upload-xml', async (req, res) => {
+app.post("/api/upload-xml", async (req, res) => {
   const parser = new xml2js.Parser(); // VULNERABLE: Default settings allow XXE
   const result = await parser.parseStringPromise(req.body.xml);
   res.json(result);
@@ -142,9 +142,9 @@ app.post('/api/upload-xml', async (req, res) => {
 
 ```javascript
 // Good: Disable external entities
-const xml2js = require('xml2js');
+const xml2js = require("xml2js");
 
-app.post('/api/upload-xml', async (req, res) => {
+app.post("/api/upload-xml", async (req, res) => {
   const parser = new xml2js.Parser({
     explicitRoot: true,
     explicitArray: false,
@@ -152,14 +152,14 @@ app.post('/api/upload-xml', async (req, res) => {
     xmlns: false,
     // Limit nesting depth
     normalize: false,
-    trim: true
+    trim: true,
   });
 
   try {
     const result = await parser.parseStringPromise(req.body.xml);
     res.json(result);
   } catch (error) {
-    res.status(400).json({ error: 'Invalid XML' });
+    res.status(400).json({ error: "Invalid XML" });
   }
 });
 
@@ -176,7 +176,7 @@ app.post('/api/upload-xml', async (req, res) => {
 
 ```javascript
 // Bad: No authorization check
-app.get('/api/invoices/:id', authenticate, async (req, res) => {
+app.get("/api/invoices/:id", authenticate, async (req, res) => {
   const invoice = await Invoice.findById(req.params.id);
   res.json(invoice);
 });
@@ -190,16 +190,16 @@ app.get('/api/invoices/:id', authenticate, async (req, res) => {
 
 ```javascript
 // Good: Verify ownership
-app.get('/api/invoices/:id', authenticate, async (req, res) => {
+app.get("/api/invoices/:id", authenticate, async (req, res) => {
   const invoice = await Invoice.findById(req.params.id);
 
   if (!invoice) {
-    return res.status(404).json({ error: 'Invoice not found' });
+    return res.status(404).json({ error: "Invoice not found" });
   }
 
   // Verify user owns this invoice
-  if (invoice.userId !== req.user.id && req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Forbidden' });
+  if (invoice.userId !== req.user.id && req.user.role !== "admin") {
+    return res.status(403).json({ error: "Forbidden" });
   }
 
   res.json(invoice);
@@ -209,7 +209,7 @@ app.get('/api/invoices/:id', authenticate, async (req, res) => {
 const invoice = await Invoice.create({
   id: crypto.randomUUID(), // Random, non-guessable ID
   userId: req.user.id,
-  amount: req.body.amount
+  amount: req.body.amount,
 });
 ```
 
@@ -223,7 +223,7 @@ const invoice = await Invoice.create({
 
 ```javascript
 // Bad: Accept all fields from request
-app.post('/api/users', async (req, res) => {
+app.post("/api/users", async (req, res) => {
   const user = await User.create(req.body); // DANGEROUS: Accepts any field
   res.json(user);
 });
@@ -241,8 +241,8 @@ app.post('/api/users', async (req, res) => {
 
 ```javascript
 // Good: Explicitly allow only specific fields
-app.post('/api/users', async (req, res) => {
-  const allowedFields = ['email', 'password', 'name'];
+app.post("/api/users", async (req, res) => {
+  const allowedFields = ["email", "password", "name"];
 
   const userData = {};
   for (const field of allowedFields) {
@@ -252,7 +252,7 @@ app.post('/api/users', async (req, res) => {
   }
 
   // Set secure defaults
-  userData.role = 'user';
+  userData.role = "user";
   userData.emailVerified = false;
 
   const user = await User.create(userData);
@@ -263,11 +263,11 @@ app.post('/api/users', async (req, res) => {
 const userSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(12).required(),
-  name: Joi.string().max(100).required()
+  name: Joi.string().max(100).required(),
   // role is not in schema, so it can't be set
 });
 
-app.post('/api/users', async (req, res) => {
+app.post("/api/users", async (req, res) => {
   const { error, value } = userSchema.validate(req.body);
 
   if (error) {
@@ -276,8 +276,8 @@ app.post('/api/users', async (req, res) => {
 
   const user = await User.create({
     ...value,
-    role: 'user',
-    emailVerified: false
+    role: "user",
+    emailVerified: false,
   });
 
   res.json(user);
@@ -294,9 +294,9 @@ app.post('/api/users', async (req, res) => {
 
 ```javascript
 // Bad: User input directly in template
-const ejs = require('ejs');
+const ejs = require("ejs");
 
-app.get('/greet', (req, res) => {
+app.get("/greet", (req, res) => {
   const name = req.query.name;
   const template = `<h1>Hello <%= ${name} %></h1>`; // DANGEROUS: User input in template
   const html = ejs.render(template);
@@ -310,11 +310,11 @@ app.get('/greet', (req, res) => {
 
 ```javascript
 // Good: Pass data as variables, don't construct template from user input
-app.get('/greet', (req, res) => {
+app.get("/greet", (req, res) => {
   const name = req.query.name;
 
-  res.render('greet', {
-    name: name // EJS auto-escapes by default
+  res.render("greet", {
+    name: name, // EJS auto-escapes by default
   });
 });
 
@@ -337,7 +337,7 @@ const transferMoney = async (fromUserId, toUserId, amount) => {
 
   // Check balance
   if (fromUser.balance < amount) {
-    throw new Error('Insufficient funds');
+    throw new Error("Insufficient funds");
   }
 
   // [WARNING] Race condition window here!
@@ -345,11 +345,11 @@ const transferMoney = async (fromUserId, toUserId, amount) => {
 
   // Update balances
   await User.findByIdAndUpdate(fromUserId, {
-    $inc: { balance: -amount }
+    $inc: { balance: -amount },
   });
 
   await User.findByIdAndUpdate(toUserId, {
-    $inc: { balance: amount }
+    $inc: { balance: amount },
   });
 };
 ```
@@ -367,23 +367,23 @@ const transferMoney = async (fromUserId, toUserId, amount) => {
       const result = await User.findOneAndUpdate(
         {
           _id: fromUserId,
-          balance: { $gte: amount } // Check in same operation
+          balance: { $gte: amount }, // Check in same operation
         },
         {
-          $inc: { balance: -amount }
+          $inc: { balance: -amount },
         },
-        { session, new: true }
+        { session, new: true },
       );
 
       if (!result) {
-        throw new Error('Insufficient funds');
+        throw new Error("Insufficient funds");
       }
 
       // Atomic increment
       await User.findByIdAndUpdate(
         toUserId,
         { $inc: { balance: amount } },
-        { session }
+        { session },
       );
     });
   } finally {
@@ -400,15 +400,15 @@ const transferMoneyWithLock = async (fromUserId, toUserId, amount) => {
     const fromUser = await User.findById(fromUserId);
 
     if (fromUser.balance < amount) {
-      throw new Error('Insufficient funds');
+      throw new Error("Insufficient funds");
     }
 
     await User.findByIdAndUpdate(fromUserId, {
-      $inc: { balance: -amount }
+      $inc: { balance: -amount },
     });
 
     await User.findByIdAndUpdate(toUserId, {
-      $inc: { balance: amount }
+      $inc: { balance: amount },
     });
   } finally {
     await lock.release();
@@ -426,7 +426,7 @@ const transferMoneyWithLock = async (fromUserId, toUserId, amount) => {
 
 ```javascript
 // Bad: Unvalidated redirect
-app.get('/redirect', (req, res) => {
+app.get("/redirect", (req, res) => {
   const url = req.query.url;
   res.redirect(url); // VULNERABLE: Can redirect to any site
 });
@@ -443,7 +443,7 @@ const isValidRedirect = (url) => {
     const parsed = new URL(url);
 
     // Only allow same origin
-    const currentOrigin = `${req.protocol}://${req.get('host')}`;
+    const currentOrigin = `${req.protocol}://${req.get("host")}`;
 
     if (parsed.origin !== currentOrigin) {
       return false;
@@ -455,24 +455,24 @@ const isValidRedirect = (url) => {
   }
 };
 
-app.get('/redirect', (req, res) => {
+app.get("/redirect", (req, res) => {
   const url = req.query.url;
 
   if (!isValidRedirect(url)) {
-    return res.status(400).json({ error: 'Invalid redirect URL' });
+    return res.status(400).json({ error: "Invalid redirect URL" });
   }
 
   res.redirect(url);
 });
 
 // Better: Use path-only redirects
-const allowedPaths = ['/dashboard', '/profile', '/settings'];
+const allowedPaths = ["/dashboard", "/profile", "/settings"];
 
-app.get('/redirect', (req, res) => {
+app.get("/redirect", (req, res) => {
   const path = req.query.path;
 
   if (!allowedPaths.includes(path)) {
-    return res.status(400).json({ error: 'Invalid redirect path' });
+    return res.status(400).json({ error: "Invalid redirect path" });
   }
 
   res.redirect(path);
@@ -489,10 +489,10 @@ app.get('/redirect', (req, res) => {
 
 ```javascript
 // Bad: Unsanitized header values
-app.get('/set-language', (req, res) => {
+app.get("/set-language", (req, res) => {
   const lang = req.query.lang;
-  res.setHeader('Content-Language', lang); // VULNERABLE: Can inject headers
-  res.send('Language set');
+  res.setHeader("Content-Language", lang); // VULNERABLE: Can inject headers
+  res.send("Language set");
 });
 
 // Attack: /set-language?lang=en%0D%0ASet-Cookie:%20admin=true
@@ -505,21 +505,21 @@ app.get('/set-language', (req, res) => {
 // Good: Validate and sanitize header values
 const sanitizeHeaderValue = (value) => {
   // Remove CRLF characters
-  return value.replace(/[\r\n]/g, '');
+  return value.replace(/[\r\n]/g, "");
 };
 
-app.get('/set-language', (req, res) => {
+app.get("/set-language", (req, res) => {
   const lang = req.query.lang;
 
   // Validate against allowlist
-  const allowedLanguages = ['en', 'es', 'fr', 'de'];
+  const allowedLanguages = ["en", "es", "fr", "de"];
 
   if (!allowedLanguages.includes(lang)) {
-    return res.status(400).json({ error: 'Invalid language' });
+    return res.status(400).json({ error: "Invalid language" });
   }
 
-  res.setHeader('Content-Language', lang);
-  res.send('Language set');
+  res.setHeader("Content-Language", lang);
+  res.send("Language set");
 });
 ```
 
@@ -535,12 +535,12 @@ app.get('/set-language', (req, res) => {
 <!-- No protection against framing -->
 <!DOCTYPE html>
 <html>
-<body>
-  <h1>Transfer Money</h1>
-  <form action="/transfer" method="POST">
-    <button type="submit">Confirm Transfer</button>
-  </form>
-</body>
+  <body>
+    <h1>Transfer Money</h1>
+    <form action="/transfer" method="POST">
+      <button type="submit">Confirm Transfer</button>
+    </form>
+  </body>
 </html>
 ```
 
@@ -549,23 +549,25 @@ app.get('/set-language', (req, res) => {
 ```javascript
 // Good: X-Frame-Options header
 app.use((req, res, next) => {
-  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader("X-Frame-Options", "DENY");
   // Or: 'SAMEORIGIN' to allow framing by same origin
   next();
 });
 
 // Better: Content-Security-Policy frame-ancestors
 app.use((req, res, next) => {
-  res.setHeader('Content-Security-Policy', "frame-ancestors 'none'");
+  res.setHeader("Content-Security-Policy", "frame-ancestors 'none'");
   next();
 });
 
 // Using Helmet
-const helmet = require('helmet');
+const helmet = require("helmet");
 
-app.use(helmet({
-  frameguard: { action: 'deny' }
-}));
+app.use(
+  helmet({
+    frameguard: { action: "deny" },
+  }),
+);
 ```
 
 ---
@@ -578,7 +580,7 @@ app.use(helmet({
 
 ```javascript
 // Bad: No logging
-app.post('/api/transfer', authenticate, async (req, res) => {
+app.post("/api/transfer", authenticate, async (req, res) => {
   await transferMoney(req.user.id, req.body.recipientId, req.body.amount);
   res.json({ success: true });
 });
@@ -588,51 +590,51 @@ app.post('/api/transfer', authenticate, async (req, res) => {
 
 ```javascript
 // Good: Comprehensive security logging
-const logger = require('winston');
+const logger = require("winston");
 
 const securityLogger = logger.createLogger({
-  level: 'info',
+  level: "info",
   format: logger.format.combine(
     logger.format.timestamp(),
-    logger.format.json()
+    logger.format.json(),
   ),
   transports: [
-    new logger.transports.File({ filename: 'security.log' }),
-    new logger.transports.Console()
-  ]
+    new logger.transports.File({ filename: "security.log" }),
+    new logger.transports.Console(),
+  ],
 });
 
-app.post('/api/transfer', authenticate, async (req, res) => {
+app.post("/api/transfer", authenticate, async (req, res) => {
   const { recipientId, amount } = req.body;
 
   // Log before action
-  securityLogger.info('Transfer initiated', {
+  securityLogger.info("Transfer initiated", {
     userId: req.user.id,
     recipientId,
     amount,
     ip: req.ip,
-    userAgent: req.get('user-agent'),
-    timestamp: new Date().toISOString()
+    userAgent: req.get("user-agent"),
+    timestamp: new Date().toISOString(),
   });
 
   try {
     await transferMoney(req.user.id, recipientId, amount);
 
     // Log success
-    securityLogger.info('Transfer completed', {
+    securityLogger.info("Transfer completed", {
       userId: req.user.id,
       recipientId,
-      amount
+      amount,
     });
 
     res.json({ success: true });
   } catch (error) {
     // Log failure
-    securityLogger.warn('Transfer failed', {
+    securityLogger.warn("Transfer failed", {
       userId: req.user.id,
       recipientId,
       amount,
-      error: error.message
+      error: error.message,
     });
 
     res.status(400).json({ error: error.message });
@@ -640,27 +642,27 @@ app.post('/api/transfer', authenticate, async (req, res) => {
 });
 
 // Log authentication failures
-app.post('/api/auth/login', async (req, res) => {
+app.post("/api/auth/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const user = await authenticateUser(email, password);
 
-    securityLogger.info('Login successful', {
+    securityLogger.info("Login successful", {
       userId: user.id,
       email,
-      ip: req.ip
+      ip: req.ip,
     });
 
     res.json({ token: generateToken(user) });
   } catch (error) {
-    securityLogger.warn('Login failed', {
+    securityLogger.warn("Login failed", {
       email,
       ip: req.ip,
-      reason: 'invalid_credentials'
+      reason: "invalid_credentials",
     });
 
-    res.status(401).json({ error: 'Invalid credentials' });
+    res.status(401).json({ error: "Invalid credentials" });
   }
 });
 ```
@@ -675,15 +677,15 @@ app.post('/api/auth/login', async (req, res) => {
 
 ```javascript
 // Bad: Logging sensitive data
-logger.info('User registered', {
+logger.info("User registered", {
   email: user.email,
   password: user.password, // BAD: Never log passwords
   ssn: user.ssn, // BAD: Never log PII
-  creditCard: user.creditCard // BAD: Never log payment info
+  creditCard: user.creditCard, // BAD: Never log payment info
 });
 
 // Bad: Returning sensitive data in API
-app.get('/api/users/:id', async (req, res) => {
+app.get("/api/users/:id", async (req, res) => {
   const user = await User.findById(req.params.id);
   res.json(user); // BAD: Returns password hash, tokens, etc.
 });
@@ -696,31 +698,40 @@ app.get('/api/users/:id', async (req, res) => {
 const sanitizeForLogging = (data) => {
   const sanitized = { ...data };
 
-  const sensitiveFields = ['password', 'passwordHash', 'ssn', 'creditCard', 'token'];
+  const sensitiveFields = [
+    "password",
+    "passwordHash",
+    "ssn",
+    "creditCard",
+    "token",
+  ];
 
   for (const field of sensitiveFields) {
     if (sanitized[field]) {
-      sanitized[field] = '[REDACTED]';
+      sanitized[field] = "[REDACTED]";
     }
   }
 
   return sanitized;
 };
 
-logger.info('User registered', sanitizeForLogging({
-  email: user.email,
-  password: user.password
-}));
+logger.info(
+  "User registered",
+  sanitizeForLogging({
+    email: user.email,
+    password: user.password,
+  }),
+);
 
 // Good: Return only necessary fields
-app.get('/api/users/:id', async (req, res) => {
+app.get("/api/users/:id", async (req, res) => {
   const user = await User.findById(req.params.id);
 
   res.json({
     id: user.id,
     email: user.email,
     name: user.name,
-    createdAt: user.createdAt
+    createdAt: user.createdAt,
     // Exclude: passwordHash, tokens, etc.
   });
 });
@@ -732,12 +743,12 @@ class UserSerializer {
       id: user.id,
       email: user.email,
       name: user.name,
-      createdAt: user.createdAt
+      createdAt: user.createdAt,
     };
   }
 }
 
-app.get('/api/users/:id', async (req, res) => {
+app.get("/api/users/:id", async (req, res) => {
   const user = await User.findById(req.params.id);
   res.json(UserSerializer.serialize(user));
 });
@@ -753,7 +764,7 @@ app.get('/api/users/:id', async (req, res) => {
 
 ```javascript
 // Bad: Forward requests without validation
-app.get('/proxy', async (req, res) => {
+app.get("/proxy", async (req, res) => {
   const url = req.query.url;
   const response = await fetch(url); // VULNERABLE: SSRF vulnerability
   const data = await response.text();
@@ -768,14 +779,14 @@ app.get('/proxy', async (req, res) => {
 
 ```javascript
 // Good: Validate destination
-const allowedDomains = ['api.example.com', 'cdn.example.com'];
+const allowedDomains = ["api.example.com", "cdn.example.com"];
 
 const isAllowedUrl = (urlString) => {
   try {
     const url = new URL(urlString);
 
     // Check protocol
-    if (!['http:', 'https:'].includes(url.protocol)) {
+    if (!["http:", "https:"].includes(url.protocol)) {
       return false;
     }
 
@@ -790,16 +801,16 @@ const isAllowedUrl = (urlString) => {
   }
 };
 
-app.get('/proxy', async (req, res) => {
+app.get("/proxy", async (req, res) => {
   const url = req.query.url;
 
   if (!isAllowedUrl(url)) {
-    return res.status(400).json({ error: 'Invalid URL' });
+    return res.status(400).json({ error: "Invalid URL" });
   }
 
   const response = await fetch(url, {
-    redirect: 'manual', // Prevent redirect-based bypass
-    timeout: 5000
+    redirect: "manual", // Prevent redirect-based bypass
+    timeout: 5000,
   });
 
   const data = await response.text();

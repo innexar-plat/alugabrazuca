@@ -1,6 +1,7 @@
 # Módulo 8 — Favoritos (`favorites`)
 
 ## Visão Geral
+
 Permite ao inquilino salvar anúncios de interesse para consultar depois.
 
 ---
@@ -42,17 +43,17 @@ UNIQUE(user_id, listing_id)
 
 ## 8.4 Endpoints
 
-| Método | Rota | Descrição | Auth |
-|--------|------|-----------|------|
-| POST | `/api/v1/favorites/:listingId` | Favoritar | ✅ |
-| DELETE | `/api/v1/favorites/:listingId` | Desfavoritar | ✅ |
-| GET | `/api/v1/favorites` | Meus favoritos | ✅ |
-| GET | `/api/v1/favorites/check/:listingId` | Verificar se é favorito | ✅ |
+| Método | Rota                                 | Descrição               | Auth |
+| ------ | ------------------------------------ | ----------------------- | ---- |
+| POST   | `/api/v1/favorites/:listingId`       | Favoritar               | ✅   |
+| DELETE | `/api/v1/favorites/:listingId`       | Desfavoritar            | ✅   |
+| GET    | `/api/v1/favorites`                  | Meus favoritos          | ✅   |
+| GET    | `/api/v1/favorites/check/:listingId` | Verificar se é favorito | ✅   |
 
 ---
 
 ## 8.5 Páginas Frontend
 
-| Rota | Página | Auth |
-|------|--------|------|
-| `/favorites` | Lista de favoritos | ✅ |
+| Rota         | Página             | Auth |
+| ------------ | ------------------ | ---- |
+| `/favorites` | Lista de favoritos | ✅   |

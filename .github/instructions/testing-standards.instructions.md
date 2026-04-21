@@ -25,13 +25,14 @@ description: "Use when: writing unit tests, integration tests, e2e tests, test c
 **O que testar:** Services, regras de negócio, funções utilitárias, validações
 
 ### Estrutura padrão (AAA)
+
 ```typescript
-describe('UserService', () => {
-  describe('createUser', () => {
-    it('should create user with hashed password', async () => {
+describe("UserService", () => {
+  describe("createUser", () => {
+    it("should create user with hashed password", async () => {
       // Arrange
-      const dto = { email: 'test@email.com', password: '123456', name: 'Test' };
-      mockRepository.save.mockResolvedValue({ id: 'uuid', ...dto });
+      const dto = { email: "test@email.com", password: "123456", name: "Test" };
+      mockRepository.save.mockResolvedValue({ id: "uuid", ...dto });
 
       // Act
       const result = await userService.createUser(dto);
@@ -41,18 +42,21 @@ describe('UserService', () => {
       expect(result.password).not.toBe(dto.password); // deve estar hasheado
     });
 
-    it('should throw ConflictException when email already exists', async () => {
+    it("should throw ConflictException when email already exists", async () => {
       // Arrange
-      mockRepository.findOne.mockResolvedValue({ id: 'existing' });
+      mockRepository.findOne.mockResolvedValue({ id: "existing" });
 
       // Act & Assert
-      await expect(userService.createUser(dto)).rejects.toThrow(ConflictException);
+      await expect(userService.createUser(dto)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 });
 ```
 
 ### Regras
+
 - Nomear: `should [expected behavior] when [context]`
 - Um `expect` principal por teste (podem ter auxiliares)
 - Mockar dependências externas (banco, APIs, email)
@@ -66,24 +70,24 @@ describe('UserService', () => {
 **O que testar:** Endpoints HTTP, fluxos completos, integração com banco de dados
 
 ```typescript
-describe('POST /users', () => {
-  it('should return 201 with created user', async () => {
+describe("POST /users", () => {
+  it("should return 201 with created user", async () => {
     const response = await request(app)
-      .post('/users')
-      .send({ email: 'test@email.com', password: 'password123', name: 'Test' })
+      .post("/users")
+      .send({ email: "test@email.com", password: "password123", name: "Test" })
       .expect(201);
 
     expect(response.body).toMatchObject({
       id: expect.any(String),
-      email: 'test@email.com',
+      email: "test@email.com",
     });
     expect(response.body.password).toBeUndefined(); // nunca retornar senha
   });
 
-  it('should return 400 when email is invalid', async () => {
+  it("should return 400 when email is invalid", async () => {
     await request(app)
-      .post('/users')
-      .send({ email: 'not-an-email', password: 'password123' })
+      .post("/users")
+      .send({ email: "not-an-email", password: "password123" })
       .expect(400);
   });
 });
@@ -93,23 +97,23 @@ describe('POST /users', () => {
 
 ## 4. Nomenclatura
 
-| Arquivo | Convenção |
-|---------|-----------|
-| Testes unitários | `user.service.spec.ts` |
+| Arquivo              | Convenção                                        |
+| -------------------- | ------------------------------------------------ |
+| Testes unitários     | `user.service.spec.ts`                           |
 | Testes de integração | `user.controller.spec.ts` ou `users.e2e-spec.ts` |
-| Fixtures/mocks | `user.mock.ts`, `__mocks__/` |
-| Factories | `user.factory.ts` |
+| Fixtures/mocks       | `user.mock.ts`, `__mocks__/`                     |
+| Factories            | `user.factory.ts`                                |
 
 ---
 
 ## 5. Cobertura (Coverage)
 
-| Nível | Mínimo aceitável |
-|-------|-----------------|
-| Components / Services / Modules | ≥ 95% |
-| Controllers / Hooks / Utilities | ≥ 95% |
-| Cobertura global do projeto | ≥ 95% |
-| Repositórios | Testar via integração |
+| Nível                           | Mínimo aceitável      |
+| ------------------------------- | --------------------- |
+| Components / Services / Modules | ≥ 95%                 |
+| Controllers / Hooks / Utilities | ≥ 95%                 |
+| Cobertura global do projeto     | ≥ 95%                 |
+| Repositórios                    | Testar via integração |
 
 ---
 

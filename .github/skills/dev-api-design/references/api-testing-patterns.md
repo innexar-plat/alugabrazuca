@@ -20,13 +20,13 @@
          └─────────────────┘
 ```
 
-| Layer | Scope | Speed | Fidelity | Run in CI |
-|---|---|---|---|---|
-| Unit | Handler logic, validators, transformers | <1ms per test | Low | Every commit |
-| Contract | Request/response schemas, consumer pacts | <100ms per test | Medium | Every commit |
-| Integration | Full HTTP stack, test database | <5s per test | High | Every PR |
-| E2E / Smoke | Critical paths against staging | <30s per test | Highest | Pre-deploy |
-| Load | Performance under traffic | Minutes | Performance-specific | Scheduled / pre-release |
+| Layer       | Scope                                    | Speed           | Fidelity             | Run in CI               |
+| ----------- | ---------------------------------------- | --------------- | -------------------- | ----------------------- |
+| Unit        | Handler logic, validators, transformers  | <1ms per test   | Low                  | Every commit            |
+| Contract    | Request/response schemas, consumer pacts | <100ms per test | Medium               | Every commit            |
+| Integration | Full HTTP stack, test database           | <5s per test    | High                 | Every PR                |
+| E2E / Smoke | Critical paths against staging           | <30s per test   | Highest              | Pre-deploy              |
+| Load        | Performance under traffic                | Minutes         | Performance-specific | Scheduled / pre-release |
 
 ---
 
@@ -70,7 +70,7 @@ it("fetches an order", async () => {
     .uponReceiving("a request for order 123")
     .withRequest("GET", "/orders/123")
     .willRespondWith(200, {
-      body: { id: "123", status: "pending", total: 5000 }
+      body: { id: "123", status: "pending", total: 5000 },
     })
     .executeTest(async (mockServer) => {
       const response = await fetch(`${mockServer.url}/orders/123`);
@@ -89,7 +89,7 @@ new Verifier({
   pactBrokerUrl: "https://pact-broker.internal",
   provider: "OrderAPI",
   providerVersion: process.env.GIT_SHA,
-  publishVerificationResult: true
+  publishVerificationResult: true,
 }).verifyProvider();
 ```
 
@@ -134,12 +134,12 @@ schemathesis run spec.yaml --stateful=links
 
 ### Test Database Strategies
 
-| Strategy | Speed | Isolation | Use when |
-|---|---|---|---|
-| Transaction rollback | Fast | Per-test | Single DB, no cross-service calls |
-| Truncate tables | Medium | Per-suite | Need committed data for reads |
-| Docker container per suite | Slow | Complete | Need fresh schema per run |
-| In-memory DB (SQLite) | Fast | Per-test | Simple schemas, no DB-specific features |
+| Strategy                   | Speed  | Isolation | Use when                                |
+| -------------------------- | ------ | --------- | --------------------------------------- |
+| Transaction rollback       | Fast   | Per-test  | Single DB, no cross-service calls       |
+| Truncate tables            | Medium | Per-suite | Need committed data for reads           |
+| Docker container per suite | Slow   | Complete  | Need fresh schema per run               |
+| In-memory DB (SQLite)      | Fast   | Per-test  | Simple schemas, no DB-specific features |
 
 ### Integration Test Structure
 
@@ -192,20 +192,17 @@ export const handlers = [
     return HttpResponse.json({
       id: params.id,
       name: "Test User",
-      email: "test@example.com"
+      email: "test@example.com",
     });
   }),
 
   http.post("/api/orders", async ({ request }) => {
     const body = await request.json();
     if (!body.items?.length) {
-      return HttpResponse.json(
-        { error: "Items required" },
-        { status: 400 }
-      );
+      return HttpResponse.json({ error: "Items required" }, { status: 400 });
     }
     return HttpResponse.json({ id: "ord_123" }, { status: 201 });
-  })
+  }),
 ];
 ```
 
@@ -255,12 +252,12 @@ prism proxy openapi.yaml https://api.staging.example.com --port 4010
 
 ### Tool Comparison
 
-| Tool | Language | Protocol | Best for |
-|---|---|---|---|
-| k6 | JavaScript | HTTP, gRPC, WS | Developer-friendly, CI integration |
-| Artillery | YAML + JS | HTTP, WS, Socket.io | Config-driven, scenario-based |
-| Locust | Python | HTTP | Python teams, custom load shapes |
-| Gatling | Scala/Java | HTTP | JVM teams, detailed reports |
+| Tool      | Language   | Protocol            | Best for                           |
+| --------- | ---------- | ------------------- | ---------------------------------- |
+| k6        | JavaScript | HTTP, gRPC, WS      | Developer-friendly, CI integration |
+| Artillery | YAML + JS  | HTTP, WS, Socket.io | Config-driven, scenario-based      |
+| Locust    | Python     | HTTP                | Python teams, custom load shapes   |
+| Gatling   | Scala/Java | HTTP                | JVM teams, detailed reports        |
 
 ### k6 Load Test Template
 
@@ -270,11 +267,11 @@ import { check, sleep } from "k6";
 
 export const options = {
   stages: [
-    { duration: "2m", target: 50 },   // ramp up
-    { duration: "5m", target: 50 },   // steady state
-    { duration: "2m", target: 200 },  // spike
-    { duration: "5m", target: 200 },  // sustained spike
-    { duration: "2m", target: 0 },    // ramp down
+    { duration: "2m", target: 50 }, // ramp up
+    { duration: "5m", target: 50 }, // steady state
+    { duration: "2m", target: 200 }, // spike
+    { duration: "5m", target: 200 }, // sustained spike
+    { duration: "2m", target: 0 }, // ramp down
   ],
   thresholds: {
     http_req_duration: ["p(95)<500", "p(99)<1000"],
@@ -324,7 +321,7 @@ it("returns product detail response", async () => {
   const sanitized = {
     ...response.body,
     createdAt: "[TIMESTAMP]",
-    id: "[UUID]"
+    id: "[UUID]",
   };
 
   expect(sanitized).toMatchSnapshot();
@@ -344,13 +341,13 @@ it("returns product detail response", async () => {
 
 ### Pipeline Stage Mapping
 
-| Stage | Tests Run | Gate |
-|---|---|---|
-| Pre-commit (local) | Unit, linting | Optional |
-| PR / commit | Unit + contract + integration | Required pass |
-| Pre-merge | Full suite including E2E smoke | Required pass |
-| Post-deploy (staging) | E2E + smoke against staging | Required pass |
-| Scheduled (nightly) | Load tests, Schemathesis fuzzing | Alert on failure |
+| Stage                 | Tests Run                        | Gate             |
+| --------------------- | -------------------------------- | ---------------- |
+| Pre-commit (local)    | Unit, linting                    | Optional         |
+| PR / commit           | Unit + contract + integration    | Required pass    |
+| Pre-merge             | Full suite including E2E smoke   | Required pass    |
+| Post-deploy (staging) | E2E + smoke against staging      | Required pass    |
+| Scheduled (nightly)   | Load tests, Schemathesis fuzzing | Alert on failure |
 
 ### CI Configuration Checklist
 
@@ -365,17 +362,17 @@ it("returns product detail response", async () => {
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|---|---|---|
-| Testing only happy paths | Misses validation, auth, and error handling | Cover 4xx and 5xx scenarios explicitly |
-| Mocking everything in integration tests | Tests pass but real integration fails | Use real HTTP + test DB for integration layer |
-| No contract tests for microservices | Breaking changes discovered in production | Implement consumer-driven contracts (Pact) |
-| Load testing production without warning | Outage risk, alert noise | Use staging; if production, coordinate with ops |
-| Snapshot tests with volatile data | Tests break on every run | Sanitize timestamps, IDs, random values |
-| Single large E2E suite as only tests | Slow, flaky, hard to debug | Follow pyramid: many unit, fewer integration, few E2E |
-| Hardcoded test data in assertions | Brittle when seed data changes | Use factories or builders, assert structure not values |
-| Skipping authentication in tests | Auth bugs found in production | Include auth in integration and E2E tests |
-| No schema validation in CI | Drift between spec and implementation | Run `spectral lint` + Schemathesis on every PR |
+| Anti-Pattern                            | Problem                                     | Fix                                                    |
+| --------------------------------------- | ------------------------------------------- | ------------------------------------------------------ |
+| Testing only happy paths                | Misses validation, auth, and error handling | Cover 4xx and 5xx scenarios explicitly                 |
+| Mocking everything in integration tests | Tests pass but real integration fails       | Use real HTTP + test DB for integration layer          |
+| No contract tests for microservices     | Breaking changes discovered in production   | Implement consumer-driven contracts (Pact)             |
+| Load testing production without warning | Outage risk, alert noise                    | Use staging; if production, coordinate with ops        |
+| Snapshot tests with volatile data       | Tests break on every run                    | Sanitize timestamps, IDs, random values                |
+| Single large E2E suite as only tests    | Slow, flaky, hard to debug                  | Follow pyramid: many unit, fewer integration, few E2E  |
+| Hardcoded test data in assertions       | Brittle when seed data changes              | Use factories or builders, assert structure not values |
+| Skipping authentication in tests        | Auth bugs found in production               | Include auth in integration and E2E tests              |
+| No schema validation in CI              | Drift between spec and implementation       | Run `spectral lint` + Schemathesis on every PR         |
 
 ---
 

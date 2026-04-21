@@ -18,13 +18,13 @@ PPP measures how much a basket of goods costs in different countries relative to
 
 ### PPP Data Sources
 
-| Source | Data Type | Update Frequency | Access |
-|--------|-----------|-----------------|--------|
-| **World Bank ICP** | Official PPP conversion factors | Annual | Free API |
-| **OECD PPP** | PPP for GDP and consumption | Annual | Free |
-| **Big Mac Index** | Informal PPP indicator | Semi-annual | Free (The Economist) |
-| **Numbeo** | Cost of living index | Continuous | API (paid) |
-| **Purchasing Power Parity API** | Developer-focused PPP data | Continuous | Free tier available |
+| Source                          | Data Type                       | Update Frequency | Access               |
+| ------------------------------- | ------------------------------- | ---------------- | -------------------- |
+| **World Bank ICP**              | Official PPP conversion factors | Annual           | Free API             |
+| **OECD PPP**                    | PPP for GDP and consumption     | Annual           | Free                 |
+| **Big Mac Index**               | Informal PPP indicator          | Semi-annual      | Free (The Economist) |
+| **Numbeo**                      | Cost of living index            | Continuous       | API (paid)           |
+| **Purchasing Power Parity API** | Developer-focused PPP data      | Continuous       | Free tier available  |
 
 ### PPP Discount Tiers
 
@@ -32,28 +32,62 @@ PPP measures how much a basket of goods costs in different countries relative to
 // Tier-based PPP pricing (recommended over continuous PPP)
 export const PPP_TIERS = {
   TIER_0: {
-    name: 'Full Price',
+    name: "Full Price",
     discount: 0,
-    countries: ['US', 'CA', 'GB', 'DE', 'FR', 'AU', 'JP', 'CH', 'NO', 'SE', 'DK', 'NL', 'AT', 'BE', 'FI', 'IE', 'SG', 'NZ'],
+    countries: [
+      "US",
+      "CA",
+      "GB",
+      "DE",
+      "FR",
+      "AU",
+      "JP",
+      "CH",
+      "NO",
+      "SE",
+      "DK",
+      "NL",
+      "AT",
+      "BE",
+      "FI",
+      "IE",
+      "SG",
+      "NZ",
+    ],
   },
   TIER_1: {
-    name: 'Moderate Discount',
-    discount: 0.30, // 30% off
-    countries: ['ES', 'IT', 'PT', 'KR', 'CZ', 'PL', 'CL', 'CR', 'UY'],
+    name: "Moderate Discount",
+    discount: 0.3, // 30% off
+    countries: ["ES", "IT", "PT", "KR", "CZ", "PL", "CL", "CR", "UY"],
   },
   TIER_2: {
-    name: 'Significant Discount',
-    discount: 0.50, // 50% off
-    countries: ['BR', 'MX', 'CO', 'AR', 'TH', 'MY', 'ZA', 'RO', 'BG', 'HU'],
+    name: "Significant Discount",
+    discount: 0.5, // 50% off
+    countries: ["BR", "MX", "CO", "AR", "TH", "MY", "ZA", "RO", "BG", "HU"],
   },
   TIER_3: {
-    name: 'Emerging Market',
+    name: "Emerging Market",
     discount: 0.65, // 65% off
-    countries: ['IN', 'ID', 'PH', 'VN', 'EG', 'NG', 'PK', 'BD', 'KE', 'ET', 'GH', 'TZ'],
+    countries: [
+      "IN",
+      "ID",
+      "PH",
+      "VN",
+      "EG",
+      "NG",
+      "PK",
+      "BD",
+      "KE",
+      "ET",
+      "GH",
+      "TZ",
+    ],
   },
 } as const;
 
-export function getPPPTier(countryCode: string): typeof PPP_TIERS[keyof typeof PPP_TIERS] {
+export function getPPPTier(
+  countryCode: string,
+): (typeof PPP_TIERS)[keyof typeof PPP_TIERS] {
   for (const tier of Object.values(PPP_TIERS)) {
     if (tier.countries.includes(countryCode)) return tier;
   }
@@ -85,20 +119,23 @@ Two approaches:
 
 ```typescript
 // Create Stripe prices for each currency/tier combination
-const PRICE_CONFIG: Record<string, Record<string, { amount: number; currency: string }>> = {
+const PRICE_CONFIG: Record<
+  string,
+  Record<string, { amount: number; currency: string }>
+> = {
   starter_monthly: {
-    default:  { amount: 999,  currency: 'usd' },
-    eur:      { amount: 899,  currency: 'eur' },
-    gbp:      { amount: 799,  currency: 'gbp' },
-    inr:      { amount: 29900, currency: 'inr' }, // ~$3.59
-    brl:      { amount: 2990, currency: 'brl' },  // ~$4.99
+    default: { amount: 999, currency: "usd" },
+    eur: { amount: 899, currency: "eur" },
+    gbp: { amount: 799, currency: "gbp" },
+    inr: { amount: 29900, currency: "inr" }, // ~$3.59
+    brl: { amount: 2990, currency: "brl" }, // ~$4.99
   },
   pro_monthly: {
-    default:  { amount: 2999, currency: 'usd' },
-    eur:      { amount: 2699, currency: 'eur' },
-    gbp:      { amount: 2399, currency: 'gbp' },
-    inr:      { amount: 89900, currency: 'inr' }, // ~$10.79
-    brl:      { amount: 8990, currency: 'brl' },  // ~$14.99
+    default: { amount: 2999, currency: "usd" },
+    eur: { amount: 2699, currency: "eur" },
+    gbp: { amount: 2399, currency: "gbp" },
+    inr: { amount: 89900, currency: "inr" }, // ~$10.79
+    brl: { amount: 8990, currency: "brl" }, // ~$14.99
   },
 };
 
@@ -113,17 +150,19 @@ export function resolvePriceId(
   const key = `${tier}_${interval}`;
 
   // Look up the appropriate pre-created Stripe Price ID
-  return STRIPE_PRICE_IDS[key][pppTier.name] || STRIPE_PRICE_IDS[key]['default'];
+  return (
+    STRIPE_PRICE_IDS[key][pppTier.name] || STRIPE_PRICE_IDS[key]["default"]
+  );
 }
 ```
 
 ### Stripe Auto-Conversion vs Explicit Prices
 
-| Approach | How | Pros | Cons |
-|----------|-----|------|------|
-| **Explicit prices** | Create Price per currency | Precise control, round numbers | More objects to manage |
-| **Stripe auto-conversion** | Single USD price, Stripe converts | Simple setup | Odd amounts ($9.99 → $13.27 AUD), exchange rate fluctuation |
-| **Hybrid** | Explicit for top markets, auto for rest | Balance control vs effort | Two systems to maintain |
+| Approach                   | How                                     | Pros                           | Cons                                                        |
+| -------------------------- | --------------------------------------- | ------------------------------ | ----------------------------------------------------------- |
+| **Explicit prices**        | Create Price per currency               | Precise control, round numbers | More objects to manage                                      |
+| **Stripe auto-conversion** | Single USD price, Stripe converts       | Simple setup                   | Odd amounts ($9.99 → $13.27 AUD), exchange rate fluctuation |
+| **Hybrid**                 | Explicit for top markets, auto for rest | Balance control vs effort      | Two systems to maintain                                     |
 
 **Recommendation**: Use explicit prices for your top 5-10 markets, auto-conversion for the rest.
 
@@ -133,14 +172,14 @@ export function resolvePriceId(
 
 ### Detection Methods
 
-| Method | Accuracy | Latency | VPN-Resistant | Implementation |
-|--------|----------|---------|---------------|---------------|
-| **Vercel headers** | High | 0ms | Moderate | `x-vercel-ip-country` |
-| **Cloudflare headers** | High | 0ms | Moderate | `CF-IPCountry` |
-| **GeoIP service** | High | 10-50ms | Moderate | MaxMind, IP2Location |
-| **User preference** | Perfect | 0ms | Yes | User selects country |
-| **Billing address** | Perfect | N/A | Yes | From payment method |
-| **Accept-Language** | Low | 0ms | Yes | Browser header (infers, not detects) |
+| Method                 | Accuracy | Latency | VPN-Resistant | Implementation                       |
+| ---------------------- | -------- | ------- | ------------- | ------------------------------------ |
+| **Vercel headers**     | High     | 0ms     | Moderate      | `x-vercel-ip-country`                |
+| **Cloudflare headers** | High     | 0ms     | Moderate      | `CF-IPCountry`                       |
+| **GeoIP service**      | High     | 10-50ms | Moderate      | MaxMind, IP2Location                 |
+| **User preference**    | Perfect  | 0ms     | Yes           | User selects country                 |
+| **Billing address**    | Perfect  | N/A     | Yes           | From payment method                  |
+| **Accept-Language**    | Low      | 0ms     | Yes           | Browser header (infers, not detects) |
 
 ### Implementation
 
@@ -188,33 +227,33 @@ export function PricingPage() {
 
 ### Tax by Region
 
-| Region | Tax Type | Rate Range | Who Collects |
-|--------|----------|-----------|--------------|
-| **US** | Sales tax | 0-10.25% | Varies by state (nexus rules) |
-| **EU** | VAT | 17-27% | Seller (or MoR) |
-| **UK** | VAT | 20% | Seller (or MoR) |
-| **Canada** | GST/HST/PST | 5-15% | Seller |
-| **Australia** | GST | 10% | Seller |
-| **India** | GST | 18% | Seller |
-| **Japan** | Consumption tax | 10% | Seller |
+| Region        | Tax Type        | Rate Range | Who Collects                  |
+| ------------- | --------------- | ---------- | ----------------------------- |
+| **US**        | Sales tax       | 0-10.25%   | Varies by state (nexus rules) |
+| **EU**        | VAT             | 17-27%     | Seller (or MoR)               |
+| **UK**        | VAT             | 20%        | Seller (or MoR)               |
+| **Canada**    | GST/HST/PST     | 5-15%      | Seller                        |
+| **Australia** | GST             | 10%        | Seller                        |
+| **India**     | GST             | 18%        | Seller                        |
+| **Japan**     | Consumption tax | 10%        | Seller                        |
 
 ### Tax Handling Options
 
-| Option | Complexity | Cost | Best For |
-|--------|-----------|------|----------|
-| **Stripe Tax** | Low | 0.5% per transaction | Self-managed Stripe |
-| **Merchant of Record** (Paddle/LemonSqueezy) | Lowest | 5% + 50c (includes tax) | Indie/small SaaS |
-| **Tax calculation service** (TaxJar, Avalara) | Medium | Subscription-based | Complex tax needs |
-| **Manual** | Highest | Accounting costs | Not recommended |
+| Option                                        | Complexity | Cost                    | Best For            |
+| --------------------------------------------- | ---------- | ----------------------- | ------------------- |
+| **Stripe Tax**                                | Low        | 0.5% per transaction    | Self-managed Stripe |
+| **Merchant of Record** (Paddle/LemonSqueezy)  | Lowest     | 5% + 50c (includes tax) | Indie/small SaaS    |
+| **Tax calculation service** (TaxJar, Avalara) | Medium     | Subscription-based      | Complex tax needs   |
+| **Manual**                                    | Highest    | Accounting costs        | Not recommended     |
 
 ```typescript
 // Stripe Tax integration
 const session = await stripe.checkout.sessions.create({
-  mode: 'subscription',
+  mode: "subscription",
   line_items: [{ price: priceId, quantity: 1 }],
   automatic_tax: { enabled: true }, // Stripe calculates and collects tax
   customer_update: {
-    address: 'auto', // Update customer address from checkout
+    address: "auto", // Update customer address from checkout
   },
   // ...
 });
@@ -229,14 +268,14 @@ const session = await stripe.checkout.sessions.create({
 ```typescript
 // Always use Intl.NumberFormat for currency display
 export function formatPrice(
-  amount: number,       // In smallest currency unit (cents)
-  currency: string,     // ISO 4217 code
-  locale?: string,      // BCP 47 locale
+  amount: number, // In smallest currency unit (cents)
+  currency: string, // ISO 4217 code
+  locale?: string, // BCP 47 locale
 ): string {
   const displayAmount = getDisplayAmount(amount, currency);
 
-  return new Intl.NumberFormat(locale || 'en-US', {
-    style: 'currency',
+  return new Intl.NumberFormat(locale || "en-US", {
+    style: "currency",
     currency: currency.toUpperCase(),
     minimumFractionDigits: isZeroDecimalCurrency(currency) ? 0 : 2,
     maximumFractionDigits: isZeroDecimalCurrency(currency) ? 0 : 2,
@@ -249,8 +288,22 @@ function getDisplayAmount(amount: number, currency: string): number {
 
 // Stripe zero-decimal currencies
 const ZERO_DECIMAL_CURRENCIES = new Set([
-  'bif', 'clp', 'djf', 'gnf', 'jpy', 'kmf', 'krw', 'mga',
-  'pyg', 'rwf', 'ugx', 'vnd', 'vuv', 'xaf', 'xof', 'xpf',
+  "bif",
+  "clp",
+  "djf",
+  "gnf",
+  "jpy",
+  "kmf",
+  "krw",
+  "mga",
+  "pyg",
+  "rwf",
+  "ugx",
+  "vnd",
+  "vuv",
+  "xaf",
+  "xof",
+  "xpf",
 ]);
 
 function isZeroDecimalCurrency(currency: string): boolean {
@@ -260,14 +313,14 @@ function isZeroDecimalCurrency(currency: string): boolean {
 
 ### Display Examples
 
-| Locale | Currency | Amount (cents) | Display |
-|--------|----------|---------------|---------|
-| en-US | USD | 999 | $9.99 |
-| de-DE | EUR | 899 | 8,99 EUR |
-| ja-JP | JPY | 1500 | 1,500 JPY |
-| pt-BR | BRL | 2990 | R$ 29,90 |
-| hi-IN | INR | 29900 | 29,900.00 INR |
-| ar-SA | SAR | 3750 | 37.50 SAR |
+| Locale | Currency | Amount (cents) | Display       |
+| ------ | -------- | -------------- | ------------- |
+| en-US  | USD      | 999            | $9.99         |
+| de-DE  | EUR      | 899            | 8,99 EUR      |
+| ja-JP  | JPY      | 1500           | 1,500 JPY     |
+| pt-BR  | BRL      | 2990           | R$ 29,90      |
+| hi-IN  | INR      | 29900          | 29,900.00 INR |
+| ar-SA  | SAR      | 3750           | 37.50 SAR     |
 
 ---
 
@@ -275,12 +328,12 @@ function isZeroDecimalCurrency(currency: string): boolean {
 
 ### Common Abuse Vectors
 
-| Vector | Description | Detection |
-|--------|-------------|-----------|
-| **VPN abuse** | User in US uses Indian VPN for lower price | IP vs billing address mismatch |
-| **Address spoofing** | Fake billing address in low-tier country | Billing address vs card BIN country |
-| **Account sharing** | One PPP subscription shared in high-income country | Usage patterns, concurrent sessions |
-| **Coupon stacking** | PPP discount + promotional coupon | Enforce mutual exclusivity |
+| Vector               | Description                                        | Detection                           |
+| -------------------- | -------------------------------------------------- | ----------------------------------- |
+| **VPN abuse**        | User in US uses Indian VPN for lower price         | IP vs billing address mismatch      |
+| **Address spoofing** | Fake billing address in low-tier country           | Billing address vs card BIN country |
+| **Account sharing**  | One PPP subscription shared in high-income country | Usage patterns, concurrent sessions |
+| **Coupon stacking**  | PPP discount + promotional coupon                  | Enforce mutual exclusivity          |
 
 ### Mitigation Strategies
 
@@ -298,7 +351,7 @@ async function validatePricingEligibility(
   // Flag if card country doesn't match pricing country
   if (cardCountry && pricingCountry && cardCountry !== pricingCountry) {
     await flagForReview(session.id, {
-      reason: 'country_mismatch',
+      reason: "country_mismatch",
       pricingCountry,
       billingCountry,
       cardCountry,
@@ -312,7 +365,7 @@ async function validatePricingEligibility(
 // Get card issuing country from payment method
 async function getCardCountry(paymentIntentId: string): Promise<string | null> {
   const pi = await stripe.paymentIntents.retrieve(paymentIntentId, {
-    expand: ['payment_method'],
+    expand: ["payment_method"],
   });
 
   const pm = pi.payment_method as Stripe.PaymentMethod;
@@ -361,23 +414,23 @@ interface PricingExperiment {
 function getPricingVariant(
   experiment: PricingExperiment,
   userId: string,
-): 'control' | 'treatment' {
+): "control" | "treatment" {
   // Deterministic assignment based on user ID
   const hash = hashString(`${experiment.id}:${userId}`);
   const bucket = (hash % 100) / 100;
-  return bucket < experiment.allocation ? 'treatment' : 'control';
+  return bucket < experiment.allocation ? "treatment" : "control";
 }
 ```
 
 ### Metrics to Track
 
-| Metric | Formula | What It Tells You |
-|--------|---------|-------------------|
-| **Conversion rate** | Signups / Visitors | Does the price point convert? |
-| **Revenue per visitor** | Total revenue / Visitors | Net revenue impact |
-| **ARPU** | Revenue / Paying users | Average yield per user |
-| **LTV** | ARPU x Average lifespan | Long-term value at this price |
-| **Churn rate** | Churned / Total | Does price affect retention? |
+| Metric                  | Formula                  | What It Tells You             |
+| ----------------------- | ------------------------ | ----------------------------- |
+| **Conversion rate**     | Signups / Visitors       | Does the price point convert? |
+| **Revenue per visitor** | Total revenue / Visitors | Net revenue impact            |
+| **ARPU**                | Revenue / Paying users   | Average yield per user        |
+| **LTV**                 | ARPU x Average lifespan  | Long-term value at this price |
+| **Churn rate**          | Churned / Total          | Does price affect retention?  |
 
 ### Statistical Significance
 
@@ -403,7 +456,7 @@ Recommended:
 export async function normaliseRevenue(
   amount: number,
   currency: string,
-  targetCurrency: string = 'USD',
+  targetCurrency: string = "USD",
 ): Promise<number> {
   if (currency.toUpperCase() === targetCurrency.toUpperCase()) return amount;
 
@@ -415,43 +468,49 @@ export async function normaliseRevenue(
 interface RevenueReport {
   period: string;
   totalRevenueUSD: number;
-  byCountry: Record<string, {
-    revenue: number;
-    currency: string;
-    revenueUSD: number;
-    subscribers: number;
-    arpu: number;
-  }>;
-  byTier: Record<string, {
-    subscribers: number;
-    mrrUSD: number;
-  }>;
+  byCountry: Record<
+    string,
+    {
+      revenue: number;
+      currency: string;
+      revenueUSD: number;
+      subscribers: number;
+      arpu: number;
+    }
+  >;
+  byTier: Record<
+    string,
+    {
+      subscribers: number;
+      mrrUSD: number;
+    }
+  >;
 }
 ```
 
 ### Dashboard Considerations
 
-| Metric | Display | Notes |
-|--------|---------|-------|
-| MRR | Always in base currency (USD) | Normalise at time of transaction |
-| ARPU by country | Local currency + USD equivalent | Show both for context |
-| Conversion by tier | Separate by PPP tier | Don't mix high/low price cohorts |
-| Revenue growth | USD-normalised | Exchange rate fluctuation can mask real growth |
-| Churn rate | Segment by PPP tier | Different retention patterns by market |
+| Metric             | Display                         | Notes                                          |
+| ------------------ | ------------------------------- | ---------------------------------------------- |
+| MRR                | Always in base currency (USD)   | Normalise at time of transaction               |
+| ARPU by country    | Local currency + USD equivalent | Show both for context                          |
+| Conversion by tier | Separate by PPP tier            | Don't mix high/low price cohorts               |
+| Revenue growth     | USD-normalised                  | Exchange rate fluctuation can mask real growth |
+| Churn rate         | Segment by PPP tier             | Different retention patterns by market         |
 
 ---
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|-------------|---------|-----|
-| Continuous PPP (per-country price) | 200+ prices to manage | Use 3-4 PPP tiers |
-| No fraud prevention | Users VPN to get low prices | Validate card BIN vs pricing country |
-| Auto-conversion only | Odd price amounts ($13.27) | Use explicit prices for top markets |
-| Ignoring zero-decimal currencies | JPY 999 displayed as $9.99 | Check Stripe zero-decimal currency list |
-| Same tax treatment everywhere | Non-compliant in many jurisdictions | Use Stripe Tax or MoR |
-| Not tracking PPP tier in analytics | Cannot segment revenue by market | Store pricing_country in metadata |
-| A/B testing prices for too short | Unreliable results | Run for 2+ billing cycles |
+| Anti-Pattern                       | Problem                             | Fix                                     |
+| ---------------------------------- | ----------------------------------- | --------------------------------------- |
+| Continuous PPP (per-country price) | 200+ prices to manage               | Use 3-4 PPP tiers                       |
+| No fraud prevention                | Users VPN to get low prices         | Validate card BIN vs pricing country    |
+| Auto-conversion only               | Odd price amounts ($13.27)          | Use explicit prices for top markets     |
+| Ignoring zero-decimal currencies   | JPY 999 displayed as $9.99          | Check Stripe zero-decimal currency list |
+| Same tax treatment everywhere      | Non-compliant in many jurisdictions | Use Stripe Tax or MoR                   |
+| Not tracking PPP tier in analytics | Cannot segment revenue by market    | Store pricing_country in metadata       |
+| A/B testing prices for too short   | Unreliable results                  | Run for 2+ billing cycles               |
 
 ---
 

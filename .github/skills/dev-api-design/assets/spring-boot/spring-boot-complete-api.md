@@ -161,7 +161,7 @@ server:
 
 jwt:
   secret: ${JWT_SECRET:change-this-secret-in-production}
-  access-expiration: ${JWT_ACCESS_EXPIRE:900000}    # 15 minutes
+  access-expiration: ${JWT_ACCESS_EXPIRE:900000} # 15 minutes
   refresh-expiration: ${JWT_REFRESH_EXPIRE:604800000} # 7 days
 
 springdoc:

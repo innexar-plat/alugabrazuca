@@ -1,6 +1,7 @@
 # Módulo 5 — Solicitações de Contato (`inquiries`)
 
 ## Visão Geral
+
 Permite ao inquilino enviar solicitação de contato/visita para um anúncio. O anfitrião pode aceitar, recusar ou responder.
 
 ---
@@ -9,20 +10,21 @@ Permite ao inquilino enviar solicitação de contato/visita para um anúncio. O 
 
 ### Campos da solicitação
 
-| Campo | Tipo | Obrigatório | Descrição |
-|-------|------|-------------|-----------|
-| `listingId` | UUID | ✅ | Anúncio de interesse |
-| `type` | enum | ✅ | `visit`, `info`, `apply` |
-| `message` | text | ✅ | Mensagem ao anfitrião (min 20, max 1000 chars) |
-| `moveInDate` | date | ❌ | Data pretendida de mudança |
-| `stayDuration` | integer | ❌ | Duração pretendida (meses) |
-| `occupants` | integer | ❌ | Quantas pessoas |
-| `hasPets` | boolean | ❌ | Tem pets? |
-| `petDetails` | string | ❌ | Tipo e tamanho do pet |
-| `occupation` | string | ❌ | Profissão/ocupação |
-| `aboutMe` | text | ❌ | Breve apresentação (max 500 chars) |
+| Campo          | Tipo    | Obrigatório | Descrição                                      |
+| -------------- | ------- | ----------- | ---------------------------------------------- |
+| `listingId`    | UUID    | ✅          | Anúncio de interesse                           |
+| `type`         | enum    | ✅          | `visit`, `info`, `apply`                       |
+| `message`      | text    | ✅          | Mensagem ao anfitrião (min 20, max 1000 chars) |
+| `moveInDate`   | date    | ❌          | Data pretendida de mudança                     |
+| `stayDuration` | integer | ❌          | Duração pretendida (meses)                     |
+| `occupants`    | integer | ❌          | Quantas pessoas                                |
+| `hasPets`      | boolean | ❌          | Tem pets?                                      |
+| `petDetails`   | string  | ❌          | Tipo e tamanho do pet                          |
+| `occupation`   | string  | ❌          | Profissão/ocupação                             |
+| `aboutMe`      | text    | ❌          | Breve apresentação (max 500 chars)             |
 
 **Tipos de solicitação:**
+
 - `visit` — Solicitar visita ao quarto
 - `info` — Pedir mais informações
 - `apply` — Candidatar-se ao quarto
@@ -31,19 +33,21 @@ Permite ao inquilino enviar solicitação de contato/visita para um anúncio. O 
 
 ## 5.2 Resposta do Anfitrião
 
-| Ação | Descrição |
-|------|-----------|
+| Ação     | Descrição                                              |
+| -------- | ------------------------------------------------------ |
 | `accept` | Aceitar solicitação → libera endereço + contato direto |
-| `reject` | Recusar com motivo opcional |
-| `reply` | Responder com mensagem (sem aceitar/recusar ainda) |
+| `reject` | Recusar com motivo opcional                            |
+| `reply`  | Responder com mensagem (sem aceitar/recusar ainda)     |
 
 ### Ao aceitar
+
 - Endereço completo do quarto é liberado para o inquilino
 - Dados de contato (WhatsApp/phone) são trocados
 - Notificação enviada ao inquilino
 - Status muda para `accepted`
 
 ### Ao recusar
+
 - Motivo opcional enviado ao inquilino
 - Status muda para `rejected`
 - Inquilino pode enviar nova solicitação para outro quarto
@@ -106,23 +110,23 @@ updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
 
 ## 5.6 Endpoints
 
-| Método | Rota | Descrição | Auth |
-|--------|------|-----------|------|
-| POST | `/api/v1/inquiries` | Criar solicitação | ✅ tenant |
-| GET | `/api/v1/inquiries/sent` | Minhas solicitações enviadas | ✅ tenant |
-| GET | `/api/v1/inquiries/received` | Solicitações recebidas | ✅ host |
-| GET | `/api/v1/inquiries/:id` | Detalhe da solicitação | ✅ owner |
-| POST | `/api/v1/inquiries/:id/accept` | Aceitar | ✅ host |
-| POST | `/api/v1/inquiries/:id/reject` | Recusar | ✅ host |
-| POST | `/api/v1/inquiries/:id/reply` | Responder | ✅ host |
-| POST | `/api/v1/inquiries/:id/cancel` | Cancelar | ✅ tenant |
+| Método | Rota                           | Descrição                    | Auth      |
+| ------ | ------------------------------ | ---------------------------- | --------- |
+| POST   | `/api/v1/inquiries`            | Criar solicitação            | ✅ tenant |
+| GET    | `/api/v1/inquiries/sent`       | Minhas solicitações enviadas | ✅ tenant |
+| GET    | `/api/v1/inquiries/received`   | Solicitações recebidas       | ✅ host   |
+| GET    | `/api/v1/inquiries/:id`        | Detalhe da solicitação       | ✅ owner  |
+| POST   | `/api/v1/inquiries/:id/accept` | Aceitar                      | ✅ host   |
+| POST   | `/api/v1/inquiries/:id/reject` | Recusar                      | ✅ host   |
+| POST   | `/api/v1/inquiries/:id/reply`  | Responder                    | ✅ host   |
+| POST   | `/api/v1/inquiries/:id/cancel` | Cancelar                     | ✅ tenant |
 
 ---
 
 ## 5.7 Páginas Frontend
 
-| Rota | Página | Auth |
-|------|--------|------|
-| `/my-inquiries` | Solicitações enviadas (inquilino) | ✅ |
-| `/host/inquiries` | Solicitações recebidas (anfitrião) | ✅ |
-| `/inquiries/:id` | Detalhe da solicitação | ✅ |
+| Rota              | Página                             | Auth |
+| ----------------- | ---------------------------------- | ---- |
+| `/my-inquiries`   | Solicitações enviadas (inquilino)  | ✅   |
+| `/host/inquiries` | Solicitações recebidas (anfitrião) | ✅   |
+| `/inquiries/:id`  | Detalhe da solicitação             | ✅   |

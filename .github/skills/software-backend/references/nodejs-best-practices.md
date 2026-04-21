@@ -62,8 +62,8 @@ async function getDashboard(userId: string) {
 
 // Bad: Sequential when parallel is possible
 async function getDashboard(userId: string) {
-  const profile = await getProfile(userId);        // waits...
-  const orders = await getRecentOrders(userId);     // then waits...
+  const profile = await getProfile(userId); // waits...
+  const orders = await getRecentOrders(userId); // then waits...
   const notifications = await getNotifications(userId); // then waits...
   return { profile, orders, notifications };
 }
@@ -79,9 +79,9 @@ async function getDashboardResilient(userId: string) {
   ]);
 
   return {
-    profile: results[0].status === 'fulfilled' ? results[0].value : null,
-    orders: results[1].status === 'fulfilled' ? results[1].value : [],
-    notifications: results[2].status === 'fulfilled' ? results[2].value : [],
+    profile: results[0].status === "fulfilled" ? results[0].value : null,
+    orders: results[1].status === "fulfilled" ? results[1].value : [],
+    notifications: results[2].status === "fulfilled" ? results[2].value : [],
   };
 }
 ```
@@ -89,9 +89,9 @@ async function getDashboardResilient(userId: string) {
 ### Streams for Large Data
 
 ```typescript
-import { pipeline } from 'node:stream/promises';
-import { createReadStream, createWriteStream } from 'node:fs';
-import { Transform } from 'node:stream';
+import { pipeline } from "node:stream/promises";
+import { createReadStream, createWriteStream } from "node:fs";
+import { Transform } from "node:stream";
 
 // Good: Stream processing for large files (constant memory)
 async function processLargeFile(input: string, output: string) {
@@ -102,16 +102,12 @@ async function processLargeFile(input: string, output: string) {
     },
   });
 
-  await pipeline(
-    createReadStream(input),
-    transform,
-    createWriteStream(output)
-  );
+  await pipeline(createReadStream(input), transform, createWriteStream(output));
 }
 
 // Bad: Loading entire file into memory
 async function processLargeFile(input: string, output: string) {
-  const data = await fs.readFile(input, 'utf-8');  // OOM for large files
+  const data = await fs.readFile(input, "utf-8"); // OOM for large files
   const processed = data.toUpperCase();
   await fs.writeFile(output, processed);
 }
@@ -120,17 +116,22 @@ async function processLargeFile(input: string, output: string) {
 ### Worker Threads for CPU-Intensive Tasks
 
 ```typescript
-import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
+import {
+  Worker,
+  isMainThread,
+  parentPort,
+  workerData,
+} from "node:worker_threads";
 
 // Main thread: offload CPU work
 function runWorker(data: unknown): Promise<unknown> {
   return new Promise((resolve, reject) => {
-    const worker = new Worker(new URL('./worker.ts', import.meta.url), {
+    const worker = new Worker(new URL("./worker.ts", import.meta.url), {
       workerData: data,
     });
-    worker.on('message', resolve);
-    worker.on('error', reject);
-    worker.on('exit', (code) => {
+    worker.on("message", resolve);
+    worker.on("error", reject);
+    worker.on("exit", (code) => {
       if (code !== 0) reject(new Error(`Worker exited with code ${code}`));
     });
   });
@@ -154,16 +155,16 @@ if (!isMainThread) {
 
 ## Framework Comparison
 
-| Feature | Express | Fastify | NestJS | Hono |
-|---------|---------|---------|--------|------|
-| Performance | Baseline | 2-3x Express | Similar to Express | 3-5x Express |
-| TypeScript | Community types | Native | Native | Native |
-| Validation | Middleware (manual) | JSON Schema (built-in) | Pipes + class-validator | Zod/Valibot middleware |
-| DI container | None | None (plugin system) | Built-in (IoC) | None |
-| Plugin ecosystem | Massive (npm) | Growing | Modules | Growing |
-| Learning curve | Low | Low-Medium | Medium-High | Low |
-| Edge/Serverless | Possible (adapters) | Possible | Heavy for edge | Native (designed for it) |
-| Best for | Simple APIs, prototypes | High-performance APIs | Enterprise, DDD, complex apps | Edge, serverless, Bun |
+| Feature          | Express                 | Fastify                | NestJS                        | Hono                     |
+| ---------------- | ----------------------- | ---------------------- | ----------------------------- | ------------------------ |
+| Performance      | Baseline                | 2-3x Express           | Similar to Express            | 3-5x Express             |
+| TypeScript       | Community types         | Native                 | Native                        | Native                   |
+| Validation       | Middleware (manual)     | JSON Schema (built-in) | Pipes + class-validator       | Zod/Valibot middleware   |
+| DI container     | None                    | None (plugin system)   | Built-in (IoC)                | None                     |
+| Plugin ecosystem | Massive (npm)           | Growing                | Modules                       | Growing                  |
+| Learning curve   | Low                     | Low-Medium             | Medium-High                   | Low                      |
+| Edge/Serverless  | Possible (adapters)     | Possible               | Heavy for edge                | Native (designed for it) |
+| Best for         | Simple APIs, prototypes | High-performance APIs  | Enterprise, DDD, complex apps | Edge, serverless, Bun    |
 
 ### Framework Selection Decision Tree
 
@@ -179,32 +180,32 @@ What are you building?
 ### Express Production Setup
 
 ```typescript
-import express from 'express';
-import helmet from 'helmet';
-import cors from 'cors';
-import compression from 'compression';
-import { pinoHttp } from 'pino-http';
+import express from "express";
+import helmet from "helmet";
+import cors from "cors";
+import compression from "compression";
+import { pinoHttp } from "pino-http";
 
 const app = express();
 
 // Security
 app.use(helmet());
-app.use(cors({ origin: process.env.ALLOWED_ORIGINS?.split(',') }));
+app.use(cors({ origin: process.env.ALLOWED_ORIGINS?.split(",") }));
 
 // Performance
 app.use(compression());
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: "1mb" }));
 
 // Observability
-app.use(pinoHttp({ level: process.env.LOG_LEVEL || 'info' }));
+app.use(pinoHttp({ level: process.env.LOG_LEVEL || "info" }));
 
 // Trust proxy (when behind load balancer)
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 // Request timeout
 app.use((req, res, next) => {
   res.setTimeout(30_000, () => {
-    res.status(408).json({ error: 'Request timeout' });
+    res.status(408).json({ error: "Request timeout" });
   });
   next();
 });
@@ -213,17 +214,18 @@ app.use((req, res, next) => {
 ### Fastify Production Setup
 
 ```typescript
-import Fastify from 'fastify';
-import fastifyHelmet from '@fastify/helmet';
-import fastifyCors from '@fastify/cors';
-import fastifyRateLimit from '@fastify/rate-limit';
+import Fastify from "fastify";
+import fastifyHelmet from "@fastify/helmet";
+import fastifyCors from "@fastify/cors";
+import fastifyRateLimit from "@fastify/rate-limit";
 
 const fastify = Fastify({
   logger: {
-    level: process.env.LOG_LEVEL || 'info',
-    transport: process.env.NODE_ENV === 'development'
-      ? { target: 'pino-pretty' }
-      : undefined,
+    level: process.env.LOG_LEVEL || "info",
+    transport:
+      process.env.NODE_ENV === "development"
+        ? { target: "pino-pretty" }
+        : undefined,
   },
   requestTimeout: 30_000,
   bodyLimit: 1_048_576, // 1MB
@@ -233,34 +235,38 @@ await fastify.register(fastifyHelmet);
 await fastify.register(fastifyCors, { origin: true });
 await fastify.register(fastifyRateLimit, {
   max: 100,
-  timeWindow: '1 minute',
+  timeWindow: "1 minute",
 });
 
 // Schema-based validation (Fastify's strength)
-fastify.post('/api/users', {
-  schema: {
-    body: {
-      type: 'object',
-      required: ['email', 'name'],
-      properties: {
-        email: { type: 'string', format: 'email' },
-        name: { type: 'string', minLength: 2, maxLength: 100 },
-      },
-    },
-    response: {
-      201: {
-        type: 'object',
+fastify.post(
+  "/api/users",
+  {
+    schema: {
+      body: {
+        type: "object",
+        required: ["email", "name"],
         properties: {
-          id: { type: 'string' },
-          email: { type: 'string' },
+          email: { type: "string", format: "email" },
+          name: { type: "string", minLength: 2, maxLength: 100 },
+        },
+      },
+      response: {
+        201: {
+          type: "object",
+          properties: {
+            id: { type: "string" },
+            email: { type: "string" },
+          },
         },
       },
     },
   },
-}, async (request, reply) => {
-  const user = await createUser(request.body);
-  reply.status(201).send(user);
-});
+  async (request, reply) => {
+    const user = await createUser(request.body);
+    reply.status(201).send(user);
+  },
+);
 ```
 
 ---
@@ -272,26 +278,26 @@ fastify.post('/api/users', {
 ```typescript
 // MUST handle these in production — otherwise the process crashes silently
 
-process.on('unhandledRejection', (reason, promise) => {
-  logger.fatal({ reason, promise }, 'Unhandled Promise Rejection');
+process.on("unhandledRejection", (reason, promise) => {
+  logger.fatal({ reason, promise }, "Unhandled Promise Rejection");
   // Log, alert, and shut down gracefully
   gracefulShutdown(1);
 });
 
-process.on('uncaughtException', (error) => {
-  logger.fatal({ error }, 'Uncaught Exception');
+process.on("uncaughtException", (error) => {
+  logger.fatal({ error }, "Uncaught Exception");
   // MUST exit after uncaught exception — process state is unreliable
   gracefulShutdown(1);
 });
 
 async function gracefulShutdown(exitCode: number) {
-  logger.info('Starting graceful shutdown...');
+  logger.info("Starting graceful shutdown...");
   // 1. Stop accepting new requests
   server.close();
   // 2. Finish in-flight requests (with timeout)
   await Promise.race([
     closeAllConnections(),
-    new Promise(resolve => setTimeout(resolve, 10_000)),
+    new Promise((resolve) => setTimeout(resolve, 10_000)),
   ]);
   // 3. Exit
   process.exit(exitCode);
@@ -302,23 +308,28 @@ async function gracefulShutdown(exitCode: number) {
 
 ```typescript
 // Express: async errors must be caught and forwarded to error middleware
-function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) => Promise<void>) {
+function asyncHandler(
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>,
+) {
   return (req: Request, res: Response, next: NextFunction) => {
     fn(req, res, next).catch(next);
   };
 }
 
-app.get('/api/users/:id', asyncHandler(async (req, res) => {
-  const user = await getUserById(req.params.id);
-  if (!user) {
-    throw new NotFoundError('User not found');
-  }
-  res.json(user);
-}));
+app.get(
+  "/api/users/:id",
+  asyncHandler(async (req, res) => {
+    const user = await getUserById(req.params.id);
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+    res.json(user);
+  }),
+);
 
 // Centralized error middleware (MUST be last)
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
-  logger.error({ err, path: req.path, method: req.method }, 'Request error');
+  logger.error({ err, path: req.path, method: req.method }, "Request error");
 
   if (err instanceof AppError) {
     res.status(err.statusCode).json({
@@ -330,8 +341,8 @@ app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
     });
   } else {
     res.status(500).json({
-      type: 'https://example.com/problems/internal-error',
-      title: 'Internal Server Error',
+      type: "https://example.com/problems/internal-error",
+      title: "Internal Server Error",
       status: 500,
       instance: req.path,
     });
@@ -356,17 +367,17 @@ abstract class AppError extends Error {
 
 class NotFoundError extends AppError {
   statusCode = 404;
-  type = 'https://example.com/problems/not-found';
+  type = "https://example.com/problems/not-found";
 }
 
 class ValidationError extends AppError {
   statusCode = 400;
-  type = 'https://example.com/problems/validation-error';
+  type = "https://example.com/problems/validation-error";
 }
 
 class ConflictError extends AppError {
   statusCode = 409;
-  type = 'https://example.com/problems/conflict';
+  type = "https://example.com/problems/conflict";
 }
 ```
 
@@ -376,26 +387,26 @@ class ConflictError extends AppError {
 
 ### Common Memory Leak Sources
 
-| Source | Symptom | Fix |
-|--------|---------|-----|
-| Event listeners not removed | RSS grows steadily | `removeListener`, `AbortController` |
-| Global caches without TTL/LRU | Heap grows until OOM | Use `lru-cache` with `maxSize` |
-| Closures retaining large objects | Heap snapshot shows unexpected retention | Break closure references |
-| Unfinished streams | Buffers accumulate | Proper `pipeline()`, error handling |
-| `setInterval` without `clearInterval` | Callbacks accumulate | Clear intervals on shutdown |
+| Source                                | Symptom                                  | Fix                                 |
+| ------------------------------------- | ---------------------------------------- | ----------------------------------- |
+| Event listeners not removed           | RSS grows steadily                       | `removeListener`, `AbortController` |
+| Global caches without TTL/LRU         | Heap grows until OOM                     | Use `lru-cache` with `maxSize`      |
+| Closures retaining large objects      | Heap snapshot shows unexpected retention | Break closure references            |
+| Unfinished streams                    | Buffers accumulate                       | Proper `pipeline()`, error handling |
+| `setInterval` without `clearInterval` | Callbacks accumulate                     | Clear intervals on shutdown         |
 
 ### Leak Detection
 
 ```typescript
 // 1. Monitor heap in production
-import v8 from 'node:v8';
+import v8 from "node:v8";
 
 function reportMemory() {
   const heap = v8.getHeapStatistics();
-  metrics.gauge('nodejs.heap.used', heap.used_heap_size);
-  metrics.gauge('nodejs.heap.total', heap.total_heap_size);
-  metrics.gauge('nodejs.heap.limit', heap.heap_size_limit);
-  metrics.gauge('nodejs.external', heap.external_memory);
+  metrics.gauge("nodejs.heap.used", heap.used_heap_size);
+  metrics.gauge("nodejs.heap.total", heap.total_heap_size);
+  metrics.gauge("nodejs.heap.limit", heap.heap_size_limit);
+  metrics.gauge("nodejs.external", heap.external_memory);
 }
 
 setInterval(reportMemory, 30_000);
@@ -413,12 +424,12 @@ setInterval(reportMemory, 30_000);
 
 ```typescript
 // Use LRU cache instead of plain objects
-import { LRUCache } from 'lru-cache';
+import { LRUCache } from "lru-cache";
 
 const cache = new LRUCache<string, UserProfile>({
-  max: 5000,              // Max entries
-  ttl: 1000 * 60 * 5,     // 5 minutes TTL
-  maxSize: 50_000_000,     // 50MB max
+  max: 5000, // Max entries
+  ttl: 1000 * 60 * 5, // 5 minutes TTL
+  maxSize: 50_000_000, // 50MB max
   sizeCalculation: (value) => JSON.stringify(value).length,
 });
 
@@ -433,8 +444,8 @@ const cache = new LRUCache<string, UserProfile>({
 ### Clustering for Multi-Core Utilization
 
 ```typescript
-import cluster from 'node:cluster';
-import { cpus } from 'node:os';
+import cluster from "node:cluster";
+import { cpus } from "node:os";
 
 if (cluster.isPrimary) {
   const numCPUs = cpus().length;
@@ -444,7 +455,7 @@ if (cluster.isPrimary) {
     cluster.fork();
   }
 
-  cluster.on('exit', (worker, code, signal) => {
+  cluster.on("exit", (worker, code, signal) => {
     console.log(`Worker ${worker.process.pid} exited (${signal || code})`);
     // Restart crashed workers
     if (code !== 0) {
@@ -480,15 +491,15 @@ Use clustering only for:
 ```typescript
 const server = app.listen(port);
 
-const signals: NodeJS.Signals[] = ['SIGTERM', 'SIGINT'];
+const signals: NodeJS.Signals[] = ["SIGTERM", "SIGINT"];
 
 for (const signal of signals) {
   process.on(signal, async () => {
-    logger.info({ signal }, 'Received shutdown signal');
+    logger.info({ signal }, "Received shutdown signal");
 
     // 1. Stop accepting new connections
     server.close(() => {
-      logger.info('HTTP server closed');
+      logger.info("HTTP server closed");
     });
 
     // 2. Close database connections
@@ -513,53 +524,57 @@ for (const signal of signals) {
 ### Essential Security Middleware
 
 ```typescript
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
-import cors from 'cors';
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import cors from "cors";
 
 // Helmet: sets security headers
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+      },
     },
-  },
-  hsts: { maxAge: 31536000, includeSubDomains: true },
-}));
+    hsts: { maxAge: 31536000, includeSubDomains: true },
+  }),
+);
 
 // CORS: restrict origins
-app.use(cors({
-  origin: ['https://app.example.com'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: ["https://app.example.com"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  }),
+);
 
 // Rate limiting: sliding window
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,  // 15 minutes
-  max: 100,                   // 100 requests per window
-  standardHeaders: true,      // Return rate limit info in headers
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // 100 requests per window
+  standardHeaders: true, // Return rate limit info in headers
   legacyHeaders: false,
-  store: new RedisStore({ client: redis }),  // Distributed rate limiting
+  store: new RedisStore({ client: redis }), // Distributed rate limiting
 });
-app.use('/api/', limiter);
+app.use("/api/", limiter);
 ```
 
 ### Security Checklist
 
-| Concern | Implementation |
-|---------|---------------|
-| Input validation | Zod/Valibot at API boundary, never trust client |
-| SQL injection | Parameterized queries (Prisma, Drizzle, prepared statements) |
-| XSS | Helmet CSP headers, sanitize output |
-| CSRF | SameSite cookies, CSRF tokens for forms |
-| Auth tokens | httpOnly, Secure, SameSite cookies (not localStorage) |
-| Password hashing | Argon2id (preferred) or bcrypt (cost >= 12) |
-| Secrets management | Environment variables + secret manager (Vault, AWS SM) |
-| Dependency auditing | `npm audit`, Socket.dev, Snyk in CI |
-| HTTPS | TLS everywhere, HSTS header |
-| Request size limits | `express.json({ limit: '1mb' })` |
+| Concern             | Implementation                                               |
+| ------------------- | ------------------------------------------------------------ |
+| Input validation    | Zod/Valibot at API boundary, never trust client              |
+| SQL injection       | Parameterized queries (Prisma, Drizzle, prepared statements) |
+| XSS                 | Helmet CSP headers, sanitize output                          |
+| CSRF                | SameSite cookies, CSRF tokens for forms                      |
+| Auth tokens         | httpOnly, Secure, SameSite cookies (not localStorage)        |
+| Password hashing    | Argon2id (preferred) or bcrypt (cost >= 12)                  |
+| Secrets management  | Environment variables + secret manager (Vault, AWS SM)       |
+| Dependency auditing | `npm audit`, Socket.dev, Snyk in CI                          |
+| HTTPS               | TLS everywhere, HSTS header                                  |
+| Request size limits | `express.json({ limit: '1mb' })`                             |
 
 ---
 
@@ -567,53 +582,53 @@ app.use('/api/', limiter);
 
 ### Profiling Tools
 
-| Tool | Purpose | Usage |
-|------|---------|-------|
-| `clinic doctor` | Identify bottleneck category (I/O, event loop, GC) | `clinic doctor -- node server.js` |
-| `clinic flame` | CPU flame graph (function-level hotspots) | `clinic flame -- node server.js` |
-| `clinic heapprofile` | Memory allocation profiling | `clinic heapprofile -- node server.js` |
-| `0x` | Lightweight CPU flame graph | `0x server.js` |
-| `autocannon` | HTTP load testing | `autocannon -c 100 -d 30 http://localhost:3000` |
-| `--inspect` | Chrome DevTools debugging and profiling | `node --inspect dist/server.js` |
-| Node.js `perf_hooks` | Programmatic performance measurement | Built-in, no external dependency |
+| Tool                 | Purpose                                            | Usage                                           |
+| -------------------- | -------------------------------------------------- | ----------------------------------------------- |
+| `clinic doctor`      | Identify bottleneck category (I/O, event loop, GC) | `clinic doctor -- node server.js`               |
+| `clinic flame`       | CPU flame graph (function-level hotspots)          | `clinic flame -- node server.js`                |
+| `clinic heapprofile` | Memory allocation profiling                        | `clinic heapprofile -- node server.js`          |
+| `0x`                 | Lightweight CPU flame graph                        | `0x server.js`                                  |
+| `autocannon`         | HTTP load testing                                  | `autocannon -c 100 -d 30 http://localhost:3000` |
+| `--inspect`          | Chrome DevTools debugging and profiling            | `node --inspect dist/server.js`                 |
+| Node.js `perf_hooks` | Programmatic performance measurement               | Built-in, no external dependency                |
 
 ### Performance Measurement
 
 ```typescript
-import { performance, PerformanceObserver } from 'node:perf_hooks';
+import { performance, PerformanceObserver } from "node:perf_hooks";
 
 // Measure specific operations
 async function measureDbQuery() {
   const start = performance.now();
-  const result = await db.query('SELECT * FROM users WHERE active = true');
+  const result = await db.query("SELECT * FROM users WHERE active = true");
   const duration = performance.now() - start;
 
-  metrics.histogram('db.query.duration', duration, { query: 'active_users' });
+  metrics.histogram("db.query.duration", duration, { query: "active_users" });
   return result;
 }
 
 // Monitor event loop lag
-import { monitorEventLoopDelay } from 'node:perf_hooks';
+import { monitorEventLoopDelay } from "node:perf_hooks";
 
 const histogram = monitorEventLoopDelay({ resolution: 20 });
 histogram.enable();
 
 setInterval(() => {
-  metrics.gauge('nodejs.event_loop.p50', histogram.percentile(50) / 1e6);
-  metrics.gauge('nodejs.event_loop.p99', histogram.percentile(99) / 1e6);
-  metrics.gauge('nodejs.event_loop.max', histogram.max / 1e6);
+  metrics.gauge("nodejs.event_loop.p50", histogram.percentile(50) / 1e6);
+  metrics.gauge("nodejs.event_loop.p99", histogram.percentile(99) / 1e6);
+  metrics.gauge("nodejs.event_loop.max", histogram.max / 1e6);
   histogram.reset();
 }, 10_000);
 ```
 
 ### Performance Budgets
 
-| Metric | Target | Action If Exceeded |
-|--------|--------|--------------------|
-| Event loop lag P99 | < 50ms | Profile CPU-heavy code, offload to workers |
-| Heap usage | < 70% of limit | Check for leaks, add LRU cache limits |
-| Response time P95 | < 200ms | Profile hot paths, add caching |
-| GC pause time | < 100ms | Reduce allocation rate, tune GC flags |
+| Metric             | Target         | Action If Exceeded                         |
+| ------------------ | -------------- | ------------------------------------------ |
+| Event loop lag P99 | < 50ms         | Profile CPU-heavy code, offload to workers |
+| Heap usage         | < 70% of limit | Check for leaks, add LRU cache limits      |
+| Response time P95  | < 200ms        | Profile hot paths, add caching             |
+| GC pause time      | < 100ms        | Reduce allocation rate, tune GC flags      |
 
 ---
 
@@ -661,22 +676,22 @@ CMD ["node", "dist/server.js"]
 
 ```typescript
 // Kubernetes-compatible health checks
-app.get('/health/live', (req, res) => {
-  res.status(200).json({ status: 'alive' });
+app.get("/health/live", (req, res) => {
+  res.status(200).json({ status: "alive" });
 });
 
-app.get('/health/ready', async (req, res) => {
+app.get("/health/ready", async (req, res) => {
   const checks = await Promise.allSettled([
     db.$queryRaw`SELECT 1`,
     redis.ping(),
   ]);
 
-  const allHealthy = checks.every(c => c.status === 'fulfilled');
+  const allHealthy = checks.every((c) => c.status === "fulfilled");
   res.status(allHealthy ? 200 : 503).json({
-    status: allHealthy ? 'ready' : 'not ready',
+    status: allHealthy ? "ready" : "not ready",
     checks: {
-      database: checks[0].status === 'fulfilled' ? 'ok' : 'fail',
-      cache: checks[1].status === 'fulfilled' ? 'ok' : 'fail',
+      database: checks[0].status === "fulfilled" ? "ok" : "fail",
+      cache: checks[1].status === "fulfilled" ? "ok" : "fail",
     },
   });
 });
@@ -686,16 +701,16 @@ app.get('/health/ready', async (req, res) => {
 
 ## Common Pitfalls
 
-| Pitfall | Impact | Fix |
-|---------|--------|-----|
-| Synchronous `fs` methods (`readFileSync`) | Blocks event loop | Use `fs/promises` |
-| `JSON.parse` on untrusted input without try/catch | Crashes process | Wrap in try/catch or use schema validation |
-| No timeout on HTTP client calls | Hangs indefinitely | `AbortSignal.timeout(5000)` on fetch |
-| Logging with `console.log` | No structure, no levels, slow | Use pino with structured JSON |
-| Starting without `NODE_ENV=production` | Debug overhead, verbose errors | Set in Dockerfile and deployment config |
-| Not setting `--max-old-space-size` | Default may be too high or too low | Set explicitly based on container memory limit |
-| Using `npm start` in Docker | Extra process, no signal handling | Use `node dist/server.js` directly |
-| Global error handlers that do not exit | Process in unknown state | Always exit after uncaughtException |
+| Pitfall                                           | Impact                             | Fix                                            |
+| ------------------------------------------------- | ---------------------------------- | ---------------------------------------------- |
+| Synchronous `fs` methods (`readFileSync`)         | Blocks event loop                  | Use `fs/promises`                              |
+| `JSON.parse` on untrusted input without try/catch | Crashes process                    | Wrap in try/catch or use schema validation     |
+| No timeout on HTTP client calls                   | Hangs indefinitely                 | `AbortSignal.timeout(5000)` on fetch           |
+| Logging with `console.log`                        | No structure, no levels, slow      | Use pino with structured JSON                  |
+| Starting without `NODE_ENV=production`            | Debug overhead, verbose errors     | Set in Dockerfile and deployment config        |
+| Not setting `--max-old-space-size`                | Default may be too high or too low | Set explicitly based on container memory limit |
+| Using `npm start` in Docker                       | Extra process, no signal handling  | Use `node dist/server.js` directly             |
+| Global error handlers that do not exit            | Process in unknown state           | Always exit after uncaughtException            |
 
 ---
 
@@ -703,11 +718,11 @@ app.get('/health/ready', async (req, res) => {
 
 ### Node.js Release Schedule
 
-| Version | Status | Active LTS Start | Maintenance End |
-|---------|--------|-------------------|-----------------|
-| Node.js 22 | Active LTS | October 2024 | April 2027 |
-| Node.js 20 | Maintenance | October 2023 | April 2026 |
-| Node.js 18 | End of Life | April 2023 | April 2025 |
+| Version    | Status      | Active LTS Start | Maintenance End |
+| ---------- | ----------- | ---------------- | --------------- |
+| Node.js 22 | Active LTS  | October 2024     | April 2027      |
+| Node.js 20 | Maintenance | October 2023     | April 2026      |
+| Node.js 18 | End of Life | April 2023       | April 2025      |
 
 **Recommendation (2026):** Use Node.js 22 LTS for new projects. Node.js 20 is acceptable for existing projects in maintenance.
 

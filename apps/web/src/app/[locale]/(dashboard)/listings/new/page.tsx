@@ -20,7 +20,10 @@ import {
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { WizardProgress } from "@/components/listings/wizard/wizard-progress";
-import { PhotoUpload, type UploadedPhoto } from "@/components/listings/wizard/photo-upload";
+import {
+  PhotoUpload,
+  type UploadedPhoto,
+} from "@/components/listings/wizard/photo-upload";
 import {
   FieldInput,
   FieldTextarea,
@@ -30,8 +33,15 @@ import {
   ChipSelect,
   ComboboxField,
 } from "@/components/listings/wizard/field-helpers";
-import { STEPS, INITIAL_FORM, type ListingFormData } from "@/components/listings/wizard/types";
-import { COUNTRIES, getRegionOptions } from "@/components/listings/wizard/location-data";
+import {
+  STEPS,
+  INITIAL_FORM,
+  type ListingFormData,
+} from "@/components/listings/wizard/types";
+import {
+  COUNTRIES,
+  getRegionOptions,
+} from "@/components/listings/wizard/location-data";
 
 const DRAFT_KEY = "listing_wizard_draft";
 
@@ -44,7 +54,11 @@ function saveDraft(form: ListingFormData, step: number) {
   }
 }
 
-function loadDraft(): { form: ListingFormData; step: number; savedAt: number } | null {
+function loadDraft(): {
+  form: ListingFormData;
+  step: number;
+  savedAt: number;
+} | null {
   try {
     const raw = localStorage.getItem(DRAFT_KEY);
     if (!raw) return null;
@@ -55,7 +69,11 @@ function loadDraft(): { form: ListingFormData; step: number; savedAt: number } |
 }
 
 function clearDraft() {
-  try { localStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ }
+  try {
+    localStorage.removeItem(DRAFT_KEY);
+  } catch {
+    /* ignore */
+  }
 }
 
 export default function CreateListingPage() {
@@ -67,9 +85,14 @@ export default function CreateListingPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState<ListingFormData>(INITIAL_FORM);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
+    "idle",
+  );
   const [showRestoreBanner, setShowRestoreBanner] = useState(false);
-  const [pendingDraft, setPendingDraft] = useState<{ form: ListingFormData; step: number } | null>(null);
+  const [pendingDraft, setPendingDraft] = useState<{
+    form: ListingFormData;
+    step: number;
+  } | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isFirstRender = useRef(true);
 
@@ -112,7 +135,10 @@ export default function CreateListingPage() {
     async (field: string, value: unknown) => {
       const zip = String(value ?? "").trim();
       setForm((prev) => ({ ...prev, zipCode: zip }));
-      if (/^\d{5}$/.test(zip) && (form.country === "US" || form.country === "")) {
+      if (
+        /^\d{5}$/.test(zip) &&
+        (form.country === "US" || form.country === "")
+      ) {
         try {
           const res = await fetch(`https://api.zippopotam.us/us/${zip}`);
           if (res.ok) {
@@ -145,7 +171,8 @@ export default function CreateListingPage() {
     switch (s) {
       case 0: // Location
         if (!form.title || form.title.length < 10) errors.push(v("titleMin"));
-        if (!form.description || form.description.length < 50) errors.push(v("descriptionMin"));
+        if (!form.description || form.description.length < 50)
+          errors.push(v("descriptionMin"));
         if (!form.propertyType) errors.push(v("propertyType"));
         if (!form.listingType) errors.push(v("listingType"));
         if (!form.country) errors.push(v("country"));
@@ -167,7 +194,8 @@ export default function CreateListingPage() {
         if (!form.parkingType) errors.push(v("parkingType"));
         break;
       case 4: // Price
-        if (!form.pricePerMonth || form.pricePerMonth <= 0) errors.push(v("pricePerMonth"));
+        if (!form.pricePerMonth || form.pricePerMonth <= 0)
+          errors.push(v("pricePerMonth"));
         if (!form.availableFrom) errors.push(v("availableFrom"));
         break;
       case 5: // Rules
@@ -176,9 +204,15 @@ export default function CreateListingPage() {
         if (!form.allowsVisitors) errors.push(v("allowsVisitors"));
         break;
       case 6: // Housing
-        if (!form.totalRooms || form.totalRooms <= 0) errors.push(v("totalRooms"));
-        if (!form.totalBathrooms || form.totalBathrooms <= 0) errors.push(v("totalBathrooms"));
-        if (form.currentOccupants === null || form.currentOccupants === undefined) errors.push(v("currentOccupants"));
+        if (!form.totalRooms || form.totalRooms <= 0)
+          errors.push(v("totalRooms"));
+        if (!form.totalBathrooms || form.totalBathrooms <= 0)
+          errors.push(v("totalBathrooms"));
+        if (
+          form.currentOccupants === null ||
+          form.currentOccupants === undefined
+        )
+          errors.push(v("currentOccupants"));
         break;
       case 7: // Photos
         {
@@ -202,7 +236,9 @@ export default function CreateListingPage() {
   function handleNext() {
     const errors = validateStep(step);
     if (errors.length > 0) {
-      setError(t("validation.requiredFields" as never) + "\n• " + errors.join("\n• "));
+      setError(
+        t("validation.requiredFields" as never) + "\n• " + errors.join("\n• "),
+      );
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -233,7 +269,11 @@ export default function CreateListingPage() {
     if (publish) {
       const validationErrors = validateForm();
       if (validationErrors.length > 0) {
-        setError(t("validation.requiredFields" as never) + "\n• " + validationErrors.join("\n• "));
+        setError(
+          t("validation.requiredFields" as never) +
+            "\n• " +
+            validationErrors.join("\n• "),
+        );
         setLoading(false);
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
@@ -242,7 +282,10 @@ export default function CreateListingPage() {
 
     try {
       const payload = buildPayload(form);
-      const res = await api.post<{ data: { id: string } }>("/listings", payload);
+      const res = await api.post<{ data: { id: string } }>(
+        "/listings",
+        payload,
+      );
       const listingId = res.data.id;
 
       // Upload photos to listing
@@ -312,7 +355,10 @@ export default function CreateListingPage() {
 
   const bathroomTypes = [
     { value: "private_ensuite", label: o("bathroomType.privateEnsuite") },
-    { value: "private_not_ensuite", label: o("bathroomType.privateNotEnsuite") },
+    {
+      value: "private_not_ensuite",
+      label: o("bathroomType.privateNotEnsuite"),
+    },
     { value: "shared", label: o("bathroomType.shared") },
   ];
 
@@ -395,15 +441,50 @@ export default function CreateListingPage() {
       case 0:
         return (
           <div className="space-y-5">
-            <SectionHeader icon={<MapPin className="h-5 w-5" />} title={t("sections.basicInfo")} subtitle={t("sections.basicInfoDesc")} />
-            <FieldInput field="title" value={form.title} onChange={set} required hint={t("fields.titleHint" as never)} />
-            <FieldTextarea field="description" value={form.description} onChange={set} required hint={t("fields.descriptionHint" as never)} minLength={50} maxLength={2000} rows={5} />
+            <SectionHeader
+              icon={<MapPin className="h-5 w-5" />}
+              title={t("sections.basicInfo")}
+              subtitle={t("sections.basicInfoDesc")}
+            />
+            <FieldInput
+              field="title"
+              value={form.title}
+              onChange={set}
+              required
+              hint={t("fields.titleHint" as never)}
+            />
+            <FieldTextarea
+              field="description"
+              value={form.description}
+              onChange={set}
+              required
+              hint={t("fields.descriptionHint" as never)}
+              minLength={50}
+              maxLength={2000}
+              rows={5}
+            />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FieldSelect field="propertyType" value={form.propertyType} onChange={set} options={propertyTypes} required />
-              <FieldSelect field="listingType" value={form.listingType} onChange={set} options={listingTypes} required />
+              <FieldSelect
+                field="propertyType"
+                value={form.propertyType}
+                onChange={set}
+                options={propertyTypes}
+                required
+              />
+              <FieldSelect
+                field="listingType"
+                value={form.listingType}
+                onChange={set}
+                options={listingTypes}
+                required
+              />
             </div>
             <div className="mt-2 border-t border-border pt-5">
-              <SectionHeader icon={<MapPin className="h-5 w-5" />} title={t("sections.address")} subtitle={t("sections.addressDesc")} />
+              <SectionHeader
+                icon={<MapPin className="h-5 w-5" />}
+                title={t("sections.address")}
+                subtitle={t("sections.addressDesc")}
+              />
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <ComboboxField
@@ -426,36 +507,111 @@ export default function CreateListingPage() {
                   required
                 />
               ) : (
-                <FieldInput field="state" value={form.state} onChange={set} required />
+                <FieldInput
+                  field="state"
+                  value={form.state}
+                  onChange={set}
+                  required
+                />
               )}
-              <FieldInput field="city" value={form.city} onChange={set} required />
+              <FieldInput
+                field="city"
+                value={form.city}
+                onChange={set}
+                required
+              />
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FieldInput field="zipCode" value={form.zipCode} onChange={handleZipChange} required hint={t("fields.zipHint" as never)} />
-              <FieldInput field="neighborhood" value={form.neighborhood} onChange={set} />
+              <FieldInput
+                field="zipCode"
+                value={form.zipCode}
+                onChange={handleZipChange}
+                required
+                hint={t("fields.zipHint" as never)}
+              />
+              <FieldInput
+                field="neighborhood"
+                value={form.neighborhood}
+                onChange={set}
+              />
             </div>
-            <FieldInput field="streetAddress" value={form.streetAddress} onChange={set} required hint={t("fields.streetAddressHint" as never)} />
+            <FieldInput
+              field="streetAddress"
+              value={form.streetAddress}
+              onChange={set}
+              required
+              hint={t("fields.streetAddressHint" as never)}
+            />
           </div>
         );
 
       case 1:
         return (
           <div className="space-y-5">
-            <SectionHeader icon={<Bed className="h-5 w-5" />} title={t("steps.room")} subtitle={t("sections.roomDesc")} />
+            <SectionHeader
+              icon={<Bed className="h-5 w-5" />}
+              title={t("steps.room")}
+              subtitle={t("sections.roomDesc")}
+            />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FieldSelect field="roomSize" value={form.roomSize} onChange={set} options={roomSizes} required />
-              <FieldSelect field="bedType" value={form.bedType} onChange={set} options={bedTypes} required />
+              <FieldSelect
+                field="roomSize"
+                value={form.roomSize}
+                onChange={set}
+                options={roomSizes}
+                required
+              />
+              <FieldSelect
+                field="bedType"
+                value={form.bedType}
+                onChange={set}
+                options={bedTypes}
+                required
+              />
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FieldInput field="bedCount" value={form.bedCount} onChange={set} type="number" min={1} max={4} />
-              <FieldInput field="floorLevel" value={form.floorLevel ?? ""} onChange={set} type="number" min={0} />
+              <FieldInput
+                field="bedCount"
+                value={form.bedCount}
+                onChange={set}
+                type="number"
+                min={1}
+                max={4}
+              />
+              <FieldInput
+                field="floorLevel"
+                value={form.floorLevel ?? ""}
+                onChange={set}
+                type="number"
+                min={0}
+              />
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <FieldToggle field="hasWindow" checked={form.hasWindow} onChange={set} />
-              <FieldToggle field="hasCloset" checked={form.hasCloset} onChange={set} />
-              <FieldToggle field="hasLock" checked={form.hasLock} onChange={set} />
-              <FieldToggle field="isFurnished" checked={form.isFurnished} onChange={set} />
-              <FieldToggle field="bedsheetsProvided" checked={form.bedsheetsProvided} onChange={set} />
+              <FieldToggle
+                field="hasWindow"
+                checked={form.hasWindow}
+                onChange={set}
+              />
+              <FieldToggle
+                field="hasCloset"
+                checked={form.hasCloset}
+                onChange={set}
+              />
+              <FieldToggle
+                field="hasLock"
+                checked={form.hasLock}
+                onChange={set}
+              />
+              <FieldToggle
+                field="isFurnished"
+                checked={form.isFurnished}
+                onChange={set}
+              />
+              <FieldToggle
+                field="bedsheetsProvided"
+                checked={form.bedsheetsProvided}
+                onChange={set}
+              />
             </div>
           </div>
         );
@@ -463,15 +619,45 @@ export default function CreateListingPage() {
       case 2:
         return (
           <div className="space-y-5">
-            <SectionHeader icon={<Bath className="h-5 w-5" />} title={t("steps.bathroom")} subtitle={t("sections.bathroomDesc")} />
+            <SectionHeader
+              icon={<Bath className="h-5 w-5" />}
+              title={t("steps.bathroom")}
+              subtitle={t("sections.bathroomDesc")}
+            />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FieldSelect field="bathroomType" value={form.bathroomType} onChange={set} options={bathroomTypes} required />
-              <FieldInput field="bathroomCount" value={form.bathroomCount} onChange={set} type="number" min={1} max={5} />
+              <FieldSelect
+                field="bathroomType"
+                value={form.bathroomType}
+                onChange={set}
+                options={bathroomTypes}
+                required
+              />
+              <FieldInput
+                field="bathroomCount"
+                value={form.bathroomCount}
+                onChange={set}
+                type="number"
+                min={1}
+                max={5}
+              />
             </div>
-            <FieldSelect field="hotWater" value={form.hotWater ?? ""} onChange={set} options={hotWaterOptions} />
+            <FieldSelect
+              field="hotWater"
+              value={form.hotWater ?? ""}
+              onChange={set}
+              options={hotWaterOptions}
+            />
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <FieldToggle field="hasBathtub" checked={form.hasBathtub} onChange={set} />
-              <FieldToggle field="hasShower" checked={form.hasShower} onChange={set} />
+              <FieldToggle
+                field="hasBathtub"
+                checked={form.hasBathtub}
+                onChange={set}
+              />
+              <FieldToggle
+                field="hasShower"
+                checked={form.hasShower}
+                onChange={set}
+              />
             </div>
           </div>
         );
@@ -479,27 +665,79 @@ export default function CreateListingPage() {
       case 3:
         return (
           <div className="space-y-5">
-            <SectionHeader icon={<Sofa className="h-5 w-5" />} title={t("steps.common")} subtitle={t("sections.commonDesc")} />
+            <SectionHeader
+              icon={<Sofa className="h-5 w-5" />}
+              title={t("steps.common")}
+              subtitle={t("sections.commonDesc")}
+            />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <FieldSelect field="kitchenAccess" value={form.kitchenAccess} onChange={set} options={kitchenOptions} required />
-              <FieldSelect field="laundryAccess" value={form.laundryAccess} onChange={set} options={laundryOptions} required />
-              <FieldSelect field="parkingType" value={form.parkingType} onChange={set} options={parkingOptions} required />
+              <FieldSelect
+                field="kitchenAccess"
+                value={form.kitchenAccess}
+                onChange={set}
+                options={kitchenOptions}
+                required
+              />
+              <FieldSelect
+                field="laundryAccess"
+                value={form.laundryAccess}
+                onChange={set}
+                options={laundryOptions}
+                required
+              />
+              <FieldSelect
+                field="parkingType"
+                value={form.parkingType}
+                onChange={set}
+                options={parkingOptions}
+                required
+              />
             </div>
-            <FieldToggle field="livingRoomAccess" checked={form.livingRoomAccess} onChange={set} />
+            <FieldToggle
+              field="livingRoomAccess"
+              checked={form.livingRoomAccess}
+              onChange={set}
+            />
 
             <div className="mt-2 border-t border-border pt-5">
-              <SectionHeader icon={<Trees className="h-5 w-5" />} title={t("sections.outdoor")} />
+              <SectionHeader
+                icon={<Trees className="h-5 w-5" />}
+                title={t("sections.outdoor")}
+              />
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <FieldToggle field="hasBackyard" checked={form.hasBackyard} onChange={set} />
-              <FieldToggle field="hasPatio" checked={form.hasPatio} onChange={set} />
-              <FieldToggle field="hasBalcony" checked={form.hasBalcony} onChange={set} />
-              <FieldToggle field="hasPool" checked={form.hasPool} onChange={set} />
-              <FieldToggle field="hasBBQArea" checked={form.hasBBQArea} onChange={set} />
+              <FieldToggle
+                field="hasBackyard"
+                checked={form.hasBackyard}
+                onChange={set}
+              />
+              <FieldToggle
+                field="hasPatio"
+                checked={form.hasPatio}
+                onChange={set}
+              />
+              <FieldToggle
+                field="hasBalcony"
+                checked={form.hasBalcony}
+                onChange={set}
+              />
+              <FieldToggle
+                field="hasPool"
+                checked={form.hasPool}
+                onChange={set}
+              />
+              <FieldToggle
+                field="hasBBQArea"
+                checked={form.hasBBQArea}
+                onChange={set}
+              />
             </div>
 
             <div className="mt-2 border-t border-border pt-5">
-              <SectionHeader icon={<Sparkles className="h-5 w-5" />} title={t("sections.amenities")} />
+              <SectionHeader
+                icon={<Sparkles className="h-5 w-5" />}
+                title={t("sections.amenities")}
+              />
             </div>
             <ChipSelect
               options={amenityOptions}
@@ -512,31 +750,89 @@ export default function CreateListingPage() {
       case 4:
         return (
           <div className="space-y-5">
-            <SectionHeader icon={<DollarSign className="h-5 w-5" />} title={t("steps.price")} subtitle={t("sections.priceDesc")} />
+            <SectionHeader
+              icon={<DollarSign className="h-5 w-5" />}
+              title={t("steps.price")}
+              subtitle={t("sections.priceDesc")}
+            />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FieldInput field="pricePerMonth" value={form.pricePerMonth ?? ""} onChange={set} type="number" min={1} required />
-              <FieldSelect field="currency" value={form.currency} onChange={set} options={[
-                { value: "USD", label: "USD ($)" },
-                { value: "EUR", label: "EUR (€)" },
-                { value: "GBP", label: "GBP (£)" },
-              ]} required />
+              <FieldInput
+                field="pricePerMonth"
+                value={form.pricePerMonth ?? ""}
+                onChange={set}
+                type="number"
+                min={1}
+                required
+              />
+              <FieldSelect
+                field="currency"
+                value={form.currency}
+                onChange={set}
+                options={[
+                  { value: "USD", label: "USD ($)" },
+                  { value: "EUR", label: "EUR (€)" },
+                  { value: "GBP", label: "GBP (£)" },
+                ]}
+                required
+              />
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FieldInput field="securityDeposit" value={form.securityDeposit ?? ""} onChange={set} type="number" min={0} />
-              <FieldInput field="utilitiesEstimate" value={form.utilitiesEstimate ?? ""} onChange={set} type="number" min={0} />
+              <FieldInput
+                field="securityDeposit"
+                value={form.securityDeposit ?? ""}
+                onChange={set}
+                type="number"
+                min={0}
+              />
+              <FieldInput
+                field="utilitiesEstimate"
+                value={form.utilitiesEstimate ?? ""}
+                onChange={set}
+                type="number"
+                min={0}
+              />
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <FieldToggle field="utilitiesIncluded" checked={form.utilitiesIncluded} onChange={set} />
-              <FieldToggle field="internetIncluded" checked={form.internetIncluded} onChange={set} />
-              <FieldToggle field="priceNegotiable" checked={form.priceNegotiable} onChange={set} />
+              <FieldToggle
+                field="utilitiesIncluded"
+                checked={form.utilitiesIncluded}
+                onChange={set}
+              />
+              <FieldToggle
+                field="internetIncluded"
+                checked={form.internetIncluded}
+                onChange={set}
+              />
+              <FieldToggle
+                field="priceNegotiable"
+                checked={form.priceNegotiable}
+                onChange={set}
+              />
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FieldInput field="minimumStay" value={form.minimumStay} onChange={set} type="number" min={1} max={12} required />
-              <FieldInput field="availableFrom" value={form.availableFrom} onChange={set} type="date" required />
+              <FieldInput
+                field="minimumStay"
+                value={form.minimumStay}
+                onChange={set}
+                type="number"
+                min={1}
+                max={12}
+                required
+              />
+              <FieldInput
+                field="availableFrom"
+                value={form.availableFrom}
+                onChange={set}
+                type="date"
+                required
+              />
             </div>
 
             <div className="mt-2 border-t border-border pt-5">
-              <SectionHeader icon={<DollarSign className="h-5 w-5" />} title={t("sections.payment")} />
+              <SectionHeader
+                icon={<DollarSign className="h-5 w-5" />}
+                title={t("sections.payment")}
+              />
             </div>
             <ChipSelect
               options={paymentOptions}
@@ -549,44 +845,137 @@ export default function CreateListingPage() {
       case 5:
         return (
           <div className="space-y-5">
-            <SectionHeader icon={<ShieldCheck className="h-5 w-5" />} title={t("steps.rules")} subtitle={t("sections.rulesDesc")} />
+            <SectionHeader
+              icon={<ShieldCheck className="h-5 w-5" />}
+              title={t("steps.rules")}
+              subtitle={t("sections.rulesDesc")}
+            />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FieldSelect field="allowsPets" value={form.allowsPets} onChange={set} options={petOptions} required />
-              <FieldSelect field="allowsSmoking" value={form.allowsSmoking} onChange={set} options={smokingOptions} required />
+              <FieldSelect
+                field="allowsPets"
+                value={form.allowsPets}
+                onChange={set}
+                options={petOptions}
+                required
+              />
+              <FieldSelect
+                field="allowsSmoking"
+                value={form.allowsSmoking}
+                onChange={set}
+                options={smokingOptions}
+                required
+              />
             </div>
-            <FieldSelect field="allowsVisitors" value={form.allowsVisitors} onChange={set} options={visitorOptions} required />
+            <FieldSelect
+              field="allowsVisitors"
+              value={form.allowsVisitors}
+              onChange={set}
+              options={visitorOptions}
+              required
+            />
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <FieldToggle field="allowsCouples" checked={form.allowsCouples} onChange={set} />
-              <FieldToggle field="allowsChildren" checked={form.allowsChildren} onChange={set} />
+              <FieldToggle
+                field="allowsCouples"
+                checked={form.allowsCouples}
+                onChange={set}
+              />
+              <FieldToggle
+                field="allowsChildren"
+                checked={form.allowsChildren}
+                onChange={set}
+              />
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FieldInput field="maxOccupants" value={form.maxOccupants} onChange={set} type="number" min={1} max={6} required />
-              <FieldInput field="quietHours" value={form.quietHours} onChange={set} placeholder="22:00 - 08:00" />
+              <FieldInput
+                field="maxOccupants"
+                value={form.maxOccupants}
+                onChange={set}
+                type="number"
+                min={1}
+                max={6}
+                required
+              />
+              <FieldInput
+                field="quietHours"
+                value={form.quietHours}
+                onChange={set}
+                placeholder="22:00 - 08:00"
+              />
             </div>
-            <FieldTextarea field="additionalRules" value={form.additionalRules} onChange={set} rows={3} />
+            <FieldTextarea
+              field="additionalRules"
+              value={form.additionalRules}
+              onChange={set}
+              rows={3}
+            />
           </div>
         );
 
       case 6:
         return (
           <div className="space-y-5">
-            <SectionHeader icon={<Home className="h-5 w-5" />} title={t("steps.housing")} subtitle={t("sections.housingDesc")} />
+            <SectionHeader
+              icon={<Home className="h-5 w-5" />}
+              title={t("steps.housing")}
+              subtitle={t("sections.housingDesc")}
+            />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <FieldInput field="totalRooms" value={form.totalRooms ?? ""} onChange={set} type="number" min={1} required />
-              <FieldInput field="totalBathrooms" value={form.totalBathrooms ?? ""} onChange={set} type="number" min={1} required />
-              <FieldInput field="currentOccupants" value={form.currentOccupants ?? ""} onChange={set} type="number" min={0} required />
+              <FieldInput
+                field="totalRooms"
+                value={form.totalRooms ?? ""}
+                onChange={set}
+                type="number"
+                min={1}
+                required
+              />
+              <FieldInput
+                field="totalBathrooms"
+                value={form.totalBathrooms ?? ""}
+                onChange={set}
+                type="number"
+                min={1}
+                required
+              />
+              <FieldInput
+                field="currentOccupants"
+                value={form.currentOccupants ?? ""}
+                onChange={set}
+                type="number"
+                min={0}
+                required
+              />
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <FieldToggle field="hostLivesIn" checked={form.hostLivesIn} onChange={set} />
-              <FieldToggle field="hasContract" checked={form.hasContract} onChange={set} />
+              <FieldToggle
+                field="hostLivesIn"
+                checked={form.hostLivesIn}
+                onChange={set}
+              />
+              <FieldToggle
+                field="hasContract"
+                checked={form.hasContract}
+                onChange={set}
+              />
             </div>
 
             <div className="mt-2 border-t border-border pt-5">
-              <SectionHeader icon={<Users className="h-5 w-5" />} title={t("sections.preferences")} subtitle={t("sections.preferencesDesc")} />
+              <SectionHeader
+                icon={<Users className="h-5 w-5" />}
+                title={t("sections.preferences")}
+                subtitle={t("sections.preferencesDesc")}
+              />
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <FieldToggle field="lgbtFriendly" checked={form.lgbtFriendly} onChange={set} />
-              <FieldToggle field="prefersBrazilian" checked={form.prefersBrazilian} onChange={set} />
+              <FieldToggle
+                field="lgbtFriendly"
+                checked={form.lgbtFriendly}
+                onChange={set}
+              />
+              <FieldToggle
+                field="prefersBrazilian"
+                checked={form.prefersBrazilian}
+                onChange={set}
+              />
             </div>
           </div>
         );
@@ -594,13 +983,20 @@ export default function CreateListingPage() {
       case 7:
         return (
           <div className="space-y-5">
-            <SectionHeader icon={<Camera className="h-5 w-5" />} title={t("steps.photos")} subtitle={t("sections.photosDesc")} />
+            <SectionHeader
+              icon={<Camera className="h-5 w-5" />}
+              title={t("steps.photos")}
+              subtitle={t("sections.photosDesc")}
+            />
             <PhotoUpload
               photos={form.photos}
               coverIndex={form.coverPhotoIndex}
               onChange={(photos) => {
                 if (typeof photos === "function") {
-                  setForm((prev) => ({ ...prev, photos: (photos as Function)(prev.photos) }));
+                  setForm((prev) => ({
+                    ...prev,
+                    photos: (photos as Function)(prev.photos),
+                  }));
                 } else {
                   set("photos", photos);
                 }
@@ -620,25 +1016,46 @@ export default function CreateListingPage() {
 
   function renderReview() {
     const validPhotos = form.photos.filter((p) => p.url && !p.error);
-    const apiBase = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1").replace("/api/v1", "");
+    const apiBase = (
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1"
+    ).replace("/api/v1", "");
 
     // Helper to resolve option label from value
-    const optLabel = (options: { value: string; label: string }[], value: string) =>
-      options.find((o) => o.value === value)?.label || value;
+    const optLabel = (
+      options: { value: string; label: string }[],
+      value: string,
+    ) => options.find((o) => o.value === value)?.label || value;
 
     // Helper to format boolean as Sim/Não
     const yesNo = (val: boolean) => (val ? "✓" : "—");
 
-    type ReviewItem = { label: string; value: string | number | boolean | undefined | null };
+    type ReviewItem = {
+      label: string;
+      value: string | number | boolean | undefined | null;
+    };
 
-    const sections: { title: string; icon: React.ReactNode; items: ReviewItem[] }[] = [
+    const sections: {
+      title: string;
+      icon: React.ReactNode;
+      items: ReviewItem[];
+    }[] = [
       {
         title: t("steps.location"),
         icon: <MapPin className="h-4 w-4" />,
         items: [
-          { label: f("propertyType"), value: form.propertyType && optLabel(propertyTypes, form.propertyType) },
-          { label: f("listingType"), value: form.listingType && optLabel(listingTypes, form.listingType) },
-          { label: f("city"), value: form.city ? `${form.city}, ${form.state}` : undefined },
+          {
+            label: f("propertyType"),
+            value:
+              form.propertyType && optLabel(propertyTypes, form.propertyType),
+          },
+          {
+            label: f("listingType"),
+            value: form.listingType && optLabel(listingTypes, form.listingType),
+          },
+          {
+            label: f("city"),
+            value: form.city ? `${form.city}, ${form.state}` : undefined,
+          },
           { label: f("country"), value: form.country },
           { label: f("neighborhood"), value: form.neighborhood },
           { label: f("zipCode"), value: form.zipCode },
@@ -648,44 +1065,110 @@ export default function CreateListingPage() {
         title: t("steps.room"),
         icon: <Bed className="h-4 w-4" />,
         items: [
-          { label: f("roomSize"), value: form.roomSize && optLabel(roomSizes, form.roomSize) },
-          { label: f("bedType"), value: form.bedType && optLabel(bedTypes, form.bedType) },
+          {
+            label: f("roomSize"),
+            value: form.roomSize && optLabel(roomSizes, form.roomSize),
+          },
+          {
+            label: f("bedType"),
+            value: form.bedType && optLabel(bedTypes, form.bedType),
+          },
           { label: f("bedCount"), value: form.bedCount },
           { label: f("floorLevel"), value: form.floorLevel },
-          { label: f("bedsheetsProvided"), value: form.bedsheetsProvided ? yesNo(form.bedsheetsProvided) : undefined },
+          {
+            label: f("bedsheetsProvided"),
+            value: form.bedsheetsProvided
+              ? yesNo(form.bedsheetsProvided)
+              : undefined,
+          },
         ],
       },
       {
         title: t("steps.bathroom"),
         icon: <Bath className="h-4 w-4" />,
         items: [
-          { label: f("bathroomType"), value: form.bathroomType && optLabel(bathroomTypes, form.bathroomType) },
+          {
+            label: f("bathroomType"),
+            value:
+              form.bathroomType && optLabel(bathroomTypes, form.bathroomType),
+          },
           { label: f("bathroomCount"), value: form.bathroomCount },
-          { label: f("hasBathtub"), value: form.hasBathtub ? yesNo(form.hasBathtub) : undefined },
-          { label: f("hasShower"), value: form.hasShower ? yesNo(form.hasShower) : undefined },
-          { label: f("hotWater"), value: form.hotWater && optLabel(hotWaterOptions, form.hotWater) },
+          {
+            label: f("hasBathtub"),
+            value: form.hasBathtub ? yesNo(form.hasBathtub) : undefined,
+          },
+          {
+            label: f("hasShower"),
+            value: form.hasShower ? yesNo(form.hasShower) : undefined,
+          },
+          {
+            label: f("hotWater"),
+            value: form.hotWater && optLabel(hotWaterOptions, form.hotWater),
+          },
         ],
       },
       {
         title: t("steps.common"),
         icon: <Sofa className="h-4 w-4" />,
         items: [
-          { label: f("kitchenAccess"), value: form.kitchenAccess && optLabel(kitchenOptions, form.kitchenAccess) },
-          { label: f("laundryAccess"), value: form.laundryAccess && optLabel(laundryOptions, form.laundryAccess) },
-          { label: f("parkingType"), value: form.parkingType && optLabel(parkingOptions, form.parkingType) },
-          { label: f("livingRoomAccess"), value: form.livingRoomAccess ? yesNo(form.livingRoomAccess) : undefined },
+          {
+            label: f("kitchenAccess"),
+            value:
+              form.kitchenAccess &&
+              optLabel(kitchenOptions, form.kitchenAccess),
+          },
+          {
+            label: f("laundryAccess"),
+            value:
+              form.laundryAccess &&
+              optLabel(laundryOptions, form.laundryAccess),
+          },
+          {
+            label: f("parkingType"),
+            value:
+              form.parkingType && optLabel(parkingOptions, form.parkingType),
+          },
+          {
+            label: f("livingRoomAccess"),
+            value: form.livingRoomAccess
+              ? yesNo(form.livingRoomAccess)
+              : undefined,
+          },
         ],
       },
       {
         title: t("steps.price"),
         icon: <DollarSign className="h-4 w-4" />,
         items: [
-          { label: f("pricePerMonth"), value: form.pricePerMonth ? `${form.currency} ${form.pricePerMonth}` : undefined },
-          { label: f("securityDeposit"), value: form.securityDeposit ? `${form.currency} ${form.securityDeposit}` : undefined },
-          { label: f("utilitiesIncluded"), value: yesNo(form.utilitiesIncluded) },
-          { label: f("utilitiesEstimate"), value: form.utilitiesEstimate ? `${form.currency} ${form.utilitiesEstimate}` : undefined },
+          {
+            label: f("pricePerMonth"),
+            value: form.pricePerMonth
+              ? `${form.currency} ${form.pricePerMonth}`
+              : undefined,
+          },
+          {
+            label: f("securityDeposit"),
+            value: form.securityDeposit
+              ? `${form.currency} ${form.securityDeposit}`
+              : undefined,
+          },
+          {
+            label: f("utilitiesIncluded"),
+            value: yesNo(form.utilitiesIncluded),
+          },
+          {
+            label: f("utilitiesEstimate"),
+            value: form.utilitiesEstimate
+              ? `${form.currency} ${form.utilitiesEstimate}`
+              : undefined,
+          },
           { label: f("internetIncluded"), value: yesNo(form.internetIncluded) },
-          { label: f("priceNegotiable"), value: form.priceNegotiable ? yesNo(form.priceNegotiable) : undefined },
+          {
+            label: f("priceNegotiable"),
+            value: form.priceNegotiable
+              ? yesNo(form.priceNegotiable)
+              : undefined,
+          },
           { label: f("availableFrom"), value: form.availableFrom },
           { label: f("minimumStay"), value: form.minimumStay || undefined },
         ],
@@ -694,11 +1177,24 @@ export default function CreateListingPage() {
         title: t("steps.rules"),
         icon: <ShieldCheck className="h-4 w-4" />,
         items: [
-          { label: f("allowsPets"), value: form.allowsPets && optLabel(petOptions, form.allowsPets) },
-          { label: f("allowsSmoking"), value: form.allowsSmoking && optLabel(smokingOptions, form.allowsSmoking) },
+          {
+            label: f("allowsPets"),
+            value: form.allowsPets && optLabel(petOptions, form.allowsPets),
+          },
+          {
+            label: f("allowsSmoking"),
+            value:
+              form.allowsSmoking &&
+              optLabel(smokingOptions, form.allowsSmoking),
+          },
           { label: f("allowsCouples"), value: yesNo(form.allowsCouples) },
           { label: f("allowsChildren"), value: yesNo(form.allowsChildren) },
-          { label: f("allowsVisitors"), value: form.allowsVisitors && optLabel(visitorOptions, form.allowsVisitors) },
+          {
+            label: f("allowsVisitors"),
+            value:
+              form.allowsVisitors &&
+              optLabel(visitorOptions, form.allowsVisitors),
+          },
           { label: f("quietHours"), value: form.quietHours || undefined },
           { label: f("maxOccupants"), value: form.maxOccupants || undefined },
         ],
@@ -712,8 +1208,16 @@ export default function CreateListingPage() {
           { label: f("currentOccupants"), value: form.currentOccupants },
           { label: f("hostLivesIn"), value: yesNo(form.hostLivesIn) },
           { label: f("hasContract"), value: yesNo(form.hasContract) },
-          { label: f("lgbtFriendly"), value: form.lgbtFriendly ? yesNo(form.lgbtFriendly) : undefined },
-          { label: f("prefersBrazilian"), value: form.prefersBrazilian ? yesNo(form.prefersBrazilian) : undefined },
+          {
+            label: f("lgbtFriendly"),
+            value: form.lgbtFriendly ? yesNo(form.lgbtFriendly) : undefined,
+          },
+          {
+            label: f("prefersBrazilian"),
+            value: form.prefersBrazilian
+              ? yesNo(form.prefersBrazilian)
+              : undefined,
+          },
         ],
       },
     ];
@@ -747,13 +1251,20 @@ export default function CreateListingPage() {
 
     return (
       <div className="space-y-6">
-        <SectionHeader icon={<Sparkles className="h-5 w-5" />} title={t("sections.reviewTitle")} subtitle={t("sections.reviewDesc")} />
+        <SectionHeader
+          icon={<Sparkles className="h-5 w-5" />}
+          title={t("sections.reviewTitle")}
+          subtitle={t("sections.reviewDesc")}
+        />
 
         {/* Photo preview */}
         {validPhotos.length > 0 && (
           <div className="grid grid-cols-4 gap-2 rounded-xl overflow-hidden">
             {validPhotos.slice(0, 5).map((photo, i) => (
-              <div key={photo.id} className={`relative ${i === 0 ? "col-span-2 row-span-2" : ""}`}>
+              <div
+                key={photo.id}
+                className={`relative ${i === 0 ? "col-span-2 row-span-2" : ""}`}
+              >
                 <img
                   src={`${apiBase}${photo.url}`}
                   alt=""
@@ -777,7 +1288,11 @@ export default function CreateListingPage() {
         {/* Title & Description */}
         {(form.title || form.description) && (
           <div className="rounded-xl border border-border bg-background p-5">
-            {form.title && <h3 className="text-base font-semibold text-foreground">{form.title}</h3>}
+            {form.title && (
+              <h3 className="text-base font-semibold text-foreground">
+                {form.title}
+              </h3>
+            )}
             {form.description && (
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
                 {form.description}
@@ -790,19 +1305,32 @@ export default function CreateListingPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {sections.map((section) => {
             const filledItems = section.items.filter(
-              (item) => item.value !== undefined && item.value !== null && item.value !== "",
+              (item) =>
+                item.value !== undefined &&
+                item.value !== null &&
+                item.value !== "",
             );
             if (filledItems.length === 0) return null;
             return (
-              <div key={section.title} className="rounded-xl border border-border bg-background p-5">
+              <div
+                key={section.title}
+                className="rounded-xl border border-border bg-background p-5"
+              >
                 <div className="mb-3 flex items-center gap-2">
                   <span className="text-primary">{section.icon}</span>
-                  <h3 className="text-sm font-semibold text-foreground">{section.title}</h3>
+                  <h3 className="text-sm font-semibold text-foreground">
+                    {section.title}
+                  </h3>
                 </div>
                 <dl className="space-y-2">
                   {filledItems.map((item) => (
-                    <div key={item.label} className="flex items-start justify-between gap-3 text-sm">
-                      <dt className="shrink-0 text-muted-foreground">{item.label}</dt>
+                    <div
+                      key={item.label}
+                      className="flex items-start justify-between gap-3 text-sm"
+                    >
+                      <dt className="shrink-0 text-muted-foreground">
+                        {item.label}
+                      </dt>
                       <dd className="font-medium text-foreground text-right break-words">
                         {String(item.value)}
                       </dd>
@@ -817,44 +1345,64 @@ export default function CreateListingPage() {
         {/* Additional rules */}
         {form.additionalRules && (
           <div className="rounded-xl border border-border bg-background p-5">
-            <h3 className="mb-2 text-sm font-semibold text-foreground">{f("additionalRules")}</h3>
-            <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">{form.additionalRules}</p>
+            <h3 className="mb-2 text-sm font-semibold text-foreground">
+              {f("additionalRules")}
+            </h3>
+            <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
+              {form.additionalRules}
+            </p>
           </div>
         )}
 
         {/* Chips sections: room features, outdoor, amenities, payment */}
         {roomFeatures.length > 0 && (
           <div className="rounded-xl border border-border bg-background p-5">
-            <h3 className="mb-3 text-sm font-semibold text-foreground">{t("steps.room")} — {t("sections.features")}</h3>
+            <h3 className="mb-3 text-sm font-semibold text-foreground">
+              {t("steps.room")} — {t("sections.features")}
+            </h3>
             <div className="flex flex-wrap gap-2">
-              {roomFeatures.map((label) => <Chip key={label} label={label} />)}
+              {roomFeatures.map((label) => (
+                <Chip key={label} label={label} />
+              ))}
             </div>
           </div>
         )}
 
         {outdoorFeatures.length > 0 && (
           <div className="rounded-xl border border-border bg-background p-5">
-            <h3 className="mb-3 text-sm font-semibold text-foreground">{t("sections.outdoor")}</h3>
+            <h3 className="mb-3 text-sm font-semibold text-foreground">
+              {t("sections.outdoor")}
+            </h3>
             <div className="flex flex-wrap gap-2">
-              {outdoorFeatures.map((label) => <Chip key={label} label={label} />)}
+              {outdoorFeatures.map((label) => (
+                <Chip key={label} label={label} />
+              ))}
             </div>
           </div>
         )}
 
         {amenityLabels.length > 0 && (
           <div className="rounded-xl border border-border bg-background p-5">
-            <h3 className="mb-3 text-sm font-semibold text-foreground">{t("sections.amenities")}</h3>
+            <h3 className="mb-3 text-sm font-semibold text-foreground">
+              {t("sections.amenities")}
+            </h3>
             <div className="flex flex-wrap gap-2">
-              {amenityLabels.map((label) => <Chip key={label} label={label} />)}
+              {amenityLabels.map((label) => (
+                <Chip key={label} label={label} />
+              ))}
             </div>
           </div>
         )}
 
         {paymentLabels.length > 0 && (
           <div className="rounded-xl border border-border bg-background p-5">
-            <h3 className="mb-3 text-sm font-semibold text-foreground">{t("sections.payment")}</h3>
+            <h3 className="mb-3 text-sm font-semibold text-foreground">
+              {t("sections.payment")}
+            </h3>
             <div className="flex flex-wrap gap-2">
-              {paymentLabels.map((label) => <Chip key={label} label={label} />)}
+              {paymentLabels.map((label) => (
+                <Chip key={label} label={label} />
+              ))}
             </div>
           </div>
         )}
@@ -864,7 +1412,9 @@ export default function CreateListingPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:py-12">
-      <h1 className="mb-2 text-2xl font-bold text-foreground sm:text-3xl">{t("title")}</h1>
+      <h1 className="mb-2 text-2xl font-bold text-foreground sm:text-3xl">
+        {t("title")}
+      </h1>
       <p className="mb-8 text-sm text-muted-foreground">{t("subtitle")}</p>
 
       {/* Restore draft banner */}
@@ -873,9 +1423,12 @@ export default function CreateListingPage() {
           <div className="flex items-start gap-3">
             <RotateCcw className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-blue-900">Rascunho salvo encontrado</p>
+              <p className="text-sm font-medium text-blue-900">
+                Rascunho salvo encontrado
+              </p>
               <p className="text-xs text-blue-700 mt-1">
-                Você tem um rascunho do passo {pendingDraft.step + 1}. Deseja continuar de onde parou?
+                Você tem um rascunho do passo {pendingDraft.step + 1}. Deseja
+                continuar de onde parou?
               </p>
             </div>
           </div>
@@ -915,7 +1468,9 @@ export default function CreateListingPage() {
           {saveStatus === "saved" && (
             <>
               <CheckCircle className="h-4 w-4 text-emerald-600" />
-              <span className="text-emerald-600 font-medium">Rascunho salvo</span>
+              <span className="text-emerald-600 font-medium">
+                Rascunho salvo
+              </span>
             </>
           )}
         </div>
@@ -947,7 +1502,10 @@ export default function CreateListingPage() {
       {/* Navigation */}
       <div className="mt-6 flex items-center justify-between">
         <button
-          onClick={() => { setError(""); setStep((s) => Math.max(0, s - 1)); }}
+          onClick={() => {
+            setError("");
+            setStep((s) => Math.max(0, s - 1));
+          }}
           disabled={step === 0}
           className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
         >

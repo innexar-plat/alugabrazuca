@@ -6,24 +6,24 @@ Operational patterns for building full-stack React applications with Remix v2 an
 
 ## Section Index
 
-| Section | Lines | Use when |
-|---------|-------|----------|
-| Remix v2 vs React Router v7 | 30–78 | Transition, imports, choosing starting point |
-| Vite Configuration | 79–139 | Setting up or migrating build tooling |
-| Loader & Action Patterns | 140–236 | Server-side data fetching and mutations |
-| clientLoader & clientAction | 237–318 | Client-side data, cache-first, offline |
-| Form Patterns & Optimistic UI | 319–396 | Forms, progressive enhancement |
-| Streaming & Deferred Data | 397–422 | Slow data sources, non-blocking rendering |
-| Revalidation Control | 423–490 | Cache control, reducing refetches |
-| Nested Routes & Layouts | 491–538 | Route hierarchy, shared layouts |
-| SPA Mode | 539–571 | Deploying without a server |
-| Resource Routes | 572–600 | API endpoints, file downloads, webhooks |
-| Session & Auth Patterns | 601–637 | Cookie sessions, auth guards |
-| Error Handling | 638–673 | Error boundaries |
-| Performance Patterns | 674–703 | Prefetching, single fetch, code splitting |
-| Testing Patterns | 704–752 | Loader/action unit tests |
-| Anti-Patterns | 753–842 | Common mistakes with WHY |
-| Decision Frameworks | 843–893 | When to use which pattern |
+| Section                       | Lines   | Use when                                     |
+| ----------------------------- | ------- | -------------------------------------------- |
+| Remix v2 vs React Router v7   | 30–78   | Transition, imports, choosing starting point |
+| Vite Configuration            | 79–139  | Setting up or migrating build tooling        |
+| Loader & Action Patterns      | 140–236 | Server-side data fetching and mutations      |
+| clientLoader & clientAction   | 237–318 | Client-side data, cache-first, offline       |
+| Form Patterns & Optimistic UI | 319–396 | Forms, progressive enhancement               |
+| Streaming & Deferred Data     | 397–422 | Slow data sources, non-blocking rendering    |
+| Revalidation Control          | 423–490 | Cache control, reducing refetches            |
+| Nested Routes & Layouts       | 491–538 | Route hierarchy, shared layouts              |
+| SPA Mode                      | 539–571 | Deploying without a server                   |
+| Resource Routes               | 572–600 | API endpoints, file downloads, webhooks      |
+| Session & Auth Patterns       | 601–637 | Cookie sessions, auth guards                 |
+| Error Handling                | 638–673 | Error boundaries                             |
+| Performance Patterns          | 674–703 | Prefetching, single fetch, code splitting    |
+| Testing Patterns              | 704–752 | Loader/action unit tests                     |
+| Anti-Patterns                 | 753–842 | Common mistakes with WHY                     |
+| Decision Frameworks           | 843–893 | When to use which pattern                    |
 
 ---
 
@@ -33,28 +33,28 @@ Operational patterns for building full-stack React applications with Remix v2 an
 
 Remix is merging into React Router. React Router v7 is effectively "Remix v3" — same team, same architecture, new package name. Understanding this is critical for import paths, documentation lookups, and long-term maintenance.
 
-| Aspect | Remix v2 | React Router v7 |
-|--------|----------|-----------------|
-| Package | `@remix-run/node`, `@remix-run/react` | `react-router` (unified package) |
-| Build tool | Remix compiler or Vite plugin | Vite plugin (only option) |
-| Config file | `remix.config.js` or `vite.config.ts` | `vite.config.ts` with `reactRouter()` plugin |
-| Route config | File-based (v2 flat routes) | File-based or `routes.ts` config |
-| `json()` helper | Required for typed responses | Optional — return plain objects (single fetch) |
-| Server runtime | `@remix-run/node`, `@remix-run/cloudflare` | `react-router` (adapters still exist) |
-| Status | Maintenance mode | Active development |
+| Aspect          | Remix v2                                   | React Router v7                                |
+| --------------- | ------------------------------------------ | ---------------------------------------------- |
+| Package         | `@remix-run/node`, `@remix-run/react`      | `react-router` (unified package)               |
+| Build tool      | Remix compiler or Vite plugin              | Vite plugin (only option)                      |
+| Config file     | `remix.config.js` or `vite.config.ts`      | `vite.config.ts` with `reactRouter()` plugin   |
+| Route config    | File-based (v2 flat routes)                | File-based or `routes.ts` config               |
+| `json()` helper | Required for typed responses               | Optional — return plain objects (single fetch) |
+| Server runtime  | `@remix-run/node`, `@remix-run/cloudflare` | `react-router` (adapters still exist)          |
+| Status          | Maintenance mode                           | Active development                             |
 
 ### Import Migration Map
 
 ```typescript
 // Remix v2 imports
-import { json, redirect, defer } from '@remix-run/node';
-import { useLoaderData, Form, useFetcher } from '@remix-run/react';
-import type { LoaderFunctionArgs, ActionFunctionArgs } from '@remix-run/node';
+import { json, redirect, defer } from "@remix-run/node";
+import { useLoaderData, Form, useFetcher } from "@remix-run/react";
+import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 
 // React Router v7 equivalents
-import { redirect, data } from 'react-router';
-import { useLoaderData, Form, useFetcher } from 'react-router';
-import type { Route } from './+types/my-route';
+import { redirect, data } from "react-router";
+import { useLoaderData, Form, useFetcher } from "react-router";
+import type { Route } from "./+types/my-route";
 // Note: json() is replaced by plain returns or data() for status/headers.
 // defer() is replaced by returning promises directly (single fetch).
 ```
@@ -82,9 +82,9 @@ New project in 2026?
 
 ```typescript
 // vite.config.ts
-import { reactRouter } from '@react-router/dev/vite';
-import { defineConfig } from 'vite';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import { reactRouter } from "@react-router/dev/vite";
+import { defineConfig } from "vite";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [reactRouter(), tsconfigPaths()],
@@ -93,26 +93,30 @@ export default defineConfig({
 
 ```typescript
 // react-router.config.ts
-import type { Config } from '@react-router/dev/config';
+import type { Config } from "@react-router/dev/config";
 
 export default {
   ssr: true, // false for SPA mode
-  async prerender() { return ['/', '/about', '/pricing']; },
+  async prerender() {
+    return ["/", "/about", "/pricing"];
+  },
 } satisfies Config;
 ```
 
 ### Remix v2 with Vite (Migration Path)
 
 ```typescript
-import { vitePlugin as remix } from '@remix-run/dev';
-import { defineConfig } from 'vite';
+import { vitePlugin as remix } from "@remix-run/dev";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [
     remix({
       future: {
-        v3_fetcherPersist: true, v3_relativeSplatPath: true,
-        v3_throwAbortReason: true, v3_lazyRouteDiscovery: true,
+        v3_fetcherPersist: true,
+        v3_relativeSplatPath: true,
+        v3_throwAbortReason: true,
+        v3_lazyRouteDiscovery: true,
         v3_singleFetch: true, // Opt into RR7 behaviors incrementally
       },
     }),
@@ -120,7 +124,7 @@ export default defineConfig({
 });
 ```
 
-Environment variables: server-side uses `process.env.DATABASE_URL` (never exposed). Client-side uses `import.meta.env.VITE_PUBLIC_API_URL` (VITE_ prefix = public).
+Environment variables: server-side uses `process.env.DATABASE_URL` (never exposed). Client-side uses `import.meta.env.VITE_PUBLIC_API_URL` (VITE\_ prefix = public).
 
 ---
 
@@ -156,12 +160,12 @@ Use `Promise.all` for independent queries in a single loader. Await auth first (
 ### Action with Validation
 
 ```typescript
-import { redirect, data } from 'react-router';
-import { z } from 'zod';
+import { redirect, data } from "react-router";
+import { z } from "zod";
 
 const createPostSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(200),
-  content: z.string().min(10, 'Content must be at least 10 characters'),
+  title: z.string().min(1, "Title is required").max(200),
+  content: z.string().min(10, "Content must be at least 10 characters"),
   categoryId: z.string().uuid(),
 });
 
@@ -169,13 +173,19 @@ export async function action({ request }: Route.ActionArgs) {
   const user = await requireAuth(request);
   const formData = await request.formData();
   const result = createPostSchema.safeParse({
-    title: formData.get('title'), content: formData.get('content'),
-    categoryId: formData.get('categoryId'),
+    title: formData.get("title"),
+    content: formData.get("content"),
+    categoryId: formData.get("categoryId"),
   });
   if (!result.success) {
-    return data({ errors: result.error.flatten().fieldErrors }, { status: 400 });
+    return data(
+      { errors: result.error.flatten().fieldErrors },
+      { status: 400 },
+    );
   }
-  const post = await db.post.create({ data: { ...result.data, authorId: user.id } });
+  const post = await db.post.create({
+    data: { ...result.data, authorId: user.id },
+  });
   return redirect(`/blog/${post.slug}`);
 }
 ```
@@ -185,11 +195,15 @@ export async function action({ request }: Route.ActionArgs) {
 ```typescript
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
-  switch (formData.get('intent')) {
-    case 'publish': return publishPost(formData);
-    case 'draft':   return saveDraft(formData);
-    case 'delete':  return deletePost(formData);
-    default: throw data({ message: 'Unknown intent' }, { status: 400 });
+  switch (formData.get("intent")) {
+    case "publish":
+      return publishPost(formData);
+    case "draft":
+      return saveDraft(formData);
+    case "delete":
+      return deletePost(formData);
+    default:
+      throw data({ message: "Unknown intent" }, { status: 400 });
   }
 }
 ```
@@ -202,14 +216,14 @@ export async function action({ request }: Route.ActionArgs) {
 
 ### When to Use
 
-| Pattern | Use `loader` (server) | Use `clientLoader` |
-|---------|----------------------|-------------------|
-| Database queries | Yes | No |
-| Secrets / auth checks | Yes | No |
-| Cache-first with fallback | Server as fallback | Client checks cache first |
-| LocalStorage / IndexedDB reads | No | Yes |
-| Combining server data + client data | Returns server portion | Merges both |
-| Offline-capable routes | No | Yes |
+| Pattern                             | Use `loader` (server)  | Use `clientLoader`        |
+| ----------------------------------- | ---------------------- | ------------------------- |
+| Database queries                    | Yes                    | No                        |
+| Secrets / auth checks               | Yes                    | No                        |
+| Cache-first with fallback           | Server as fallback     | Client checks cache first |
+| LocalStorage / IndexedDB reads      | No                     | Yes                       |
+| Combining server data + client data | Returns server portion | Merges both               |
+| Offline-capable routes              | No                     | Yes                       |
 
 ### Cache-First Pattern
 
@@ -217,20 +231,26 @@ export async function action({ request }: Route.ActionArgs) {
 // Server loader — fallback when cache misses
 export async function loader({ params }: Route.LoaderArgs) {
   const product = await db.product.findUnique({ where: { id: params.id } });
-  if (!product) throw data({ message: 'Not found' }, { status: 404 });
+  if (!product) throw data({ message: "Not found" }, { status: 404 });
   return { product };
 }
 
 // Client loader — checks localStorage before calling server
-export async function clientLoader({ params, serverLoader }: Route.ClientLoaderArgs) {
+export async function clientLoader({
+  params,
+  serverLoader,
+}: Route.ClientLoaderArgs) {
   const cached = localStorage.getItem(`product-${params.id}`);
   if (cached) {
     const parsed = JSON.parse(cached);
-    if (Date.now() - parsed.cachedAt < 5 * 60 * 1000) return { product: parsed.data };
+    if (Date.now() - parsed.cachedAt < 5 * 60 * 1000)
+      return { product: parsed.data };
   }
   const serverData = await serverLoader();
-  localStorage.setItem(`product-${params.id}`,
-    JSON.stringify({ data: serverData.product, cachedAt: Date.now() }));
+  localStorage.setItem(
+    `product-${params.id}`,
+    JSON.stringify({ data: serverData.product, cachedAt: Date.now() }),
+  );
   return serverData;
 }
 
@@ -252,24 +272,30 @@ For routes reading only from browser storage, export only `clientLoader` (no ser
 ### Form with Validation Feedback
 
 ```tsx
-import { Form, useNavigation } from 'react-router';
+import { Form, useNavigation } from "react-router";
 
 export default function CreatePost({ actionData }: Route.ComponentProps) {
-  const isSubmitting = useNavigation().state === 'submitting';
+  const isSubmitting = useNavigation().state === "submitting";
   return (
     <Form method="post">
       <fieldset disabled={isSubmitting}>
         <label htmlFor="title">Title</label>
         <input id="title" name="title" type="text" required />
         {actionData?.errors?.title && (
-          <p className="error" role="alert">{actionData.errors.title[0]}</p>
+          <p className="error" role="alert">
+            {actionData.errors.title[0]}
+          </p>
         )}
         <label htmlFor="content">Content</label>
         <textarea id="content" name="content" rows={10} required />
         {actionData?.errors?.content && (
-          <p className="error" role="alert">{actionData.errors.content[0]}</p>
+          <p className="error" role="alert">
+            {actionData.errors.content[0]}
+          </p>
         )}
-        <button type="submit">{isSubmitting ? 'Creating...' : 'Create Post'}</button>
+        <button type="submit">
+          {isSubmitting ? "Creating..." : "Create Post"}
+        </button>
       </fieldset>
     </Form>
   );
@@ -279,21 +305,21 @@ export default function CreatePost({ actionData }: Route.ComponentProps) {
 ### Optimistic UI with useFetcher
 
 ```tsx
-import { useFetcher } from 'react-router';
+import { useFetcher } from "react-router";
 
 function TodoItem({ todo }: { todo: Todo }) {
   const fetcher = useFetcher();
-  const isToggling = fetcher.formData?.get('intent') === 'toggle';
+  const isToggling = fetcher.formData?.get("intent") === "toggle";
   const optimisticDone = isToggling ? !todo.done : todo.done;
-  if (fetcher.formData?.get('intent') === 'delete') return null; // Optimistic removal
+  if (fetcher.formData?.get("intent") === "delete") return null; // Optimistic removal
 
   return (
-    <li className={optimisticDone ? 'completed' : ''}>
+    <li className={optimisticDone ? "completed" : ""}>
       <span>{todo.text}</span>
       <fetcher.Form method="post" action="/todos">
         <input type="hidden" name="intent" value="toggle" />
         <input type="hidden" name="todoId" value={todo.id} />
-        <button type="submit">{optimisticDone ? 'Undo' : 'Complete'}</button>
+        <button type="submit">{optimisticDone ? "Undo" : "Complete"}</button>
       </fetcher.Form>
     </li>
   );
@@ -315,9 +341,12 @@ export async function loader({ request }: Route.LoaderArgs) {
   const user = await requireAuth(request);
   const profile = await db.user.findUnique({ where: { id: user.id } });
   return {
-    profile,                                               // Renders immediately
-    recentActivity: db.activity.findMany({ where: { userId: user.id }, take: 20 }),  // Streams in
-    recommendations: recommendationService.getForUser(user.id),                      // Streams in
+    profile, // Renders immediately
+    recentActivity: db.activity.findMany({
+      where: { userId: user.id },
+      take: 20,
+    }), // Streams in
+    recommendations: recommendationService.getForUser(user.id), // Streams in
   };
 }
 ```
@@ -338,15 +367,21 @@ By default, all active loaders revalidate after every action and navigation. `sh
 
 ```typescript
 export function shouldRevalidate({
-  currentUrl, nextUrl, formAction, formMethod, defaultShouldRevalidate,
+  currentUrl,
+  nextUrl,
+  formAction,
+  formMethod,
+  defaultShouldRevalidate,
 }: ShouldRevalidateFunctionArgs) {
-  if (nextUrl.pathname.startsWith('/blog')) return false; // Skip for blog nav
-  if (formMethod === 'POST' && formAction === '/settings') return true;
+  if (nextUrl.pathname.startsWith("/blog")) return false; // Skip for blog nav
+  if (formMethod === "POST" && formAction === "/settings") return true;
   return defaultShouldRevalidate;
 }
 
 // Static data — never revalidate after initial load
-export function shouldRevalidate() { return false; }
+export function shouldRevalidate() {
+  return false;
+}
 ```
 
 Strategies: (1) `return false` for static data (site config, translations), (2) compare `searchParams` for pagination-only revalidation, (3) fall through to `defaultShouldRevalidate`.
@@ -356,13 +391,13 @@ Strategies: (1) `return false` for static data (site config, translations), (2) 
 Trigger manual revalidation from anywhere — useful for polling, websocket events, or after non-form mutations.
 
 ```tsx
-import { useRevalidator } from 'react-router';
+import { useRevalidator } from "react-router";
 
 function LiveDashboard() {
   const revalidator = useRevalidator();
   useEffect(() => {
     const interval = setInterval(() => {
-      if (revalidator.state === 'idle') revalidator.revalidate();
+      if (revalidator.state === "idle") revalidator.revalidate();
     }, 30_000);
     return () => clearInterval(interval);
   }, [revalidator]);
@@ -370,7 +405,7 @@ function LiveDashboard() {
   return (
     <div>
       <DashboardContent />
-      {revalidator.state === 'loading' && <span>Syncing...</span>}
+      {revalidator.state === "loading" && <span>Syncing...</span>}
     </div>
   );
 }
@@ -402,17 +437,21 @@ app/routes/
 ### Layout Route with Outlet
 
 ```tsx
-import { Outlet, NavLink } from 'react-router';
+import { Outlet, NavLink } from "react-router";
 
 export default function DashboardLayout() {
   return (
     <div className="dashboard">
       <nav>
-        <NavLink to="/dashboard" end>Overview</NavLink>
+        <NavLink to="/dashboard" end>
+          Overview
+        </NavLink>
         <NavLink to="/dashboard/projects">Projects</NavLink>
         <NavLink to="/dashboard/settings">Settings</NavLink>
       </nav>
-      <main><Outlet /></main>
+      <main>
+        <Outlet />
+      </main>
     </div>
   );
 }
@@ -430,13 +469,13 @@ SPA mode generates a static `index.html` at build time with no server runtime. U
 
 Set `ssr: false` in `react-router.config.ts`.
 
-| Feature | SSR mode | SPA mode |
-|---------|----------|----------|
-| Server `loader`/`action` | Available | Not available |
-| `clientLoader`/`clientAction` | Optional | Required for data/mutations |
-| Initial HTML | Server-rendered | Static shell |
-| SEO | Full SSR | Requires prerendering |
-| Hosting | Node/edge server | Any static host |
+| Feature                       | SSR mode         | SPA mode                    |
+| ----------------------------- | ---------------- | --------------------------- |
+| Server `loader`/`action`      | Available        | Not available               |
+| `clientLoader`/`clientAction` | Optional         | Required for data/mutations |
+| Initial HTML                  | Server-rendered  | Static shell                |
+| SEO                           | Full SSR         | Requires prerendering       |
+| Hosting                       | Node/edge server | Any static host             |
 
 In SPA mode, all data fetching uses `clientLoader`. Set `clientLoader.hydrate = true` and export `HydrateFallback`.
 
@@ -452,7 +491,7 @@ Resource routes have no default component — JSON APIs, file downloads, webhook
 // app/routes/api.posts.ts
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
-  const page = Number(url.searchParams.get('page')) || 1;
+  const page = Number(url.searchParams.get("page")) || 1;
   const [posts, total] = await Promise.all([
     db.post.findMany({ skip: (page - 1) * 20, take: 20 }),
     db.post.count(),
@@ -469,23 +508,28 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 ```typescript
 // app/utils/session.server.ts
-import { createCookieSessionStorage, redirect } from 'react-router';
+import { createCookieSessionStorage, redirect } from "react-router";
 
 const sessionStorage = createCookieSessionStorage({
   cookie: {
-    name: '__session',
-    secure: process.env.NODE_ENV === 'production',
+    name: "__session",
+    secure: process.env.NODE_ENV === "production",
     secrets: [process.env.SESSION_SECRET!],
-    sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 7, httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7,
+    httpOnly: true,
   },
 });
 
 export async function requireAuth(request: Request) {
-  const session = await sessionStorage.getSession(request.headers.get('Cookie'));
-  const userId = session.get('userId');
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie"),
+  );
+  const userId = session.get("userId");
   if (!userId) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirectTo', new URL(request.url).pathname);
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("redirectTo", new URL(request.url).pathname);
     throw redirect(loginUrl.toString());
   }
   return db.user.findUniqueOrThrow({ where: { id: userId } });
@@ -493,9 +537,9 @@ export async function requireAuth(request: Request) {
 
 export async function createUserSession(userId: string, redirectTo: string) {
   const session = await sessionStorage.getSession();
-  session.set('userId', userId);
+  session.set("userId", userId);
   return redirect(redirectTo, {
-    headers: { 'Set-Cookie': await sessionStorage.commitSession(session) },
+    headers: { "Set-Cookie": await sessionStorage.commitSession(session) },
   });
 }
 ```
@@ -507,7 +551,7 @@ export async function createUserSession(userId: string, redirectTo: string) {
 ### Route-Level Error Boundary
 
 ```tsx
-import { isRouteErrorResponse, useRouteError } from 'react-router';
+import { isRouteErrorResponse, useRouteError } from "react-router";
 
 export function ErrorBoundary() {
   const error = useRouteError();
@@ -519,8 +563,12 @@ export function ErrorBoundary() {
       </div>
     );
   }
-  console.error('Unexpected error:', error);
-  return <div className="error-page"><h1>Something went wrong</h1></div>;
+  console.error("Unexpected error:", error);
+  return (
+    <div className="error-page">
+      <h1>Something went wrong</h1>
+    </div>
+  );
 }
 ```
 
@@ -554,24 +602,33 @@ Routes are automatically code-split — each route module loads only when naviga
 ### Loader Unit Test
 
 ```typescript
-import { describe, it, expect, vi } from 'vitest';
-import { loader } from './blog.$slug';
+import { describe, it, expect, vi } from "vitest";
+import { loader } from "./blog.$slug";
 
-describe('blog post loader', () => {
-  it('returns post for valid slug', async () => {
-    vi.mocked(db.post.findUnique).mockResolvedValue(
-      { id: '1', slug: 'hello', title: 'Hello', content: '<p>Hi</p>' });
-    const result = await loader({
-      request: new Request('http://localhost/blog/hello'),
-      params: { slug: 'hello' }, context: {},
+describe("blog post loader", () => {
+  it("returns post for valid slug", async () => {
+    vi.mocked(db.post.findUnique).mockResolvedValue({
+      id: "1",
+      slug: "hello",
+      title: "Hello",
+      content: "<p>Hi</p>",
     });
-    expect(result.post.title).toBe('Hello');
+    const result = await loader({
+      request: new Request("http://localhost/blog/hello"),
+      params: { slug: "hello" },
+      context: {},
+    });
+    expect(result.post.title).toBe("Hello");
   });
 
-  it('throws 404 for unknown slug', async () => {
+  it("throws 404 for unknown slug", async () => {
     vi.mocked(db.post.findUnique).mockResolvedValue(null);
     await expect(
-      loader({ request: new Request('http://localhost/blog/x'), params: { slug: 'x' }, context: {} })
+      loader({
+        request: new Request("http://localhost/blog/x"),
+        params: { slug: "x" },
+        context: {},
+      }),
     ).rejects.toMatchObject({ status: 404 });
   });
 });
@@ -592,7 +649,9 @@ describe('blog post loader', () => {
 function ProductPage() {
   const [product, setProduct] = useState(null);
   useEffect(() => {
-    fetch(`/api/products/${id}`).then(r => r.json()).then(setProduct);
+    fetch(`/api/products/${id}`)
+      .then((r) => r.json())
+      .then(setProduct);
   }, [id]);
 }
 ```
@@ -643,8 +702,8 @@ return { user, posts: getPosts(user.id), comments: getComments(user.id) };
 ### 6. Using window.location for Navigation
 
 ```typescript
-window.location.href = '/dashboard'; // BAD — full reload, destroys state
-navigate('/dashboard');               // CORRECT — client-side transition
+window.location.href = "/dashboard"; // BAD — full reload, destroys state
+navigate("/dashboard"); // CORRECT — client-side transition
 ```
 
 **Why:** `window.location` destroys React trees, cached data, and client state. Use `useNavigate()` in components or `throw redirect()` from loaders/actions.
@@ -674,25 +733,25 @@ Where should this data come from?
 
 ### SSR vs SPA vs Prerendering
 
-| Criterion | SSR | SPA Mode | Prerendering |
-|-----------|-----|----------|-------------|
-| SEO | Full support | Limited | Full support |
-| First paint | Fast (streamed HTML) | Slower (JS must load) | Fastest (static HTML) |
-| Dynamic content | Yes | Yes | Build-time only |
-| Hosting | Node/edge server | Any static host | Any static host |
-| Auth-gated content | Server-side checks | Client-side checks | Not suitable |
-| Use case | Marketing, e-commerce, blogs | Admin panels, dashboards | Docs, landing pages |
+| Criterion          | SSR                          | SPA Mode                 | Prerendering          |
+| ------------------ | ---------------------------- | ------------------------ | --------------------- |
+| SEO                | Full support                 | Limited                  | Full support          |
+| First paint        | Fast (streamed HTML)         | Slower (JS must load)    | Fastest (static HTML) |
+| Dynamic content    | Yes                          | Yes                      | Build-time only       |
+| Hosting            | Node/edge server             | Any static host          | Any static host       |
+| Auth-gated content | Server-side checks           | Client-side checks       | Not suitable          |
+| Use case           | Marketing, e-commerce, blogs | Admin panels, dashboards | Docs, landing pages   |
 
 ### When to Use Form vs useFetcher
 
-| Scenario | Use `<Form>` | Use `useFetcher` |
-|----------|-------------|-----------------|
-| Full-page form submission | Yes | No |
-| Navigation after submit (redirect) | Yes | Possible but not typical |
-| Inline edit (no navigation) | No | Yes |
-| Multiple independent mutations on one page | No | Yes (one fetcher per item) |
-| File upload with progress | Either | Either |
-| Optimistic UI on list items | No | Yes |
+| Scenario                                   | Use `<Form>` | Use `useFetcher`           |
+| ------------------------------------------ | ------------ | -------------------------- |
+| Full-page form submission                  | Yes          | No                         |
+| Navigation after submit (redirect)         | Yes          | Possible but not typical   |
+| Inline edit (no navigation)                | No           | Yes                        |
+| Multiple independent mutations on one page | No           | Yes (one fetcher per item) |
+| File upload with progress                  | Either       | Either                     |
+| Optimistic UI on list items                | No           | Yes                        |
 
 ---
 

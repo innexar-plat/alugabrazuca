@@ -8,8 +8,8 @@ import {
   Min,
   Max,
   IsNumber,
-} from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+} from "class-validator";
+import { Transform, Type } from "class-transformer";
 import {
   ListingType,
   RoomSize,
@@ -17,7 +17,7 @@ import {
   BathroomType,
   KitchenAccess,
   LaundryAccess,
-} from '@prisma/client';
+} from "@prisma/client";
 
 export class SearchListingsDto {
   // ── Pagination ──
@@ -37,16 +37,16 @@ export class SearchListingsDto {
   // ── Sort ──
   @IsOptional()
   @IsString()
-  sortBy?: string = 'createdAt';
+  sortBy?: string = "createdAt";
 
   @IsOptional()
   @IsString()
-  order?: 'asc' | 'desc' = 'desc';
+  order?: "asc" | "desc" = "desc";
 
   // ── Text search ──
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
+  @Transform(({ value }) => (typeof value === "string" ? value.trim() : value))
   query?: string;
 
   // ── Location ──
@@ -84,12 +84,12 @@ export class SearchListingsDto {
   maxPrice?: number;
 
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ value }) => value === "true" || value === true)
   @IsBoolean()
   utilitiesIncluded?: boolean;
 
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ value }) => value === "true" || value === true)
   @IsBoolean()
   internetIncluded?: boolean;
 
@@ -107,17 +107,17 @@ export class SearchListingsDto {
   bedType?: BedType;
 
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ value }) => value === "true" || value === true)
   @IsBoolean()
   isFurnished?: boolean;
 
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ value }) => value === "true" || value === true)
   @IsBoolean()
   hasWindow?: boolean;
 
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ value }) => value === "true" || value === true)
   @IsBoolean()
   hasLock?: boolean;
 
@@ -137,27 +137,27 @@ export class SearchListingsDto {
 
   // ── Rules ──
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ value }) => value === "true" || value === true)
   @IsBoolean()
   allowsPets?: boolean;
 
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ value }) => value === "true" || value === true)
   @IsBoolean()
   allowsSmoking?: boolean;
 
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ value }) => value === "true" || value === true)
   @IsBoolean()
   allowsCouples?: boolean;
 
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ value }) => value === "true" || value === true)
   @IsBoolean()
   allowsChildren?: boolean;
 
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ value }) => value === "true" || value === true)
   @IsBoolean()
   lgbtFriendly?: boolean;
 
@@ -174,17 +174,17 @@ export class SearchListingsDto {
 
   // ── Other ──
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ value }) => value === "true" || value === true)
   @IsBoolean()
   hasParking?: boolean;
 
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ value }) => value === "true" || value === true)
   @IsBoolean()
   hasPool?: boolean;
 
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ value }) => value === "true" || value === true)
   @IsBoolean()
   hasContract?: boolean;
 }

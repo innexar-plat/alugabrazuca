@@ -1,18 +1,20 @@
 # Módulo 7 — Avaliações & Reviews (`reviews`)
 
 ## Visão Geral
+
 Sistema de avaliações bidirecionais: inquilino avalia o quarto/anfitrião e anfitrião avalia o inquilino. Baseado em experiência real de moradia.
 
 ---
 
 ## 7.1 Quem pode avaliar
 
-| Avaliador | Avalia | Quando |
-|-----------|--------|--------|
+| Avaliador                      | Avalia         | Quando                               |
+| ------------------------------ | -------------- | ------------------------------------ |
 | Inquilino → Quarto + Anfitrião | Listing + Host | Após 30 dias de moradia ou após sair |
-| Anfitrião → Inquilino | Tenant | Após inquilino sair |
+| Anfitrião → Inquilino          | Tenant         | Após inquilino sair                  |
 
 ### Pré-requisitos
+
 - Solicitação aceita (`inquiry.status = accepted`)
 - Mínimo 30 dias desde a aceitação OU anúncio marcado como `rented`
 - Cada parte pode avaliar apenas 1 vez por estadia
@@ -23,24 +25,24 @@ Sistema de avaliações bidirecionais: inquilino avalia o quarto/anfitrião e an
 
 ### Notas (1 a 5 estrelas)
 
-| Critério | Descrição |
-|----------|-----------|
-| `accuracyRating` | Anúncio corresponde à realidade? |
-| `cleanlinessRating` | Limpeza do quarto e áreas comuns |
-| `locationRating` | Localização e acessibilidade |
-| `valueRating` | Custo-benefício |
-| `communicationRating` | Comunicação com o anfitrião |
-| `overallRating` | Nota geral (calculada: média das anteriores) |
+| Critério              | Descrição                                    |
+| --------------------- | -------------------------------------------- |
+| `accuracyRating`      | Anúncio corresponde à realidade?             |
+| `cleanlinessRating`   | Limpeza do quarto e áreas comuns             |
+| `locationRating`      | Localização e acessibilidade                 |
+| `valueRating`         | Custo-benefício                              |
+| `communicationRating` | Comunicação com o anfitrião                  |
+| `overallRating`       | Nota geral (calculada: média das anteriores) |
 
 ### Campos adicionais
 
-| Campo | Tipo | Obrigatório | Descrição |
-|-------|------|-------------|-----------|
-| `comment` | text | ✅ | Comentário (min 20, max 1000 chars) |
-| `pros` | string[] | ❌ | Pontos positivos |
-| `cons` | string[] | ❌ | Pontos negativos |
-| `wouldRecommend` | boolean | ✅ | Recomendaria? |
-| `stayDuration` | integer | ✅ | Quanto tempo morou (meses) |
+| Campo            | Tipo     | Obrigatório | Descrição                           |
+| ---------------- | -------- | ----------- | ----------------------------------- |
+| `comment`        | text     | ✅          | Comentário (min 20, max 1000 chars) |
+| `pros`           | string[] | ❌          | Pontos positivos                    |
+| `cons`           | string[] | ❌          | Pontos negativos                    |
+| `wouldRecommend` | boolean  | ✅          | Recomendaria?                       |
+| `stayDuration`   | integer  | ✅          | Quanto tempo morou (meses)          |
 
 ---
 
@@ -48,20 +50,20 @@ Sistema de avaliações bidirecionais: inquilino avalia o quarto/anfitrião e an
 
 ### Notas (1 a 5 estrelas)
 
-| Critério | Descrição |
-|----------|-----------|
-| `cleanlinessRating` | Manteve o quarto limpo? |
-| `respectRating` | Respeitou regras da casa? |
+| Critério              | Descrição                 |
+| --------------------- | ------------------------- |
+| `cleanlinessRating`   | Manteve o quarto limpo?   |
+| `respectRating`       | Respeitou regras da casa? |
 | `communicationRating` | Comunicação e convivência |
-| `paymentRating` | Pagamento em dia? |
-| `overallRating` | Nota geral (média) |
+| `paymentRating`       | Pagamento em dia?         |
+| `overallRating`       | Nota geral (média)        |
 
 ### Campos adicionais
 
-| Campo | Tipo | Obrigatório |
-|-------|------|-------------|
-| `comment` | text | ✅ |
-| `wouldRentAgain` | boolean | ✅ |
+| Campo            | Tipo    | Obrigatório |
+| ---------------- | ------- | ----------- |
+| `comment`        | text    | ✅          |
+| `wouldRentAgain` | boolean | ✅          |
 
 ---
 
@@ -115,20 +117,20 @@ updated_at            TIMESTAMP NOT NULL DEFAULT NOW()
 
 ## 7.6 Endpoints
 
-| Método | Rota | Descrição | Auth |
-|--------|------|-----------|------|
-| POST | `/api/v1/reviews` | Criar avaliação | ✅ |
-| GET | `/api/v1/reviews/listing/:listingId` | Reviews do anúncio | ❌ |
-| GET | `/api/v1/reviews/user/:userId` | Reviews do usuário | ❌ |
-| GET | `/api/v1/reviews/pending` | Minhas avaliações pendentes | ✅ |
-| POST | `/api/v1/reviews/:id/report` | Reportar review | ✅ |
+| Método | Rota                                 | Descrição                   | Auth |
+| ------ | ------------------------------------ | --------------------------- | ---- |
+| POST   | `/api/v1/reviews`                    | Criar avaliação             | ✅   |
+| GET    | `/api/v1/reviews/listing/:listingId` | Reviews do anúncio          | ❌   |
+| GET    | `/api/v1/reviews/user/:userId`       | Reviews do usuário          | ❌   |
+| GET    | `/api/v1/reviews/pending`            | Minhas avaliações pendentes | ✅   |
+| POST   | `/api/v1/reviews/:id/report`         | Reportar review             | ✅   |
 
 ---
 
 ## 7.7 Páginas Frontend
 
-| Rota | Página | Auth |
-|------|--------|------|
-| `/reviews/new/:inquiryId` | Formulário de avaliação | ✅ |
-| `/reviews/pending` | Avaliações pendentes | ✅ |
-| Componente inline | Reviews na página do anúncio e perfil | ❌ |
+| Rota                      | Página                                | Auth |
+| ------------------------- | ------------------------------------- | ---- |
+| `/reviews/new/:inquiryId` | Formulário de avaliação               | ✅   |
+| `/reviews/pending`        | Avaliações pendentes                  | ✅   |
+| Componente inline         | Reviews na página do anúncio e perfil | ❌   |

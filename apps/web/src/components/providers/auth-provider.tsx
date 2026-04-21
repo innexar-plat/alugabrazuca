@@ -77,7 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("accessToken", accessToken);
       await fetchUser();
     },
-    [fetchUser]
+    [fetchUser],
   );
 
   const logout = useCallback(async () => {
@@ -99,7 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       logout,
       refreshUser: fetchUser,
     }),
-    [user, isLoading, login, logout, fetchUser]
+    [user, isLoading, login, logout, fetchUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

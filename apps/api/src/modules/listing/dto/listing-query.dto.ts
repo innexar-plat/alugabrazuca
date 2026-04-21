@@ -1,6 +1,6 @@
-import { IsOptional, IsString, IsInt, Min, Max, IsEnum } from 'class-validator';
-import { Type } from 'class-transformer';
-import { ListingStatus } from '@prisma/client';
+import { IsOptional, IsString, IsInt, Min, Max, IsEnum } from "class-validator";
+import { Type } from "class-transformer";
+import { ListingStatus } from "@prisma/client";
 
 export class ListingQueryDto {
   @IsOptional()
@@ -18,11 +18,11 @@ export class ListingQueryDto {
 
   @IsOptional()
   @IsString()
-  sortBy?: string = 'createdAt';
+  sortBy?: string = "createdAt";
 
   @IsOptional()
   @IsString()
-  order?: 'asc' | 'desc' = 'desc';
+  order?: "asc" | "desc" = "desc";
 
   @IsOptional()
   @IsEnum(ListingStatus)

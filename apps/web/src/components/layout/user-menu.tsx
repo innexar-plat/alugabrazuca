@@ -5,12 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useRouter } from "@/i18n/routing";
-import {
-  User,
-  Home,
-  LogOut,
-  ChevronDown,
-} from "lucide-react";
+import { User, Home, LogOut, ChevronDown } from "lucide-react";
 
 export function UserMenu() {
   const { user, logout } = useAuth();
@@ -32,7 +27,8 @@ export function UserMenu() {
 
   if (!user) return null;
 
-  const initials = `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`.toUpperCase();
+  const initials =
+    `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`.toUpperCase();
   const displayName = user.displayName || `${user.firstName} ${user.lastName}`;
 
   async function handleLogout() {

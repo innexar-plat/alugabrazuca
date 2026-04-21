@@ -9,17 +9,17 @@ This skill provides operational checklists and prompts for structured code revie
 
 ## Quick Reference
 
-| Review Type | Focus Areas | Key Checklist | When to Use |
-|-------------|-------------|---------------|-------------|
-| Security Review | Auth, input validation, secrets, OWASP Top 10 | [software-security-appsec](../software-security-appsec/SKILL.md) | Security-critical code, API endpoints |
-| Supply Chain Review | Dependencies, lockfiles, licenses, SBOM, CI policies | [dev-dependency-management](../dev-dependency-management/SKILL.md) | Dependency bumps, build/CI changes |
-| Performance Review | N+1 queries, algorithms, caching, hot paths | DB queries, loops, memory allocation | High-traffic features, bottlenecks |
-| Correctness Review | Logic, edge cases, error handling, tests | Boundary conditions, null checks, retries | Business logic, data transformations |
-| Maintainability Review | Naming, complexity, duplication, readability | Function length, naming clarity, DRY | Complex modules, shared code |
-| Test Review | Coverage, edge cases, flakiness, assertions | Test quality, missing scenarios | New features, refactors |
-| Frontend Review | Accessibility, responsive design, performance | [frontend-review.md](assets/web-frontend/frontend-review.md) | UI/UX changes |
-| Backend Review | API design, error handling, database patterns | [api-review.md](assets/backend-api/api-review.md) | API endpoints, services |
-| Blockchain Review | Reentrancy, access control, gas optimization | [crypto-review.md](assets/blockchain/crypto-review.md) | Smart contracts, DeFi protocols |
+| Review Type            | Focus Areas                                          | Key Checklist                                                      | When to Use                           |
+| ---------------------- | ---------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------- |
+| Security Review        | Auth, input validation, secrets, OWASP Top 10        | [software-security-appsec](../software-security-appsec/SKILL.md)   | Security-critical code, API endpoints |
+| Supply Chain Review    | Dependencies, lockfiles, licenses, SBOM, CI policies | [dev-dependency-management](../dev-dependency-management/SKILL.md) | Dependency bumps, build/CI changes    |
+| Performance Review     | N+1 queries, algorithms, caching, hot paths          | DB queries, loops, memory allocation                               | High-traffic features, bottlenecks    |
+| Correctness Review     | Logic, edge cases, error handling, tests             | Boundary conditions, null checks, retries                          | Business logic, data transformations  |
+| Maintainability Review | Naming, complexity, duplication, readability         | Function length, naming clarity, DRY                               | Complex modules, shared code          |
+| Test Review            | Coverage, edge cases, flakiness, assertions          | Test quality, missing scenarios                                    | New features, refactors               |
+| Frontend Review        | Accessibility, responsive design, performance        | [frontend-review.md](assets/web-frontend/frontend-review.md)       | UI/UX changes                         |
+| Backend Review         | API design, error handling, database patterns        | [api-review.md](assets/backend-api/api-review.md)                  | API endpoints, services               |
+| Blockchain Review      | Reentrancy, access control, gas optimization         | [crypto-review.md](assets/blockchain/crypto-review.md)             | Smart contracts, DeFi protocols       |
 
 ---
 
@@ -111,12 +111,12 @@ For complex PRs, apply multiple review modes sequentially:
 
 ### Timezone-Friendly Reviews
 
-| Practice | Implementation |
-|----------|----------------|
-| Review windows | Define 4-hour overlap windows |
-| Review rotation | Assign reviewers across timezones |
-| Async communication | Use PR comments, not DMs |
-| Review SLAs | 24-hour initial response, 48-hour completion |
+| Practice            | Implementation                               |
+| ------------------- | -------------------------------------------- |
+| Review windows      | Define 4-hour overlap windows                |
+| Review rotation     | Assign reviewers across timezones            |
+| Async communication | Use PR comments, not DMs                     |
+| Review SLAs         | 24-hour initial response, 48-hour completion |
 
 ### Non-Blocking Reviews
 
@@ -136,12 +136,12 @@ PR Submitted -> Auto-checks (CI) -> Async Review -> Merge
 
 ### Review Prioritization Matrix
 
-| Priority | Criteria | SLA |
-|----------|----------|-----|
-| P0 | Security fix, production incident | 4 hours |
-| P1 | Bug fix, blocking dependency | 24 hours |
-| P2 | Feature work, tech debt | 48 hours |
-| P3 | Documentation, refactoring | 72 hours |
+| Priority | Criteria                          | SLA      |
+| -------- | --------------------------------- | -------- |
+| P0       | Security fix, production incident | 4 hours  |
+| P1       | Bug fix, blocking dependency      | 24 hours |
+| P2       | Feature work, tech debt           | 48 hours |
+| P3       | Documentation, refactoring        | 72 hours |
 
 ---
 
@@ -151,15 +151,15 @@ PR Submitted -> Auto-checks (CI) -> Async Review -> Merge
 
 #### AI Review Assistants
 
-| Tool | Use Case | Limitation |
-|------|----------|------------|
-| GitHub Copilot PR | Summary, suggestions | May miss context |
-| CodeRabbit | Automated PR review comments | Requires human validation |
-| Qodo | Test generation + review, 15+ workflows | Enterprise pricing |
-| OpenAI Codex | System-level codebase context | API integration required |
-| AWS Security Agent | OWASP Top 10, policy violations | Preview only (2026) |
-| Endor Labs AI SAST | AI-assisted SAST | Security-focused |
-| Graphite | PR stacking, stack-aware merge queue | Process, not content |
+| Tool               | Use Case                                | Limitation                |
+| ------------------ | --------------------------------------- | ------------------------- |
+| GitHub Copilot PR  | Summary, suggestions                    | May miss context          |
+| CodeRabbit         | Automated PR review comments            | Requires human validation |
+| Qodo               | Test generation + review, 15+ workflows | Enterprise pricing        |
+| OpenAI Codex       | System-level codebase context           | API integration required  |
+| AWS Security Agent | OWASP Top 10, policy violations         | Preview only (2026)       |
+| Endor Labs AI SAST | AI-assisted SAST                        | Security-focused          |
+| Graphite           | PR stacking, stack-aware merge queue    | Process, not content      |
 
 **AI assistant rules:**
 
@@ -211,6 +211,7 @@ Use [assets/core/review-comment-guidelines.md](assets/core/review-comment-guidel
 ## Navigation
 
 **Resources**
+
 - [references/operational-playbook.md](references/operational-playbook.md)
 - [references/review-checklist-comprehensive.md](references/review-checklist-comprehensive.md)
 - [references/implementing-effective-code-reviews-checklist.md](references/implementing-effective-code-reviews-checklist.md)
@@ -223,6 +224,7 @@ Use [assets/core/review-comment-guidelines.md](assets/core/review-comment-guidel
 - [references/code-review-metrics.md](references/code-review-metrics.md)
 
 **Templates**
+
 - [assets/core/pull-request-description-template.md](assets/core/pull-request-description-template.md)
 - [assets/core/review-checklist-judgment.md](assets/core/review-checklist-judgment.md)
 - [assets/core/review-comment-guidelines.md](assets/core/review-comment-guidelines.md)
@@ -237,6 +239,7 @@ Use [assets/core/review-comment-guidelines.md](assets/core/review-comment-guidel
 - [assets/data-ml/ml-deployment-review.md](assets/data-ml/ml-deployment-review.md)
 
 **Data**
+
 - [data/sources.json](data/sources.json) — Curated external references
 - Shared checklists: [../software-clean-code-standard/assets/checklists/secure-code-review-checklist.md](../software-clean-code-standard/assets/checklists/secure-code-review-checklist.md), [../software-clean-code-standard/assets/checklists/backend-api-review-checklist.md](../software-clean-code-standard/assets/checklists/backend-api-review-checklist.md)
 

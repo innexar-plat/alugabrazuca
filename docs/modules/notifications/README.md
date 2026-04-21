@@ -1,6 +1,7 @@
 # Módulo 12 — Notificações (`notifications`)
 
 ## Visão Geral
+
 Sistema de notificações por e-mail e in-app (push futuro) para manter usuários engajados e informados.
 
 ---
@@ -9,55 +10,55 @@ Sistema de notificações por e-mail e in-app (push futuro) para manter usuário
 
 ### Para o Anfitrião
 
-| Evento | E-mail | In-app | Push |
-|--------|--------|--------|------|
-| Nova solicitação recebida | ✅ | ✅ | ✅ |
-| Solicitação cancelada pelo inquilino | ❌ | ✅ | ❌ |
-| Nova avaliação recebida | ✅ | ✅ | ✅ |
-| Anúncio aprovado | ✅ | ✅ | ❌ |
-| Anúncio rejeitado | ✅ | ✅ | ❌ |
-| Anúncio prestes a expirar (7 dias) | ✅ | ✅ | ❌ |
-| Assinatura renovada | ✅ | ✅ | ❌ |
-| Assinatura falhando | ✅ | ✅ | ✅ |
-| Destaque expirado | ✅ | ✅ | ❌ |
-| Nova mensagem | ❌ | ✅ | ✅ |
-| Denúncia sobre seu anúncio | ✅ | ✅ | ❌ |
+| Evento                               | E-mail | In-app | Push |
+| ------------------------------------ | ------ | ------ | ---- |
+| Nova solicitação recebida            | ✅     | ✅     | ✅   |
+| Solicitação cancelada pelo inquilino | ❌     | ✅     | ❌   |
+| Nova avaliação recebida              | ✅     | ✅     | ✅   |
+| Anúncio aprovado                     | ✅     | ✅     | ❌   |
+| Anúncio rejeitado                    | ✅     | ✅     | ❌   |
+| Anúncio prestes a expirar (7 dias)   | ✅     | ✅     | ❌   |
+| Assinatura renovada                  | ✅     | ✅     | ❌   |
+| Assinatura falhando                  | ✅     | ✅     | ✅   |
+| Destaque expirado                    | ✅     | ✅     | ❌   |
+| Nova mensagem                        | ❌     | ✅     | ✅   |
+| Denúncia sobre seu anúncio           | ✅     | ✅     | ❌   |
 
 ### Para o Inquilino
 
-| Evento | E-mail | In-app | Push |
-|--------|--------|--------|------|
-| Solicitação aceita | ✅ | ✅ | ✅ |
-| Solicitação recusada | ✅ | ✅ | ❌ |
-| Anfitrião respondeu | ✅ | ✅ | ✅ |
-| Solicitação expirou | ❌ | ✅ | ❌ |
-| Nova avaliação recebida | ✅ | ✅ | ✅ |
-| Favorito baixou de preço | ✅ | ✅ | ✅ |
-| Favorito prestes a expirar | ❌ | ✅ | ❌ |
-| Nova mensagem | ❌ | ✅ | ✅ |
-| Convite para avaliar | ✅ | ✅ | ❌ |
+| Evento                     | E-mail | In-app | Push |
+| -------------------------- | ------ | ------ | ---- |
+| Solicitação aceita         | ✅     | ✅     | ✅   |
+| Solicitação recusada       | ✅     | ✅     | ❌   |
+| Anfitrião respondeu        | ✅     | ✅     | ✅   |
+| Solicitação expirou        | ❌     | ✅     | ❌   |
+| Nova avaliação recebida    | ✅     | ✅     | ✅   |
+| Favorito baixou de preço   | ✅     | ✅     | ✅   |
+| Favorito prestes a expirar | ❌     | ✅     | ❌   |
+| Nova mensagem              | ❌     | ✅     | ✅   |
+| Convite para avaliar       | ✅     | ✅     | ❌   |
 
 ### Para o Admin
 
-| Evento | E-mail | In-app |
-|--------|--------|--------|
-| Novo anúncio para revisão | ✅ | ✅ |
-| Nova denúncia | ✅ | ✅ |
-| Nova verificação pendente | ✅ | ✅ |
-| Pagamento falhou | ✅ | ✅ |
+| Evento                    | E-mail | In-app |
+| ------------------------- | ------ | ------ |
+| Novo anúncio para revisão | ✅     | ✅     |
+| Nova denúncia             | ✅     | ✅     |
+| Nova verificação pendente | ✅     | ✅     |
+| Pagamento falhou          | ✅     | ✅     |
 
 ---
 
 ## 12.2 Preferências do Usuário
 
-| Preferência | Opções |
-|-------------|--------|
-| E-mail de marketing | on/off |
+| Preferência         | Opções                        |
+| ------------------- | ----------------------------- |
+| E-mail de marketing | on/off                        |
 | E-mail transacional | sempre on (não pode desligar) |
-| Notificações in-app | on/off por tipo |
-| Push notifications | on/off (futuro) |
-| Horário de silêncio | ex: 22:00-08:00 |
-| Idioma dos e-mails | PT, EN, ES |
+| Notificações in-app | on/off por tipo               |
+| Push notifications  | on/off (futuro)               |
+| Horário de silêncio | ex: 22:00-08:00               |
+| Idioma dos e-mails  | PT, EN, ES                    |
 
 ---
 
@@ -112,21 +113,21 @@ updated_at          TIMESTAMP NOT NULL DEFAULT NOW()
 
 ## 12.5 Endpoints
 
-| Método | Rota | Descrição | Auth |
-|--------|------|-----------|------|
-| GET | `/api/v1/notifications` | Listar notificações | ✅ |
-| PATCH | `/api/v1/notifications/:id/read` | Marcar como lida | ✅ |
-| PATCH | `/api/v1/notifications/read-all` | Marcar todas como lidas | ✅ |
-| GET | `/api/v1/notifications/unread-count` | Total não lidas | ✅ |
-| GET | `/api/v1/notifications/preferences` | Minhas preferências | ✅ |
-| PATCH | `/api/v1/notifications/preferences` | Atualizar preferências | ✅ |
+| Método | Rota                                 | Descrição               | Auth |
+| ------ | ------------------------------------ | ----------------------- | ---- |
+| GET    | `/api/v1/notifications`              | Listar notificações     | ✅   |
+| PATCH  | `/api/v1/notifications/:id/read`     | Marcar como lida        | ✅   |
+| PATCH  | `/api/v1/notifications/read-all`     | Marcar todas como lidas | ✅   |
+| GET    | `/api/v1/notifications/unread-count` | Total não lidas         | ✅   |
+| GET    | `/api/v1/notifications/preferences`  | Minhas preferências     | ✅   |
+| PATCH  | `/api/v1/notifications/preferences`  | Atualizar preferências  | ✅   |
 
 ---
 
 ## 12.6 Páginas Frontend
 
-| Rota | Página | Auth |
-|------|--------|------|
-| `/notifications` | Central de notificações | ✅ |
-| `/settings/notifications` | Preferências | ✅ |
-| Componente (sino) | Badge de não lidas no header | ✅ |
+| Rota                      | Página                       | Auth |
+| ------------------------- | ---------------------------- | ---- |
+| `/notifications`          | Central de notificações      | ✅   |
+| `/settings/notifications` | Preferências                 | ✅   |
+| Componente (sino)         | Badge de não lidas no header | ✅   |

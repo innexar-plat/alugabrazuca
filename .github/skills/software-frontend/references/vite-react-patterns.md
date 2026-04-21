@@ -54,37 +54,37 @@ Operational patterns for building fast React applications with Vite.
 ### vite.config.ts
 
 ```typescript
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
 
 export default defineConfig({
   plugins: [react()],
 
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@components': path.resolve(__dirname, './src/components'),
-      '@hooks': path.resolve(__dirname, './src/hooks'),
-      '@utils': path.resolve(__dirname, './src/utils')
-    }
+      "@": path.resolve(__dirname, "./src"),
+      "@components": path.resolve(__dirname, "./src/components"),
+      "@hooks": path.resolve(__dirname, "./src/hooks"),
+      "@utils": path.resolve(__dirname, "./src/utils"),
+    },
   },
 
   server: {
     port: 3000,
-    open: true
+    open: true,
   },
 
   build: {
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom'],
-          router: ['react-router-dom']
-        }
-      }
-    }
-  }
+          vendor: ["react", "react-dom"],
+          router: ["react-router-dom"],
+        },
+      },
+    },
+  },
 });
 ```
 
@@ -96,7 +96,7 @@ export default defineConfig({
 
 ```tsx
 // src/components/UserCard.tsx
-import { useState } from 'react';
+import { useState } from "react";
 
 interface UserCardProps {
   name: string;
@@ -117,9 +117,7 @@ export function UserCard({ name, email, avatar, onEdit }: UserCardProps) {
       {avatar && <img src={avatar} alt={name} />}
       <h3>{name}</h3>
       <p>{email}</p>
-      {isHovered && onEdit && (
-        <button onClick={onEdit}>Edit</button>
-      )}
+      {isHovered && onEdit && <button onClick={onEdit}>Edit</button>}
     </div>
   );
 }
@@ -129,7 +127,7 @@ export function UserCard({ name, email, avatar, onEdit }: UserCardProps) {
 
 ```typescript
 // src/hooks/useLocalStorage.ts
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
   // Initialize state from localStorage
@@ -147,7 +145,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     try {
       window.localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
-      console.error('Error saving to localStorage:', error);
+      console.error("Error saving to localStorage:", error);
     }
   }, [key, value]);
 
@@ -156,13 +154,14 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 ```
 
 Usage:
+
 ```tsx
 function App() {
-  const [theme, setTheme] = useLocalStorage('theme', 'light');
+  const [theme, setTheme] = useLocalStorage("theme", "light");
 
   return (
     <div className={theme}>
-      <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
+      <button onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
         Toggle Theme
       </button>
     </div>
@@ -178,24 +177,24 @@ function App() {
 
 ```tsx
 // src/main.tsx
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5,  // 5 minutes
+      staleTime: 1000 * 60 * 5, // 5 minutes
       retry: 3,
-      refetchOnWindowFocus: false
-    }
-  }
+      refetchOnWindowFocus: false,
+    },
+  },
 });
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <App />
     </QueryClientProvider>
-  </StrictMode>
+  </StrictMode>,
 );
 ```
 
@@ -203,7 +202,7 @@ createRoot(document.getElementById('root')!).render(
 
 ```typescript
 // src/hooks/usePosts.ts
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface Post {
   id: number;
@@ -212,25 +211,25 @@ interface Post {
 }
 
 async function fetchPosts(): Promise<Post[]> {
-  const res = await fetch('https://api.example.com/posts');
-  if (!res.ok) throw new Error('Failed to fetch posts');
+  const res = await fetch("https://api.example.com/posts");
+  if (!res.ok) throw new Error("Failed to fetch posts");
   return res.json();
 }
 
-async function createPost(newPost: Omit<Post, 'id'>): Promise<Post> {
-  const res = await fetch('https://api.example.com/posts', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(newPost)
+async function createPost(newPost: Omit<Post, "id">): Promise<Post> {
+  const res = await fetch("https://api.example.com/posts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(newPost),
   });
-  if (!res.ok) throw new Error('Failed to create post');
+  if (!res.ok) throw new Error("Failed to create post");
   return res.json();
 }
 
 export function usePosts() {
   return useQuery({
-    queryKey: ['posts'],
-    queryFn: fetchPosts
+    queryKey: ["posts"],
+    queryFn: fetchPosts,
   });
 }
 
@@ -241,13 +240,14 @@ export function useCreatePost() {
     mutationFn: createPost,
     onSuccess: () => {
       // Invalidate and refetch posts
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-    }
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
   });
 }
 ```
 
 Usage:
+
 ```tsx
 function BlogList() {
   const { data: posts, isLoading, error } = usePosts();
@@ -259,13 +259,13 @@ function BlogList() {
   return (
     <div>
       <button
-        onClick={() => createPost.mutate({ title: 'New Post', content: '...' })}
+        onClick={() => createPost.mutate({ title: "New Post", content: "..." })}
         disabled={createPost.isPending}
       >
         Create Post
       </button>
 
-      {posts?.map(post => (
+      {posts?.map((post) => (
         <article key={post.id}>
           <h2>{post.title}</h2>
         </article>
@@ -283,14 +283,14 @@ function BlogList() {
 
 ```tsx
 // src/main.tsx
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter } from "react-router-dom";
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <App />
     </BrowserRouter>
-  </StrictMode>
+  </StrictMode>,
 );
 ```
 
@@ -298,14 +298,14 @@ createRoot(document.getElementById('root')!).render(
 
 ```tsx
 // src/App.tsx
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
 
 // Lazy load routes
-const Home = lazy(() => import('./pages/Home'));
-const Blog = lazy(() => import('./pages/Blog'));
-const BlogPost = lazy(() => import('./pages/BlogPost'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Home = lazy(() => import("./pages/Home"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
 
 function App() {
   return (
@@ -333,8 +333,8 @@ function App() {
 
 ```tsx
 // src/components/ProtectedRoute.tsx
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { Navigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -353,10 +353,10 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 ### Code Splitting
 
 ```tsx
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense } from "react";
 
 // Lazy load components
-const HeavyComponent = lazy(() => import('./HeavyComponent'));
+const HeavyComponent = lazy(() => import("./HeavyComponent"));
 
 function App() {
   return (
@@ -370,7 +370,7 @@ function App() {
 ### Memoization
 
 ```tsx
-import { useMemo, useCallback, memo } from 'react';
+import { useMemo, useCallback, memo } from "react";
 
 // Memoize expensive calculations
 function ExpensiveComponent({ items }: { items: Item[] }) {
@@ -379,7 +379,7 @@ function ExpensiveComponent({ items }: { items: Item[] }) {
   }, [items]);
 
   const handleClick = useCallback(() => {
-    console.log('Clicked!');
+    console.log("Clicked!");
   }, []);
 
   return <div>Total: {total}</div>;
@@ -444,13 +444,10 @@ npm install -D rollup-plugin-visualizer
 
 ```typescript
 // vite.config.ts
-import { visualizer } from 'rollup-plugin-visualizer';
+import { visualizer } from "rollup-plugin-visualizer";
 
 export default defineConfig({
-  plugins: [
-    react(),
-    visualizer({ open: true })
-  ]
+  plugins: [react(), visualizer({ open: true })],
 });
 ```
 
@@ -462,19 +459,19 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return 'vendor';
+          if (id.includes("node_modules")) {
+            return "vendor";
           }
-        }
-      }
+        },
+      },
     },
-    minify: 'terser',
+    minify: "terser",
     terserOptions: {
       compress: {
-        drop_console: true
-      }
-    }
-  }
+        drop_console: true,
+      },
+    },
+  },
 });
 ```
 
@@ -498,6 +495,7 @@ export default defineConfig({
 ## Common Pitfalls
 
 [FAIL] **Don't:**
+
 - Use CRA (deprecated) - use Vite instead
 - Forget to memoize expensive computations
 - Over-use useEffect
@@ -505,6 +503,7 @@ export default defineConfig({
 - Ignore bundle size
 
 [OK] **Do:**
+
 - Use Vite for fast development
 - Leverage TanStack Query for data fetching
 - Lazy load routes

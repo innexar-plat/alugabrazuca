@@ -8,22 +8,22 @@
 
 ## Stack
 
-| Camada | Tecnologia |
-|--------|-----------|
-| Monorepo | Turborepo |
-| Frontend | Next.js 16 + React 19 + TypeScript 5.9 |
-| UI | Tailwind CSS v4 + shadcn/ui |
-| i18n | next-intl (PT, EN, ES) |
-| Backend | NestJS (Modular Monolith) |
-| ORM/DB | Prisma + PostgreSQL 16 |
-| Cache/Jobs | Redis 7 + BullMQ |
-| Auth | Auth.js + Passport.js + JWT + Google OAuth |
-| Storage | MinIO (dev) / S3 (prod) |
-| Pagamentos | Stripe |
-| E-mail | Resend + React Email |
-| Testes | Vitest + Supertest + Playwright |
-| Deploy | Docker Compose + Nginx + Let's Encrypt |
-| CI/CD | GitHub Actions |
+| Camada     | Tecnologia                                 |
+| ---------- | ------------------------------------------ |
+| Monorepo   | Turborepo                                  |
+| Frontend   | Next.js 16 + React 19 + TypeScript 5.9     |
+| UI         | Tailwind CSS v4 + shadcn/ui                |
+| i18n       | next-intl (PT, EN, ES)                     |
+| Backend    | NestJS (Modular Monolith)                  |
+| ORM/DB     | Prisma + PostgreSQL 16                     |
+| Cache/Jobs | Redis 7 + BullMQ                           |
+| Auth       | Auth.js + Passport.js + JWT + Google OAuth |
+| Storage    | MinIO (dev) / S3 (prod)                    |
+| Pagamentos | Stripe                                     |
+| E-mail     | Resend + React Email                       |
+| Testes     | Vitest + Supertest + Playwright            |
+| Deploy     | Docker Compose + Nginx + Let's Encrypt     |
+| CI/CD      | GitHub Actions                             |
 
 ---
 
@@ -73,32 +73,32 @@ pnpm --filter api prisma migrate dev
 pnpm dev
 ```
 
-| Serviço | URL |
-|---------|-----|
-| Frontend | http://localhost:3000 |
-| Backend API | http://localhost:3001 |
+| Serviço       | URL                   |
+| ------------- | --------------------- |
+| Frontend      | http://localhost:3000 |
+| Backend API   | http://localhost:3001 |
 | MinIO Console | http://localhost:9001 |
-| PostgreSQL | localhost:5432 |
-| Redis | localhost:6379 |
+| PostgreSQL    | localhost:5432        |
+| Redis         | localhost:6379        |
 
 ---
 
 ## Módulos (ordem oficial)
 
-| # | Módulo | Status |
-|---|--------|--------|
-| 1 | Auth & Perfil | ⬜ |
-| 2 | Anúncio de Quarto | ⬜ |
-| 3 | Busca Pública | ⬜ |
-| 4 | Landing & SEO | ⬜ |
-| 5 | Solicitações | ⬜ |
-| 6 | Mensagens | ⬜ |
-| 7 | Avaliações | ⬜ |
-| 8 | Favoritos | ⬜ |
-| 9 | Painel Admin | ⬜ |
-| 10 | Verificação | ⬜ |
-| 11 | Monetização | ⬜ |
-| 12 | Notificações | ⬜ |
+| #   | Módulo            | Status |
+| --- | ----------------- | ------ |
+| 1   | Auth & Perfil     | ⬜     |
+| 2   | Anúncio de Quarto | ⬜     |
+| 3   | Busca Pública     | ⬜     |
+| 4   | Landing & SEO     | ⬜     |
+| 5   | Solicitações      | ⬜     |
+| 6   | Mensagens         | ⬜     |
+| 7   | Avaliações        | ⬜     |
+| 8   | Favoritos         | ⬜     |
+| 9   | Painel Admin      | ⬜     |
+| 10  | Verificação       | ⬜     |
+| 11  | Monetização       | ⬜     |
+| 12  | Notificações      | ⬜     |
 
 ---
 

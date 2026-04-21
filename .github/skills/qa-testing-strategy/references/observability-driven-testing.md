@@ -55,13 +55,13 @@ Use production telemetry (traces, metrics, logs) as the foundation for test desi
 
 ### Traditional vs Observability-Driven Testing
 
-| Traditional Testing | Observability-Driven Testing |
-|---------------------|------------------------------|
+| Traditional Testing               | Observability-Driven Testing                    |
+| --------------------------------- | ----------------------------------------------- |
 | Write tests, hope they catch bugs | Observe production, write tests for real issues |
-| Mock everything | Use real traces for validation |
-| Test in isolation | Test distributed behavior |
-| Debug with logs | Debug with traces |
-| Coverage = lines executed | Coverage = behaviors observed |
+| Mock everything                   | Use real traces for validation                  |
+| Test in isolation                 | Test distributed behavior                       |
+| Debug with logs                   | Debug with traces                               |
+| Coverage = lines executed         | Coverage = behaviors observed                   |
 
 ---
 
@@ -90,54 +90,60 @@ Use production telemetry (traces, metrics, logs) as the foundation for test desi
 
 ```typescript
 // test-instrumentation.ts
-import { trace, SpanStatusCode } from '@opentelemetry/api';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { trace, SpanStatusCode } from "@opentelemetry/api";
+import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
+import { SimpleSpanProcessor } from "@opentelemetry/sdk-trace-base";
+import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 
 // Initialize tracer for tests
 const provider = new NodeTracerProvider();
 provider.addSpanProcessor(
   new SimpleSpanProcessor(
-    new OTLPTraceExporter({ url: 'http://localhost:4318/v1/traces' })
-  )
+    new OTLPTraceExporter({ url: "http://localhost:4318/v1/traces" }),
+  ),
 );
 provider.register();
 
-const tracer = trace.getTracer('test-suite');
+const tracer = trace.getTracer("test-suite");
 
 // Instrumented test
-describe('Order Service', () => {
-  it('should create order with payment', async () => {
-    await tracer.startActiveSpan('test:create-order-with-payment', async (span) => {
-      try {
-        // Arrange
-        span.setAttribute('test.phase', 'arrange');
-        const user = await createTestUser();
-        const product = await createTestProduct();
+describe("Order Service", () => {
+  it("should create order with payment", async () => {
+    await tracer.startActiveSpan(
+      "test:create-order-with-payment",
+      async (span) => {
+        try {
+          // Arrange
+          span.setAttribute("test.phase", "arrange");
+          const user = await createTestUser();
+          const product = await createTestProduct();
 
-        // Act
-        span.setAttribute('test.phase', 'act');
-        const order = await orderService.create({
-          userId: user.id,
-          productId: product.id,
-          quantity: 1
-        });
+          // Act
+          span.setAttribute("test.phase", "act");
+          const order = await orderService.create({
+            userId: user.id,
+            productId: product.id,
+            quantity: 1,
+          });
 
-        // Assert
-        span.setAttribute('test.phase', 'assert');
-        expect(order.status).toBe('paid');
-        expect(order.paymentId).toBeDefined();
+          // Assert
+          span.setAttribute("test.phase", "assert");
+          expect(order.status).toBe("paid");
+          expect(order.paymentId).toBeDefined();
 
-        span.setStatus({ code: SpanStatusCode.OK });
-      } catch (error) {
-        span.setStatus({ code: SpanStatusCode.ERROR, message: error.message });
-        span.recordException(error);
-        throw error;
-      } finally {
-        span.end();
-      }
-    });
+          span.setStatus({ code: SpanStatusCode.OK });
+        } catch (error) {
+          span.setStatus({
+            code: SpanStatusCode.ERROR,
+            message: error.message,
+          });
+          span.recordException(error);
+          throw error;
+        } finally {
+          span.end();
+        }
+      },
+    );
   });
 });
 ```
@@ -407,22 +413,22 @@ STEP 4: Check for missing spans or errors
 
 ```typescript
 // Use trace context in test assertions
-it('should handle concurrent orders', async () => {
+it("should handle concurrent orders", async () => {
   const traceId = generateTraceId();
 
   // Inject trace context
   const result = await orderService.create(order, {
     traceId,
-    spanId: generateSpanId()
+    spanId: generateSpanId(),
   });
 
   // On failure, print trace link
-  if (result.status !== 'success') {
+  if (result.status !== "success") {
     console.log(`Trace: ${JAEGER_URL}/trace/${traceId}`);
     console.log(`Failing span: ${result.spanId}`);
   }
 
-  expect(result.status).toBe('success');
+  expect(result.status).toBe("success");
 });
 ```
 
@@ -434,26 +440,26 @@ it('should handle concurrent orders', async () => {
 
 ```typescript
 // slo-validation.test.ts
-describe('SLO Validation', () => {
-  it('should meet latency SLO under load', async () => {
+describe("SLO Validation", () => {
+  it("should meet latency SLO under load", async () => {
     const results = await runLoadTest({
-      duration: '5m',
+      duration: "5m",
       vus: 100,
-      rps: 1000
+      rps: 1000,
     });
 
     // Query actual metrics
     const p99Latency = await prometheus.query(
-      'histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))'
+      "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))",
     );
 
     const errorRate = await prometheus.query(
-      'sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m]))'
+      'sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m]))',
     );
 
     // Assert SLOs
-    expect(p99Latency).toBeLessThan(0.2);  // 200ms
-    expect(errorRate).toBeLessThan(0.01);   // 1%
+    expect(p99Latency).toBeLessThan(0.2); // 200ms
+    expect(errorRate).toBeLessThan(0.01); // 1%
   });
 });
 ```
@@ -465,7 +471,7 @@ describe('SLO Validation', () => {
 name: SLO Validation Gate
 on:
   schedule:
-    - cron: '0 * * * *'  # Hourly
+    - cron: "0 * * * *" # Hourly
 
 jobs:
   validate-slos:

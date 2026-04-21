@@ -10,6 +10,7 @@ Versionamento: [Semantic Versioning](https://semver.org/lang/pt-BR/)
 ## [Unreleased]
 
 ### Added
+
 - Documentação completa de 12 módulos (auth → notifications)
 - Blueprint executivo (`docs/BLUEPRINT.md`)
 - Método de construção com 3 fases (fundação, módulos, deploy)

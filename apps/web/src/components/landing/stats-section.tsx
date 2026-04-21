@@ -15,7 +15,13 @@ interface StatsSectionProps {
   stats: Stats;
 }
 
-function AnimatedCounter({ end, duration = 2000 }: { end: number; duration?: number }) {
+function AnimatedCounter({
+  end,
+  duration = 2000,
+}: {
+  end: number;
+  duration?: number;
+}) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const hasAnimated = useRef(false);

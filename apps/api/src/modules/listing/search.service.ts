@@ -1,24 +1,27 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { SearchListingsDto } from './dto';
-import { ListingStatus, ParkingType, PetPolicy, SmokingPolicy, Prisma } from '@prisma/client';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { SearchListingsDto } from "./dto";
+import {
+  ListingStatus,
+  ParkingType,
+  PetPolicy,
+  SmokingPolicy,
+  Prisma,
+} from "@prisma/client";
 
 @Injectable()
 export class SearchService {
   constructor(private readonly prisma: PrismaService) {}
 
   async search(dto: SearchListingsDto) {
-    const {
-      page = 1,
-      limit = 20,
-      sortBy = 'createdAt',
-      order = 'desc',
-    } = dto;
+    const { page = 1, limit = 20, sortBy = "createdAt", order = "desc" } = dto;
 
     const where = this.buildWhere(dto);
 
-    const allowedSortFields = ['createdAt', 'pricePerMonth', 'viewCount'];
-    const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
+    const allowedSortFields = ["createdAt", "pricePerMonth", "viewCount"];
+    const safeSortBy = allowedSortFields.includes(sortBy)
+      ? sortBy
+      : "createdAt";
 
     const [items, total] = await this.prisma.$transaction([
       this.prisma.listing.findMany({
@@ -46,7 +49,7 @@ export class SearchService {
           isFeatured: true,
           createdAt: true,
           photos: {
-            orderBy: { sortOrder: 'asc' },
+            orderBy: { sortOrder: "asc" },
             take: 1,
             select: { url: true, thumbnailUrl: true },
           },
@@ -58,10 +61,7 @@ export class SearchService {
             },
           },
         },
-        orderBy: [
-          { isFeatured: 'desc' },
-          { [safeSortBy]: order },
-        ],
+        orderBy: [{ isFeatured: "desc" }, { [safeSortBy]: order }],
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -81,13 +81,13 @@ export class SearchService {
 
   async getCities() {
     const cities = await this.prisma.listing.groupBy({
-      by: ['country', 'state', 'city'],
+      by: ["country", "state", "city"],
       where: {
         status: ListingStatus.active,
         deletedAt: null,
       },
       _count: { id: true },
-      orderBy: { _count: { id: 'desc' } },
+      orderBy: { _count: { id: "desc" } },
     });
 
     return {
@@ -112,14 +112,14 @@ export class SearchService {
         status: ListingStatus.active,
         deletedAt: null,
         OR: [
-          { city: { contains: sanitized, mode: 'insensitive' } },
-          { state: { contains: sanitized, mode: 'insensitive' } },
-          { neighborhood: { contains: sanitized, mode: 'insensitive' } },
+          { city: { contains: sanitized, mode: "insensitive" } },
+          { state: { contains: sanitized, mode: "insensitive" } },
+          { neighborhood: { contains: sanitized, mode: "insensitive" } },
           { zipCode: { startsWith: sanitized } },
         ],
       },
       select: { city: true, state: true, country: true },
-      distinct: ['city', 'state', 'country'],
+      distinct: ["city", "state", "country"],
       take: 10,
     });
 
@@ -143,42 +143,58 @@ export class SearchService {
     if (dto.query) {
       conditions.push({
         OR: [
-          { title: { contains: dto.query, mode: 'insensitive' } },
-          { city: { contains: dto.query, mode: 'insensitive' } },
-          { neighborhood: { contains: dto.query, mode: 'insensitive' } },
-          { state: { contains: dto.query, mode: 'insensitive' } },
+          { title: { contains: dto.query, mode: "insensitive" } },
+          { city: { contains: dto.query, mode: "insensitive" } },
+          { neighborhood: { contains: dto.query, mode: "insensitive" } },
+          { state: { contains: dto.query, mode: "insensitive" } },
           { zipCode: { startsWith: dto.query } },
         ],
       });
     }
 
     // Location
-    if (dto.country) conditions.push({ country: { equals: dto.country, mode: 'insensitive' } });
-    if (dto.state) conditions.push({ state: { equals: dto.state, mode: 'insensitive' } });
-    if (dto.city) conditions.push({ city: { equals: dto.city, mode: 'insensitive' } });
-    if (dto.neighborhood) conditions.push({ neighborhood: { contains: dto.neighborhood, mode: 'insensitive' } });
+    if (dto.country)
+      conditions.push({
+        country: { equals: dto.country, mode: "insensitive" },
+      });
+    if (dto.state)
+      conditions.push({ state: { equals: dto.state, mode: "insensitive" } });
+    if (dto.city)
+      conditions.push({ city: { equals: dto.city, mode: "insensitive" } });
+    if (dto.neighborhood)
+      conditions.push({
+        neighborhood: { contains: dto.neighborhood, mode: "insensitive" },
+      });
     if (dto.zipCode) conditions.push({ zipCode: { startsWith: dto.zipCode } });
 
     // Price
-    if (dto.minPrice !== undefined) conditions.push({ pricePerMonth: { gte: dto.minPrice } });
-    if (dto.maxPrice !== undefined) conditions.push({ pricePerMonth: { lte: dto.maxPrice } });
+    if (dto.minPrice !== undefined)
+      conditions.push({ pricePerMonth: { gte: dto.minPrice } });
+    if (dto.maxPrice !== undefined)
+      conditions.push({ pricePerMonth: { lte: dto.maxPrice } });
 
     // Room
     if (dto.listingType) conditions.push({ listingType: dto.listingType });
     if (dto.roomSize) conditions.push({ roomSize: dto.roomSize });
     if (dto.bedType) conditions.push({ bedType: dto.bedType });
-    if (dto.isFurnished !== undefined) conditions.push({ isFurnished: dto.isFurnished });
-    if (dto.hasWindow !== undefined) conditions.push({ hasWindow: dto.hasWindow });
+    if (dto.isFurnished !== undefined)
+      conditions.push({ isFurnished: dto.isFurnished });
+    if (dto.hasWindow !== undefined)
+      conditions.push({ hasWindow: dto.hasWindow });
     if (dto.hasLock !== undefined) conditions.push({ hasLock: dto.hasLock });
 
     // Bathroom, Kitchen, Laundry
     if (dto.bathroomType) conditions.push({ bathroomType: dto.bathroomType });
-    if (dto.kitchenAccess) conditions.push({ kitchenAccess: dto.kitchenAccess });
-    if (dto.laundryAccess) conditions.push({ laundryAccess: dto.laundryAccess });
+    if (dto.kitchenAccess)
+      conditions.push({ kitchenAccess: dto.kitchenAccess });
+    if (dto.laundryAccess)
+      conditions.push({ laundryAccess: dto.laundryAccess });
 
     // Utilities
-    if (dto.utilitiesIncluded !== undefined) conditions.push({ utilitiesIncluded: dto.utilitiesIncluded });
-    if (dto.internetIncluded !== undefined) conditions.push({ internetIncluded: dto.internetIncluded });
+    if (dto.utilitiesIncluded !== undefined)
+      conditions.push({ utilitiesIncluded: dto.utilitiesIncluded });
+    if (dto.internetIncluded !== undefined)
+      conditions.push({ internetIncluded: dto.internetIncluded });
 
     // Rules
     if (dto.allowsPets === true) {
@@ -187,9 +203,12 @@ export class SearchService {
     if (dto.allowsSmoking === true) {
       conditions.push({ allowsSmoking: { not: SmokingPolicy.no } });
     }
-    if (dto.allowsCouples !== undefined) conditions.push({ allowsCouples: dto.allowsCouples });
-    if (dto.allowsChildren !== undefined) conditions.push({ allowsChildren: dto.allowsChildren });
-    if (dto.lgbtFriendly !== undefined) conditions.push({ lgbtFriendly: dto.lgbtFriendly });
+    if (dto.allowsCouples !== undefined)
+      conditions.push({ allowsCouples: dto.allowsCouples });
+    if (dto.allowsChildren !== undefined)
+      conditions.push({ allowsChildren: dto.allowsChildren });
+    if (dto.lgbtFriendly !== undefined)
+      conditions.push({ lgbtFriendly: dto.lgbtFriendly });
 
     // Availability
     if (dto.availableFrom) {
@@ -204,7 +223,8 @@ export class SearchService {
       conditions.push({ parkingType: { not: ParkingType.none } });
     }
     if (dto.hasPool === true) conditions.push({ hasPool: true });
-    if (dto.hasContract !== undefined) conditions.push({ hasContract: dto.hasContract });
+    if (dto.hasContract !== undefined)
+      conditions.push({ hasContract: dto.hasContract });
 
     return { AND: conditions };
   }

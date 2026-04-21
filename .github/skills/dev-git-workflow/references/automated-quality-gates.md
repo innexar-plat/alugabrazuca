@@ -56,7 +56,7 @@ Enforce code quality automatically in PRs using CI/CD pipelines and quality gate
 on:
   pull_request:
     branches: [main, develop]
-  merge_group:  # Required for merge queue!
+  merge_group: # Required for merge queue!
     branches: [main]
 ```
 
@@ -66,13 +66,13 @@ on:
 
 When configuring merge queue in **Settings -> Branches -> Branch protection**:
 
-| Setting | Description | Recommendation |
-| ------- | ----------- | -------------- |
-| Build concurrency | Max parallel CI builds (1-100) | 5-10 for balanced throughput |
-| Minimum group size | PRs to batch before testing | 2-3 for busy repos |
-| Maximum group size | Max PRs per batch | 5-10 to limit blast radius |
-| Wait timeout | Max time waiting for CI | 60-120 minutes |
-| Only merge non-failing | Skip flaky test failures | Enable if tests are flaky |
+| Setting                | Description                    | Recommendation               |
+| ---------------------- | ------------------------------ | ---------------------------- |
+| Build concurrency      | Max parallel CI builds (1-100) | 5-10 for balanced throughput |
+| Minimum group size     | PRs to batch before testing    | 2-3 for busy repos           |
+| Maximum group size     | Max PRs per batch              | 5-10 to limit blast radius   |
+| Wait timeout           | Max time waiting for CI        | 60-120 minutes               |
+| Only merge non-failing | Skip flaky test failures       | Enable if tests are flaky    |
 
 **Best practices for merge queues**:
 
@@ -96,7 +96,7 @@ name: PR Quality Gates
 on:
   pull_request:
     branches: [main, develop]
-  merge_group:  # Support merge queue
+  merge_group: # Support merge queue
     branches: [main]
 
 jobs:
@@ -105,14 +105,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # For accurate coverage diffs
+          fetch-depth: 0 # For accurate coverage diffs
 
       # Setup
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -255,8 +255,8 @@ code-quality:
     - docker:stable-dind
   script:
     - docker run --rm
-        -v $(pwd):/code
-        codeclimate/codeclimate analyze
+      -v $(pwd):/code
+      codeclimate/codeclimate analyze
   artifacts:
     reports:
       codequality: gl-code-quality-report.json
@@ -340,13 +340,8 @@ npx husky add .husky/pre-commit "npx lint-staged"
     "prettier --write",
     "jest --bail --findRelatedTests"
   ],
-  "*.{json,md,yml,yaml}": [
-    "prettier --write"
-  ],
-  "*.{css,scss}": [
-    "stylelint --fix",
-    "prettier --write"
-  ]
+  "*.{json,md,yml,yaml}": ["prettier --write"],
+  "*.{css,scss}": ["stylelint --fix", "prettier --write"]
 }
 ```
 
@@ -356,15 +351,15 @@ npx husky add .husky/pre-commit "npx lint-staged"
 
 ### Recommended Thresholds
 
-| Metric | Threshold | Severity | Action |
-|--------|-----------|----------|--------|
-| **Test Coverage** | < 80% | [FAIL] Blocking | Must add tests |
-| **Linter Errors** | > 0 | [FAIL] Blocking | Must fix |
-| **Security Vulnerabilities** | High/Critical | [FAIL] Blocking | Must patch |
-| **PR Size** | > 1000 LOC | [WARNING] Warning | Consider splitting |
-| **Cyclomatic Complexity** | > 10 | [WARNING] Warning | Consider refactoring |
-| **Bundle Size Increase** | > 10% | [WARNING] Warning | Review dependencies |
-| **Build Time** | > 10 min | ℹ Info | Optimize if possible |
+| Metric                       | Threshold     | Severity          | Action               |
+| ---------------------------- | ------------- | ----------------- | -------------------- |
+| **Test Coverage**            | < 80%         | [FAIL] Blocking   | Must add tests       |
+| **Linter Errors**            | > 0           | [FAIL] Blocking   | Must fix             |
+| **Security Vulnerabilities** | High/Critical | [FAIL] Blocking   | Must patch           |
+| **PR Size**                  | > 1000 LOC    | [WARNING] Warning | Consider splitting   |
+| **Cyclomatic Complexity**    | > 10          | [WARNING] Warning | Consider refactoring |
+| **Bundle Size Increase**     | > 10%         | [WARNING] Warning | Review dependencies  |
+| **Build Time**               | > 10 min      | ℹ Info            | Optimize if possible |
 
 ---
 
@@ -375,6 +370,7 @@ npx husky add .husky/pre-commit "npx lint-staged"
 Configure in **Settings -> Branches -> Branch protection rules**:
 
 **Required checks before merging**:
+
 - [OK] All tests pass
 - [OK] Code coverage ≥ 80%
 - [OK] No linter errors
@@ -382,6 +378,7 @@ Configure in **Settings -> Branches -> Branch protection rules**:
 - [OK] PR approved by 1+ reviewers
 
 **Optional checks** (warnings only):
+
 - [WARNING] PR size check
 - [WARNING] Performance benchmarks
 - [WARNING] Bundle size increase
@@ -439,6 +436,7 @@ Using GitHub Actions:
 ### When to Skip
 
 **Only skip quality gates for**:
+
 - Critical production outages
 - Security vulnerabilities requiring immediate patch
 - Data loss prevention
@@ -453,6 +451,7 @@ git commit -m "fix: critical security patch [skip-ci]"
 ```
 
 **Post-hotfix requirements**:
+
 - [ ] Create follow-up PR to add missing tests
 - [ ] Document why gates were skipped
 - [ ] Review in next team retrospective
@@ -470,7 +469,7 @@ exemptions:
   - path: "legacy/**/*"
     reason: "Legacy code - gradual migration"
     checks:
-      - coverage  # Don't block on coverage
+      - coverage # Don't block on coverage
     expires: "2025-12-31"
 
   - path: "scripts/**/*"
@@ -482,7 +481,7 @@ exemptions:
   - path: "**/*.test.ts"
     reason: "Test files"
     checks:
-      - complexity  # Tests can be complex
+      - complexity # Tests can be complex
 ```
 
 ---
@@ -492,6 +491,7 @@ exemptions:
 ### Track Over Time
 
 **Metrics to monitor**:
+
 - Average PR size
 - Time to merge
 - Test coverage trend
@@ -499,6 +499,7 @@ exemptions:
 - Security vulnerability count
 
 **Tools**:
+
 - **GitHub Insights** - Built-in PR metrics
 - **Codecov** - Coverage trends
 - **SonarQube** - Code quality trends

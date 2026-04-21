@@ -94,7 +94,7 @@ if (!order) throw new ForbiddenException();
 const users = await db.query(`SELECT * FROM users WHERE email = '${email}'`);
 
 // ✅ Correto — parameterized query
-const users = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+const users = await db.query("SELECT * FROM users WHERE email = $1", [email]);
 ```
 
 ---

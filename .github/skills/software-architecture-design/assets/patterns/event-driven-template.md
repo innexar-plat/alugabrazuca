@@ -30,10 +30,10 @@ Use this template when designing event-driven systems with asynchronous communic
 
 ## Event Catalog
 
-| Event Name | Version | Producer | Consumers | Schema Registry |
-|------------|---------|----------|-----------|-----------------|
-| OrderPlaced | 1.0 | OrderService | PaymentService, InventoryService | schema-registry/order-placed-v1.json |
-| PaymentProcessed | 1.0 | PaymentService | OrderService, NotificationService | schema-registry/payment-processed-v1.json |
+| Event Name       | Version | Producer       | Consumers                         | Schema Registry                           |
+| ---------------- | ------- | -------------- | --------------------------------- | ----------------------------------------- |
+| OrderPlaced      | 1.0     | OrderService   | PaymentService, InventoryService  | schema-registry/order-placed-v1.json      |
+| PaymentProcessed | 1.0     | PaymentService | OrderService, NotificationService | schema-registry/payment-processed-v1.json |
 
 ## Event Broker Configuration
 

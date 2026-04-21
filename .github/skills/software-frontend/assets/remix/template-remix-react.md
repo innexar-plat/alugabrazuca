@@ -60,9 +60,9 @@ my-app/
 
 ```tsx
 // app/routes/blog.$slug.tsx
-import { json, type LoaderFunctionArgs } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
-import { prisma } from '~/utils/db.server';
+import { json, type LoaderFunctionArgs } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+import { prisma } from "~/utils/db.server";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const post = await prisma.post.findUnique({
@@ -70,7 +70,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   });
 
   if (!post) {
-    throw new Response('Not Found', { status: 404 });
+    throw new Response("Not Found", { status: 404 });
   }
 
   return json({ post });
@@ -93,9 +93,9 @@ export default function BlogPost() {
 
 ```tsx
 // app/routes/login.tsx
-import { json, redirect, type ActionFunctionArgs } from '@remix-run/node';
-import { Form, useActionData } from '@remix-run/react';
-import { z } from 'zod';
+import { json, redirect, type ActionFunctionArgs } from "@remix-run/node";
+import { Form, useActionData } from "@remix-run/react";
+import { z } from "zod";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -104,15 +104,15 @@ const loginSchema = z.object({
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const email = formData.get('email');
-  const password = formData.get('password');
+  const email = formData.get("email");
+  const password = formData.get("password");
 
   const result = loginSchema.safeParse({ email, password });
 
   if (!result.success) {
     return json(
       { errors: result.error.flatten().fieldErrors },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -120,16 +120,13 @@ export async function action({ request }: ActionFunctionArgs) {
   const user = await authenticateUser(result.data);
 
   if (!user) {
-    return json(
-      { errors: { email: 'Invalid credentials' } },
-      { status: 401 }
-    );
+    return json({ errors: { email: "Invalid credentials" } }, { status: 401 });
   }
 
   // Create session
-  return redirect('/dashboard', {
+  return redirect("/dashboard", {
     headers: {
-      'Set-Cookie': await createUserSession(user.id),
+      "Set-Cookie": await createUserSession(user.id),
     },
   });
 }
@@ -141,12 +138,7 @@ export default function Login() {
     <Form method="post">
       <div>
         <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-        />
+        <input id="email" name="email" type="email" required />
         {actionData?.errors?.email && (
           <span className="error">{actionData.errors.email}</span>
         )}
@@ -154,12 +146,7 @@ export default function Login() {
 
       <div>
         <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          required
-        />
+        <input id="password" name="password" type="password" required />
         {actionData?.errors?.password && (
           <span className="error">{actionData.errors.password}</span>
         )}
@@ -175,15 +162,13 @@ export default function Login() {
 
 ```tsx
 // app/routes/_layout.tsx
-import { Outlet } from '@remix-run/react';
+import { Outlet } from "@remix-run/react";
 
 export default function Layout() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-white shadow">
-        <nav className="container mx-auto px-4 py-4">
-          {/* Navigation */}
-        </nav>
+        <nav className="container mx-auto px-4 py-4">{/* Navigation */}</nav>
       </header>
 
       <main className="flex-1">

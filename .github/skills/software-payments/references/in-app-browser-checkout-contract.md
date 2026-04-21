@@ -32,6 +32,7 @@ rg -n "api/stripe/checkout|api/purchases/checkout|createCheckout|checkout" app s
 ## Verification Matrix
 
 For each entrypoint, verify:
+
 - status-specific handling exists
 - user sees deterministic recovery UI
 - copy is localized

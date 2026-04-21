@@ -8,29 +8,29 @@ import {
   Post,
   Query,
   UseGuards,
-} from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { InquiryService } from './inquiry.service';
-import { CreateInquiryDto } from './dto/create-inquiry.dto';
-import { RejectInquiryDto } from './dto/reject-inquiry.dto';
-import { ReplyInquiryDto } from './dto/reply-inquiry.dto';
+} from "@nestjs/common";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { CurrentUser } from "../auth/decorators/current-user.decorator";
+import { InquiryService } from "./inquiry.service";
+import { CreateInquiryDto } from "./dto/create-inquiry.dto";
+import { RejectInquiryDto } from "./dto/reject-inquiry.dto";
+import { ReplyInquiryDto } from "./dto/reply-inquiry.dto";
 
 @UseGuards(JwtAuthGuard)
-@Controller('inquiries')
+@Controller("inquiries")
 export class InquiryController {
   constructor(private readonly inquiryService: InquiryService) {}
 
   @Post()
-  create(@CurrentUser('id') userId: string, @Body() dto: CreateInquiryDto) {
+  create(@CurrentUser("id") userId: string, @Body() dto: CreateInquiryDto) {
     return this.inquiryService.create(userId, dto);
   }
 
-  @Get('sent')
+  @Get("sent")
   findSent(
-    @CurrentUser('id') userId: string,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
+    @CurrentUser("id") userId: string,
+    @Query("page") page?: string,
+    @Query("limit") limit?: string,
   ) {
     return this.inquiryService.findSent(
       userId,
@@ -39,11 +39,11 @@ export class InquiryController {
     );
   }
 
-  @Get('received')
+  @Get("received")
   findReceived(
-    @CurrentUser('id') userId: string,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
+    @CurrentUser("id") userId: string,
+    @Query("page") page?: string,
+    @Query("limit") limit?: string,
   ) {
     return this.inquiryService.findReceived(
       userId,
@@ -52,44 +52,44 @@ export class InquiryController {
     );
   }
 
-  @Get(':id')
+  @Get(":id")
   findOne(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
+    @Param("id", ParseUUIDPipe) id: string,
+    @CurrentUser("id") userId: string,
   ) {
     return this.inquiryService.findOne(id, userId);
   }
 
-  @Post(':id/accept')
+  @Post(":id/accept")
   accept(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
+    @Param("id", ParseUUIDPipe) id: string,
+    @CurrentUser("id") userId: string,
   ) {
     return this.inquiryService.accept(id, userId);
   }
 
-  @Post(':id/reject')
+  @Post(":id/reject")
   reject(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
+    @Param("id", ParseUUIDPipe) id: string,
+    @CurrentUser("id") userId: string,
     @Body() dto: RejectInquiryDto,
   ) {
     return this.inquiryService.reject(id, userId, dto);
   }
 
-  @Post(':id/reply')
+  @Post(":id/reply")
   reply(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
+    @Param("id", ParseUUIDPipe) id: string,
+    @CurrentUser("id") userId: string,
     @Body() dto: ReplyInquiryDto,
   ) {
     return this.inquiryService.reply(id, userId, dto);
   }
 
-  @Post(':id/cancel')
+  @Post(":id/cancel")
   cancel(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
+    @Param("id", ParseUUIDPipe) id: string,
+    @CurrentUser("id") userId: string,
   ) {
     return this.inquiryService.cancel(id, userId);
   }

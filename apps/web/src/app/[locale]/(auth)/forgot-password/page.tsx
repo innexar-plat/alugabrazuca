@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
-import Link from 'next/link';
-import { api } from '@/lib/api';
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { api } from "@/lib/api";
 
 export default function ForgotPasswordPage() {
-  const t = useTranslations('auth.forgotPassword');
-  const [email, setEmail] = useState('');
+  const t = useTranslations("auth.forgotPassword");
+  const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -16,7 +16,7 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      await api.post('/auth/forgot-password', { email });
+      await api.post("/auth/forgot-password", { email });
       setSent(true);
     } finally {
       setLoading(false);
@@ -27,23 +27,23 @@ export default function ForgotPasswordPage() {
     <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-8 shadow-lg">
       <div className="mb-6 text-center">
         <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
-          {t('title')}
+          {t("title")}
         </h1>
         <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-          {t('subtitle')}
+          {t("subtitle")}
         </p>
       </div>
 
       {sent ? (
         <div className="space-y-4">
           <div className="rounded-lg bg-[hsl(var(--success)/0.1)] p-3 text-sm text-[hsl(var(--success))]">
-            {t('success')}
+            {t("success")}
           </div>
           <Link
             href="/login"
             className="block text-center text-sm font-medium text-[hsl(var(--primary))] hover:underline"
           >
-            {t('backToLogin')}
+            {t("backToLogin")}
           </Link>
         </div>
       ) : (
@@ -53,7 +53,7 @@ export default function ForgotPasswordPage() {
               htmlFor="email"
               className="mb-1 block text-sm font-medium text-[hsl(var(--foreground))]"
             >
-              {t('email')}
+              {t("email")}
             </label>
             <input
               id="email"
@@ -70,14 +70,14 @@ export default function ForgotPasswordPage() {
             disabled={loading}
             className="w-full rounded-lg bg-[hsl(var(--primary))] px-4 py-2.5 text-sm font-semibold text-[hsl(var(--primary-foreground))] transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            {loading ? '...' : t('submit')}
+            {loading ? "..." : t("submit")}
           </button>
 
           <Link
             href="/login"
             className="block text-center text-sm text-[hsl(var(--muted-foreground))] hover:underline"
           >
-            {t('backToLogin')}
+            {t("backToLogin")}
           </Link>
         </form>
       )}

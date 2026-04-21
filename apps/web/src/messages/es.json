@@ -468,7 +468,8 @@
       "photos": "Fotos",
       "location": "Ubicación",
       "approximateArea": "Área aproximada — dirección exacta después de contacto aceptado"
-    }  },
+    }
+  },
   "profile": {
     "title": "Mi Perfil",
     "subtitle": "Administra tu información personal",
@@ -498,7 +499,8 @@
     "publicProfile": "Perfil público",
     "publicProfileDesc": "Información visible para otros usuarios",
     "listings": "anuncios",
-    "joinedIn": "Se unió en"  },
+    "joinedIn": "Se unió en"
+  },
   "search": {
     "metaTitle": "Buscar Habitaciones",
     "metaDescription": "Encuentra habitaciones en alquiler en EE.UU. y Europa. Filtra por precio, ciudad, comodidades y más.",

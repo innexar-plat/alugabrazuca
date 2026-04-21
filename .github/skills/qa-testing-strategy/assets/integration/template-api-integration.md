@@ -5,18 +5,21 @@ Use this template for testing API integrations, service communication, and datab
 ## Framework Selection
 
 **Supertest + Jest/Vitest** - Best for:
+
 - REST API testing with Express/Fastify
 - HTTP request/response validation
 - Middleware testing
 - Integration with existing Jest/Vitest setup
 
 **Playwright/Puppeteer** - Best for:
+
 - Full-stack integration tests
 - Browser-based API interactions
 - Testing with real authentication flows
 - Visual verification alongside API calls
 
 **Testcontainers** - Best for:
+
 - Testing with real databases (PostgreSQL, MongoDB, Redis)
 - Message queue integration (RabbitMQ, Kafka)
 - Isolated test environments
@@ -26,298 +29,309 @@ Use this template for testing API integrations, service communication, and datab
 
 ```typescript
 // api/users.integration.test.ts
-import request from 'supertest'
-import { app } from '../app'
-import { db } from '../database'
-import { UserFactory } from '../test-factories/user.factory'
+import request from "supertest";
+import { app } from "../app";
+import { db } from "../database";
+import { UserFactory } from "../test-factories/user.factory";
 
-describe('User API Integration', () => {
+describe("User API Integration", () => {
   beforeAll(async () => {
     // Setup: Start test database
-    await db.connect()
-    await db.migrate.latest()
-  })
+    await db.connect();
+    await db.migrate.latest();
+  });
 
   afterAll(async () => {
     // Teardown: Close connections
-    await db.destroy()
-  })
+    await db.destroy();
+  });
 
   beforeEach(async () => {
     // Reset database state before each test
-    await db('users').truncate()
-  })
+    await db("users").truncate();
+  });
 
-  describe('POST /api/users', () => {
-    it('should create user and return 201', async () => {
+  describe("POST /api/users", () => {
+    it("should create user and return 201", async () => {
       // Arrange
       const userData = {
-        email: 'test@example.com',
-        password: 'SecurePass123!',
-        name: 'Test User'
-      }
+        email: "test@example.com",
+        password: "SecurePass123!",
+        name: "Test User",
+      };
 
       // Act
       const response = await request(app)
-        .post('/api/users')
+        .post("/api/users")
         .send(userData)
-        .expect('Content-Type', /json/)
-        .expect(201)
+        .expect("Content-Type", /json/)
+        .expect(201);
 
       // Assert
       expect(response.body).toMatchObject({
         id: expect.any(String),
-        email: 'test@example.com',
-        name: 'Test User'
-      })
-      expect(response.body.password).toBeUndefined() // Never return password
+        email: "test@example.com",
+        name: "Test User",
+      });
+      expect(response.body.password).toBeUndefined(); // Never return password
 
       // Verify database state
-      const dbUser = await db('users').where({ id: response.body.id }).first()
-      expect(dbUser).toBeDefined()
-      expect(dbUser.email).toBe('test@example.com')
-    })
+      const dbUser = await db("users").where({ id: response.body.id }).first();
+      expect(dbUser).toBeDefined();
+      expect(dbUser.email).toBe("test@example.com");
+    });
 
-    it('should return 409 for duplicate email', async () => {
+    it("should return 409 for duplicate email", async () => {
       // Arrange
-      const userData = { email: 'test@example.com', password: 'pass', name: 'Test' }
-      await request(app).post('/api/users').send(userData)
+      const userData = {
+        email: "test@example.com",
+        password: "pass",
+        name: "Test",
+      };
+      await request(app).post("/api/users").send(userData);
 
       // Act
       const response = await request(app)
-        .post('/api/users')
+        .post("/api/users")
         .send(userData)
-        .expect(409)
+        .expect(409);
 
       // Assert
-      expect(response.body.error).toBe('Email already exists')
-    })
+      expect(response.body.error).toBe("Email already exists");
+    });
 
-    it('should validate required fields', async () => {
+    it("should validate required fields", async () => {
       // Act
       const response = await request(app)
-        .post('/api/users')
-        .send({ email: 'test@example.com' }) // Missing password and name
-        .expect(400)
+        .post("/api/users")
+        .send({ email: "test@example.com" }) // Missing password and name
+        .expect(400);
 
       // Assert
       expect(response.body.errors).toContainEqual(
-        expect.objectContaining({ field: 'password', message: expect.any(String) })
-      )
+        expect.objectContaining({
+          field: "password",
+          message: expect.any(String),
+        }),
+      );
       expect(response.body.errors).toContainEqual(
-        expect.objectContaining({ field: 'name', message: expect.any(String) })
-      )
-    })
-  })
+        expect.objectContaining({ field: "name", message: expect.any(String) }),
+      );
+    });
+  });
 
-  describe('GET /api/users/:id', () => {
-    it('should return user by id', async () => {
+  describe("GET /api/users/:id", () => {
+    it("should return user by id", async () => {
       // Arrange
-      const user = await UserFactory.createInDb(db)
+      const user = await UserFactory.createInDb(db);
 
       // Act
       const response = await request(app)
         .get(`/api/users/${user.id}`)
-        .expect(200)
+        .expect(200);
 
       // Assert
       expect(response.body).toMatchObject({
         id: user.id,
         email: user.email,
-        name: user.name
-      })
-    })
+        name: user.name,
+      });
+    });
 
-    it('should return 404 for non-existent user', async () => {
+    it("should return 404 for non-existent user", async () => {
       // Act
       const response = await request(app)
-        .get('/api/users/non-existent-id')
-        .expect(404)
+        .get("/api/users/non-existent-id")
+        .expect(404);
 
       // Assert
-      expect(response.body.error).toBe('User not found')
-    })
-  })
+      expect(response.body.error).toBe("User not found");
+    });
+  });
 
-  describe('PUT /api/users/:id', () => {
-    it('should update user', async () => {
+  describe("PUT /api/users/:id", () => {
+    it("should update user", async () => {
       // Arrange
-      const user = await UserFactory.createInDb(db)
-      const updates = { name: 'Updated Name' }
+      const user = await UserFactory.createInDb(db);
+      const updates = { name: "Updated Name" };
 
       // Act
       const response = await request(app)
         .put(`/api/users/${user.id}`)
         .send(updates)
-        .expect(200)
+        .expect(200);
 
       // Assert
-      expect(response.body.name).toBe('Updated Name')
+      expect(response.body.name).toBe("Updated Name");
 
       // Verify database state
-      const dbUser = await db('users').where({ id: user.id }).first()
-      expect(dbUser.name).toBe('Updated Name')
-    })
+      const dbUser = await db("users").where({ id: user.id }).first();
+      expect(dbUser.name).toBe("Updated Name");
+    });
 
-    it('should not allow email update', async () => {
+    it("should not allow email update", async () => {
       // Arrange
-      const user = await UserFactory.createInDb(db)
+      const user = await UserFactory.createInDb(db);
 
       // Act
       const response = await request(app)
         .put(`/api/users/${user.id}`)
-        .send({ email: 'newemail@example.com' })
-        .expect(400)
+        .send({ email: "newemail@example.com" })
+        .expect(400);
 
       // Assert
-      expect(response.body.error).toContain('cannot change email')
-    })
-  })
+      expect(response.body.error).toContain("cannot change email");
+    });
+  });
 
-  describe('DELETE /api/users/:id', () => {
-    it('should soft delete user', async () => {
+  describe("DELETE /api/users/:id", () => {
+    it("should soft delete user", async () => {
       // Arrange
-      const user = await UserFactory.createInDb(db)
+      const user = await UserFactory.createInDb(db);
 
       // Act
-      await request(app)
-        .delete(`/api/users/${user.id}`)
-        .expect(204)
+      await request(app).delete(`/api/users/${user.id}`).expect(204);
 
       // Assert - User should still exist but be marked deleted
-      const dbUser = await db('users').where({ id: user.id }).first()
-      expect(dbUser.deleted_at).toBeDefined()
-    })
-  })
-})
+      const dbUser = await db("users").where({ id: user.id }).first();
+      expect(dbUser.deleted_at).toBeDefined();
+    });
+  });
+});
 ```
 
 ## Authentication Integration Tests
 
 ```typescript
-describe('Authentication Flow', () => {
-  let authToken: string
+describe("Authentication Flow", () => {
+  let authToken: string;
 
-  describe('POST /api/auth/login', () => {
-    it('should authenticate user and return token', async () => {
+  describe("POST /api/auth/login", () => {
+    it("should authenticate user and return token", async () => {
       // Arrange
-      const user = await UserFactory.createInDb(db, { password: 'TestPass123!' })
+      const user = await UserFactory.createInDb(db, {
+        password: "TestPass123!",
+      });
 
       // Act
       const response = await request(app)
-        .post('/api/auth/login')
-        .send({ email: user.email, password: 'TestPass123!' })
-        .expect(200)
+        .post("/api/auth/login")
+        .send({ email: user.email, password: "TestPass123!" })
+        .expect(200);
 
       // Assert
       expect(response.body).toMatchObject({
         token: expect.any(String),
         user: {
           id: user.id,
-          email: user.email
-        }
-      })
+          email: user.email,
+        },
+      });
 
-      authToken = response.body.token
-    })
+      authToken = response.body.token;
+    });
 
-    it('should reject invalid credentials', async () => {
+    it("should reject invalid credentials", async () => {
       // Arrange
-      const user = await UserFactory.createInDb(db, { password: 'TestPass123!' })
+      const user = await UserFactory.createInDb(db, {
+        password: "TestPass123!",
+      });
 
       // Act
       const response = await request(app)
-        .post('/api/auth/login')
-        .send({ email: user.email, password: 'WrongPassword' })
-        .expect(401)
+        .post("/api/auth/login")
+        .send({ email: user.email, password: "WrongPassword" })
+        .expect(401);
 
       // Assert
-      expect(response.body.error).toBe('Invalid credentials')
-    })
+      expect(response.body.error).toBe("Invalid credentials");
+    });
 
-    it('should lock account after 5 failed attempts', async () => {
+    it("should lock account after 5 failed attempts", async () => {
       // Arrange
-      const user = await UserFactory.createInDb(db, { password: 'TestPass123!' })
+      const user = await UserFactory.createInDb(db, {
+        password: "TestPass123!",
+      });
 
       // Act - 5 failed attempts
       for (let i = 0; i < 5; i++) {
         await request(app)
-          .post('/api/auth/login')
-          .send({ email: user.email, password: 'WrongPassword' })
+          .post("/api/auth/login")
+          .send({ email: user.email, password: "WrongPassword" });
       }
 
       // Act - 6th attempt should be locked
       const response = await request(app)
-        .post('/api/auth/login')
-        .send({ email: user.email, password: 'TestPass123!' }) // Even correct password
-        .expect(423)
+        .post("/api/auth/login")
+        .send({ email: user.email, password: "TestPass123!" }) // Even correct password
+        .expect(423);
 
       // Assert
-      expect(response.body.error).toContain('Account locked')
-    })
-  })
+      expect(response.body.error).toContain("Account locked");
+    });
+  });
 
-  describe('Protected Routes', () => {
-    it('should allow access with valid token', async () => {
+  describe("Protected Routes", () => {
+    it("should allow access with valid token", async () => {
       // Arrange
-      const user = await UserFactory.createInDb(db)
-      const token = await generateAuthToken(user)
+      const user = await UserFactory.createInDb(db);
+      const token = await generateAuthToken(user);
 
       // Act
       const response = await request(app)
-        .get('/api/users/me')
-        .set('Authorization', `Bearer ${token}`)
-        .expect(200)
+        .get("/api/users/me")
+        .set("Authorization", `Bearer ${token}`)
+        .expect(200);
 
       // Assert
-      expect(response.body.id).toBe(user.id)
-    })
+      expect(response.body.id).toBe(user.id);
+    });
 
-    it('should reject invalid token', async () => {
+    it("should reject invalid token", async () => {
       // Act
       const response = await request(app)
-        .get('/api/users/me')
-        .set('Authorization', 'Bearer invalid-token')
-        .expect(401)
+        .get("/api/users/me")
+        .set("Authorization", "Bearer invalid-token")
+        .expect(401);
 
       // Assert
-      expect(response.body.error).toBe('Invalid token')
-    })
+      expect(response.body.error).toBe("Invalid token");
+    });
 
-    it('should reject expired token', async () => {
+    it("should reject expired token", async () => {
       // Arrange
-      const user = await UserFactory.createInDb(db)
-      const expiredToken = await generateAuthToken(user, { expiresIn: '-1h' })
+      const user = await UserFactory.createInDb(db);
+      const expiredToken = await generateAuthToken(user, { expiresIn: "-1h" });
 
       // Act
       const response = await request(app)
-        .get('/api/users/me')
-        .set('Authorization', `Bearer ${expiredToken}`)
-        .expect(401)
+        .get("/api/users/me")
+        .set("Authorization", `Bearer ${expiredToken}`)
+        .expect(401);
 
       // Assert
-      expect(response.body.error).toContain('expired')
-    })
-  })
-})
+      expect(response.body.error).toContain("expired");
+    });
+  });
+});
 ```
 
 ## Database Integration Tests
 
 ```typescript
-import { PostgreSqlContainer } from '@testcontainers/postgresql'
+import { PostgreSqlContainer } from "@testcontainers/postgresql";
 
-describe('Database Integration', () => {
-  let container: PostgreSqlContainer
-  let testDb: Database
+describe("Database Integration", () => {
+  let container: PostgreSqlContainer;
+  let testDb: Database;
 
   beforeAll(async () => {
     // Start PostgreSQL container
-    container = await new PostgreSqlContainer('postgres:15')
-      .withDatabase('test_db')
-      .withUsername('test_user')
-      .withPassword('test_pass')
-      .start()
+    container = await new PostgreSqlContainer("postgres:15")
+      .withDatabase("test_db")
+      .withUsername("test_user")
+      .withPassword("test_pass")
+      .start();
 
     // Connect to test database
     testDb = await connectToDatabase({
@@ -325,292 +339,304 @@ describe('Database Integration', () => {
       port: container.getPort(),
       database: container.getDatabase(),
       username: container.getUsername(),
-      password: container.getPassword()
-    })
+      password: container.getPassword(),
+    });
 
     // Run migrations
-    await testDb.migrate.latest()
-  }, 60000) // Increased timeout for container startup
+    await testDb.migrate.latest();
+  }, 60000); // Increased timeout for container startup
 
   afterAll(async () => {
-    await testDb.destroy()
-    await container.stop()
-  })
+    await testDb.destroy();
+    await container.stop();
+  });
 
-  describe('Transaction Handling', () => {
-    it('should commit transaction on success', async () => {
+  describe("Transaction Handling", () => {
+    it("should commit transaction on success", async () => {
       // Act
       await testDb.transaction(async (trx) => {
-        await trx('users').insert({ email: 'test@example.com', name: 'Test' })
-        await trx('profiles').insert({ user_email: 'test@example.com', bio: 'Test bio' })
-      })
+        await trx("users").insert({ email: "test@example.com", name: "Test" });
+        await trx("profiles").insert({
+          user_email: "test@example.com",
+          bio: "Test bio",
+        });
+      });
 
       // Assert
-      const user = await testDb('users').where({ email: 'test@example.com' }).first()
-      const profile = await testDb('profiles').where({ user_email: 'test@example.com' }).first()
+      const user = await testDb("users")
+        .where({ email: "test@example.com" })
+        .first();
+      const profile = await testDb("profiles")
+        .where({ user_email: "test@example.com" })
+        .first();
 
-      expect(user).toBeDefined()
-      expect(profile).toBeDefined()
-    })
+      expect(user).toBeDefined();
+      expect(profile).toBeDefined();
+    });
 
-    it('should rollback transaction on error', async () => {
+    it("should rollback transaction on error", async () => {
       // Act
       await expect(
         testDb.transaction(async (trx) => {
-          await trx('users').insert({ email: 'test@example.com', name: 'Test' })
-          throw new Error('Simulated error')
-        })
-      ).rejects.toThrow()
+          await trx("users").insert({
+            email: "test@example.com",
+            name: "Test",
+          });
+          throw new Error("Simulated error");
+        }),
+      ).rejects.toThrow();
 
       // Assert - User should not exist
-      const user = await testDb('users').where({ email: 'test@example.com' }).first()
-      expect(user).toBeUndefined()
-    })
-  })
+      const user = await testDb("users")
+        .where({ email: "test@example.com" })
+        .first();
+      expect(user).toBeUndefined();
+    });
+  });
 
-  describe('Complex Queries', () => {
-    it('should perform join queries', async () => {
+  describe("Complex Queries", () => {
+    it("should perform join queries", async () => {
       // Arrange
-      await testDb('users').insert([
-        { id: '1', email: 'user1@example.com', name: 'User 1' },
-        { id: '2', email: 'user2@example.com', name: 'User 2' }
-      ])
-      await testDb('posts').insert([
-        { id: '1', user_id: '1', title: 'Post 1' },
-        { id: '2', user_id: '1', title: 'Post 2' },
-        { id: '3', user_id: '2', title: 'Post 3' }
-      ])
+      await testDb("users").insert([
+        { id: "1", email: "user1@example.com", name: "User 1" },
+        { id: "2", email: "user2@example.com", name: "User 2" },
+      ]);
+      await testDb("posts").insert([
+        { id: "1", user_id: "1", title: "Post 1" },
+        { id: "2", user_id: "1", title: "Post 2" },
+        { id: "3", user_id: "2", title: "Post 3" },
+      ]);
 
       // Act
-      const results = await testDb('users')
-        .select('users.name', testDb.raw('COUNT(posts.id) as post_count'))
-        .leftJoin('posts', 'users.id', 'posts.user_id')
-        .groupBy('users.id')
-        .orderBy('post_count', 'desc')
+      const results = await testDb("users")
+        .select("users.name", testDb.raw("COUNT(posts.id) as post_count"))
+        .leftJoin("posts", "users.id", "posts.user_id")
+        .groupBy("users.id")
+        .orderBy("post_count", "desc");
 
       // Assert
-      expect(results).toHaveLength(2)
-      expect(results[0]).toMatchObject({ name: 'User 1', post_count: '2' })
-      expect(results[1]).toMatchObject({ name: 'User 2', post_count: '1' })
-    })
-  })
-})
+      expect(results).toHaveLength(2);
+      expect(results[0]).toMatchObject({ name: "User 1", post_count: "2" });
+      expect(results[1]).toMatchObject({ name: "User 2", post_count: "1" });
+    });
+  });
+});
 ```
 
 ## External Service Integration Tests
 
 ```typescript
-import { WireMock } from 'wiremock'
+import { WireMock } from "wiremock";
 
-describe('External Service Integration', () => {
-  let wireMock: WireMock
+describe("External Service Integration", () => {
+  let wireMock: WireMock;
 
   beforeAll(async () => {
     // Start WireMock server for stubbing external APIs
-    wireMock = new WireMock({ host: 'localhost', port: 8080 })
-    await wireMock.start()
-  })
+    wireMock = new WireMock({ host: "localhost", port: 8080 });
+    await wireMock.start();
+  });
 
   afterAll(async () => {
-    await wireMock.stop()
-  })
+    await wireMock.stop();
+  });
 
   beforeEach(async () => {
-    await wireMock.resetAll()
-  })
+    await wireMock.resetAll();
+  });
 
-  describe('Payment Service Integration', () => {
-    it('should process payment successfully', async () => {
+  describe("Payment Service Integration", () => {
+    it("should process payment successfully", async () => {
       // Arrange - Stub external payment API
       await wireMock.stub({
         request: {
-          method: 'POST',
-          url: '/api/payments'
+          method: "POST",
+          url: "/api/payments",
         },
         response: {
           status: 200,
           jsonBody: {
-            transactionId: 'TX123456',
-            status: 'approved'
-          }
-        }
-      })
+            transactionId: "TX123456",
+            status: "approved",
+          },
+        },
+      });
 
-      const order = await OrderFactory.createInDb(db)
+      const order = await OrderFactory.createInDb(db);
 
       // Act
       const response = await request(app)
         .post(`/api/orders/${order.id}/pay`)
-        .send({ amount: 100, currency: 'USD' })
-        .expect(200)
+        .send({ amount: 100, currency: "USD" })
+        .expect(200);
 
       // Assert
       expect(response.body).toMatchObject({
-        transactionId: 'TX123456',
-        status: 'approved'
-      })
+        transactionId: "TX123456",
+        status: "approved",
+      });
 
       // Verify WireMock received request
-      const requests = await wireMock.getRequests()
-      expect(requests).toHaveLength(1)
-      expect(requests[0].body).toContain('amount')
-    })
+      const requests = await wireMock.getRequests();
+      expect(requests).toHaveLength(1);
+      expect(requests[0].body).toContain("amount");
+    });
 
-    it('should handle payment service timeout', async () => {
+    it("should handle payment service timeout", async () => {
       // Arrange - Stub with delay
       await wireMock.stub({
         request: {
-          method: 'POST',
-          url: '/api/payments'
+          method: "POST",
+          url: "/api/payments",
         },
         response: {
           status: 200,
-          fixedDelayMilliseconds: 10000 // 10 second delay
-        }
-      })
+          fixedDelayMilliseconds: 10000, // 10 second delay
+        },
+      });
 
-      const order = await OrderFactory.createInDb(db)
+      const order = await OrderFactory.createInDb(db);
 
       // Act
       const response = await request(app)
         .post(`/api/orders/${order.id}/pay`)
-        .send({ amount: 100, currency: 'USD' })
-        .expect(504)
+        .send({ amount: 100, currency: "USD" })
+        .expect(504);
 
       // Assert
-      expect(response.body.error).toContain('timeout')
-    })
+      expect(response.body.error).toContain("timeout");
+    });
 
-    it('should retry on service failure', async () => {
+    it("should retry on service failure", async () => {
       // Arrange - First call fails, second succeeds
       await wireMock.stub({
         request: {
-          method: 'POST',
-          url: '/api/payments'
+          method: "POST",
+          url: "/api/payments",
         },
         response: {
-          status: 500
-        }
-      })
+          status: 500,
+        },
+      });
 
       setTimeout(async () => {
-        await wireMock.resetAll()
+        await wireMock.resetAll();
         await wireMock.stub({
           request: {
-            method: 'POST',
-            url: '/api/payments'
+            method: "POST",
+            url: "/api/payments",
           },
           response: {
             status: 200,
-            jsonBody: { transactionId: 'TX123456', status: 'approved' }
-          }
-        })
-      }, 1000)
+            jsonBody: { transactionId: "TX123456", status: "approved" },
+          },
+        });
+      }, 1000);
 
-      const order = await OrderFactory.createInDb(db)
+      const order = await OrderFactory.createInDb(db);
 
       // Act
       const response = await request(app)
         .post(`/api/orders/${order.id}/pay`)
-        .send({ amount: 100, currency: 'USD' })
-        .expect(200)
+        .send({ amount: 100, currency: "USD" })
+        .expect(200);
 
       // Assert
-      expect(response.body.transactionId).toBe('TX123456')
+      expect(response.body.transactionId).toBe("TX123456");
 
       // Verify retries happened
-      const requests = await wireMock.getRequests()
-      expect(requests.length).toBeGreaterThan(1)
-    })
-  })
-})
+      const requests = await wireMock.getRequests();
+      expect(requests.length).toBeGreaterThan(1);
+    });
+  });
+});
 ```
 
 ## Message Queue Integration Tests
 
 ```typescript
-import { RabbitMQContainer } from '@testcontainers/rabbitmq'
-import amqp from 'amqplib'
+import { RabbitMQContainer } from "@testcontainers/rabbitmq";
+import amqp from "amqplib";
 
-describe('Message Queue Integration', () => {
-  let container: RabbitMQContainer
-  let connection: amqp.Connection
-  let channel: amqp.Channel
+describe("Message Queue Integration", () => {
+  let container: RabbitMQContainer;
+  let connection: amqp.Connection;
+  let channel: amqp.Channel;
 
   beforeAll(async () => {
     // Start RabbitMQ container
-    container = await new RabbitMQContainer().start()
+    container = await new RabbitMQContainer().start();
 
     // Connect to RabbitMQ
-    connection = await amqp.connect(container.getAmqpUrl())
-    channel = await connection.createChannel()
-  }, 60000)
+    connection = await amqp.connect(container.getAmqpUrl());
+    channel = await connection.createChannel();
+  }, 60000);
 
   afterAll(async () => {
-    await channel.close()
-    await connection.close()
-    await container.stop()
-  })
+    await channel.close();
+    await connection.close();
+    await container.stop();
+  });
 
-  describe('Order Processing Queue', () => {
-    it('should publish and consume messages', async () => {
+  describe("Order Processing Queue", () => {
+    it("should publish and consume messages", async () => {
       // Arrange
-      const queueName = 'order_processing'
-      await channel.assertQueue(queueName, { durable: false })
+      const queueName = "order_processing";
+      await channel.assertQueue(queueName, { durable: false });
 
       const orderData = {
-        orderId: '123',
-        userId: 'user-456',
-        total: 99.99
-      }
+        orderId: "123",
+        userId: "user-456",
+        total: 99.99,
+      };
 
       // Act - Publish message
-      channel.sendToQueue(queueName, Buffer.from(JSON.stringify(orderData)))
+      channel.sendToQueue(queueName, Buffer.from(JSON.stringify(orderData)));
 
       // Assert - Consume message
       const message = await new Promise<any>((resolve) => {
         channel.consume(queueName, (msg) => {
           if (msg) {
-            resolve(JSON.parse(msg.content.toString()))
-            channel.ack(msg)
+            resolve(JSON.parse(msg.content.toString()));
+            channel.ack(msg);
           }
-        })
-      })
+        });
+      });
 
-      expect(message).toMatchObject(orderData)
-    })
+      expect(message).toMatchObject(orderData);
+    });
 
-    it('should handle message rejection and retry', async () => {
+    it("should handle message rejection and retry", async () => {
       // Arrange
-      const queueName = 'order_processing_retry'
-      await channel.assertQueue(queueName, { durable: true })
-      await channel.assertQueue(`${queueName}_dlq`, { durable: true })
+      const queueName = "order_processing_retry";
+      await channel.assertQueue(queueName, { durable: true });
+      await channel.assertQueue(`${queueName}_dlq`, { durable: true });
 
-      const invalidOrder = { orderId: 'invalid' }
-      channel.sendToQueue(queueName, Buffer.from(JSON.stringify(invalidOrder)))
+      const invalidOrder = { orderId: "invalid" };
+      channel.sendToQueue(queueName, Buffer.from(JSON.stringify(invalidOrder)));
 
       // Act - Consumer rejects invalid message
-      let attempts = 0
+      let attempts = 0;
       await new Promise<void>((resolve) => {
         channel.consume(queueName, (msg) => {
           if (msg) {
-            attempts++
+            attempts++;
             if (attempts < 3) {
-              channel.nack(msg, false, true) // Requeue
+              channel.nack(msg, false, true); // Requeue
             } else {
-              channel.sendToQueue(`${queueName}_dlq`, msg.content) // Dead letter
-              channel.ack(msg)
-              resolve()
+              channel.sendToQueue(`${queueName}_dlq`, msg.content); // Dead letter
+              channel.ack(msg);
+              resolve();
             }
           }
-        })
-      })
+        });
+      });
 
       // Assert
-      expect(attempts).toBe(3)
-    })
-  })
-})
+      expect(attempts).toBe(3);
+    });
+  });
+});
 ```
 
 ## Best Practices Checklist
@@ -632,28 +658,31 @@ describe('Message Queue Integration', () => {
 ## Common Pitfalls
 
 [FAIL] **Using in-memory databases for integration tests**:
+
 ```typescript
 // Bad - SQLite in-memory doesn't match production PostgreSQL
-const db = new SQLite(':memory:')
+const db = new SQLite(":memory:");
 
 // Good - Use Testcontainers with real PostgreSQL
-const container = await new PostgreSqlContainer('postgres:15').start()
+const container = await new PostgreSqlContainer("postgres:15").start();
 ```
 
 [FAIL] **Not cleaning up between tests**:
+
 ```typescript
 // Bad - Tests interfere with each other
 beforeAll(async () => {
-  await db.seed.run() // Only runs once
-})
+  await db.seed.run(); // Only runs once
+});
 
 // Good - Fresh state for each test
 beforeEach(async () => {
-  await db('users').truncate()
-})
+  await db("users").truncate();
+});
 ```
 
 [FAIL] **Testing external APIs directly**:
+
 ```typescript
 // Bad - Tests depend on external service availability
 await fetch('https://api.stripe.com/v1/charges')
@@ -684,22 +713,22 @@ await wireMock.stub({ ... })
 ### vitest.integration.config.ts
 
 ```typescript
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    include: ['**/*.integration.test.ts'],
+    include: ["**/*.integration.test.ts"],
     testTimeout: 30000, // Longer timeout for containers
     hookTimeout: 60000, // Container startup can be slow
-    globalSetup: './test/integration-setup.ts',
-    pool: 'forks', // Isolation for database tests
+    globalSetup: "./test/integration-setup.ts",
+    pool: "forks", // Isolation for database tests
     poolOptions: {
       forks: {
-        singleFork: false // Run tests in parallel
-      }
-    }
-  }
-})
+        singleFork: false, // Run tests in parallel
+      },
+    },
+  },
+});
 ```
 
 ## Related Resources

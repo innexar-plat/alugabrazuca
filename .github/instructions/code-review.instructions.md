@@ -99,11 +99,11 @@ Ao revisar um PR, percorrer cada categoria abaixo. Uma flag `❌` bloqueia o mer
 
 ## Critérios de Aprovação
 
-| Flag | Ação |
-|------|------|
-| ❌ Bloqueante | Deve ser corrigido antes do merge |
+| Flag          | Ação                                      |
+| ------------- | ----------------------------------------- |
+| ❌ Bloqueante | Deve ser corrigido antes do merge         |
 | ⚠️ Importante | Deve ser discutido, pode ser em follow-up |
-| 💬 Sugestão | Opcional, melhoria futura |
+| 💬 Sugestão   | Opcional, melhoria futura                 |
 
 ---
 

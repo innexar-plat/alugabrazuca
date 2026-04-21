@@ -7,6 +7,7 @@ Use these contracts when exposing LLMs, agent tools, or multimodal models over H
 This resource is only relevant if your API surface includes AI/agent capabilities. Do not apply these patterns to normal REST/GraphQL/gRPC APIs unless explicitly required.
 
 ## Request Shape
+
 - `trace_id` + `request_id`
 - `actor`: user_id, org_id, roles/scopes, auth method
 - `prompt`: user text; `system_instructions`
@@ -17,6 +18,7 @@ This resource is only relevant if your API surface includes AI/agent capabilitie
 - `delivery`: `stream=true|false`, `async=true|false`, callback URL + HMAC secret
 
 ## Response Shape (Sync/Stream)
+
 - `choices[]`: message, role, finish_reason
 - `stream_delta`: partial tokens or chunks
 - `citations[]`: source_id, span, url
@@ -25,25 +27,30 @@ This resource is only relevant if your API surface includes AI/agent capabilitie
 - `trace_id` echoed; `rate_limit`: limit/remaining/reset
 
 ## Errors (use RFC 9457)
+
 - `model_timeout`, `tool_failed`, `guardrail_blocked`, `retrieval_miss`, `validation_error`, `quota_exceeded`
 - Include `trace_id`, `hint`, `retryable`
 
 ## Long-Running Jobs
+
 - `202 Accepted` + `Location` for status; payload: `job_id`, `state`, `expires_at`, `eta`
 - `state` transitions: queued → running → succeeded | failed | cancelled
 - Webhooks: signed with HMAC; replay protection; include `trace_id`
 
 ## Streaming (SSE/WebSocket)
+
 - SSE fields: `event=delta|done|error`, `id`, `data` (JSON lines)
 - Close codes: document retry guidance; include `retry` in SSE if applicable
 - Keep-alives: comment frames to avoid idle timeouts
 
 ## Safety & Guardrails
+
 - Pre-check: content moderation, prompt injection scan, policy scope check
 - Tool gating: enforce allowlist, validate args schema, human approval for high-risk
 - Post-check: PII redaction, policy filters, hallucination/citation checks when available
 
 ## Observability
+
 - Propagate `traceparent`/`tracestate` or `trace_id` header
 - Emit spans: `llm_call`, `retrieval`, `tool_call`, `memory_op`
 - Log: request envelope sans secrets, rate-limit decisions, guardrail outcomes
@@ -105,7 +112,10 @@ MCP is Anthropic's open standard (Nov 2024) for AI-to-API integration. Adopted b
     "type": "object",
     "properties": {
       "query": { "type": "string", "description": "Search terms" },
-      "category": { "type": "string", "enum": ["electronics", "clothing", "home"] },
+      "category": {
+        "type": "string",
+        "enum": ["electronics", "clothing", "home"]
+      },
       "max_price": { "type": "number", "description": "Maximum price in USD" }
     },
     "required": ["query"]

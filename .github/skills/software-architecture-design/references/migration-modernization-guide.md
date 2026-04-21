@@ -52,14 +52,14 @@ Phase 1: Identify                Phase 2: Intercept              Phase 3: Replac
 
 Rank modules by these criteria:
 
-| Criterion | Weight | Description |
-|-----------|--------|-------------|
-| Business value of independent deployment | High | Revenue impact, release frequency needs |
-| Coupling to other modules | High | Fewer dependencies = easier extraction |
-| Team ownership clarity | Medium | Clear owner = better extraction outcome |
-| Data isolation feasibility | High | Shared tables make extraction hard |
-| Change frequency | Medium | Frequently changed code benefits most |
-| Performance isolation needs | Medium | One module's load affecting another |
+| Criterion                                | Weight | Description                             |
+| ---------------------------------------- | ------ | --------------------------------------- |
+| Business value of independent deployment | High   | Revenue impact, release frequency needs |
+| Coupling to other modules                | High   | Fewer dependencies = easier extraction  |
+| Team ownership clarity                   | Medium | Clear owner = better extraction outcome |
+| Data isolation feasibility               | High   | Shared tables make extraction hard      |
+| Change frequency                         | Medium | Frequently changed code benefits most   |
+| Performance isolation needs              | Medium | One module's load affecting another     |
 
 **Step 3: Build the new service**
 
@@ -68,7 +68,7 @@ Rank modules by these criteria:
 // This is critical — callers should not know about the migration
 
 // New orders-service (standalone)
-app.post('/api/orders', async (req, res) => {
+app.post("/api/orders", async (req, res) => {
   // New implementation with same API contract
   const order = await createOrder(req.body);
   res.json(order);
@@ -188,12 +188,12 @@ Each service has its own database instance.
 
 ### Data Synchronization During Decomposition
 
-| Approach | Description | When |
-|----------|-------------|------|
-| Dual writes | Write to both old and new DB | Short transition periods only |
-| CDC (Change Data Capture) | Stream changes from old to new | Gradual migration, minimal code changes |
-| ETL batch sync | Periodic bulk sync | Non-real-time data, analytics |
-| API calls | New service fetches data via API | Loosely coupled, eventually consistent |
+| Approach                  | Description                      | When                                    |
+| ------------------------- | -------------------------------- | --------------------------------------- |
+| Dual writes               | Write to both old and new DB     | Short transition periods only           |
+| CDC (Change Data Capture) | Stream changes from old to new   | Gradual migration, minimal code changes |
+| ETL batch sync            | Periodic bulk sync               | Non-real-time data, analytics           |
+| API calls                 | New service fetches data via API | Loosely coupled, eventually consistent  |
 
 **CDC Example with Debezium:**
 
@@ -216,12 +216,12 @@ Each service has its own database instance.
 
 When decomposing a shared database, you lose cross-table joins. Solutions:
 
-| Pattern | Use When | Trade-off |
-|---------|----------|-----------|
-| API composition | Low-frequency queries, few services | Latency from multiple API calls |
-| Data denormalization | Read-heavy, stale data OK | Storage duplication, sync complexity |
-| Event-driven sync | Real-time needs, owned data changes | Eventual consistency |
-| Materialized views in read DB | Complex reporting queries | Additional infrastructure |
+| Pattern                       | Use When                            | Trade-off                            |
+| ----------------------------- | ----------------------------------- | ------------------------------------ |
+| API composition               | Low-frequency queries, few services | Latency from multiple API calls      |
+| Data denormalization          | Read-heavy, stale data OK           | Storage duplication, sync complexity |
+| Event-driven sync             | Real-time needs, owned data changes | Eventual consistency                 |
+| Materialized views in read DB | Complex reporting queries           | Additional infrastructure            |
 
 ---
 
@@ -232,21 +232,21 @@ When decomposing a shared database, you lose cross-table joins. Solutions:
 ```typescript
 // Flag: route traffic to new vs old implementation
 const flags = {
-  'orders-service-v2': {
-    type: 'percentage',
-    value: 25,  // 25% of traffic to new service
+  "orders-service-v2": {
+    type: "percentage",
+    value: 25, // 25% of traffic to new service
     metadata: {
-      migration: 'orders-extraction',
-      startDate: '2026-01-15',
-      targetCompletion: '2026-03-01',
-      rollbackPlan: 'Set to 0%, revert proxy config',
+      migration: "orders-extraction",
+      startDate: "2026-01-15",
+      targetCompletion: "2026-03-01",
+      rollbackPlan: "Set to 0%, revert proxy config",
     },
   },
 };
 
 // Usage in routing layer
 async function handleOrderRequest(req: Request): Promise<Response> {
-  if (featureFlags.isEnabled('orders-service-v2', { userId: req.userId })) {
+  if (featureFlags.isEnabled("orders-service-v2", { userId: req.userId })) {
     return newOrdersService.handle(req);
   }
   return monolith.handle(req);
@@ -272,20 +272,20 @@ IMPORTANT: Set a cleanup deadline. Stale flags are tech debt.
 async function getOrder(orderId: string): Promise<Order> {
   const oldResult = await monolith.getOrder(orderId);
 
-  if (featureFlags.isEnabled('orders-comparison-reads')) {
+  if (featureFlags.isEnabled("orders-comparison-reads")) {
     try {
       const newResult = await newService.getOrder(orderId);
       if (!deepEqual(oldResult, newResult)) {
-        logger.warn('Migration mismatch', {
+        logger.warn("Migration mismatch", {
           orderId,
           diff: generateDiff(oldResult, newResult),
         });
-        metrics.increment('migration.comparison.mismatch');
+        metrics.increment("migration.comparison.mismatch");
       } else {
-        metrics.increment('migration.comparison.match');
+        metrics.increment("migration.comparison.match");
       }
     } catch (error) {
-      metrics.increment('migration.comparison.error');
+      metrics.increment("migration.comparison.error");
     }
   }
 
@@ -299,14 +299,14 @@ async function getOrder(orderId: string): Promise<Order> {
 
 ### Migration Risk Matrix
 
-| Risk Factor | Low Risk | Medium Risk | High Risk |
-|-------------|----------|-------------|-----------|
-| Data coupling | No shared tables | Shared lookup tables | Shared mutable tables with joins |
-| Traffic volume | <100 req/s | 100–1000 req/s | >1000 req/s |
-| Consistency requirements | Eventual OK | Read-your-writes needed | Strong ACID required |
-| Team experience | Done migrations before | Some distributed systems experience | First microservice extraction |
-| Rollback complexity | Stateless, easy revert | Some state to reconcile | Data divergence makes rollback hard |
-| Business criticality | Internal tool | Customer-facing, non-revenue | Payment, checkout, auth |
+| Risk Factor              | Low Risk               | Medium Risk                         | High Risk                           |
+| ------------------------ | ---------------------- | ----------------------------------- | ----------------------------------- |
+| Data coupling            | No shared tables       | Shared lookup tables                | Shared mutable tables with joins    |
+| Traffic volume           | <100 req/s             | 100–1000 req/s                      | >1000 req/s                         |
+| Consistency requirements | Eventual OK            | Read-your-writes needed             | Strong ACID required                |
+| Team experience          | Done migrations before | Some distributed systems experience | First microservice extraction       |
+| Rollback complexity      | Stateless, easy revert | Some state to reconcile             | Data divergence makes rollback hard |
+| Business criticality     | Internal tool          | Customer-facing, non-revenue        | Payment, checkout, auth             |
 
 ### Risk Mitigation Checklist
 
@@ -321,12 +321,12 @@ async function getOrder(orderId: string): Promise<Order> {
 
 ### Go/No-Go Criteria Per Phase
 
-| Metric | Green (Go) | Yellow (Pause) | Red (Rollback) |
-|--------|------------|----------------|-----------------|
-| Error rate | <0.1% increase | 0.1–1% increase | >1% increase |
-| P95 latency | <10% increase | 10–50% increase | >50% increase |
-| Data mismatches | <0.01% | 0.01–0.1% | >0.1% |
-| Business metric (conversion, etc.) | No change | <2% drop | >2% drop |
+| Metric                             | Green (Go)     | Yellow (Pause)  | Red (Rollback) |
+| ---------------------------------- | -------------- | --------------- | -------------- |
+| Error rate                         | <0.1% increase | 0.1–1% increase | >1% increase   |
+| P95 latency                        | <10% increase  | 10–50% increase | >50% increase  |
+| Data mismatches                    | <0.01%         | 0.01–0.1%       | >0.1%          |
+| Business metric (conversion, etc.) | No change      | <2% drop        | >2% drop       |
 
 ---
 
@@ -355,22 +355,22 @@ async function shadowTraffic(req: Request, res: Response, next: NextFunction) {
   next();
 
   // 2. Asynchronously send a copy to the new service (fire-and-forget)
-  if (featureFlags.isEnabled('shadow-traffic-orders')) {
+  if (featureFlags.isEnabled("shadow-traffic-orders")) {
     setImmediate(async () => {
       try {
         const shadowStart = Date.now();
         const shadowResponse = await newService.mirror(req);
         const shadowLatency = Date.now() - shadowStart;
 
-        metrics.histogram('shadow.latency', shadowLatency);
+        metrics.histogram("shadow.latency", shadowLatency);
 
         // Compare responses (logged, not returned to client)
         if (res.locals.responseBody) {
           const match = deepEqual(res.locals.responseBody, shadowResponse);
-          metrics.increment(match ? 'shadow.match' : 'shadow.mismatch');
+          metrics.increment(match ? "shadow.match" : "shadow.mismatch");
         }
       } catch (error) {
-        metrics.increment('shadow.error');
+        metrics.increment("shadow.error");
         // Failures in shadow traffic NEVER affect the real response
       }
     });
@@ -420,14 +420,14 @@ Stage 4: Steady State
 
 ### Case Study Pattern: E-Commerce Migration
 
-| Phase | Extract | Why First | Risk Level |
-|-------|---------|-----------|------------|
-| 1 | Notifications | No writes to core data, read-only | Low |
-| 2 | Search/Catalog | Heavy reads, independent index | Low-Medium |
-| 3 | Inventory | Clear bounded context, event-driven | Medium |
-| 4 | Orders | Core domain, complex state machine | High |
-| 5 | Payments | Regulatory, compliance needs isolation | High |
-| 6 | User/Auth | Shared dependency, extract last | Very High |
+| Phase | Extract        | Why First                              | Risk Level |
+| ----- | -------------- | -------------------------------------- | ---------- |
+| 1     | Notifications  | No writes to core data, read-only      | Low        |
+| 2     | Search/Catalog | Heavy reads, independent index         | Low-Medium |
+| 3     | Inventory      | Clear bounded context, event-driven    | Medium     |
+| 4     | Orders         | Core domain, complex state machine     | High       |
+| 5     | Payments       | Regulatory, compliance needs isolation | High       |
+| 6     | User/Auth      | Shared dependency, extract last        | Very High  |
 
 **Key principle:** Extract the easiest services first to build team confidence and infrastructure. Save the hardest (most coupled, most critical) for last.
 
@@ -523,9 +523,9 @@ Score: 7+  → Begin migration with strangler fig approach
 
 Score each module (1-5 per criterion), extract in descending total order:
 
-| Module | Coupling (inverse) | Change Frequency | Business Value | Team Readiness | Total |
-|--------|-------------------|-----------------|----------------|----------------|-------|
-| Module A | ? | ? | ? | ? | ? |
+| Module   | Coupling (inverse) | Change Frequency | Business Value | Team Readiness | Total |
+| -------- | ------------------ | ---------------- | -------------- | -------------- | ----- |
+| Module A | ?                  | ?                | ?              | ?              | ?     |
 
 ---
 

@@ -6,20 +6,20 @@ Operational patterns for production-ready Angular with standalone components, si
 
 ## Section Index
 
-| # | Section | Lines | Use When |
-|---|---------|-------|----------|
-| 1 | [Standalone Components](#standalone-components) | 26–55 | Scaffolding components or migrating from NgModules |
-| 2 | [Signals & Reactive State](#signals--reactive-state) | 57–158 | Managing state, derived values, async data loading |
-| 3 | [Signal Inputs, Outputs & Model](#signal-inputs-outputs--model) | 160–206 | Defining component APIs with signal-based I/O |
-| 4 | [Dependency Injection](#dependency-injection) | 208–256 | Wiring services, HTTP clients, injection tokens |
-| 5 | [Modern Template Syntax](#modern-template-syntax) | 258–325 | @if, @for, @switch, @let, @defer |
-| 6 | [Forms](#forms) | 327–372 | Typed reactive forms and signal-based form patterns |
-| 7 | [Routing & Navigation](#routing--navigation) | 374–424 | Lazy loading, view transitions, functional guards |
-| 8 | [Change Detection](#change-detection) | 426–460 | OnPush vs zoneless, performance tuning |
-| 9 | [Testing](#testing) | 462–521 | Unit testing components, services, signal inputs |
-| 10 | [SSR & Hydration](#ssr--hydration) | 523–547 | Server-side rendering and hydration safety |
-| 11 | [Anti-Patterns](#anti-patterns) | 549–592 | Reviewing code for common mistakes |
-| 12 | [Migration Guide](#migration-guide) | 594–647 | Upgrading from older Angular patterns |
+| #   | Section                                                         | Lines   | Use When                                            |
+| --- | --------------------------------------------------------------- | ------- | --------------------------------------------------- |
+| 1   | [Standalone Components](#standalone-components)                 | 26–55   | Scaffolding components or migrating from NgModules  |
+| 2   | [Signals & Reactive State](#signals--reactive-state)            | 57–158  | Managing state, derived values, async data loading  |
+| 3   | [Signal Inputs, Outputs & Model](#signal-inputs-outputs--model) | 160–206 | Defining component APIs with signal-based I/O       |
+| 4   | [Dependency Injection](#dependency-injection)                   | 208–256 | Wiring services, HTTP clients, injection tokens     |
+| 5   | [Modern Template Syntax](#modern-template-syntax)               | 258–325 | @if, @for, @switch, @let, @defer                    |
+| 6   | [Forms](#forms)                                                 | 327–372 | Typed reactive forms and signal-based form patterns |
+| 7   | [Routing & Navigation](#routing--navigation)                    | 374–424 | Lazy loading, view transitions, functional guards   |
+| 8   | [Change Detection](#change-detection)                           | 426–460 | OnPush vs zoneless, performance tuning              |
+| 9   | [Testing](#testing)                                             | 462–521 | Unit testing components, services, signal inputs    |
+| 10  | [SSR & Hydration](#ssr--hydration)                              | 523–547 | Server-side rendering and hydration safety          |
+| 11  | [Anti-Patterns](#anti-patterns)                                 | 549–592 | Reviewing code for common mistakes                  |
+| 12  | [Migration Guide](#migration-guide)                             | 594–647 | Upgrading from older Angular patterns               |
 
 ---
 
@@ -29,13 +29,13 @@ All components are standalone by default in Angular 21 (`standalone: true` is im
 
 ```typescript
 @Component({
-  selector: 'app-user-profile',
+  selector: "app-user-profile",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DatePipe, RouterLink],
   template: `
     @if (user(); as u) {
       <h2>{{ u.firstName }} {{ u.lastName }}</h2>
-      <p>Joined {{ u.createdAt | date:'mediumDate' }}</p>
+      <p>Joined {{ u.createdAt | date: "mediumDate" }}</p>
     } @else {
       <p>Loading profile…</p>
     }
@@ -45,7 +45,7 @@ export class UserProfileComponent {
   user = signal<User | null>(null);
   displayName = computed(() => {
     const u = this.user();
-    return u ? `${u.firstName} ${u.lastName}` : 'Guest';
+    return u ? `${u.firstName} ${u.lastName}` : "Guest";
   });
 }
 ```
@@ -58,13 +58,13 @@ Key rules: import only what the template uses (no `CommonModule`), always use `O
 
 ### Signals vs RxJS Decision
 
-| Criterion | Signals | RxJS Observables |
-|-----------|---------|-----------------|
-| Synchronous state | Primary use | Overkill |
-| Derived values | `computed()` — glitch-free | `combineLatest` — more boilerplate |
-| Async HTTP | `resource()` / `rxResource()` | `HttpClient` returns Observable |
-| Event streams (debounce, throttle) | Not designed for this | Core strength |
-| Template binding | Direct — `{{ count() }}` | Requires `async` pipe |
+| Criterion                          | Signals                       | RxJS Observables                   |
+| ---------------------------------- | ----------------------------- | ---------------------------------- |
+| Synchronous state                  | Primary use                   | Overkill                           |
+| Derived values                     | `computed()` — glitch-free    | `combineLatest` — more boilerplate |
+| Async HTTP                         | `resource()` / `rxResource()` | `HttpClient` returns Observable    |
+| Event streams (debounce, throttle) | Not designed for this         | Core strength                      |
+| Template binding                   | Direct — `{{ count() }}`      | Requires `async` pipe              |
 
 **Rule of thumb**: Start with signals. Reach for RxJS when you need stream operators or Observable-based libraries.
 
@@ -74,12 +74,20 @@ Key rules: import only what the template uses (no `CommonModule`), always use `O
 export class CartComponent {
   items = signal<CartItem[]>([]);
   promoCode = signal<string | null>(null);
-  subtotal = computed(() => this.items().reduce((sum, i) => sum + i.price * i.quantity, 0));
-  discount = computed(() => this.promoCode() === 'SAVE20' ? this.subtotal() * 0.2 : 0);
+  subtotal = computed(() =>
+    this.items().reduce((sum, i) => sum + i.price * i.quantity, 0),
+  );
+  discount = computed(() =>
+    this.promoCode() === "SAVE20" ? this.subtotal() * 0.2 : 0,
+  );
   total = computed(() => this.subtotal() - this.discount());
 
-  addItem(item: CartItem) { this.items.update(current => [...current, item]); }
-  removeItem(id: string) { this.items.update(current => current.filter(i => i.id !== id)); }
+  addItem(item: CartItem) {
+    this.items.update((current) => [...current, item]);
+  }
+  removeItem(id: string) {
+    this.items.update((current) => current.filter((i) => i.id !== id));
+  }
 }
 ```
 
@@ -90,8 +98,10 @@ Writable signal whose value resets when a source changes. Use for "selected item
 ```typescript
 export class ProductListComponent {
   products = signal<Product[]>([]);
-  selectedProduct = linkedSignal(() => this.products()[0] ?? null);  // Resets on list change
-  selectProduct(p: Product) { this.selectedProduct.set(p); }         // User can override
+  selectedProduct = linkedSignal(() => this.products()[0] ?? null); // Resets on list change
+  selectProduct(p: Product) {
+    this.selectedProduct.set(p);
+  } // User can override
 }
 ```
 
@@ -117,7 +127,9 @@ export class UserDetailComponent {
   userResource = resource({
     request: () => ({ id: this.userId() }),
     loader: async ({ request, abortSignal }) => {
-      const res = await fetch(`/api/users/${request.id}`, { signal: abortSignal });
+      const res = await fetch(`/api/users/${request.id}`, {
+        signal: abortSignal,
+      });
       if (!res.ok) throw new Error(`Failed to load user ${request.id}`);
       return res.json() as Promise<User>;
     },
@@ -128,14 +140,11 @@ export class UserDetailComponent {
 Template:
 
 ```html
-@switch (userResource.status()) {
-  @case ('loading') { <app-skeleton /> }
-  @case ('error') { <app-error [message]="userResource.error()?.message" /> }
-  @case ('resolved') {
-    @let user = userResource.value()!;
-    <h2>{{ user.name }}</h2>
-  }
-}
+@switch (userResource.status()) { @case ('loading') { <app-skeleton /> } @case
+('error') { <app-error [message]="userResource.error()?.message" /> } @case
+('resolved') { @let user = userResource.value()!;
+<h2>{{ user.name }}</h2>
+} }
 ```
 
 ### rxResource() — Observable Integration
@@ -145,10 +154,13 @@ Use when the data source is an Observable (e.g., `HttpClient`).
 ```typescript
 export class OrderListComponent {
   private http = inject(HttpClient);
-  statusFilter = signal<OrderStatus>('pending');
+  statusFilter = signal<OrderStatus>("pending");
   ordersResource = rxResource({
     request: () => ({ status: this.statusFilter() }),
-    loader: ({ request }) => this.http.get<Order[]>('/api/orders', { params: { status: request.status } }),
+    loader: ({ request }) =>
+      this.http.get<Order[]>("/api/orders", {
+        params: { status: request.status },
+      }),
   });
 }
 ```
@@ -163,9 +175,9 @@ export class OrderListComponent {
 
 ```typescript
 export class ProductCardComponent {
-  product = input.required<Product>();              // Required — enforced at call site
-  showActions = input(true);                         // Optional with default
-  size = input<'sm' | 'md' | 'lg'>('md', { alias: 'cardSize' });
+  product = input.required<Product>(); // Required — enforced at call site
+  showActions = input(true); // Optional with default
+  size = input<"sm" | "md" | "lg">("md", { alias: "cardSize" });
   price = input.required({ transform: (v: number | string) => Number(v) });
 }
 ```
@@ -174,10 +186,12 @@ export class ProductCardComponent {
 
 ```typescript
 export class SearchBarComponent {
-  query = signal('');
+  query = signal("");
   search = output<string>();
   clear = output<void>();
-  onSearch() { this.search.emit(this.query()); }
+  onSearch() {
+    this.search.emit(this.query());
+  }
 }
 ```
 
@@ -189,19 +203,21 @@ Replaces `@Input() value` + `@Output() valueChange` with a single declaration.
 export class RatingComponent {
   value = model.required<number>();
   maxStars = input(5);
-  setRating(star: number) { this.value.set(star + 1); }
+  setRating(star: number) {
+    this.value.set(star + 1);
+  }
 }
 // Parent: <app-rating [(value)]="review.rating" [maxStars]="10" />
 ```
 
 ### Migration Table
 
-| Legacy | Modern | Notes |
-|--------|--------|-------|
-| `@Input() name: string` | `name = input.required<string>()` | Access via `this.name()` |
-| `@Input() name = 'default'` | `name = input('default')` | Type inferred |
-| `@Output() clicked = new EventEmitter<void>()` | `clicked = output<void>()` | `.emit()` same |
-| `@Input() value` + `@Output() valueChange` | `value = model<T>()` | Single declaration |
+| Legacy                                         | Modern                            | Notes                    |
+| ---------------------------------------------- | --------------------------------- | ------------------------ |
+| `@Input() name: string`                        | `name = input.required<string>()` | Access via `this.name()` |
+| `@Input() name = 'default'`                    | `name = input('default')`         | Type inferred            |
+| `@Output() clicked = new EventEmitter<void>()` | `clicked = output<void>()`        | `.emit()` same           |
+| `@Input() value` + `@Output() valueChange`     | `value = model<T>()`              | Single declaration       |
 
 ---
 
@@ -210,12 +226,14 @@ export class RatingComponent {
 ### inject() Function (Preferred)
 
 ```typescript
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class OrderService {
   private http = inject(HttpClient);
   private config = inject(APP_CONFIG);
   getOrders(status: OrderStatus) {
-    return this.http.get<Order[]>(`${this.config.apiUrl}/orders`, { params: { status } });
+    return this.http.get<Order[]>(`${this.config.apiUrl}/orders`, {
+      params: { status },
+    });
   }
 }
 ```
@@ -223,17 +241,17 @@ export class OrderService {
 ### HttpClient Error Handling
 
 ```typescript
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class ApiService {
   private http = inject(HttpClient);
   get<T>(url: string, params?: Record<string, string>): Observable<T> {
     return this.http.get<T>(url, { params }).pipe(
       retry({ count: 2, delay: 1000 }),
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401) inject(Router).navigate(['/login']);
+        if (error.status === 401) inject(Router).navigate(["/login"]);
         return throwError(() => ({
           status: error.status,
-          message: error.error?.message ?? 'An unexpected error occurred',
+          message: error.error?.message ?? "An unexpected error occurred",
         }));
       }),
     );
@@ -246,7 +264,10 @@ export class ApiService {
 ```typescript
 export const appConfig: ApplicationConfig = {
   providers: [
-    { provide: APP_CONFIG, useValue: { apiUrl: '/api', features: { darkMode: true } } },
+    {
+      provide: APP_CONFIG,
+      useValue: { apiUrl: "/api", features: { darkMode: true } },
+    },
     provideHttpClient(withInterceptors([authInterceptor])),
     provideRouter(routes, withViewTransitions()),
   ],
@@ -261,11 +282,11 @@ export const appConfig: ApplicationConfig = {
 
 ```html
 @if (userResource.status() === 'loading') {
-  <app-skeleton />
+<app-skeleton />
 } @else if (userResource.value(); as user) {
-  <app-user-card [user]="user" />
+<app-user-card [user]="user" />
 } @else {
-  <p>No user found</p>
+<p>No user found</p>
 }
 ```
 
@@ -275,9 +296,9 @@ export const appConfig: ApplicationConfig = {
 
 ```html
 @for (order of orders(); track order.id) {
-  <app-order-row [order]="order" (cancel)="cancelOrder(order.id)" />
+<app-order-row [order]="order" (cancel)="cancelOrder(order.id)" />
 } @empty {
-  <p>No orders match your filters.</p>
+<p>No orders match your filters.</p>
 }
 ```
 
@@ -286,8 +307,7 @@ export const appConfig: ApplicationConfig = {
 Declares a local variable to avoid repeated signal calls.
 
 ```html
-@let user = currentUser();
-@let plan = user?.subscription?.plan ?? 'free';
+@let user = currentUser(); @let plan = user?.subscription?.plan ?? 'free';
 <h1>Welcome, {{ user?.name ?? 'Guest' }}</h1>
 <span class="badge">{{ plan | titlecase }}</span>
 ```
@@ -298,25 +318,21 @@ Lazy-loads a template section and its component dependencies on demand.
 
 ```html
 @defer (on viewport) {
-  <app-product-reviews [productId]="product().id" />
+<app-product-reviews [productId]="product().id" />
 } @placeholder {
-  <div class="h-64 bg-gray-100 animate-pulse"></div>
+<div class="h-64 bg-gray-100 animate-pulse"></div>
 } @loading (minimum 300ms) {
-  <app-spinner />
+<app-spinner />
 } @error {
-  <p>Failed to load reviews.</p>
-}
-
-@defer (on interaction) {
-  <app-heavy-chart [data]="analyticsData()" />
+<p>Failed to load reviews.</p>
+} @defer (on interaction) {
+<app-heavy-chart [data]="analyticsData()" />
 } @placeholder {
-  <button>Show analytics</button>
-}
-
-@defer (on viewport; prefetch on idle) {
-  <app-related-products [category]="product().category" />
+<button>Show analytics</button>
+} @defer (on viewport; prefetch on idle) {
+<app-related-products [category]="product().category" />
 } @placeholder {
-  <app-skeleton-grid [count]="4" />
+<app-skeleton-grid [count]="4" />
 }
 ```
 
@@ -339,14 +355,23 @@ interface CheckoutForm {
 export class CheckoutComponent {
   private fb = inject(FormBuilder);
   form = this.fb.group<CheckoutForm>({
-    email: this.fb.nonNullable.control('', [Validators.required, Validators.email]),
-    postalCode: this.fb.nonNullable.control('', [Validators.required, Validators.pattern(/^\d{5}(-\d{4})?$/)]),
+    email: this.fb.nonNullable.control("", [
+      Validators.required,
+      Validators.email,
+    ]),
+    postalCode: this.fb.nonNullable.control("", [
+      Validators.required,
+      Validators.pattern(/^\d{5}(-\d{4})?$/),
+    ]),
     agreeToTerms: this.fb.nonNullable.control(false, [Validators.requiredTrue]),
   });
 
   onSubmit() {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-    const value = this.form.getRawValue();  // Fully typed
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    const value = this.form.getRawValue(); // Fully typed
   }
 }
 ```
@@ -357,11 +382,14 @@ For search/filter inputs where reactive forms add unnecessary overhead:
 
 ```typescript
 export class QuickSearchComponent {
-  query = signal('');
-  category = signal<string>('all');
+  query = signal("");
+  category = signal<string>("all");
   results = rxResource({
     request: () => ({ q: this.query(), cat: this.category() }),
-    loader: ({ request }) => inject(HttpClient).get<SearchResult[]>('/api/search', { params: request }),
+    loader: ({ request }) =>
+      inject(HttpClient).get<SearchResult[]>("/api/search", {
+        params: request,
+      }),
   });
 }
 // Template: <input [value]="query()" (input)="query.set($any($event.target).value)" />
@@ -377,9 +405,23 @@ export class QuickSearchComponent {
 
 ```typescript
 export const routes: Routes = [
-  { path: '', loadComponent: () => import('./home.component').then(m => m.HomeComponent) },
-  { path: 'orders', loadComponent: () => import('./order-list.component').then(m => m.OrderListComponent), canActivate: [authGuard] },
-  { path: 'admin', loadChildren: () => import('./admin/admin.routes').then(m => m.ADMIN_ROUTES), canMatch: [adminGuard] },
+  {
+    path: "",
+    loadComponent: () =>
+      import("./home.component").then((m) => m.HomeComponent),
+  },
+  {
+    path: "orders",
+    loadComponent: () =>
+      import("./order-list.component").then((m) => m.OrderListComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: "admin",
+    loadChildren: () =>
+      import("./admin/admin.routes").then((m) => m.ADMIN_ROUTES),
+    canMatch: [adminGuard],
+  },
 ];
 ```
 
@@ -387,23 +429,29 @@ export const routes: Routes = [
 
 ```typescript
 export const authGuard: CanActivateFn = () => {
-  const auth = inject(AuthService), router = inject(Router);
-  return auth.isAuthenticated() ? true : router.createUrlTree(['/login']);
+  const auth = inject(AuthService),
+    router = inject(Router);
+  return auth.isAuthenticated() ? true : router.createUrlTree(["/login"]);
 };
 
 export const orderResolver: ResolveFn<Order> = (route) =>
-  inject(OrderService).getOrder(route.paramMap.get('id')!);
+  inject(OrderService).getOrder(route.paramMap.get("id")!);
 ```
 
 ### View Transitions API
 
 ```typescript
-providers: [provideRouter(routes, withViewTransitions())]
+providers: [provideRouter(routes, withViewTransitions())];
 ```
 
 ```css
-::view-transition-old(root), ::view-transition-new(root) { animation-duration: 200ms; }
-.product-image { view-transition-name: product-hero; }
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+}
+.product-image {
+  view-transition-name: product-hero;
+}
 ```
 
 ### Navigation Loading Indicator
@@ -413,10 +461,17 @@ export class AppComponent {
   private router = inject(Router);
   isNavigating = signal(false);
   constructor() {
-    this.router.events.pipe(
-      filter(e => e instanceof NavigationStart || e instanceof NavigationEnd || e instanceof NavigationCancel),
-      takeUntilDestroyed(),
-    ).subscribe(e => this.isNavigating.set(e instanceof NavigationStart));
+    this.router.events
+      .pipe(
+        filter(
+          (e) =>
+            e instanceof NavigationStart ||
+            e instanceof NavigationEnd ||
+            e instanceof NavigationCancel,
+        ),
+        takeUntilDestroyed(),
+      )
+      .subscribe((e) => this.isNavigating.set(e instanceof NavigationStart));
   }
 }
 ```
@@ -427,34 +482,42 @@ export class AppComponent {
 
 ### OnPush vs Zoneless
 
-| Criterion | OnPush (with Zone.js) | Zoneless |
-|-----------|----------------------|----------|
-| Migration effort | Low — one line per component | Medium — audit all triggers |
-| Third-party compat | Full | Some libraries need manual `markForCheck()` |
-| Bundle size | None | Removes ~15 KB (Zone.js) |
-| Recommended for | All projects today | New projects, performance-critical apps |
+| Criterion          | OnPush (with Zone.js)        | Zoneless                                    |
+| ------------------ | ---------------------------- | ------------------------------------------- |
+| Migration effort   | Low — one line per component | Medium — audit all triggers                 |
+| Third-party compat | Full                         | Some libraries need manual `markForCheck()` |
+| Bundle size        | None                         | Removes ~15 KB (Zone.js)                    |
+| Recommended for    | All projects today           | New projects, performance-critical apps     |
 
 ### OnPush (Current Best Practice)
 
 ```typescript
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `@for (item of items(); track item.id) { <app-item-card [item]="item" /> }`,
+  template: `@for (item of items(); track item.id) {
+    <app-item-card [item]="item" />
+  }`,
 })
-export class ItemListComponent { items = signal<Item[]>([]); }
+export class ItemListComponent {
+  items = signal<Item[]>([]);
+}
 ```
 
 ### Zoneless Setup
 
 ```typescript
-providers: [provideExperimentalZonelessChangeDetection(), provideHttpClient(), provideRouter(routes)]
+providers: [
+  provideExperimentalZonelessChangeDetection(),
+  provideHttpClient(),
+  provideRouter(routes),
+];
 ```
 
 All state changes must flow through signals. Plain property mutations will not trigger re-renders:
 
 ```typescript
-this.count.update(c => c + 1);  // Works — signal notifies the framework
-this.count = this.count + 1;     // Broken in zoneless — no re-render
+this.count.update((c) => c + 1); // Works — signal notifies the framework
+this.count = this.count + 1; // Broken in zoneless — no re-render
 ```
 
 ---
@@ -464,17 +527,19 @@ this.count = this.count + 1;     // Broken in zoneless — no re-render
 ### Component Test with Signals
 
 ```typescript
-describe('CartComponent', () => {
+describe("CartComponent", () => {
   let component: CartComponent;
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [CartComponent] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [CartComponent],
+    }).compileComponents();
     component = TestBed.createComponent(CartComponent).componentInstance;
   });
 
-  it('should compute total from items', () => {
+  it("should compute total from items", () => {
     component.items.set([
-      { id: '1', name: 'Widget', price: 10, quantity: 2 },
-      { id: '2', name: 'Gadget', price: 25, quantity: 1 },
+      { id: "1", name: "Widget", price: 10, quantity: 2 },
+      { id: "2", name: "Gadget", price: 25, quantity: 1 },
     ]);
     expect(component.total()).toBe(45);
   });
@@ -486,22 +551,34 @@ describe('CartComponent', () => {
 `HttpClientTestingModule` is deprecated. Use `provideHttpClientTesting()`.
 
 ```typescript
-describe('OrderService', () => {
+describe("OrderService", () => {
   let service: OrderService;
   let httpMock: HttpTestingController;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [OrderService, provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        OrderService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
     });
     service = TestBed.inject(OrderService);
     httpMock = TestBed.inject(HttpTestingController);
   });
   afterEach(() => httpMock.verify());
 
-  it('should fetch orders by status', () => {
-    const mock: Order[] = [{ id: '1', status: 'pending', total: 99.99, createdAt: '2026-01-15' }];
-    service.getOrders('pending').subscribe(orders => expect(orders).toEqual(mock));
-    httpMock.expectOne(r => r.url === '/api/orders' && r.params.get('status') === 'pending').flush(mock);
+  it("should fetch orders by status", () => {
+    const mock: Order[] = [
+      { id: "1", status: "pending", total: 99.99, createdAt: "2026-01-15" },
+    ];
+    service
+      .getOrders("pending")
+      .subscribe((orders) => expect(orders).toEqual(mock));
+    httpMock
+      .expectOne(
+        (r) => r.url === "/api/orders" && r.params.get("status") === "pending",
+      )
+      .flush(mock);
   });
 });
 ```
@@ -509,12 +586,18 @@ describe('OrderService', () => {
 ### Testing Signal Inputs
 
 ```typescript
-it('should display product name', async () => {
-  await TestBed.configureTestingModule({ imports: [ProductCardComponent] }).compileComponents();
+it("should display product name", async () => {
+  await TestBed.configureTestingModule({
+    imports: [ProductCardComponent],
+  }).compileComponents();
   const fixture = TestBed.createComponent(ProductCardComponent);
-  fixture.componentRef.setInput('product', { id: '1', name: 'Wireless Keyboard', price: 79.99 });
+  fixture.componentRef.setInput("product", {
+    id: "1",
+    name: "Wireless Keyboard",
+    price: 79.99,
+  });
   fixture.detectChanges();
-  expect(fixture.nativeElement.textContent).toContain('Wireless Keyboard');
+  expect(fixture.nativeElement.textContent).toContain("Wireless Keyboard");
 });
 ```
 
@@ -527,7 +610,10 @@ it('should display product name', async () => {
 ```typescript
 // app.config.server.ts
 export const serverConfig = mergeApplicationConfig(appConfig, {
-  providers: [provideServerRendering(), provideServerRoutesConfig(serverRoutes)],
+  providers: [
+    provideServerRendering(),
+    provideServerRoutesConfig(serverRoutes),
+  ],
 });
 ```
 
@@ -536,6 +622,7 @@ export const serverConfig = mergeApplicationConfig(appConfig, {
 1. **No `window`/`document`/`localStorage` during SSR.** Guard with `isPlatformBrowser(inject(PLATFORM_ID))`.
 
 2. **Use `afterNextRender` for browser-only initialization** (chart libraries, DOM measurement):
+
 ```typescript
 constructor() { afterNextRender(() => this.initChart()); }
 ```
@@ -549,6 +636,7 @@ constructor() { afterNextRender(() => this.initChart()); }
 ## Anti-Patterns
 
 **Mixing constructor DI and inject()** — `inject()` is the modern standard; pick one style.
+
 ```typescript
 // BAD
 constructor(private http: HttpClient) { this.router = inject(Router); }
@@ -558,6 +646,7 @@ private router = inject(Router);
 ```
 
 **Subscribing without cleanup** — leaked subscriptions cause memory leaks on destroyed components.
+
 ```typescript
 // BAD
 ngOnInit() { this.apiService.getData().subscribe(d => this.data.set(d)); }
@@ -568,18 +657,25 @@ dataResource = rxResource({ loader: () => this.apiService.getData() });
 ```
 
 **Using `$index` as track** — prevents DOM reuse on reorder, destroys component state.
+
 ```html
-<!-- BAD --> @for (item of items(); track $index) { ... }
-<!-- GOOD --> @for (item of items(); track item.id) { ... }
+<!-- BAD -->
+@for (item of items(); track $index) { ... }
+<!-- GOOD -->
+@for (item of items(); track item.id) { ... }
 ```
 
 **Calling methods in templates** — runs on every CD cycle. Use `computed()` to memoize.
+
 ```html
-<!-- BAD --> @for (item of getFilteredItems(); track item.id) { ... }
-<!-- GOOD --> @for (item of filteredItems(); track item.id) { ... }
+<!-- BAD -->
+@for (item of getFilteredItems(); track item.id) { ... }
+<!-- GOOD -->
+@for (item of filteredItems(); track item.id) { ... }
 ```
 
 **effect() for state derivation** — creates reactive cycles, triggers framework warnings.
+
 ```typescript
 // BAD
 constructor() { effect(() => this.doubled.set(this.count() * 2)); }
@@ -619,7 +715,9 @@ title = model('');  // [(title)]="parentTitle"
 // BEFORE (deprecated)
 TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
 // AFTER
-TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+TestBed.configureTestingModule({
+  providers: [provideHttpClient(), provideHttpClientTesting()],
+});
 ```
 
 ### *ngIf/*ngFor to Modern Control Flow
@@ -629,8 +727,11 @@ TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpCli
 <div *ngIf="user$ | async as user">{{ user.name }}</div>
 <li *ngFor="let item of items; trackBy: trackById">{{ item.name }}</li>
 <!-- AFTER -->
-@if (user(); as user) { <div>{{ user.name }}</div> }
-@for (item of items(); track item.id) { <li>{{ item.name }}</li> }
+@if (user(); as user) {
+<div>{{ user.name }}</div>
+} @for (item of items(); track item.id) {
+<li>{{ item.name }}</li>
+}
 ```
 
 ### Manual Subscribe to resource()

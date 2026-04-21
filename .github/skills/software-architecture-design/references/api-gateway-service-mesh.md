@@ -21,17 +21,17 @@ Deep reference for API gateway architectures, service mesh implementation (Istio
 
 ### Core Gateway Responsibilities
 
-| Function | Description | Example |
-|----------|-------------|---------|
-| Routing | Route requests to backend services | `/api/orders/*` -> orders-service |
-| Authentication | Validate tokens, API keys | JWT verification, OAuth introspection |
-| Rate limiting | Throttle requests per client/endpoint | 100 req/min per API key |
-| Request transformation | Modify headers, body, path | Add correlation IDs, strip internal headers |
-| Response aggregation | Combine multiple backend responses | BFF pattern for mobile clients |
-| Load balancing | Distribute traffic across instances | Round-robin, least connections, weighted |
-| Caching | Cache responses at the edge | Cache GET responses with TTL |
-| Circuit breaking | Fail fast when backend is unhealthy | Open circuit after 5 consecutive failures |
-| TLS termination | Handle HTTPS at the gateway | Offload TLS from backend services |
+| Function               | Description                           | Example                                     |
+| ---------------------- | ------------------------------------- | ------------------------------------------- |
+| Routing                | Route requests to backend services    | `/api/orders/*` -> orders-service           |
+| Authentication         | Validate tokens, API keys             | JWT verification, OAuth introspection       |
+| Rate limiting          | Throttle requests per client/endpoint | 100 req/min per API key                     |
+| Request transformation | Modify headers, body, path            | Add correlation IDs, strip internal headers |
+| Response aggregation   | Combine multiple backend responses    | BFF pattern for mobile clients              |
+| Load balancing         | Distribute traffic across instances   | Round-robin, least connections, weighted    |
+| Caching                | Cache responses at the edge           | Cache GET responses with TTL                |
+| Circuit breaking       | Fail fast when backend is unhealthy   | Open circuit after 5 consecutive failures   |
+| TLS termination        | Handle HTTPS at the gateway           | Offload TLS from backend services           |
 
 ### Gateway Topology Patterns
 
@@ -84,14 +84,14 @@ Best for: Large organizations, multiple teams owning their own gateway configura
 // Token bucket rate limiting (typical gateway configuration)
 // Kong rate-limiting plugin configuration
 const rateLimitConfig = {
-  plugin: 'rate-limiting',
+  plugin: "rate-limiting",
   config: {
-    minute: 60,              // 60 requests per minute
-    hour: 1000,              // 1000 requests per hour
-    policy: 'redis',         // Use Redis for distributed counting
-    fault_tolerant: true,    // Allow traffic if Redis is down
+    minute: 60, // 60 requests per minute
+    hour: 1000, // 1000 requests per hour
+    policy: "redis", // Use Redis for distributed counting
+    fault_tolerant: true, // Allow traffic if Redis is down
     hide_client_headers: false,
-    redis_host: 'redis',
+    redis_host: "redis",
     redis_port: 6379,
   },
 };
@@ -102,18 +102,18 @@ const rateLimitConfig = {
 // X-RateLimit-Reset: 1640000000
 ```
 
-| Algorithm | Description | Use When |
-|-----------|-------------|----------|
-| Token bucket | Tokens replenish at fixed rate, consumed per request | Burst-tolerant, smooth throttling |
-| Sliding window | Count requests in a rolling time window | Precise limits, no burst |
-| Fixed window | Count requests per fixed time interval | Simple, slight burst at window edges |
-| Leaky bucket | Process requests at fixed rate, queue excess | Smooth output rate |
+| Algorithm      | Description                                          | Use When                             |
+| -------------- | ---------------------------------------------------- | ------------------------------------ |
+| Token bucket   | Tokens replenish at fixed rate, consumed per request | Burst-tolerant, smooth throttling    |
+| Sliding window | Count requests in a rolling time window              | Precise limits, no burst             |
+| Fixed window   | Count requests per fixed time interval               | Simple, slight burst at window edges |
+| Leaky bucket   | Process requests at fixed rate, queue excess         | Smooth output rate                   |
 
 ### Request Aggregation
 
 ```typescript
 // BFF aggregation pattern — single client request, multiple backend calls
-app.get('/api/dashboard', async (req, res) => {
+app.get("/api/dashboard", async (req, res) => {
   const userId = req.user.id;
 
   // Parallel fetch from multiple services
@@ -127,7 +127,11 @@ app.get('/api/dashboard', async (req, res) => {
   // Aggregate into client-optimized response
   res.json({
     user: { name: profile.name, avatar: profile.avatar },
-    recentOrders: orders.map(o => ({ id: o.id, status: o.status, total: o.total })),
+    recentOrders: orders.map((o) => ({
+      id: o.id,
+      status: o.status,
+      total: o.total,
+    })),
     unreadCount: notifications.length,
     recommendations: recommendations.slice(0, 3),
   });
@@ -163,27 +167,27 @@ A service mesh is a dedicated infrastructure layer for service-to-service commun
 
 ### Sidecar Proxy Responsibilities
 
-| Responsibility | Description |
-|---------------|-------------|
-| Traffic routing | Route requests based on rules (headers, weight, path) |
-| Load balancing | Distribute traffic across service instances |
-| mTLS encryption | Encrypt all service-to-service traffic |
-| Circuit breaking | Prevent cascading failures |
-| Retry and timeout | Automatic retry with configurable backoff |
-| Observability | Emit metrics, traces, and access logs |
-| Health checking | Active and passive health checks |
-| Rate limiting | Per-service or per-route limits |
-| Access control | Authorization policies between services |
+| Responsibility    | Description                                           |
+| ----------------- | ----------------------------------------------------- |
+| Traffic routing   | Route requests based on rules (headers, weight, path) |
+| Load balancing    | Distribute traffic across service instances           |
+| mTLS encryption   | Encrypt all service-to-service traffic                |
+| Circuit breaking  | Prevent cascading failures                            |
+| Retry and timeout | Automatic retry with configurable backoff             |
+| Observability     | Emit metrics, traces, and access logs                 |
+| Health checking   | Active and passive health checks                      |
+| Rate limiting     | Per-service or per-route limits                       |
+| Access control    | Authorization policies between services               |
 
 ### Control Plane vs Data Plane
 
-| Component | Control Plane | Data Plane |
-|-----------|--------------|------------|
-| Role | Configuration and policy distribution | Request processing |
-| Components | Istiod, Linkerd control plane | Envoy proxy, Linkerd proxy |
-| Scaling | Single instance or HA pair | One per service instance (sidecar) |
-| Failure impact | No new config updates, existing config works | Service-to-service traffic affected |
-| Resource usage | Low (control only) | Per-pod overhead (CPU, memory, latency) |
+| Component      | Control Plane                                | Data Plane                              |
+| -------------- | -------------------------------------------- | --------------------------------------- |
+| Role           | Configuration and policy distribution        | Request processing                      |
+| Components     | Istiod, Linkerd control plane                | Envoy proxy, Linkerd proxy              |
+| Scaling        | Single instance or HA pair                   | One per service instance (sidecar)      |
+| Failure impact | No new config updates, existing config works | Service-to-service traffic affected     |
+| Resource usage | Low (control only)                           | Per-pod overhead (CPU, memory, latency) |
 
 ---
 
@@ -191,30 +195,30 @@ A service mesh is a dedicated infrastructure layer for service-to-service commun
 
 ### Gateway Comparison
 
-| Feature | Kong | AWS API Gateway | Envoy (standalone) | Traefik | NGINX |
-|---------|------|----------------|--------------------|---------| ------|
-| Deployment | Self-hosted / Cloud | Managed | Self-hosted | Self-hosted | Self-hosted |
-| Plugin ecosystem | Large (Lua, Go) | AWS integrations | Filters (C++, Wasm) | Middleware | Modules |
-| Rate limiting | Built-in | Built-in | Filter | Middleware | Module |
-| Auth | JWT, OAuth, OIDC | IAM, Cognito, Lambda auth | ext_authz filter | ForwardAuth | Auth module |
-| Observability | Prometheus, Datadog | CloudWatch | Prometheus, Zipkin | Prometheus | Stub status |
-| gRPC support | Yes | Yes | Native | Yes | Yes |
-| WebSocket | Yes | Yes | Yes | Yes | Yes |
-| Best for | Multi-cloud, plugin needs | AWS-native workloads | High performance, mesh ingress | Docker/K8s auto-discovery | Simple, proven |
+| Feature          | Kong                      | AWS API Gateway           | Envoy (standalone)             | Traefik                   | NGINX          |
+| ---------------- | ------------------------- | ------------------------- | ------------------------------ | ------------------------- | -------------- |
+| Deployment       | Self-hosted / Cloud       | Managed                   | Self-hosted                    | Self-hosted               | Self-hosted    |
+| Plugin ecosystem | Large (Lua, Go)           | AWS integrations          | Filters (C++, Wasm)            | Middleware                | Modules        |
+| Rate limiting    | Built-in                  | Built-in                  | Filter                         | Middleware                | Module         |
+| Auth             | JWT, OAuth, OIDC          | IAM, Cognito, Lambda auth | ext_authz filter               | ForwardAuth               | Auth module    |
+| Observability    | Prometheus, Datadog       | CloudWatch                | Prometheus, Zipkin             | Prometheus                | Stub status    |
+| gRPC support     | Yes                       | Yes                       | Native                         | Yes                       | Yes            |
+| WebSocket        | Yes                       | Yes                       | Yes                            | Yes                       | Yes            |
+| Best for         | Multi-cloud, plugin needs | AWS-native workloads      | High performance, mesh ingress | Docker/K8s auto-discovery | Simple, proven |
 
 ### Service Mesh Comparison
 
-| Feature | Istio | Linkerd | AWS App Mesh | Cilium Service Mesh |
-|---------|-------|---------|--------------|---------------------|
-| Proxy | Envoy | linkerd2-proxy (Rust) | Envoy | eBPF (no sidecar) |
-| Complexity | High | Low | Medium | Medium |
-| Resource overhead | Higher (Envoy sidecar) | Lower (lightweight proxy) | Medium | Lowest (kernel-level) |
-| mTLS | Automatic | Automatic | Manual config | Automatic |
-| Multi-cluster | Yes | Yes (limited) | Cross-account | Yes |
-| Traffic management | Advanced (fault injection, mirroring) | Basic (split, retry) | Basic | Advanced |
-| Observability | Rich (Kiali, Jaeger, Prometheus) | Built-in dashboard | CloudWatch, X-Ray | Hubble |
-| Learning curve | Steep | Gentle | Moderate | Moderate |
-| Best for | Complex mesh, advanced traffic | Simple mesh, low overhead | AWS-native workloads | High performance, eBPF |
+| Feature            | Istio                                 | Linkerd                   | AWS App Mesh         | Cilium Service Mesh    |
+| ------------------ | ------------------------------------- | ------------------------- | -------------------- | ---------------------- |
+| Proxy              | Envoy                                 | linkerd2-proxy (Rust)     | Envoy                | eBPF (no sidecar)      |
+| Complexity         | High                                  | Low                       | Medium               | Medium                 |
+| Resource overhead  | Higher (Envoy sidecar)                | Lower (lightweight proxy) | Medium               | Lowest (kernel-level)  |
+| mTLS               | Automatic                             | Automatic                 | Manual config        | Automatic              |
+| Multi-cluster      | Yes                                   | Yes (limited)             | Cross-account        | Yes                    |
+| Traffic management | Advanced (fault injection, mirroring) | Basic (split, retry)      | Basic                | Advanced               |
+| Observability      | Rich (Kiali, Jaeger, Prometheus)      | Built-in dashboard        | CloudWatch, X-Ray    | Hubble                 |
+| Learning curve     | Steep                                 | Gentle                    | Moderate             | Moderate               |
+| Best for           | Complex mesh, advanced traffic        | Simple mesh, low overhead | AWS-native workloads | High performance, eBPF |
 
 ### Selection Quick Guide
 
@@ -275,12 +279,12 @@ spec:
 
 ### Certificate Management
 
-| Approach | Description | Complexity |
-|----------|-------------|------------|
-| Mesh-managed CA | Mesh control plane issues and rotates certs | Low (automatic) |
-| External CA (Vault) | HashiCorp Vault issues certs, mesh distributes | Medium |
-| SPIFFE/SPIRE | Standard identity framework, pluggable CAs | Medium-High |
-| Manual certs | Team manages certs manually | High (do not do this) |
+| Approach            | Description                                    | Complexity            |
+| ------------------- | ---------------------------------------------- | --------------------- |
+| Mesh-managed CA     | Mesh control plane issues and rotates certs    | Low (automatic)       |
+| External CA (Vault) | HashiCorp Vault issues certs, mesh distributes | Medium                |
+| SPIFFE/SPIRE        | Standard identity framework, pluggable CAs     | Medium-High           |
+| Manual certs        | Team manages certs manually                    | High (do not do this) |
 
 **Recommended:** Use mesh-managed CA for most deployments. Integrate with external CA (Vault, AWS ACM PCA) for enterprise compliance requirements.
 
@@ -302,23 +306,23 @@ Each proxy adds its own span without application code changes.
 
 **Trace header propagation:**
 
-| Header | Standard | Used By |
-|--------|----------|---------|
-| `traceparent` | W3C Trace Context | OpenTelemetry, modern systems |
-| `x-request-id` | De facto | Envoy, Istio |
-| `x-b3-traceid` | Zipkin B3 | Zipkin, older Istio |
+| Header         | Standard          | Used By                       |
+| -------------- | ----------------- | ----------------------------- |
+| `traceparent`  | W3C Trace Context | OpenTelemetry, modern systems |
+| `x-request-id` | De facto          | Envoy, Istio                  |
+| `x-b3-traceid` | Zipkin B3         | Zipkin, older Istio           |
 
 ### Mesh-Level Metrics
 
 Standard metrics emitted by sidecar proxies (no application instrumentation needed):
 
-| Metric | Description | Alert On |
-|--------|-------------|----------|
-| `request_count` | Total requests per service/route | Unexpected traffic drops |
-| `request_duration` | Latency histogram (P50, P95, P99) | P99 > SLO threshold |
-| `response_code` | Count by status code (2xx, 4xx, 5xx) | 5xx rate > 0.1% |
-| `tcp_connections` | Active TCP connections | Approaching connection limits |
-| `retry_count` | Automatic retries triggered | High retry rate = unhealthy upstream |
+| Metric             | Description                          | Alert On                             |
+| ------------------ | ------------------------------------ | ------------------------------------ |
+| `request_count`    | Total requests per service/route     | Unexpected traffic drops             |
+| `request_duration` | Latency histogram (P50, P95, P99)    | P99 > SLO threshold                  |
+| `response_code`    | Count by status code (2xx, 4xx, 5xx) | 5xx rate > 0.1%                      |
+| `tcp_connections`  | Active TCP connections               | Approaching connection limits        |
+| `retry_count`      | Automatic retries triggered          | High retry rate = unhealthy upstream |
 
 ### Golden Signals Dashboard
 
@@ -351,18 +355,18 @@ Tools:
 
 ### Comparison Matrix
 
-| Concern | API Gateway | Service Mesh | Both (Recommended) |
-|---------|-------------|-------------|-------------------|
-| North-south traffic (client → service) | Primary role | Not designed for | Gateway handles |
-| East-west traffic (service → service) | Not designed for | Primary role | Mesh handles |
-| External authentication | Yes | No | Gateway handles |
-| Service-to-service auth (mTLS) | No | Yes | Mesh handles |
-| Public rate limiting | Yes | No | Gateway handles |
-| Internal circuit breaking | Limited | Yes | Mesh handles |
-| External API versioning | Yes | No | Gateway handles |
-| Internal traffic splitting | No | Yes | Mesh handles |
-| TLS termination (external) | Yes | No | Gateway handles |
-| mTLS (internal) | No | Yes | Mesh handles |
+| Concern                                | API Gateway      | Service Mesh     | Both (Recommended) |
+| -------------------------------------- | ---------------- | ---------------- | ------------------ |
+| North-south traffic (client → service) | Primary role     | Not designed for | Gateway handles    |
+| East-west traffic (service → service)  | Not designed for | Primary role     | Mesh handles       |
+| External authentication                | Yes              | No               | Gateway handles    |
+| Service-to-service auth (mTLS)         | No               | Yes              | Mesh handles       |
+| Public rate limiting                   | Yes              | No               | Gateway handles    |
+| Internal circuit breaking              | Limited          | Yes              | Mesh handles       |
+| External API versioning                | Yes              | No               | Gateway handles    |
+| Internal traffic splitting             | No               | Yes              | Mesh handles       |
+| TLS termination (external)             | Yes              | No               | Gateway handles    |
+| mTLS (internal)                        | No               | Yes              | Mesh handles       |
 
 ### Recommended Architecture
 
@@ -387,13 +391,13 @@ Tools:
 
 ### When You Do NOT Need a Service Mesh
 
-| Scenario | Why No Mesh |
-|----------|-------------|
-| < 10 services | Overhead exceeds benefit |
-| Single team, single repo | Library-based patterns suffice |
-| Serverless architecture | Functions are too short-lived for sidecars |
-| Low traffic internal tools | Complexity not justified |
-| Early-stage startup | Focus on product, not infrastructure |
+| Scenario                   | Why No Mesh                                |
+| -------------------------- | ------------------------------------------ |
+| < 10 services              | Overhead exceeds benefit                   |
+| Single team, single repo   | Library-based patterns suffice             |
+| Serverless architecture    | Functions are too short-lived for sidecars |
+| Low traffic internal tools | Complexity not justified                   |
+| Early-stage startup        | Focus on product, not infrastructure       |
 
 **Alternatives to mesh for small deployments:**
 

@@ -281,16 +281,19 @@ Comprehensive checklists for PR creation, merging, and release management to ens
 ### Choose Merge Strategy
 
 **Squash and Merge** - When:
+
 - [ ] Feature branch with many WIP commits
 - [ ] Want single commit in history
 - [ ] PR is self-contained feature
 
 **Rebase and Merge** - When:
+
 - [ ] Commits are already clean and logical
 - [ ] Want to preserve individual commits
 - [ ] Linear history preferred
 
 **Merge Commit** - When:
+
 - [ ] Want to preserve branch context
 - [ ] Multiple developers collaborated
 - [ ] Shared feature branch

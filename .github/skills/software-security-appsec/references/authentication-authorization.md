@@ -28,33 +28,33 @@ const registerPasskey = async (userId) => {
 
   // Return options for navigator.credentials.create()
   return {
-    challenge: challenge.toString('base64url'),
+    challenge: challenge.toString("base64url"),
     rp: {
-      name: 'Your App',
-      id: 'yourapp.com' // Must match origin
+      name: "Your App",
+      id: "yourapp.com", // Must match origin
     },
     user: {
-      id: Buffer.from(userId).toString('base64url'),
+      id: Buffer.from(userId).toString("base64url"),
       name: user.email,
-      displayName: user.name
+      displayName: user.name,
     },
     pubKeyCredParams: [
-      { alg: -7, type: 'public-key' },   // ES256
-      { alg: -257, type: 'public-key' }  // RS256
+      { alg: -7, type: "public-key" }, // ES256
+      { alg: -257, type: "public-key" }, // RS256
     ],
     authenticatorSelection: {
-      authenticatorAttachment: 'platform', // or 'cross-platform' for security keys
-      residentKey: 'required',
-      userVerification: 'required'
+      authenticatorAttachment: "platform", // or 'cross-platform' for security keys
+      residentKey: "required",
+      userVerification: "required",
     },
     timeout: 60000,
-    attestation: 'none' // Use 'direct' if you need device attestation
+    attestation: "none", // Use 'direct' if you need device attestation
   };
 };
 
 // 2. Client-side registration
 const credential = await navigator.credentials.create({
-  publicKey: registrationOptions
+  publicKey: registrationOptions,
 });
 
 // Send credential to server for verification and storage
@@ -65,17 +65,17 @@ const authenticateWithPasskey = async (userId) => {
   await storeChallenge(userId, challenge);
 
   return {
-    challenge: challenge.toString('base64url'),
-    rpId: 'yourapp.com',
+    challenge: challenge.toString("base64url"),
+    rpId: "yourapp.com",
     allowCredentials: await getUserCredentials(userId), // Optional: for non-discoverable
-    userVerification: 'required',
-    timeout: 60000
+    userVerification: "required",
+    timeout: 60000,
   };
 };
 
 // 4. Client-side authentication
 const assertion = await navigator.credentials.get({
-  publicKey: authenticationOptions
+  publicKey: authenticationOptions,
 });
 
 // 5. Server-side verification
@@ -107,12 +107,12 @@ Phase 4: Deprecate password-only accounts (2027+)
 
 ### Libraries
 
-| Platform | Library |
-|----------|---------|
-| Node.js | `@simplewebauthn/server` |
-| Python | `py_webauthn` |
-| Go | `github.com/go-webauthn/webauthn` |
-| .NET | `Fido2.AspNet` |
+| Platform | Library                           |
+| -------- | --------------------------------- |
+| Node.js  | `@simplewebauthn/server`          |
+| Python   | `py_webauthn`                     |
+| Go       | `github.com/go-webauthn/webauthn` |
+| .NET     | `Fido2.AspNet`                    |
 
 ---
 
@@ -123,14 +123,14 @@ Phase 4: Deprecate password-only accounts (2027+)
 **Use when:** Stateless authentication for APIs and SPAs (use with passkeys or as fallback)
 
 ```javascript
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 // 1. User registration
 const registerUser = async (email, password) => {
   // Validate password strength
   if (password.length < 12) {
-    throw new ValidationError('Password must be at least 12 characters');
+    throw new ValidationError("Password must be at least 12 characters");
   }
 
   // Hash password
@@ -139,7 +139,7 @@ const registerUser = async (email, password) => {
   // Create user
   const user = await User.create({
     email,
-    passwordHash
+    passwordHash,
   });
 
   return user;
@@ -151,14 +151,14 @@ const loginUser = async (email, password) => {
 
   if (!user) {
     // Use constant-time comparison to prevent timing attacks
-    await bcrypt.compare(password, '$2b$12$constantTimeHashValue');
-    throw new AuthenticationError('Invalid credentials');
+    await bcrypt.compare(password, "$2b$12$constantTimeHashValue");
+    throw new AuthenticationError("Invalid credentials");
   }
 
   const valid = await bcrypt.compare(password, user.passwordHash);
 
   if (!valid) {
-    throw new AuthenticationError('Invalid credentials');
+    throw new AuthenticationError("Invalid credentials");
   }
 
   // Generate access token (short-lived)
@@ -166,15 +166,15 @@ const loginUser = async (email, password) => {
     {
       userId: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
     },
     process.env.JWT_SECRET,
     {
-      expiresIn: '15m',
-      algorithm: 'HS256',
-      issuer: 'your-app',
-      audience: 'your-api'
-    }
+      expiresIn: "15m",
+      algorithm: "HS256",
+      issuer: "your-app",
+      audience: "your-api",
+    },
   );
 
   // Generate refresh token (long-lived)
@@ -182,9 +182,9 @@ const loginUser = async (email, password) => {
     { userId: user.id, tokenVersion: user.tokenVersion },
     process.env.JWT_REFRESH_SECRET,
     {
-      expiresIn: '7d',
-      algorithm: 'HS256'
-    }
+      expiresIn: "7d",
+      algorithm: "HS256",
+    },
   );
 
   // Store refresh token hash
@@ -192,7 +192,7 @@ const loginUser = async (email, password) => {
   await RefreshToken.create({
     userId: user.id,
     tokenHash: refreshTokenHash,
-    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
   });
 
   return { accessToken, refreshToken };
@@ -202,51 +202,51 @@ const loginUser = async (email, password) => {
 const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Missing authentication token' });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Missing authentication token" });
   }
 
   const token = authHeader.substring(7);
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET, {
-      algorithms: ['HS256'],
-      issuer: 'your-app',
-      audience: 'your-api'
+      algorithms: ["HS256"],
+      issuer: "your-app",
+      audience: "your-api",
     });
 
     req.user = payload;
     next();
   } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token expired' });
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ error: "Token expired" });
     }
 
-    return res.status(401).json({ error: 'Invalid token' });
+    return res.status(401).json({ error: "Invalid token" });
   }
 };
 
 // 4. Token refresh
 const refreshAccessToken = async (refreshToken) => {
   const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, {
-    algorithms: ['HS256']
+    algorithms: ["HS256"],
   });
 
   const user = await User.findById(payload.userId);
 
   if (!user || user.tokenVersion !== payload.tokenVersion) {
-    throw new AuthenticationError('Invalid refresh token');
+    throw new AuthenticationError("Invalid refresh token");
   }
 
   // Verify refresh token exists in database
   const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
   const storedToken = await RefreshToken.findOne({
     userId: user.id,
-    expiresAt: { $gt: new Date() }
+    expiresAt: { $gt: new Date() },
   });
 
   if (!storedToken) {
-    throw new AuthenticationError('Refresh token not found or expired');
+    throw new AuthenticationError("Refresh token not found or expired");
   }
 
   // Generate new access token
@@ -254,15 +254,15 @@ const refreshAccessToken = async (refreshToken) => {
     {
       userId: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
     },
     process.env.JWT_SECRET,
     {
-      expiresIn: '15m',
-      algorithm: 'HS256',
-      issuer: 'your-app',
-      audience: 'your-api'
-    }
+      expiresIn: "15m",
+      algorithm: "HS256",
+      issuer: "your-app",
+      audience: "your-api",
+    },
   );
 
   return accessToken;
@@ -278,6 +278,7 @@ const logoutUser = async (userId, refreshToken) => {
 ```
 
 **Security Considerations:**
+
 - Use short expiration for access tokens (15-30 minutes)
 - Store refresh tokens securely (httpOnly cookies or secure storage)
 - Implement token rotation on refresh
@@ -292,33 +293,35 @@ const logoutUser = async (userId, refreshToken) => {
 **Use when:** Traditional web applications with server-side rendering
 
 ```javascript
-const session = require('express-session');
-const RedisStore = require('connect-redis').default;
-const { createClient } = require('redis');
+const session = require("express-session");
+const RedisStore = require("connect-redis").default;
+const { createClient } = require("redis");
 
 // 1. Configure session store
 const redisClient = createClient({
   host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT
+  port: process.env.REDIS_PORT,
 });
 
 redisClient.connect();
 
-app.use(session({
-  store: new RedisStore({ client: redisClient }),
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: true,        // HTTPS only
-    httpOnly: true,      // No client-side access
-    sameSite: 'strict',  // CSRF protection
-    maxAge: 30 * 60 * 1000 // 30 minutes
-  }
-}));
+app.use(
+  session({
+    store: new RedisStore({ client: redisClient }),
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: true, // HTTPS only
+      httpOnly: true, // No client-side access
+      sameSite: "strict", // CSRF protection
+      maxAge: 30 * 60 * 1000, // 30 minutes
+    },
+  }),
+);
 
 // 2. Login handler
-app.post('/auth/login', async (req, res) => {
+app.post("/auth/login", async (req, res) => {
   const { email, password } = req.body;
 
   const user = await authenticateUser(email, password);
@@ -326,39 +329,40 @@ app.post('/auth/login', async (req, res) => {
   // Regenerate session ID to prevent fixation
   req.session.regenerate((err) => {
     if (err) {
-      return res.status(500).json({ error: 'Session error' });
+      return res.status(500).json({ error: "Session error" });
     }
 
     req.session.userId = user.id;
     req.session.role = user.role;
 
-    res.json({ message: 'Logged in successfully' });
+    res.json({ message: "Logged in successfully" });
   });
 });
 
 // 3. Authentication middleware
 const requireAuth = (req, res, next) => {
   if (!req.session.userId) {
-    return res.status(401).json({ error: 'Not authenticated' });
+    return res.status(401).json({ error: "Not authenticated" });
   }
 
   next();
 };
 
 // 4. Logout handler
-app.post('/auth/logout', (req, res) => {
+app.post("/auth/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      return res.status(500).json({ error: 'Logout failed' });
+      return res.status(500).json({ error: "Logout failed" });
     }
 
-    res.clearCookie('connect.sid');
-    res.json({ message: 'Logged out successfully' });
+    res.clearCookie("connect.sid");
+    res.json({ message: "Logged out successfully" });
   });
 });
 ```
 
 **Security Considerations:**
+
 - Use secure session storage (Redis, database)
 - Set secure cookie flags (secure, httpOnly, sameSite)
 - Regenerate session ID on login
@@ -372,52 +376,59 @@ app.post('/auth/logout', (req, res) => {
 **Use when:** Third-party authentication (Google, GitHub, etc.)
 
 ```javascript
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const passport = require("passport");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 // 1. Configure OAuth strategy
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'https://yourapp.com/auth/google/callback',
-  scope: ['profile', 'email']
-},
-async (accessToken, refreshToken, profile, done) => {
-  try {
-    // Find or create user
-    let user = await User.findOne({ googleId: profile.id });
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "https://yourapp.com/auth/google/callback",
+      scope: ["profile", "email"],
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        // Find or create user
+        let user = await User.findOne({ googleId: profile.id });
 
-    if (!user) {
-      user = await User.create({
-        googleId: profile.id,
-        email: profile.emails[0].value,
-        name: profile.displayName,
-        avatar: profile.photos[0].value
-      });
-    }
+        if (!user) {
+          user = await User.create({
+            googleId: profile.id,
+            email: profile.emails[0].value,
+            name: profile.displayName,
+            avatar: profile.photos[0].value,
+          });
+        }
 
-    return done(null, user);
-  } catch (error) {
-    return done(error, null);
-  }
-}));
-
-// 2. OAuth routes
-app.get('/auth/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] })
+        return done(null, user);
+      } catch (error) {
+        return done(error, null);
+      }
+    },
+  ),
 );
 
-app.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login' }),
+// 2. OAuth routes
+app.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] }),
+);
+
+app.get(
+  "/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res) => {
     // Generate JWT for subsequent API requests
     const token = generateJWT(req.user);
     res.redirect(`/dashboard?token=${token}`);
-  }
+  },
 );
 ```
 
 **Security Considerations:**
+
 - Validate state parameter to prevent CSRF
 - Use PKCE (Proof Key for Code Exchange) for SPAs
 - Verify token signatures from OAuth provider
@@ -431,20 +442,20 @@ app.get('/auth/google/callback',
 **Use when:** High-security applications requiring additional verification
 
 ```javascript
-const speakeasy = require('speakeasy');
-const QRCode = require('qrcode');
+const speakeasy = require("speakeasy");
+const QRCode = require("qrcode");
 
 // 1. Enable MFA (generate secret)
 const enableMFA = async (userId) => {
   const secret = speakeasy.generateSecret({
     name: `YourApp (${userId})`,
-    length: 32
+    length: 32,
   });
 
   // Store secret
   await User.findByIdAndUpdate(userId, {
     mfaSecret: secret.base32,
-    mfaEnabled: false // Enable after verification
+    mfaEnabled: false, // Enable after verification
   });
 
   // Generate QR code
@@ -452,7 +463,7 @@ const enableMFA = async (userId) => {
 
   return {
     secret: secret.base32,
-    qrCode
+    qrCode,
   };
 };
 
@@ -462,9 +473,9 @@ const verifyMFASetup = async (userId, token) => {
 
   const verified = speakeasy.totp.verify({
     secret: user.mfaSecret,
-    encoding: 'base32',
+    encoding: "base32",
     token: token,
-    window: 2 // Allow 2 time steps (60 seconds)
+    window: 2, // Allow 2 time steps (60 seconds)
   });
 
   if (verified) {
@@ -482,13 +493,13 @@ const loginWithMFA = async (email, password, mfaToken) => {
   if (user.mfaEnabled) {
     const verified = speakeasy.totp.verify({
       secret: user.mfaSecret,
-      encoding: 'base32',
+      encoding: "base32",
       token: mfaToken,
-      window: 2
+      window: 2,
     });
 
     if (!verified) {
-      throw new AuthenticationError('Invalid MFA code');
+      throw new AuthenticationError("Invalid MFA code");
     }
   }
 
@@ -500,17 +511,17 @@ const generateBackupCodes = async (userId) => {
   const codes = [];
 
   for (let i = 0; i < 10; i++) {
-    const code = crypto.randomBytes(4).toString('hex');
+    const code = crypto.randomBytes(4).toString("hex");
     codes.push(code);
   }
 
   // Hash and store codes
   const hashedCodes = await Promise.all(
-    codes.map(code => bcrypt.hash(code, 10))
+    codes.map((code) => bcrypt.hash(code, 10)),
   );
 
   await User.findByIdAndUpdate(userId, {
-    mfaBackupCodes: hashedCodes
+    mfaBackupCodes: hashedCodes,
   });
 
   return codes; // Return only once, user must save them
@@ -518,6 +529,7 @@ const generateBackupCodes = async (userId) => {
 ```
 
 **Security Considerations:**
+
 - Use TOTP (Time-based One-Time Password) algorithm
 - Allow time window for code validation
 - Provide backup codes for account recovery
@@ -535,20 +547,20 @@ const generateBackupCodes = async (userId) => {
 ```javascript
 // 1. Define roles
 const ROLES = {
-  ADMIN: 'admin',
-  MODERATOR: 'moderator',
-  USER: 'user',
-  GUEST: 'guest'
+  ADMIN: "admin",
+  MODERATOR: "moderator",
+  USER: "user",
+  GUEST: "guest",
 };
 
 // 2. Define permissions
 const PERMISSIONS = {
-  USERS_READ: 'users:read',
-  USERS_WRITE: 'users:write',
-  USERS_DELETE: 'users:delete',
-  POSTS_READ: 'posts:read',
-  POSTS_WRITE: 'posts:write',
-  POSTS_DELETE: 'posts:delete'
+  USERS_READ: "users:read",
+  USERS_WRITE: "users:write",
+  USERS_DELETE: "users:delete",
+  POSTS_READ: "posts:read",
+  POSTS_WRITE: "posts:write",
+  POSTS_DELETE: "posts:delete",
 };
 
 // 3. Role-permission mapping
@@ -559,32 +571,27 @@ const rolePermissions = {
     PERMISSIONS.USERS_DELETE,
     PERMISSIONS.POSTS_READ,
     PERMISSIONS.POSTS_WRITE,
-    PERMISSIONS.POSTS_DELETE
+    PERMISSIONS.POSTS_DELETE,
   ],
   [ROLES.MODERATOR]: [
     PERMISSIONS.USERS_READ,
     PERMISSIONS.POSTS_READ,
     PERMISSIONS.POSTS_WRITE,
-    PERMISSIONS.POSTS_DELETE
+    PERMISSIONS.POSTS_DELETE,
   ],
-  [ROLES.USER]: [
-    PERMISSIONS.POSTS_READ,
-    PERMISSIONS.POSTS_WRITE
-  ],
-  [ROLES.GUEST]: [
-    PERMISSIONS.POSTS_READ
-  ]
+  [ROLES.USER]: [PERMISSIONS.POSTS_READ, PERMISSIONS.POSTS_WRITE],
+  [ROLES.GUEST]: [PERMISSIONS.POSTS_READ],
 };
 
 // 4. Authorization middleware
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      return res.status(401).json({ error: "Not authenticated" });
     }
 
     if (!allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({ error: 'Insufficient permissions' });
+      return res.status(403).json({ error: "Insufficient permissions" });
     }
 
     next();
@@ -594,17 +601,17 @@ const requireRole = (...allowedRoles) => {
 const requirePermission = (...requiredPermissions) => {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      return res.status(401).json({ error: "Not authenticated" });
     }
 
     const userPermissions = rolePermissions[req.user.role] || [];
 
-    const hasPermission = requiredPermissions.every(
-      permission => userPermissions.includes(permission)
+    const hasPermission = requiredPermissions.every((permission) =>
+      userPermissions.includes(permission),
     );
 
     if (!hasPermission) {
-      return res.status(403).json({ error: 'Insufficient permissions' });
+      return res.status(403).json({ error: "Insufficient permissions" });
     }
 
     next();
@@ -612,16 +619,18 @@ const requirePermission = (...requiredPermissions) => {
 };
 
 // 5. Usage
-app.get('/api/users',
+app.get(
+  "/api/users",
   authenticate,
   requirePermission(PERMISSIONS.USERS_READ),
-  listUsers
+  listUsers,
 );
 
-app.delete('/api/users/:id',
+app.delete(
+  "/api/users/:id",
   authenticate,
   requireRole(ROLES.ADMIN),
-  deleteUser
+  deleteUser,
 );
 ```
 
@@ -646,8 +655,8 @@ class PolicyEngine {
     for (const policy of this.policies) {
       const result = await policy.evaluate(context);
 
-      if (result === 'allow') return true;
-      if (result === 'deny') return false;
+      if (result === "allow") return true;
+      if (result === "deny") return false;
     }
 
     // Deny by default
@@ -660,22 +669,22 @@ class OwnResourcePolicy {
   async evaluate(context) {
     const { user, resource, action } = context;
 
-    if (action === 'edit' && resource.type === 'post') {
-      return resource.authorId === user.id ? 'allow' : 'deny';
+    if (action === "edit" && resource.type === "post") {
+      return resource.authorId === user.id ? "allow" : "deny";
     }
 
-    return 'continue';
+    return "continue";
   }
 }
 
 // 3. Example policy: Admins can do anything
 class AdminPolicy {
   async evaluate(context) {
-    if (context.user.role === 'admin') {
-      return 'allow';
+    if (context.user.role === "admin") {
+      return "allow";
     }
 
-    return 'continue';
+    return "continue";
   }
 }
 
@@ -685,15 +694,15 @@ class TimeBasedPolicy {
     const { user, action } = context;
 
     // Sensitive operations only during business hours
-    if (action === 'delete' && user.role !== 'admin') {
+    if (action === "delete" && user.role !== "admin") {
       const hour = new Date().getHours();
 
       if (hour < 9 || hour > 17) {
-        return 'deny';
+        return "deny";
       }
     }
 
-    return 'continue';
+    return "continue";
   }
 }
 
@@ -715,14 +724,14 @@ const authorize = (action, resourceType) => {
       action,
       environment: {
         time: new Date(),
-        ipAddress: req.ip
-      }
+        ipAddress: req.ip,
+      },
     };
 
     const allowed = await policyEngine.evaluate(context);
 
     if (!allowed) {
-      return res.status(403).json({ error: 'Access denied' });
+      return res.status(403).json({ error: "Access denied" });
     }
 
     req.resource = resource;
@@ -731,11 +740,7 @@ const authorize = (action, resourceType) => {
 };
 
 // 7. Usage
-app.put('/api/posts/:id',
-  authenticate,
-  authorize('edit', 'post'),
-  updatePost
-);
+app.put("/api/posts/:id", authenticate, authorize("edit", "post"), updatePost);
 ```
 
 ---
@@ -747,27 +752,32 @@ app.put('/api/posts/:id',
 ```javascript
 // 1. Define relationships
 const RELATIONSHIPS = {
-  OWNER: 'owner',
-  EDITOR: 'editor',
-  VIEWER: 'viewer'
+  OWNER: "owner",
+  EDITOR: "editor",
+  VIEWER: "viewer",
 };
 
 // 2. Permission model
-const ResourcePermission = mongoose.model('ResourcePermission', {
+const ResourcePermission = mongoose.model("ResourcePermission", {
   resourceType: String,
   resourceId: String,
   userId: String,
   relationship: String,
-  grantedAt: Date
+  grantedAt: Date,
 });
 
 // 3. Check relationship
-const hasRelationship = async (userId, resourceType, resourceId, relationship) => {
+const hasRelationship = async (
+  userId,
+  resourceType,
+  resourceId,
+  relationship,
+) => {
   const permission = await ResourcePermission.findOne({
     userId,
     resourceType,
     resourceId,
-    relationship
+    relationship,
   });
 
   return !!permission;
@@ -780,7 +790,7 @@ const grantAccess = async (userId, resourceType, resourceId, relationship) => {
     resourceType,
     resourceId,
     relationship,
-    grantedAt: new Date()
+    grantedAt: new Date(),
   });
 };
 
@@ -789,7 +799,7 @@ const revokeAccess = async (userId, resourceType, resourceId) => {
   await ResourcePermission.deleteOne({
     userId,
     resourceType,
-    resourceId
+    resourceId,
   });
 };
 
@@ -803,7 +813,7 @@ const requireRelationship = (resourceType, ...allowedRelationships) => {
         req.user.id,
         resourceType,
         resourceId,
-        relationship
+        relationship,
       );
 
       if (hasAccess) {
@@ -811,21 +821,28 @@ const requireRelationship = (resourceType, ...allowedRelationships) => {
       }
     }
 
-    return res.status(403).json({ error: 'Access denied' });
+    return res.status(403).json({ error: "Access denied" });
   };
 };
 
 // 7. Usage
-app.get('/api/documents/:id',
+app.get(
+  "/api/documents/:id",
   authenticate,
-  requireRelationship('document', RELATIONSHIPS.OWNER, RELATIONSHIPS.EDITOR, RELATIONSHIPS.VIEWER),
-  getDocument
+  requireRelationship(
+    "document",
+    RELATIONSHIPS.OWNER,
+    RELATIONSHIPS.EDITOR,
+    RELATIONSHIPS.VIEWER,
+  ),
+  getDocument,
 );
 
-app.put('/api/documents/:id',
+app.put(
+  "/api/documents/:id",
   authenticate,
-  requireRelationship('document', RELATIONSHIPS.OWNER, RELATIONSHIPS.EDITOR),
-  updateDocument
+  requireRelationship("document", RELATIONSHIPS.OWNER, RELATIONSHIPS.EDITOR),
+  updateDocument,
 );
 ```
 
@@ -845,20 +862,28 @@ const validatePasswordStrength = (password) => {
   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
   if (password.length < minLength) {
-    throw new ValidationError(`Password must be at least ${minLength} characters`);
+    throw new ValidationError(
+      `Password must be at least ${minLength} characters`,
+    );
   }
 
-  const complexityScore = [hasUpperCase, hasLowerCase, hasNumbers, hasSpecialChar]
-    .filter(Boolean).length;
+  const complexityScore = [
+    hasUpperCase,
+    hasLowerCase,
+    hasNumbers,
+    hasSpecialChar,
+  ].filter(Boolean).length;
 
   if (complexityScore < 3) {
-    throw new ValidationError('Password must include at least 3 of: uppercase, lowercase, numbers, special characters');
+    throw new ValidationError(
+      "Password must include at least 3 of: uppercase, lowercase, numbers, special characters",
+    );
   }
 
   // Check against common passwords
-  const commonPasswords = ['password123', 'qwerty123', 'admin123'];
+  const commonPasswords = ["password123", "qwerty123", "admin123"];
   if (commonPasswords.includes(password.toLowerCase())) {
-    throw new ValidationError('Password is too common');
+    throw new ValidationError("Password is too common");
   }
 
   return true;
@@ -874,24 +899,28 @@ const initiatePasswordReset = async (email) => {
   }
 
   // Generate reset token
-  const resetToken = crypto.randomBytes(32).toString('hex');
+  const resetToken = crypto.randomBytes(32).toString("hex");
   const resetTokenHash = await bcrypt.hash(resetToken, 10);
 
   await User.findByIdAndUpdate(user.id, {
     resetTokenHash,
-    resetTokenExpires: new Date(Date.now() + 60 * 60 * 1000) // 1 hour
+    resetTokenExpires: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
   });
 
   // Send email with reset link
-  await sendEmail(email, 'Password Reset', `
+  await sendEmail(
+    email,
+    "Password Reset",
+    `
     Reset your password: https://yourapp.com/reset-password?token=${resetToken}
     This link expires in 1 hour.
-  `);
+  `,
+  );
 };
 
 const resetPassword = async (token, newPassword) => {
   const users = await User.find({
-    resetTokenExpires: { $gt: new Date() }
+    resetTokenExpires: { $gt: new Date() },
   });
 
   for (const user of users) {
@@ -906,23 +935,23 @@ const resetPassword = async (token, newPassword) => {
         passwordHash,
         resetTokenHash: null,
         resetTokenExpires: null,
-        tokenVersion: user.tokenVersion + 1 // Invalidate existing tokens
+        tokenVersion: user.tokenVersion + 1, // Invalidate existing tokens
       });
 
       return true;
     }
   }
 
-  throw new ValidationError('Invalid or expired reset token');
+  throw new ValidationError("Invalid or expired reset token");
 };
 ```
 
 ### Rate Limiting
 
 ```javascript
-const rateLimit = require('express-rate-limit');
-const RedisStore = require('rate-limit-redis');
-const { createClient } = require('redis');
+const rateLimit = require("express-rate-limit");
+const RedisStore = require("rate-limit-redis");
+const { createClient } = require("redis");
 
 const redisClient = createClient();
 
@@ -931,9 +960,9 @@ const apiLimiter = rateLimit({
   store: new RedisStore({ client: redisClient }),
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100,
-  message: 'Too many requests',
+  message: "Too many requests",
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
 });
 
 // Strict limiter for authentication endpoints
@@ -942,11 +971,11 @@ const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
   skipSuccessfulRequests: true,
-  message: 'Too many login attempts'
+  message: "Too many login attempts",
 });
 
-app.use('/api/', apiLimiter);
-app.use('/api/auth/', authLimiter);
+app.use("/api/", apiLimiter);
+app.use("/api/auth/", authLimiter);
 ```
 
 ---

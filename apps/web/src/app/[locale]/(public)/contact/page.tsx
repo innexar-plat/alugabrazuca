@@ -18,7 +18,8 @@ export async function generateMetadata({
 
 export default function ContactPage() {
   const t = useTranslations("contact");
-  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "contact@alugabrazuca.com";
+  const contactEmail =
+    process.env.NEXT_PUBLIC_CONTACT_EMAIL || "contact@alugabrazuca.com";
 
   return (
     <section className="px-4 py-16 sm:py-24">

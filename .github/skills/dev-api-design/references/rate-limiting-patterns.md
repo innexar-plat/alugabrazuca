@@ -7,6 +7,7 @@ This guide provides production-ready patterns for implementing rate limiting and
 ## Why Rate Limiting?
 
 **Goals:**
+
 - Prevent abuse and DDoS attacks
 - Ensure fair resource allocation
 - Protect backend services from overload
@@ -22,17 +23,20 @@ This guide provides production-ready patterns for implementing rate limiting and
 **Best for:** Most use cases, allows bursts
 
 **How it works:**
+
 - Bucket holds N tokens
 - Each request consumes 1 token
 - Tokens refill at fixed rate R per second
 - Request allowed if tokens available
 
 **Characteristics:**
+
 - [OK] Allows traffic bursts (within bucket size)
 - [OK] Smooth rate limiting
 - [OK] Simple to implement
 
 **Example:**
+
 ```
 Bucket size: 100 tokens
 Refill rate: 10 tokens/second
@@ -49,15 +53,18 @@ After 5 seconds → 50 tokens refilled
 **Best for:** Simple rate limits, less precise
 
 **How it works:**
+
 - Count requests in fixed time window (e.g., per minute)
 - Reset counter at window boundary
 
 **Characteristics:**
+
 - [OK] Simple to implement
 - [FAIL] Boundary issue: 2x limit at window edge
 - [FAIL] Bursty traffic spikes
 
 **Example:**
+
 ```
 Limit: 100 requests/minute
 Window: 12:00:00 - 12:01:00
@@ -74,15 +81,18 @@ Total in 11 seconds: 200 requests (exceeds spirit of limit)
 **Best for:** More accurate rate limiting, prevents boundary issues
 
 **How it works:**
+
 - Track requests with timestamps
 - Count requests in rolling window (last N seconds)
 
 **Characteristics:**
+
 - [OK] No boundary issues
 - [OK] Accurate rate limiting
 - [FAIL] More memory (store timestamps)
 
 **Example:**
+
 ```
 Limit: 100 requests/minute
 Current time: 12:01:30
@@ -99,11 +109,13 @@ Else → Reject
 **Best for:** Smoothing bursty traffic, message queues
 
 **How it works:**
+
 - Requests added to queue (bucket)
 - Processed at fixed rate (leak rate)
 - Queue overflow = reject
 
 **Characteristics:**
+
 - [OK] Smooth output rate
 - [FAIL] Adds latency (queuing)
 - Best for background jobs, not synchronous APIs
@@ -175,6 +187,7 @@ def get_rate_limit(user):
 ### Redis + Token Bucket
 
 **Why Redis?**
+
 - Fast in-memory storage
 - Built-in TTL (automatic cleanup)
 - Atomic operations
@@ -314,6 +327,7 @@ def check_rate_limit_sliding_window(key: str, limit: int, window: int) -> bool:
 ### Express.js + express-rate-limit
 
 **Installation:**
+
 ```bash
 npm install express-rate-limit redis
 ```
@@ -321,43 +335,43 @@ npm install express-rate-limit redis
 **Implementation (TypeScript):**
 
 ```typescript
-import express from 'express';
-import rateLimit from 'express-rate-limit';
-import RedisStore from 'rate-limit-redis';
-import { createClient } from 'redis';
+import express from "express";
+import rateLimit from "express-rate-limit";
+import RedisStore from "rate-limit-redis";
+import { createClient } from "redis";
 
-const redisClient = createClient({ url: 'redis://localhost:6379' });
+const redisClient = createClient({ url: "redis://localhost:6379" });
 await redisClient.connect();
 
 // Create rate limiter
 const limiter = rateLimit({
   store: new RedisStore({
     client: redisClient,
-    prefix: 'rate_limit:',
+    prefix: "rate_limit:",
   }),
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 100, // 100 requests per hour
   message: {
-    type: 'https://api.example.com/errors/rate-limit-exceeded',
-    title: 'Too Many Requests',
+    type: "https://api.example.com/errors/rate-limit-exceeded",
+    title: "Too Many Requests",
     status: 429,
-    detail: 'Rate limit exceeded. Try again later.',
+    detail: "Rate limit exceeded. Try again later.",
   },
   standardHeaders: true, // Return rate limit info in headers
   legacyHeaders: false,
   handler: (req, res) => {
     res.status(429).json({
-      type: 'https://api.example.com/errors/rate-limit-exceeded',
-      title: 'Too Many Requests',
+      type: "https://api.example.com/errors/rate-limit-exceeded",
+      title: "Too Many Requests",
       status: 429,
-      detail: 'Rate limit exceeded. Try again later.',
+      detail: "Rate limit exceeded. Try again later.",
       retryAfter: Math.ceil(req.rateLimit.resetTime / 1000),
     });
   },
 });
 
 // Apply globally
-app.use('/api/', limiter);
+app.use("/api/", limiter);
 
 // Per-route limits
 const strictLimiter = rateLimit({
@@ -366,7 +380,7 @@ const strictLimiter = rateLimit({
   max: 10, // 10 requests per 15 minutes
 });
 
-app.post('/api/v1/auth/login', strictLimiter, (req, res) => {
+app.post("/api/v1/auth/login", strictLimiter, (req, res) => {
   // Login endpoint with stricter limit
 });
 ```
@@ -595,14 +609,14 @@ rate_limit_usage = Histogram(
 
 ## Decision Matrix
 
-| Use Case | Algorithm | Storage |
-|----------|-----------|---------|
-| Simple API, single server | Fixed Window | In-memory |
-| Distributed API, multiple servers | Token Bucket | Redis |
-| Prevent abuse, allow bursts | Token Bucket | Redis |
-| Accurate rate limiting | Sliding Window | Redis |
-| Background jobs, queuing | Leaky Bucket | Redis |
-| High-traffic API | Token Bucket | Redis Cluster |
+| Use Case                          | Algorithm      | Storage       |
+| --------------------------------- | -------------- | ------------- |
+| Simple API, single server         | Fixed Window   | In-memory     |
+| Distributed API, multiple servers | Token Bucket   | Redis         |
+| Prevent abuse, allow bursts       | Token Bucket   | Redis         |
+| Accurate rate limiting            | Sliding Window | Redis         |
+| Background jobs, queuing          | Leaky Bucket   | Redis         |
+| High-traffic API                  | Token Bucket   | Redis Cluster |
 
 ---
 

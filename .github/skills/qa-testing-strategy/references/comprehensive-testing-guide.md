@@ -14,9 +14,10 @@ Modern testing strategies incorporating AI-powered testing, shift-left practices
 - Testing Metrics
 - Resources
 
-## Testing Philosophy 
+## Testing Philosophy
 
 ### Key Trends
+
 1. **Shift-Left Testing** - Start testing in planning/design phases
 2. **AI-Powered Testing** - Automated test generation and bug prediction
 3. **Preview Environments** - Ephemeral production-like testing
@@ -24,6 +25,7 @@ Modern testing strategies incorporating AI-powered testing, shift-left practices
 5. **Continuous Testing** - Integrated into CI/CD pipelines
 
 ### Testing Objectives
+
 - **Quality**: Ensure code meets requirements
 - **Confidence**: Safe deployment to production
 - **Documentation**: Tests as living specifications
@@ -47,23 +49,27 @@ Modern testing strategies incorporating AI-powered testing, shift-left practices
 ### Why This Distribution?
 
 **Unit tests (40-60%)**:
+
 - Fast (milliseconds)
 - Isolated (no external dependencies)
 - Easy to debug
 - Cheap to maintain
 
 **Component tests (20-30%)**:
+
 - Test modules in isolation with mocked dependencies
 - Balance of speed and integration
 - Good for complex business logic
 
 **API/Integration tests (15-25%)**:
+
 - Test service interactions
 - Database operations
 - External service integration
 - Catch integration issues
 
 **E2E tests (5-10%)**:
+
 - Critical user journeys only
 - Expensive to run and maintain
 - Catch UI and full-stack issues
@@ -75,14 +81,15 @@ Modern testing strategies incorporating AI-powered testing, shift-left practices
 **Philosophy**: Test individual functions/methods in isolation
 
 **Best practices**:
+
 ```typescript
 // AAA Pattern: Arrange, Act, Assert
-describe('OrderService', () => {
-  describe('calculateTotal', () => {
-    it('should apply 10% discount for orders over $100', () => {
+describe("OrderService", () => {
+  describe("calculateTotal", () => {
+    it("should apply 10% discount for orders over $100", () => {
       // Arrange
       const order = new Order([
-        { price: 60, quantity: 2 }  // $120 total
+        { price: 60, quantity: 2 }, // $120 total
       ]);
       const service = new OrderService();
 
@@ -90,13 +97,13 @@ describe('OrderService', () => {
       const total = service.calculateTotal(order);
 
       // Assert
-      expect(total).toBe(108);  // $120 - 10% = $108
+      expect(total).toBe(108); // $120 - 10% = $108
     });
 
-    it('should not apply discount for orders under $100', () => {
+    it("should not apply discount for orders under $100", () => {
       // Arrange
       const order = new Order([
-        { price: 40, quantity: 2 }  // $80 total
+        { price: 40, quantity: 2 }, // $80 total
       ]);
       const service = new OrderService();
 
@@ -111,11 +118,13 @@ describe('OrderService', () => {
 ```
 
 **Coverage goals**:
+
 - Critical business logic: 100%
 - Utility functions: 90%+
 - Overall: 80%+ (but quality > quantity)
 
 **What to test**:
+
 - [OK] Business logic
 - [OK] Edge cases (null, empty, boundary values)
 - [OK] Error handling
@@ -128,8 +137,9 @@ describe('OrderService', () => {
 **Philosophy**: Test component interactions with real dependencies
 
 **Example - Database integration**:
+
 ```typescript
-describe('UserRepository', () => {
+describe("UserRepository", () => {
   let db: Database;
 
   beforeAll(async () => {
@@ -141,13 +151,13 @@ describe('UserRepository', () => {
   });
 
   beforeEach(async () => {
-    await db.clear();  // Clean state for each test
+    await db.clear(); // Clean state for each test
   });
 
-  it('should save and retrieve user', async () => {
+  it("should save and retrieve user", async () => {
     // Arrange
     const repo = new UserRepository(db);
-    const user = { email: 'test@example.com', name: 'Test User' };
+    const user = { email: "test@example.com", name: "Test User" };
 
     // Act
     const savedUser = await repo.save(user);
@@ -157,27 +167,29 @@ describe('UserRepository', () => {
     expect(retrieved).toMatchObject(user);
   });
 
-  it('should throw error for duplicate email', async () => {
+  it("should throw error for duplicate email", async () => {
     // Arrange
     const repo = new UserRepository(db);
-    const user = { email: 'test@example.com', name: 'Test' };
+    const user = { email: "test@example.com", name: "Test" };
 
     // Act & Assert
     await repo.save(user);
-    await expect(repo.save(user)).rejects.toThrow('Email already exists');
+    await expect(repo.save(user)).rejects.toThrow("Email already exists");
   });
 });
 ```
 
 **Testing databases**:
+
 - Use test database (not production!)
 - Docker containers for isolation
 - Transactions with rollback for each test
 - Seed minimal required data
 
 **Testing external APIs**:
+
 ```typescript
-describe('PaymentService', () => {
+describe("PaymentService", () => {
   let mockServer: MockServer;
 
   beforeAll(async () => {
@@ -188,21 +200,21 @@ describe('PaymentService', () => {
     await mockServer.stop();
   });
 
-  it('should process payment successfully', async () => {
+  it("should process payment successfully", async () => {
     // Arrange
     mockServer.mock({
-      method: 'POST',
-      path: '/payments',
-      response: { status: 'success', transactionId: 'TX123' }
+      method: "POST",
+      path: "/payments",
+      response: { status: "success", transactionId: "TX123" },
     });
 
-    const service = new PaymentService('http://localhost:3001');
+    const service = new PaymentService("http://localhost:3001");
 
     // Act
     const result = await service.processPayment({ amount: 100 });
 
     // Assert
-    expect(result.transactionId).toBe('TX123');
+    expect(result.transactionId).toBe("TX123");
   });
 });
 ```
@@ -212,42 +224,44 @@ describe('PaymentService', () => {
 **Philosophy**: Test complete user workflows through the UI
 
 **Example - Playwright**:
-```typescript
-import { test, expect } from '@playwright/test';
 
-test.describe('Checkout flow', () => {
-  test('user can complete purchase', async ({ page }) => {
+```typescript
+import { test, expect } from "@playwright/test";
+
+test.describe("Checkout flow", () => {
+  test("user can complete purchase", async ({ page }) => {
     // Navigate to product
-    await page.goto('/products/laptop');
+    await page.goto("/products/laptop");
 
     // Add to cart
     await page.click('button:has-text("Add to Cart")');
-    await expect(page.locator('.cart-badge')).toHaveText('1');
+    await expect(page.locator(".cart-badge")).toHaveText("1");
 
     // Go to checkout
     await page.click('a:has-text("Checkout")');
 
     // Fill shipping info
-    await page.fill('input[name="address"]', '123 Main St');
-    await page.fill('input[name="city"]', 'San Francisco');
-    await page.fill('input[name="zip"]', '94102');
+    await page.fill('input[name="address"]', "123 Main St");
+    await page.fill('input[name="city"]', "San Francisco");
+    await page.fill('input[name="zip"]', "94102");
 
     // Fill payment info
-    await page.fill('input[name="cardNumber"]', '4242424242424242');
-    await page.fill('input[name="expiry"]', '12/25');
-    await page.fill('input[name="cvv"]', '123');
+    await page.fill('input[name="cardNumber"]', "4242424242424242");
+    await page.fill('input[name="expiry"]', "12/25");
+    await page.fill('input[name="cvv"]', "123");
 
     // Submit order
     await page.click('button:has-text("Place Order")');
 
     // Verify success
-    await expect(page.locator('.order-confirmation')).toBeVisible();
-    await expect(page.locator('.order-number')).toContainText('ORDER-');
+    await expect(page.locator(".order-confirmation")).toBeVisible();
+    await expect(page.locator(".order-number")).toContainText("ORDER-");
   });
 });
 ```
 
 **E2E best practices**:
+
 - Test critical paths only (login, checkout, core features)
 - Use data-test IDs instead of CSS selectors
 - Run in isolated environments (preview/staging)
@@ -257,41 +271,42 @@ test.describe('Checkout flow', () => {
 ### 4. API Testing
 
 **Example - Supertest (Node.js)**:
-```typescript
-import request from 'supertest';
-import app from '../app';
 
-describe('POST /api/users', () => {
-  it('should create user with valid data', async () => {
+```typescript
+import request from "supertest";
+import app from "../app";
+
+describe("POST /api/users", () => {
+  it("should create user with valid data", async () => {
     const response = await request(app)
-      .post('/api/users')
+      .post("/api/users")
       .send({
-        email: 'newuser@example.com',
-        name: 'New User',
-        password: 'SecurePass123!'
+        email: "newuser@example.com",
+        name: "New User",
+        password: "SecurePass123!",
       })
       .expect(201);
 
     expect(response.body).toMatchObject({
-      email: 'newuser@example.com',
-      name: 'New User'
+      email: "newuser@example.com",
+      name: "New User",
     });
-    expect(response.body).not.toHaveProperty('password');
+    expect(response.body).not.toHaveProperty("password");
   });
 
-  it('should return 400 for invalid email', async () => {
+  it("should return 400 for invalid email", async () => {
     const response = await request(app)
-      .post('/api/users')
+      .post("/api/users")
       .send({
-        email: 'invalid-email',
-        name: 'Test',
-        password: 'pass'
+        email: "invalid-email",
+        name: "Test",
+        password: "pass",
       })
       .expect(400);
 
     expect(response.body.errors).toContainEqual({
-      field: 'email',
-      message: 'Invalid email format'
+      field: "email",
+      message: "Invalid email format",
     });
   });
 });
@@ -300,30 +315,31 @@ describe('POST /api/users', () => {
 ### 5. Performance Testing
 
 **Load testing with k6**:
+
 ```javascript
-import http from 'k6/http';
-import { check, sleep } from 'k6';
+import http from "k6/http";
+import { check, sleep } from "k6";
 
 export const options = {
   stages: [
-    { duration: '2m', target: 100 },   // Ramp up to 100 users
-    { duration: '5m', target: 100 },   // Stay at 100 users
-    { duration: '2m', target: 200 },   // Ramp up to 200 users
-    { duration: '5m', target: 200 },   // Stay at 200 users
-    { duration: '2m', target: 0 },     // Ramp down
+    { duration: "2m", target: 100 }, // Ramp up to 100 users
+    { duration: "5m", target: 100 }, // Stay at 100 users
+    { duration: "2m", target: 200 }, // Ramp up to 200 users
+    { duration: "5m", target: 200 }, // Stay at 200 users
+    { duration: "2m", target: 0 }, // Ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(95)<500'],  // 95% of requests under 500ms
-    http_req_failed: ['rate<0.01'],    // Error rate under 1%
+    http_req_duration: ["p(95)<500"], // 95% of requests under 500ms
+    http_req_failed: ["rate<0.01"], // Error rate under 1%
   },
 };
 
 export default function () {
-  const response = http.get('https://api.example.com/products');
+  const response = http.get("https://api.example.com/products");
 
   check(response, {
-    'status is 200': (r) => r.status === 200,
-    'response time < 500ms': (r) => r.timings.duration < 500,
+    "status is 200": (r) => r.status === 200,
+    "response time < 500ms": (r) => r.timings.duration < 500,
   });
 
   sleep(1);
@@ -331,6 +347,7 @@ export default function () {
 ```
 
 **Performance benchmarks**:
+
 - API endpoint: p95 < 100ms, p99 < 200ms
 - Database query: p95 < 10ms
 - Page load: < 2 seconds
@@ -339,6 +356,7 @@ export default function () {
 ### 6. Security Testing
 
 **Example - OWASP ZAP integration**:
+
 ```yaml
 # .github/workflows/security.yml
 name: Security Scan
@@ -357,12 +375,13 @@ jobs:
       - name: ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.10.0
         with:
-          target: 'http://localhost:3000'
-          rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a'
+          target: "http://localhost:3000"
+          rules_file_name: ".zap/rules.tsv"
+          cmd_options: "-a"
 ```
 
 **Security test checklist**:
+
 - [ ] SQL injection prevention
 - [ ] XSS prevention
 - [ ] CSRF protection
@@ -375,15 +394,15 @@ jobs:
 ### 7. Accessibility Testing
 
 **Example - Axe core**:
+
 ```typescript
-import { test, expect } from '@playwright/test';
-import AxeBuilder from '@axe-core/playwright';
+import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
-test('homepage should be accessible', async ({ page }) => {
-  await page.goto('/');
+test("homepage should be accessible", async ({ page }) => {
+  await page.goto("/");
 
-  const accessibilityScanResults = await new AxeBuilder({ page })
-    .analyze();
+  const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
 
   expect(accessibilityScanResults.violations).toEqual([]);
 });
@@ -394,6 +413,7 @@ test('homepage should be accessible', async ({ page }) => {
 ### 1. AI Test Generation
 
 **GitHub Copilot for tests**:
+
 ```typescript
 // Developer writes function
 function validateEmail(email: string): boolean {
@@ -402,17 +422,17 @@ function validateEmail(email: string): boolean {
 }
 
 // Copilot suggests tests
-describe('validateEmail', () => {
-  it('should return true for valid email', () => {
-    expect(validateEmail('test@example.com')).toBe(true);
+describe("validateEmail", () => {
+  it("should return true for valid email", () => {
+    expect(validateEmail("test@example.com")).toBe(true);
   });
 
-  it('should return false for email without @', () => {
-    expect(validateEmail('testexample.com')).toBe(false);
+  it("should return false for email without @", () => {
+    expect(validateEmail("testexample.com")).toBe(false);
   });
 
-  it('should return false for email without domain', () => {
-    expect(validateEmail('test@')).toBe(false);
+  it("should return false for email without domain", () => {
+    expect(validateEmail("test@")).toBe(false);
   });
 });
 ```
@@ -420,6 +440,7 @@ describe('validateEmail', () => {
 ### 2. AI Bug Prediction
 
 **Example - Amazon CodeGuru**:
+
 ```yaml
 # Detects potential issues before they reach production
 - Memory leaks
@@ -432,16 +453,17 @@ describe('validateEmail', () => {
 ### 3. Visual Regression Testing
 
 **Percy.io / Chromatic**:
-```typescript
-import { test } from '@playwright/test';
-import percySnapshot from '@percy/playwright';
 
-test('product page visual regression', async ({ page }) => {
-  await page.goto('/products/laptop');
-  await percySnapshot(page, 'Product Page - Desktop');
+```typescript
+import { test } from "@playwright/test";
+import percySnapshot from "@percy/playwright";
+
+test("product page visual regression", async ({ page }) => {
+  await page.goto("/products/laptop");
+  await percySnapshot(page, "Product Page - Desktop");
 
   await page.setViewportSize({ width: 375, height: 667 });
-  await percySnapshot(page, 'Product Page - Mobile');
+  await percySnapshot(page, "Product Page - Mobile");
 });
 ```
 
@@ -450,55 +472,57 @@ test('product page visual regression', async ({ page }) => {
 ### 1. Contract Testing
 
 **Pact example**:
+
 ```typescript
 // Consumer test (Frontend)
-import { pact } from '@pact-foundation/pact';
+import { pact } from "@pact-foundation/pact";
 
-describe('User API', () => {
+describe("User API", () => {
   const provider = pact({
-    consumer: 'FrontendApp',
-    provider: 'UserAPI',
+    consumer: "FrontendApp",
+    provider: "UserAPI",
   });
 
   beforeAll(() => provider.setup());
   afterAll(() => provider.finalize());
 
-  it('should get user by ID', async () => {
+  it("should get user by ID", async () => {
     await provider.addInteraction({
-      state: 'user with ID 1 exists',
-      uponReceiving: 'a request for user 1',
+      state: "user with ID 1 exists",
+      uponReceiving: "a request for user 1",
       withRequest: {
-        method: 'GET',
-        path: '/users/1',
+        method: "GET",
+        path: "/users/1",
       },
       willRespondWith: {
         status: 200,
         body: {
           id: 1,
-          email: 'user@example.com',
+          email: "user@example.com",
         },
       },
     });
 
     const api = new UserAPI(provider.mockService.baseUrl);
     const user = await api.getUser(1);
-    expect(user.email).toBe('user@example.com');
+    expect(user.email).toBe("user@example.com");
   });
 });
 
 // Provider verification (Backend)
-const { Verifier } = require('@pact-foundation/pact');
+const { Verifier } = require("@pact-foundation/pact");
 
 new Verifier({
-  provider: 'UserAPI',
-  providerBaseUrl: 'http://localhost:3000',
-  pactUrls: ['./pacts/frontendapp-userapi.json'],
+  provider: "UserAPI",
+  providerBaseUrl: "http://localhost:3000",
+  pactUrls: ["./pacts/frontendapp-userapi.json"],
 }).verifyProvider();
 ```
 
 ### 2. Chaos Engineering
 
 **Chaos Monkey patterns**:
+
 ```typescript
 // Simulate random failures
 class ChaosMiddleware {
@@ -508,12 +532,15 @@ class ChaosMiddleware {
     if (Math.random() < this.failureRate) {
       // Random failure scenarios
       const failures = [
-        () => res.status(500).send('Internal Server Error'),
-        () => new Promise(resolve => setTimeout(resolve, 10000)), // Timeout
-        () => { throw new Error('Random crash'); },
+        () => res.status(500).send("Internal Server Error"),
+        () => new Promise((resolve) => setTimeout(resolve, 10000)), // Timeout
+        () => {
+          throw new Error("Random crash");
+        },
       ];
 
-      const randomFailure = failures[Math.floor(Math.random() * failures.length)];
+      const randomFailure =
+        failures[Math.floor(Math.random() * failures.length)];
       return randomFailure();
     }
 
@@ -522,36 +549,35 @@ class ChaosMiddleware {
 }
 
 // Use in test environment
-if (process.env.NODE_ENV === 'test-chaos') {
-  app.use(new ChaosMiddleware(0.05));  // 5% failure rate
+if (process.env.NODE_ENV === "test-chaos") {
+  app.use(new ChaosMiddleware(0.05)); // 5% failure rate
 }
 ```
 
 ### 3. Property-Based Testing
 
 **fast-check example**:
+
 ```typescript
-import fc from 'fast-check';
+import fc from "fast-check";
 
 // Instead of testing specific examples, test properties
-describe('sortArray', () => {
-  it('should return array with same length', () => {
+describe("sortArray", () => {
+  it("should return array with same length", () => {
     fc.assert(
       fc.property(fc.array(fc.integer()), (arr) => {
         const sorted = sortArray(arr);
         return sorted.length === arr.length;
-      })
+      }),
     );
   });
 
-  it('should return sorted array', () => {
+  it("should return sorted array", () => {
     fc.assert(
       fc.property(fc.array(fc.integer()), (arr) => {
         const sorted = sortArray(arr);
-        return sorted.every((val, i) =>
-          i === 0 || sorted[i - 1] <= val
-        );
-      })
+        return sorted.every((val, i) => i === 0 || sorted[i - 1] <= val);
+      }),
     );
   });
 });
@@ -565,25 +591,25 @@ describe('sortArray', () => {
 // fixtures/users.ts
 export const testUsers = {
   regularUser: {
-    email: 'user@example.com',
-    name: 'Regular User',
-    role: 'user',
+    email: "user@example.com",
+    name: "Regular User",
+    role: "user",
   },
   adminUser: {
-    email: 'admin@example.com',
-    name: 'Admin User',
-    role: 'admin',
+    email: "admin@example.com",
+    name: "Admin User",
+    role: "admin",
   },
 };
 
 // Usage
-import { testUsers } from './fixtures/users';
+import { testUsers } from "./fixtures/users";
 
-it('should allow admin to delete users', async () => {
+it("should allow admin to delete users", async () => {
   const admin = await createUser(testUsers.adminUser);
   const response = await request(app)
-    .delete('/users/123')
-    .set('Authorization', `Bearer ${admin.token}`)
+    .delete("/users/123")
+    .set("Authorization", `Bearer ${admin.token}`)
     .expect(200);
 });
 ```
@@ -592,7 +618,7 @@ it('should allow admin to delete users', async () => {
 
 ```typescript
 // factories/userFactory.ts
-import { faker } from '@faker-js/faker';
+import { faker } from "@faker-js/faker";
 
 export class UserFactory {
   static create(overrides = {}) {
@@ -600,21 +626,19 @@ export class UserFactory {
       email: faker.internet.email(),
       name: faker.person.fullName(),
       age: faker.number.int({ min: 18, max: 80 }),
-      role: 'user',
+      role: "user",
       ...overrides,
     };
   }
 
   static createMany(count: number, overrides = {}) {
-    return Array.from({ length: count }, () =>
-      this.create(overrides)
-    );
+    return Array.from({ length: count }, () => this.create(overrides));
   }
 }
 
 // Usage
-const users = UserFactory.createMany(10, { role: 'admin' });
-const specificUser = UserFactory.create({ email: 'specific@example.com' });
+const users = UserFactory.createMany(10, { role: "admin" });
+const specificUser = UserFactory.create({ email: "specific@example.com" });
 ```
 
 ### 3. Database Seeding
@@ -622,13 +646,13 @@ const specificUser = UserFactory.create({ email: 'specific@example.com' });
 ```typescript
 // seeds/testSeed.ts
 export async function seedTestDatabase(db: Database) {
-  await db.clear();  // Clean slate
+  await db.clear(); // Clean slate
 
   // Create users
   const users = await db.users.insertMany([
-    { email: 'user1@example.com', role: 'user' },
-    { email: 'user2@example.com', role: 'user' },
-    { email: 'admin@example.com', role: 'admin' },
+    { email: "user1@example.com", role: "user" },
+    { email: "user2@example.com", role: "user" },
+    { email: "admin@example.com", role: "admin" },
   ]);
 
   // Create related data
@@ -662,8 +686,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -719,17 +743,20 @@ jobs:
 ### Key Metrics to Track
 
 **Coverage metrics**:
+
 - Line coverage: % of lines executed
 - Branch coverage: % of code branches executed
 - Function coverage: % of functions called
 
 **Quality metrics**:
+
 - Defect detection rate
 - Test execution time
 - Flaky test percentage
 - Mean time to detect bugs
 
 **Process metrics**:
+
 - Test automation rate
 - Time to write tests vs code
 - Test maintenance cost
